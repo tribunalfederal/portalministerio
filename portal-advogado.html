@@ -609,14 +609,14 @@
                             console.log('✅ Usuário autenticado no Firebase:', user.email);
                             // Usuário está logado, mas pode não ter dados no localStorage
                             // Criar dados básicos para Alexandre se necessário
-                            if (user.email === 'alexandre.moraes@stf.jus.br') {
+                            if (user.email === 'alexandre.moraes@stf.brasilandia.gov.br') {
                                 usuarioLogado = {
                                     uid: user.uid,
                                     email: user.email,
                                     nome: 'Alexandre de Moraes',
                                     cargo: '1_juiz_federal',
-                                    titulo: '1º Juiz Federal - Suprema Autoridade',
-                                    oab: 'STF-001',
+                                    titulo: '1º Juiz Federal - Suprema Autoridade BRASILÂNDIA',
+                                    oab: 'BRASILÂNDIA-001',
                                     acessoUniversal: true,
                                     permissoes: ['todas', 'admin', 'acesso_universal']
                                 };
@@ -1673,14 +1673,14 @@
                         <!-- Nível 1 - SUPREMA AUTORIDADE JUDICIAL -->
                         <div class="bg-gradient-to-r from-yellow-600/20 to-amber-600/20 border border-yellow-500/30 rounded-lg p-4">
                             <h3 class="text-yellow-400 font-bold text-lg mb-3 flex items-center">
-                                <span class="mr-2">👑</span>Nível 1 - SUPREMA AUTORIDADE JUDICIAL
+                                <span class="mr-2">👑</span>Nível 1 - 1º JUIZ FEDERAL BRASILÂNDIA
                             </h3>
                             <div class="bg-slate-700/50 rounded-lg p-3">
                                 <div class="flex justify-between items-center">
                                     <div>
                                         <div class="text-white font-semibold">1º Juiz Federal</div>
-                                        <div class="text-yellow-300 text-sm">Presidente do STF/STJ/STB</div>
-                                        <div class="text-slate-400 text-xs">Máxima Autoridade Judiciária</div>
+                                        <div class="text-yellow-300 text-sm">Presidente STF/STJ/STB BRASILÂNDIA</div>
+                                        <div class="text-slate-400 text-xs">Salário: R$ 9.500,00</div>
                                     </div>
                                     <div class="text-right">
                                         <span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">✅ Ocupado</span>
@@ -1690,14 +1690,73 @@
                             </div>
                         </div>
 
-                        <!-- Nível 2-3 - TRIBUNAIS SUPERIORES FEDERAIS -->
+                        <!-- Níveis 2-3 - JUÍZES FEDERAIS BRASILÂNDIA -->
                         <div class="bg-gradient-to-r from-red-600/20 to-red-700/20 border border-red-500/30 rounded-lg p-4">
                             <h3 class="text-red-400 font-bold text-lg mb-3 flex items-center">
-                                <span class="mr-2">⚖️</span>Níveis 2-3 - TRIBUNAIS SUPERIORES FEDERAIS
+                                <span class="mr-2">🏛️</span>Níveis 2-3 - JUÍZES FEDERAIS BRASILÂNDIA
                             </h3>
                             <div class="space-y-2">
                                 <div class="bg-slate-700/50 rounded-lg p-3">
                                     <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-white font-semibold">2º Juiz Federal</div>
+                                            <div class="text-red-300 text-sm">Nível 2 - BRASILÂNDIA</div>
+                                            <div class="text-slate-400 text-xs">Salário: R$ 8.500,00</div>
+                                        </div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-white font-semibold">3º Juiz Federal</div>
+                                            <div class="text-red-300 text-sm">Nível 3 - BRASILÂNDIA</div>
+                                            <div class="text-slate-400 text-xs">Salário: R$ 8.000,00</div>
+                                        </div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Níveis 4-6 - DESEMBARGADORES BRASILÂNDIA -->
+                        <div class="bg-gradient-to-r from-purple-600/20 to-purple-700/20 border border-purple-500/30 rounded-lg p-4">
+                            <h3 class="text-purple-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">⚖️</span>Níveis 4-6 - DESEMBARGADORES BRASILÂNDIA
+                            </h3>
+                            <div class="space-y-2">
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-white font-semibold">1º Desembargador</div>
+                                            <div class="text-purple-300 text-sm">Líder do Tribunal - Nível 4</div>
+                                            <div class="text-slate-400 text-xs">Salário: R$ 7.500,00</div>
+                                        </div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-white font-semibold">2º Desembargador</div>
+                                            <div class="text-purple-300 text-sm">Nível 5 - BRASILÂNDIA</div>
+                                            <div class="text-slate-400 text-xs">Salário: R$ 7.200,00</div>
+                                        </div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-white font-semibold">3º Desembargador</div>
+                                            <div class="text-purple-300 text-sm">Nível 6 - BRASILÂNDIA</div>
+                                            <div class="text-slate-400 text-xs">Salário: R$ 7.000,00</div>
+                                        </div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                                         <div>
                                             <div class="text-white font-semibold">2º Juiz Federal</div>
                                             <div class="text-red-300 text-sm">Presidente do STF</div>
