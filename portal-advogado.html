@@ -269,6 +269,33 @@
                         <p class="text-blue-200 text-sm">Resposta do réu à ação</p>
                     </div>
 
+                    <!-- Calculadora de Honorários -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="abrirCalculadoraHonorarios()">
+                        <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-calculator text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Calculadora de Honorários</h3>
+                        <p class="text-blue-200 text-sm">Calcular valores de honorários</p>
+                    </div>
+
+                    <!-- Banco de Jurisprudência -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="abrirJurisprudencia()">
+                        <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-book text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Jurisprudência</h3>
+                        <p class="text-blue-200 text-sm">Pesquisa de jurisprudências</p>
+                    </div>
+
+                    <!-- Modelos de Contratos -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="abrirContratos()">
+                        <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-handshake text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Contratos</h3>
+                        <p class="text-blue-200 text-sm">Modelos de contratos</p>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -406,7 +433,441 @@
 
         // Gerar documento específico
         function gerarDocumento(tipo) {
-            alert(`🚧 Gerando ${tipo}... (Em desenvolvimento)\n\nEste será o sistema de geração de documentos específicos para advogados.`);
+            const tiposDocumentos = {
+                'peticao': 'Petição Inicial',
+                'recurso': 'Recurso',
+                'contestacao': 'Contestação',
+                'requerimento': 'Requerimento',
+                'procuracao': 'Procuração',
+                'contrato-honorarios': 'Contrato de Honorários'
+            };
+
+            const nomeDoc = tiposDocumentos[tipo] || tipo;
+            
+            // Abrir modal de geração de documento em tempo real
+            mostrarModalGerarDocumento(tipo, nomeDoc);
+        }
+
+        // Modal para gerar documentos em tempo real
+        function mostrarModalGerarDocumento(tipo, nomeDoc) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center overflow-y-auto p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-gradient-to-br from-gray-800/90 to-gray-700/90 rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto border-2 border-blue-500/50">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <i class="fas fa-file-alt mr-3 text-blue-400"></i>
+                            Gerar ${nomeDoc}
+                        </h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white text-2xl">×</button>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Formulário -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-white font-medium mb-2">Cliente/Requerente</label>
+                                <input type="text" id="doc-cliente" class="w-full p-3 rounded-lg bg-gray-900 border border-blue-500/50 text-white" placeholder="Nome completo do cliente">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-white font-medium mb-2">CPF/CNPJ</label>
+                                <input type="text" id="doc-cpf" class="w-full p-3 rounded-lg bg-gray-900 border border-blue-500/50 text-white" placeholder="000.000.000-00">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-white font-medium mb-2">Assunto/Objeto</label>
+                                <input type="text" id="doc-assunto" class="w-full p-3 rounded-lg bg-gray-900 border border-blue-500/50 text-white" placeholder="Assunto do documento">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-white font-medium mb-2">Conteúdo/Pedidos</label>
+                                <textarea id="doc-conteudo" rows="6" class="w-full p-3 rounded-lg bg-gray-900 border border-blue-500/50 text-white resize-none" placeholder="Descreva o conteúdo ou pedidos..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Preview -->
+                        <div class="bg-white rounded-lg p-6 min-h-[500px]">
+                            <div id="doc-preview" class="text-black">
+                                <div class="text-center mb-6">
+                                    <h3 class="font-bold text-lg">${nomeDoc.toUpperCase()}</h3>
+                                </div>
+                                <p class="mb-4">
+                                    <strong>Excelentíssimo(a) Senhor(a) Doutor(a) Juiz(a) de Direito,</strong>
+                                </p>
+                                <div id="preview-conteudo">
+                                    <p class="mb-4">
+                                        <span id="preview-cliente">CLIENTE</span>, brasileiro(a), portador(a) do CPF nº <span id="preview-cpf">000.000.000-00</span>, 
+                                        por intermédio de seu advogado que esta subscreve, vem respeitosamente à presença de Vossa Excelência para...
+                                    </p>
+                                    <p class="mb-4 font-bold">DO OBJETO:</p>
+                                    <p class="mb-4" id="preview-assunto">Assunto do documento...</p>
+                                    <p class="mb-4 font-bold">DOS PEDIDOS:</p>
+                                    <p class="mb-4" id="preview-pedidos">Conteúdo será exibido aqui...</p>
+                                </div>
+                                <p class="mt-8 text-right">
+                                    ___________________________<br>
+                                    <strong>${usuarioLogado?.nome || 'Advogado'}</strong><br>
+                                    OAB: ${usuarioLogado?.oab || 'N/A'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 mt-6">
+                        <button onclick="atualizarPreviewDocumento()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg transition-all">
+                            <i class="fas fa-sync mr-2"></i>Atualizar Preview
+                        </button>
+                        <button onclick="salvarDocumentoFirebase('${tipo}')" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-lg transition-all">
+                            <i class="fas fa-save mr-2"></i>Salvar no Firebase
+                        </button>
+                        <button onclick="imprimirDocumento()" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-lg transition-all">
+                            <i class="fas fa-print mr-2"></i>Imprimir
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Event listeners para atualização em tempo real
+            ['doc-cliente', 'doc-cpf', 'doc-assunto', 'doc-conteudo'].forEach(id => {
+                const elemento = document.getElementById(id);
+                if (elemento) {
+                    elemento.addEventListener('input', atualizarPreviewDocumento);
+                }
+            });
+        }
+
+        // Atualizar preview em tempo real
+        function atualizarPreviewDocumento() {
+            const cliente = document.getElementById('doc-cliente')?.value || 'CLIENTE';
+            const cpf = document.getElementById('doc-cpf')?.value || '000.000.000-00';
+            const assunto = document.getElementById('doc-assunto')?.value || 'Assunto do documento...';
+            const conteudo = document.getElementById('doc-conteudo')?.value || 'Conteúdo será exibido aqui...';
+            
+            const previewCliente = document.getElementById('preview-cliente');
+            const previewCpf = document.getElementById('preview-cpf');
+            const previewAssunto = document.getElementById('preview-assunto');
+            const previewPedidos = document.getElementById('preview-pedidos');
+            
+            if (previewCliente) previewCliente.textContent = cliente.toUpperCase();
+            if (previewCpf) previewCpf.textContent = cpf;
+            if (previewAssunto) previewAssunto.textContent = assunto;
+            if (previewPedidos) previewPedidos.textContent = conteudo;
+        }
+
+        // Salvar documento no Firebase em tempo real
+        async function salvarDocumentoFirebase(tipo) {
+            try {
+                if (!window.firebaseDB || !window.firebaseModules || !usuarioLogado) {
+                    throw new Error('Firebase não inicializado ou usuário não logado');
+                }
+
+                const documento = {
+                    tipo: tipo,
+                    cliente: document.getElementById('doc-cliente')?.value || '',
+                    cpf: document.getElementById('doc-cpf')?.value || '',
+                    assunto: document.getElementById('doc-assunto')?.value || '',
+                    conteudo: document.getElementById('doc-conteudo')?.value || '',
+                    advogado: usuarioLogado.nome,
+                    oab: usuarioLogado.oab,
+                    dataGeracao: new Date().toISOString(),
+                    status: 'rascunho'
+                };
+
+                // Salvar na coleção 'documentos'
+                const docRef = await window.firebaseModules.addDoc(
+                    window.firebaseModules.collection(window.firebaseDB, 'documentos'),
+                    documento
+                );
+
+                alert(`✅ Documento ${tipo} salvo no Firebase!\nID: ${docRef.id}`);
+                
+                console.log('📄 Documento salvo:', documento);
+                
+            } catch (error) {
+                console.error('❌ Erro ao salvar documento:', error);
+                alert('❌ Erro ao salvar documento. Tente novamente.');
+            }
+        }
+
+        // Imprimir documento
+        function imprimirDocumento() {
+            const conteudo = document.getElementById('doc-preview')?.innerHTML;
+            if (!conteudo) {
+                alert('❌ Erro ao obter conteúdo do documento');
+                return;
+            }
+
+            const janela = window.open('', '_blank');
+            janela.document.write(`
+                <html>
+                <head>
+                    <title>Documento - ${usuarioLogado?.nome || 'Advogado'}</title>
+                    <style>
+                        body { font-family: 'Times New Roman', serif; margin: 2cm; line-height: 1.6; }
+                        h3 { text-align: center; margin-bottom: 2rem; }
+                        p { margin-bottom: 1rem; text-align: justify; }
+                        .assinatura { text-align: right; margin-top: 3rem; }
+                    </style>
+                </head>
+                <body>${conteudo}</body>
+                </html>
+            `);
+            janela.document.close();
+            janela.print();
+        }
+
+        // ===== FERRAMENTAS ESPECÍFICAS PARA ADVOGADOS =====
+
+        // Calculadora de Honorários
+        function abrirCalculadoraHonorarios() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center overflow-y-auto p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-gradient-to-br from-gray-800/90 to-gray-700/90 rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-green-500/50">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <i class="fas fa-calculator mr-3 text-green-400"></i>
+                            Calculadora de Honorários
+                        </h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white text-2xl">×</button>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-white font-medium mb-2">Tipo de Processo</label>
+                                <select id="calc-tipo-processo" class="w-full p-3 rounded-lg bg-gray-900 border border-green-500/50 text-white" onchange="calcularHonorarios()">
+                                    <option value="civel">Cível</option>
+                                    <option value="criminal">Criminal</option>
+                                    <option value="trabalhista">Trabalhista</option>
+                                    <option value="administrativo">Administrativo</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-white font-medium mb-2">Valor da Causa (R$)</label>
+                                <input type="number" id="calc-valor-causa" class="w-full p-3 rounded-lg bg-gray-900 border border-green-500/50 text-white" placeholder="0.00" oninput="calcularHonorarios()">
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-white font-medium mb-2">Percentual (%)</label>
+                                <input type="number" id="calc-percentual" class="w-full p-3 rounded-lg bg-gray-900 border border-green-500/50 text-white" value="20" min="10" max="50" oninput="calcularHonorarios()">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-white font-medium mb-2">Valor Mínimo (R$)</label>
+                                <input type="number" id="calc-valor-minimo" class="w-full p-3 rounded-lg bg-gray-900 border border-green-500/50 text-white" value="1000" oninput="calcularHonorarios()">
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-500/20 rounded-lg p-6 border border-green-500/50">
+                            <h3 class="text-white font-bold text-xl mb-4">Resultado do Cálculo</h3>
+                            <div class="space-y-2">
+                                <p class="text-green-200">Honorários Calculados: <span class="text-white font-bold" id="resultado-honorarios">R$ 0,00</span></p>
+                                <p class="text-green-200">Valor da Causa: <span class="text-white font-bold" id="resultado-causa">R$ 0,00</span></p>
+                                <p class="text-green-200">Percentual Aplicado: <span class="text-white font-bold" id="resultado-percentual">0%</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <button onclick="salvarCalculoHonorarios()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-lg transition-all">
+                                <i class="fas fa-save mr-2"></i>Salvar Cálculo
+                            </button>
+                            <button onclick="gerarContratoHonorarios()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg transition-all">
+                                <i class="fas fa-file-contract mr-2"></i>Gerar Contrato
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            calcularHonorarios(); // Calcular inicial
+        }
+
+        function calcularHonorarios() {
+            const valorCausa = parseFloat(document.getElementById('calc-valor-causa')?.value || 0);
+            const percentual = parseFloat(document.getElementById('calc-percentual')?.value || 20);
+            const valorMinimo = parseFloat(document.getElementById('calc-valor-minimo')?.value || 1000);
+            
+            const honorariosCalculados = Math.max((valorCausa * percentual / 100), valorMinimo);
+            
+            document.getElementById('resultado-honorarios').textContent = `R$ ${honorariosCalculados.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('resultado-causa').textContent = `R$ ${valorCausa.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('resultado-percentual').textContent = `${percentual}%`;
+        }
+
+        async function salvarCalculoHonorarios() {
+            try {
+                const calculo = {
+                    tipoProcesso: document.getElementById('calc-tipo-processo')?.value,
+                    valorCausa: parseFloat(document.getElementById('calc-valor-causa')?.value || 0),
+                    percentual: parseFloat(document.getElementById('calc-percentual')?.value || 20),
+                    valorMinimo: parseFloat(document.getElementById('calc-valor-minimo')?.value || 1000),
+                    honorariosCalculados: parseFloat(document.getElementById('resultado-honorarios')?.textContent.replace(/[^\d.,]/g, '').replace(',', '.')),
+                    advogado: usuarioLogado?.nome,
+                    oab: usuarioLogado?.oab,
+                    dataCalculo: new Date().toISOString()
+                };
+
+                if (window.firebaseDB && window.firebaseModules) {
+                    await window.firebaseModules.addDoc(
+                        window.firebaseModules.collection(window.firebaseDB, 'calculos-honorarios'),
+                        calculo
+                    );
+                    alert('✅ Cálculo de honorários salvo no Firebase!');
+                } else {
+                    alert('⚠️ Firebase não disponível, mas cálculo realizado!');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao salvar cálculo:', error);
+                alert('❌ Erro ao salvar. Cálculo realizado com sucesso!');
+            }
+        }
+
+        // Banco de Jurisprudência
+        function abrirJurisprudencia() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center overflow-y-auto p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-gradient-to-br from-gray-800/90 to-gray-700/90 rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto border-2 border-purple-500/50">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <i class="fas fa-book mr-3 text-purple-400"></i>
+                            Banco de Jurisprudência
+                        </h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white text-2xl">×</button>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex gap-4 mb-4">
+                            <input type="text" id="busca-jurisprudencia" class="flex-1 p-3 rounded-lg bg-gray-900 border border-purple-500/50 text-white" placeholder="Buscar jurisprudência...">
+                            <button onclick="buscarJurisprudencia()" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-lg transition-all">
+                                <i class="fas fa-search mr-2"></i>Buscar
+                            </button>
+                        </div>
+                        
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="filtrarPorTribunal('STF')" class="bg-red-600/50 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-all">STF</button>
+                            <button onclick="filtrarPorTribunal('STJ')" class="bg-blue-600/50 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-all">STJ</button>
+                            <button onclick="filtrarPorTribunal('TST')" class="bg-green-600/50 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-all">TST</button>
+                            <button onclick="filtrarPorTribunal('TRF')" class="bg-yellow-600/50 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm transition-all">TRF</button>
+                        </div>
+                    </div>
+                    
+                    <div id="resultados-jurisprudencia" class="space-y-4 max-h-96 overflow-y-auto">
+                        <div class="bg-purple-500/20 rounded-lg p-4 border border-purple-500/30">
+                            <h4 class="text-purple-300 font-bold mb-2">STF - RE 123456/SP</h4>
+                            <p class="text-white text-sm mb-2">Responsabilidade civil. Dano moral. Quantum indenizatório.</p>
+                            <p class="text-gray-300 text-xs mb-3">Relator: Min. Alexandre de Moraes - Data: 15/12/2024</p>
+                            <p class="text-gray-200 text-sm">O quantum indenizatório deve ser fixado levando-se em conta a gravidade da ofensa, a situação econômica das partes e o caráter pedagógico da sanção...</p>
+                        </div>
+                        
+                        <div class="bg-blue-500/20 rounded-lg p-4 border border-blue-500/30">
+                            <h4 class="text-blue-300 font-bold mb-2">STJ - REsp 987654/RJ</h4>
+                            <p class="text-white text-sm mb-2">Direito processual civil. Honorários advocatícios.</p>
+                            <p class="text-gray-300 text-xs mb-3">Relator: Min. Nancy Andrighi - Data: 10/12/2024</p>
+                            <p class="text-gray-200 text-sm">Os honorários advocatícios devem ser fixados entre 10% e 20% sobre o valor da condenação, observando-se o grau de zelo profissional...</p>
+                        </div>
+                        
+                        <div class="text-center py-8">
+                            <p class="text-gray-400">Use a busca para encontrar jurisprudências específicas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 mt-6">
+                        <button onclick="salvarJurisprudencia()" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-lg transition-all">
+                            <i class="fas fa-star mr-2"></i>Favoritar
+                        </button>
+                        <button onclick="exportarJurisprudencia()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-lg transition-all">
+                            <i class="fas fa-download mr-2"></i>Exportar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function buscarJurisprudencia() {
+            const termo = document.getElementById('busca-jurisprudencia')?.value;
+            if (termo) {
+                alert(`🔍 Buscando jurisprudências sobre: "${termo}"\n\n(Em desenvolvimento - integração com APIs dos tribunais)`);
+            }
+        }
+
+        // Modelos de Contratos
+        function abrirContratos() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center overflow-y-auto p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-gradient-to-br from-gray-800/90 to-gray-700/90 rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto border-2 border-orange-500/50">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <i class="fas fa-handshake mr-3 text-orange-400"></i>
+                            Modelos de Contratos
+                        </h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-white text-2xl">×</button>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-orange-500/20 rounded-lg p-4 border border-orange-500/30 cursor-pointer hover:bg-orange-500/30 transition-all" onclick="gerarContrato('honorarios')">
+                            <h4 class="text-orange-300 font-bold mb-2">📋 Contrato de Honorários</h4>
+                            <p class="text-white text-sm">Acordo de prestação de serviços advocatícios</p>
+                        </div>
+                        
+                        <div class="bg-blue-500/20 rounded-lg p-4 border border-blue-500/30 cursor-pointer hover:bg-blue-500/30 transition-all" onclick="gerarContrato('compra-venda')">
+                            <h4 class="text-blue-300 font-bold mb-2">🏠 Compra e Venda</h4>
+                            <p class="text-white text-sm">Contrato de compra e venda de imóvel</p>
+                        </div>
+                        
+                        <div class="bg-green-500/20 rounded-lg p-4 border border-green-500/30 cursor-pointer hover:bg-green-500/30 transition-all" onclick="gerarContrato('locacao')">
+                            <h4 class="text-green-300 font-bold mb-2">🏢 Locação</h4>
+                            <p class="text-white text-sm">Contrato de locação de imóvel</p>
+                        </div>
+                        
+                        <div class="bg-purple-500/20 rounded-lg p-4 border border-purple-500/30 cursor-pointer hover:bg-purple-500/30 transition-all" onclick="gerarContrato('prestacao-servicos')">
+                            <h4 class="text-purple-300 font-bold mb-2">🔧 Prestação de Serviços</h4>
+                            <p class="text-white text-sm">Acordo para prestação de serviços</p>
+                        </div>
+                        
+                        <div class="bg-pink-500/20 rounded-lg p-4 border border-pink-500/30 cursor-pointer hover:bg-pink-500/30 transition-all" onclick="gerarContrato('sociedade')">
+                            <h4 class="text-pink-300 font-bold mb-2">🤝 Contrato Social</h4>
+                            <p class="text-white text-sm">Constituição de sociedade empresária</p>
+                        </div>
+                        
+                        <div class="bg-yellow-500/20 rounded-lg p-4 border border-yellow-500/30 cursor-pointer hover:bg-yellow-500/30 transition-all" onclick="gerarContrato('consultoria')">
+                            <h4 class="text-yellow-300 font-bold mb-2">💼 Consultoria</h4>
+                            <p class="text-white text-sm">Serviços de consultoria jurídica</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-orange-500/10 rounded-lg p-4 border border-orange-500/30">
+                        <h3 class="text-white font-bold mb-3">ℹ️ Como usar</h3>
+                        <ul class="text-orange-200 text-sm space-y-1">
+                            <li>• Clique no modelo desejado para gerar o contrato</li>
+                            <li>• Preencha os dados solicitados</li>
+                            <li>• O contrato será gerado automaticamente</li>
+                            <li>• Você pode salvar no Firebase e imprimir</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function gerarContrato(tipo) {
+            alert(`📄 Gerando contrato de ${tipo}...\n\n(Em desenvolvimento - gerador automático de contratos)`);
         }
 
         // Função para voltar ao portal principal
