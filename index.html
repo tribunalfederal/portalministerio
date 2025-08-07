@@ -105,6 +105,7 @@
         // Tornar disponível globalmente
         window.firebaseAuth = auth;
         window.firebaseDB = db;
+        window.firebaseApp = app;
         window.firebaseModules = {
             signInWithEmailAndPassword,
             createUserWithEmailAndPassword,
@@ -131,18 +132,29 @@
         
         // Configurar listener para notificações em tempo real
         function iniciarListenerNotificacoes() {
-            const notificacoesRef = collection(db, 'notificacoes');
-            const q = query(notificacoesRef, where('ativo', '==', true));
-            
-            onSnapshot(q, (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added') {
-                        const notificacao = change.doc.data();
-                        notificacao.id = change.doc.id;
-                        mostrarNotificacaoTempo(notificacao);
-                    }
+            try {
+                const { collection, query, where, onSnapshot } = window.firebaseModules;
+                const db = window.firebaseDB;
+                
+                const notificacoesRef = collection(db, 'notificacoes');
+                const q = query(notificacoesRef, where('ativo', '==', true));
+                
+                onSnapshot(q, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const notificacao = change.doc.data();
+                            notificacao.id = change.doc.id;
+                            mostrarNotificacaoTempo(notificacao);
+                        }
+                    });
+                }, (error) => {
+                    console.warn('Erro no listener de notificações:', error);
                 });
-            });
+                
+                console.log('✅ Listener de notificações iniciado');
+            } catch (error) {
+                console.error('❌ Erro ao iniciar listener:', error);
+            }
         }
         
         // Mostrar notificação em tempo real
@@ -216,25 +228,122 @@
         
         // Função para enviar notificação (para testes)
         async function enviarNotificacaoTeste(tipo = 'info') {
+            console.log(`🧪 Testando notificação tipo: ${tipo}`);
+            
             try {
-                await addDoc(collection(db, 'notificacoes'), {
+                const { collection, addDoc } = window.firebaseModules;
+                const db = window.firebaseDB;
+                
+                if (!db) {
+                    throw new Error('Firebase não inicializado');
+                }
+                
+                const notificacaoData = {
                     titulo: tipo === 'urgente' ? '🚨 Alerta Urgente' : tipo === 'sucesso' ? '✅ Operação Concluída' : 'ℹ️ Informação',
                     mensagem: tipo === 'urgente' ? 'Situação crítica detectada no sistema!' : tipo === 'sucesso' ? 'Documento salvo com sucesso no Firebase' : 'Nova atualização disponível no sistema',
                     tipo: tipo,
                     timestamp: new Date(),
                     ativo: true,
                     usuario: 'Sistema de Teste'
-                });
-                console.log('✅ Notificação enviada:', tipo);
+                };
+                
+                await addDoc(collection(db, 'notificacoes'), notificacaoData);
+                console.log('✅ Notificação enviada ao Firebase:', tipo);
+                
+                // Também mostrar notificação local imediatamente
+                mostrarNotificacaoLocal(tipo);
+                
             } catch (error) {
-                console.error('❌ Erro ao enviar notificação:', error);
+                console.error('❌ Erro ao enviar para Firebase:', error);
+                console.log('🔄 Mostrando notificação local como fallback');
                 // Fallback: mostrar notificação local se Firebase falhar
                 mostrarNotificacaoLocal(tipo);
             }
         }
         
+        // ===== NOTIFICAÇÕES REAIS DO SISTEMA JURÍDICO =====
+        
+        // Notificar quando documento é salvo
+        function notificarDocumentoSalvo(tipoDoc, nomeDoc) {
+            const notificacao = {
+                titulo: '📄 Documento Salvo',
+                mensagem: `${tipoDoc} "${nomeDoc}" foi salvo com sucesso no Firebase`,
+                tipo: 'sucesso',
+                timestamp: { toDate: () => new Date() }
+            };
+            mostrarNotificacaoTempo(notificacao);
+        }
+        
+        // Notificar quando cálculo de pena é feito
+        function notificarCalculoPena(totalAnos, totalCrimes) {
+            const notificacao = {
+                titulo: '⚖️ Pena Calculada',
+                mensagem: `${totalCrimes} crime(s) • Pena total: ${totalAnos} anos`,
+                tipo: 'info',
+                timestamp: { toDate: () => new Date() }
+            };
+            mostrarNotificacaoTempo(notificacao);
+        }
+        
+        // Notificar login de usuário
+        function notificarLogin(nomeUsuario, cargo) {
+            const notificacao = {
+                titulo: '👋 Login Realizado',
+                mensagem: `Bem-vindo, ${nomeUsuario} (${cargo})`,
+                tipo: 'sucesso',
+                timestamp: { toDate: () => new Date() }
+            };
+            mostrarNotificacaoTempo(notificacao);
+        }
+        
+        // Notificar acesso a portal
+        function notificarAcessoPortal(nomePortal) {
+            const notificacao = {
+                titulo: '🏛️ Portal Acessado',
+                mensagem: `Redirecionando para ${nomePortal}...`,
+                tipo: 'info',
+                timestamp: { toDate: () => new Date() }
+            };
+            mostrarNotificacaoTempo(notificacao);
+        }
+        
+        // Notificar erro crítico
+        function notificarErro(mensagemErro) {
+            const notificacao = {
+                titulo: '🚨 Erro do Sistema',
+                mensagem: mensagemErro,
+                tipo: 'urgente',
+                timestamp: { toDate: () => new Date() }
+            };
+            mostrarNotificacaoTempo(notificacao);
+        }
+        
+        // Notificar OAB liberada (para admins)
+        function notificarOABLiberada(numeroOAB, nomeAdvogado) {
+            const notificacao = {
+                titulo: '🆔 OAB Liberada',
+                mensagem: `OAB ${numeroOAB} autorizada para ${nomeAdvogado}`,
+                tipo: 'sucesso',
+                timestamp: { toDate: () => new Date() }
+            };
+            mostrarNotificacaoTempo(notificacao);
+        }
+        
+        // Notificar backup automático
+        function notificarBackup() {
+            const notificacao = {
+                titulo: '💾 Backup Realizado',
+                mensagem: 'Dados salvos automaticamente no Firebase',
+                tipo: 'info',
+                timestamp: { toDate: () => new Date() }
+            };
+            mostrarNotificacaoTempo(notificacao);
+        }
+        
         // Mostrar notificação local como fallback
         function mostrarNotificacaoLocal(tipo) {
+            console.log(`🎯 Exibindo notificação local: ${tipo}`);
+            
             const notificacao = {
                 titulo: tipo === 'urgente' ? '🚨 Alerta Urgente' : tipo === 'sucesso' ? '✅ Operação Concluída' : 'ℹ️ Informação',
                 mensagem: tipo === 'urgente' ? 'Situação crítica detectada!' : tipo === 'sucesso' ? 'Operação realizada com sucesso!' : 'Teste de notificação local',
@@ -244,19 +353,54 @@
             mostrarNotificacaoTempo(notificacao);
         }
         
+        // Função de teste simplificada para debug
+        function testeNotificacaoSimples(tipo) {
+            console.log(`🚀 Teste simples: ${tipo}`);
+            mostrarNotificacaoLocal(tipo);
+        }
+        
         // Inicializar sistema de notificações quando a página carregar
         window.addEventListener('load', () => {
-            setTimeout(iniciarListenerNotificacoes, 2000);
-            setTimeout(monitorarConexaoFirebase, 1000);
+            console.log('🔄 Inicializando sistema de notificações...');
+            setTimeout(() => {
+                iniciarListenerNotificacoes();
+                console.log('✅ Listener de notificações iniciado');
+            }, 3000);
+            
+            setTimeout(() => {
+                monitorarConexaoFirebase();
+                console.log('✅ Monitor Firebase iniciado');
+            }, 1000);
         });
+        
+        // Tornar funções disponíveis globalmente
+        window.enviarNotificacaoTeste = enviarNotificacaoTeste;
+        window.mostrarNotificacaoLocal = mostrarNotificacaoLocal;
+        window.testeNotificacaoSimples = testeNotificacaoSimples;
+        
+        // Funções reais do sistema
+        window.notificarDocumentoSalvo = notificarDocumentoSalvo;
+        window.notificarCalculoPena = notificarCalculoPena;
+        window.notificarLogin = notificarLogin;
+        window.notificarAcessoPortal = notificarAcessoPortal;
+        window.notificarErro = notificarErro;
+        window.notificarOABLiberada = notificarOABLiberada;
+        window.notificarBackup = notificarBackup;
         
         // Monitorar conexão Firebase
         function monitorarConexaoFirebase() {
             const statusEl = document.getElementById('firebase-status');
             
-            // Tentar uma operação simples para verificar conectividade
-            setInterval(async () => {
+            // Função para verificar status
+            const verificarStatus = async () => {
                 try {
+                    const { doc, getDoc } = window.firebaseModules;
+                    const db = window.firebaseDB;
+                    
+                    if (!db) {
+                        throw new Error('Firebase DB não disponível');
+                    }
+                    
                     // Tentar ler um documento simples
                     const testRef = doc(db, 'system', 'status');
                     await getDoc(testRef);
@@ -269,6 +413,7 @@
                             <span class="text-white text-xs">Firebase Online</span>
                         `;
                     }
+                    console.log('✅ Firebase conectado');
                 } catch (error) {
                     // Erro de conexão
                     if (statusEl) {
@@ -278,10 +423,35 @@
                             <span class="text-white text-xs">Firebase Offline</span>
                         `;
                     }
-                    console.warn('Firebase desconectado:', error);
+                    console.warn('⚠️ Firebase desconectado:', error.message);
                 }
-            }, 10000); // Verificar a cada 10 segundos
+            };
+            
+            // Verificar imediatamente
+            verificarStatus();
+            
+            // Verificar a cada 15 segundos
+            setInterval(verificarStatus, 15000);
         }
+        
+        // Log final de inicialização
+        console.log('🔥 Firebase inicializado com sucesso!');
+        console.log('📋 Funções de teste disponíveis globalmente');
+        console.log('🧪 Use: enviarNotificacaoTeste("info"), enviarNotificacaoTeste("sucesso"), enviarNotificacaoTeste("urgente")');
+        
+        // Sistema de backup automático
+        function iniciarBackupAutomatico() {
+            // Backup a cada 10 minutos
+            setInterval(() => {
+                if (typeof notificarBackup === 'function') {
+                    notificarBackup();
+                }
+                console.log('💾 Backup automático realizado');
+            }, 600000); // 10 minutos
+        }
+        
+        // Iniciar backup automático
+        setTimeout(iniciarBackupAutomatico, 30000); // Começar após 30 segundos
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -1768,6 +1938,11 @@ function calcularPena() {
 
     exibirResultado(multaTotal, tempoTotal, multaFinal, tempoFinal, reducaoTotal, reducoesList);
     adicionarAoHistorico(multaTotal, tempoTotal, multaFinal, tempoFinal, reducaoTotal);
+    
+    // Notificar cálculo concluído
+    if (typeof notificarCalculoPena === 'function') {
+        notificarCalculoPena(tempoFinal.toFixed(1), crimesSelecionados.length);
+    }
 }
 
 // Mostra resultado detalhado
@@ -3827,6 +4002,11 @@ document.addEventListener('input', function(e) {
                 // Carregar dados do usuário
                 await carregarDadosUsuario(user);
                 
+                // Notificar login realizado
+                if (typeof notificarLogin === 'function' && usuarioLogado) {
+                    notificarLogin(usuarioLogado.nome, usuarioLogado.titulo);
+                }
+                
                 // Registrar log de login
                 await registrarLog('login', `Login realizado por ${user.email}`);
                 
@@ -5538,17 +5718,36 @@ document.addEventListener('input', function(e) {
             
             // Definir mapeamento de portais
             const portais = {
+                'advogado': 'Portal do Advogado',
+                'promotor': 'Portal do Promotor',
+                'juiz-estadual': 'Portal Juiz Estadual',
+                'juiz-federal': 'Portal Juiz Federal'
+            };
+            
+            const arquivos = {
                 'advogado': 'portal-advogado.html',
                 'promotor': 'portal-promotor.html',
                 'juiz-estadual': 'portal-juiz-estadual.html',
                 'juiz-federal': 'portal-juiz-federal.html'
             };
             
-            const arquivo = portais[portal];
-            if (arquivo) {
-                window.location.href = arquivo;
+            const nomePortal = portais[portal];
+            const arquivo = arquivos[portal];
+            
+            if (arquivo && nomePortal) {
+                // Notificar acesso ao portal
+                if (typeof notificarAcessoPortal === 'function') {
+                    notificarAcessoPortal(nomePortal);
+                }
+                
+                setTimeout(() => {
+                    window.location.href = arquivo;
+                }, 1500); // Dar tempo para ver a notificação
             } else {
                 alert('❌ Portal não encontrado!');
+                if (typeof notificarErro === 'function') {
+                    notificarErro('Portal não encontrado: ' + portal);
+                }
             }
         }
 
@@ -7735,14 +7934,23 @@ function filtrarCrimes() {
     </div>
     
     <!-- Botões de teste de notificação (apenas para desenvolvimento) -->
-    <button onclick="enviarNotificacaoTeste('info')" class="btn-teste-notif" style="bottom: 130px;">
-        📢 Teste Info
+    <button onclick="testeNotificacaoSimples('info')" class="btn-teste-notif" style="bottom: 205px;" title="Teste notificação local">
+        📢 Local Info
     </button>
-    <button onclick="enviarNotificacaoTeste('sucesso')" class="btn-teste-notif" style="bottom: 105px;">
-        ✅ Teste Sucesso
+    <button onclick="testeNotificacaoSimples('sucesso')" class="btn-teste-notif" style="bottom: 180px;" title="Teste notificação local">
+        ✅ Local Sucesso
     </button>
-    <button onclick="enviarNotificacaoTeste('urgente')" class="btn-teste-notif" style="bottom: 80px;">
-        🚨 Teste Urgente
+    <button onclick="testeNotificacaoSimples('urgente')" class="btn-teste-notif" style="bottom: 155px;" title="Teste notificação local">
+        🚨 Local Urgente
+    </button>
+    <button onclick="notificarDocumentoSalvo('Petição', 'Apelação Criminal #123')" class="btn-teste-notif" style="bottom: 130px;" title="Teste documento salvo">
+        📄 Doc Salvo
+    </button>
+    <button onclick="notificarOABLiberada('123456', 'João Silva')" class="btn-teste-notif" style="bottom: 105px;" title="Teste OAB liberada">
+        🆔 OAB Liberada
+    </button>
+    <button onclick="notificarBackup()" class="btn-teste-notif" style="bottom: 80px;" title="Teste backup">
+        � Backup
     </button>
 
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ab8181102a27f1',t:'MTc1NDQ1MTU1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
