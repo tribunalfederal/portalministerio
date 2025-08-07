@@ -364,6 +364,11 @@
         function inicializarSistemaConectividade() {
             console.log('🔧 Inicializando sistema de conectividade Firebase...');
             
+            // Definir status inicial como online
+            firebaseStatus.isOnline = true;
+            firebaseStatus.lastConnect = new Date();
+            atualizarIndicadorStatus('conectado');
+            
             configurarPersistenciaOffline();
             iniciarMonitorConectividade();
             configurarKeepAlive();
@@ -373,7 +378,7 @@
                 verificarConexaoFirebase();
             }, 2000);
             
-            console.log('✅ Sistema de conectividade inicializado');
+            console.log('✅ Sistema de conectividade inicializado - Firebase Online');
         }
 
         // Tornar funções disponíveis globalmente
@@ -795,6 +800,152 @@
             };
             mostrarNotificacaoTempo(notificacao);
         }
+        
+        // ===== SISTEMA DE SINCRONIZAÇÃO ENTRE PORTAIS =====
+        
+        // Sincronizar processos entre diferentes portais do sistema jurídico
+        async function sincronizarProcessos(dadosProcesso) {
+            try {
+                const { collection, addDoc, doc, setDoc } = window.firebaseModules;
+                const db = window.firebaseDB;
+                
+                if (!db) {
+                    console.warn('⚠️ Firebase offline - processo não sincronizado');
+                    return false;
+                }
+                
+                // Identificador único do processo
+                const processoId = dadosProcesso.id || `PROC_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                
+                // Dados do processo para sincronização
+                const processoSincronizado = {
+                    id: processoId,
+                    tipo: dadosProcesso.tipo, // 'peticao', 'sentenca', 'denuncia', 'contrato', etc.
+                    origem: dadosProcesso.origem, // portal que criou
+                    destinatario: dadosProcesso.destinatario, // cargo/portal destinatário
+                    conteudo: dadosProcesso.conteudo,
+                    status: dadosProcesso.status || 'pendente',
+                    prioridade: dadosProcesso.prioridade || 'normal',
+                    dataEnvio: new Date().toISOString(),
+                    metadata: {
+                        remetente: usuarioLogado ? usuarioLogado.nome : 'Sistema',
+                        cargoRemetente: usuarioLogado ? usuarioLogado.cargo : 'sistema',
+                        emailRemetente: usuarioLogado ? usuarioLogado.email : 'sistema@juridico.gov.br'
+                    }
+                };
+                
+                // Salvar na coleção de processos sincronizados
+                await setDoc(doc(db, 'processos_sincronizados', processoId), processoSincronizado);
+                
+                // Notificar todos os portais sobre o novo processo
+                await enviarNotificacaoGlobal({
+                    titulo: `📄 ${obterTituloProcesso(dadosProcesso.tipo)}`,
+                    mensagem: `Novo processo de ${dadosProcesso.origem} para ${dadosProcesso.destinatario}`,
+                    tipo: 'processo',
+                    dados: {
+                        processoId: processoId,
+                        tipo: dadosProcesso.tipo,
+                        origem: dadosProcesso.origem,
+                        destinatario: dadosProcesso.destinatario
+                    }
+                });
+                
+                console.log('✅ Processo sincronizado entre portais:', processoId);
+                return true;
+                
+            } catch (error) {
+                console.error('❌ Erro ao sincronizar processo:', error);
+                return false;
+            }
+        }
+        
+        // Obter título apropriado para o tipo de processo
+        function obterTituloProcesso(tipo) {
+            const titulos = {
+                'peticao': 'Petição Jurídica',
+                'sentenca': 'Sentença Judicial',
+                'denuncia': 'Denúncia do MP',
+                'contrato': 'Contrato Legal',
+                'despacho': 'Despacho Judicial',
+                'intimacao': 'Intimação',
+                'mandado': 'Mandado Judicial',
+                'recurso': 'Recurso Legal',
+                'habeas_corpus': 'Habeas Corpus',
+                'acao_civil': 'Ação Civil'
+            };
+            return titulos[tipo] || 'Documento Jurídico';
+        }
+        
+        // Receber processos sincronizados
+        async function receberProcessosSincronizados() {
+            try {
+                const { collection, onSnapshot, query, where, orderBy } = window.firebaseModules;
+                const db = window.firebaseDB;
+                
+                if (!db) return;
+                
+                // Escutar novos processos para este portal
+                const processosQuery = query(
+                    collection(db, 'processos_sincronizados'),
+                    where('destinatario', '==', usuarioLogado?.cargo || 'todos'),
+                    orderBy('dataEnvio', 'desc')
+                );
+                
+                const unsubscribe = onSnapshot(processosQuery, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const processo = change.doc.data();
+                            mostrarProcessoRecebido(processo);
+                        }
+                    });
+                });
+                
+                listeners.push(unsubscribe);
+                
+            } catch (error) {
+                console.error('❌ Erro ao configurar listener de processos:', error);
+            }
+        }
+        
+        // Mostrar processo recebido na interface
+        function mostrarProcessoRecebido(processo) {
+            const notificacao = {
+                titulo: `📨 ${obterTituloProcesso(processo.tipo)} Recebido`,
+                mensagem: `De: ${processo.metadata.remetente} (${processo.origem})`,
+                tipo: 'processo',
+                processo: processo,
+                timestamp: { toDate: () => new Date(processo.dataEnvio) }
+            };
+            
+            mostrarNotificacaoTempo(notificacao);
+            
+            // Adicionar badge de processo pendente se não estiver no portal correto
+            if (processo.destinatario !== (usuarioLogado?.cargo || '')) {
+                adicionarBadgeProcessoPendente();
+            }
+        }
+        
+        // Adicionar badge visual de processo pendente
+        function adicionarBadgeProcessoPendente() {
+            let badge = document.getElementById('badge-processo-pendente');
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.id = 'badge-processo-pendente';
+                badge.className = 'fixed top-4 left-4 bg-red-500 text-white px-3 py-2 rounded-lg shadow-lg z-50 animate-pulse';
+                badge.innerHTML = '📨 Processos Pendentes';
+                badge.onclick = () => abrirGerenciadorProcessos();
+                document.body.appendChild(badge);
+            }
+        }
+        
+        // Abrir gerenciador de processos
+        function abrirGerenciadorProcessos() {
+            alert('🔄 Sistema de Gerenciamento de Processos\n\nEsta funcionalidade permite visualizar e gerenciar todos os processos sincronizados entre os portais do sistema jurídico.\n\n📄 Tipos de processos:\n• Petições\n• Sentenças\n• Denúncias\n• Contratos\n• Despachos\n• Intimações\n\nPara acessar, utilize o portal específico do seu cargo.');
+        }
+        
+        // Tornar funções disponíveis globalmente
+        window.sincronizarProcessos = sincronizarProcessos;
+        window.receberProcessosSincronizados = receberProcessosSincronizados;
         
         // Notificar erro crítico
         function notificarErro(mensagemErro) {
@@ -2307,13 +2458,6 @@
                     </div>
                 </div>
                 
-                <!-- Botão para Primeiro Acesso -->
-                <div class="mt-8">
-                    <button onclick="abrirModalPrimeiroAcesso()" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-4 px-8 rounded-2xl transform hover:scale-105 transition-all shadow-lg">
-                        <span class="text-2xl mr-3">👋</span>
-                        Primeira Vez Aqui? Cadastre-se
-                    </button>
-                </div>
             </div>
 
            <!-- ...existing code... -->
@@ -4264,6 +4408,12 @@ document.addEventListener('input', function(e) {
                     };
                     
                     console.log('👤 Usuário logado configurado:', usuarioLogado);
+                    
+                    // Inicializar sistema de sincronização entre portais
+                    setTimeout(() => {
+                        receberProcessosSincronizados();
+                        console.log('🔄 Sistema de sincronização de processos inicializado');
+                    }, 1000);
                     
                     // Aguardar um pouco para garantir que os elementos DOM estejam prontos
                     setTimeout(() => {
@@ -6370,30 +6520,6 @@ document.addEventListener('input', function(e) {
             }
         }
 
-        // Função para salvar dados do sistema
-        async function salvarDados() {
-            try {
-                const { doc, setDoc } = window.firebaseModules;
-                const db = window.firebaseDB;
-                
-                if (!db) {
-                    console.warn('⚠️ Firebase offline - dados não serão salvos');
-                    return;
-                }
-                
-                // Salvar registros OAB
-                await setDoc(doc(db, 'sistema', 'registrosOAB'), registrosOAB);
-                
-                // Salvar usuários cadastrados
-                await setDoc(doc(db, 'sistema', 'usuariosCadastrados'), usuariosCadastrados);
-                
-                console.log('💾 Dados do sistema salvos no Firebase');
-                
-            } catch (error) {
-                console.error('❌ Erro ao salvar dados:', error);
-            }
-        }
-
         function mostrarMensagemPrimeiro(texto, tipo) {
             const mensagem = document.getElementById('mensagem-primeiro-acesso');
             const textoMensagem = document.getElementById('texto-mensagem-primeiro');
@@ -6924,59 +7050,6 @@ document.addEventListener('input', function(e) {
         
         // ===== FIM FUNÇÕES ADMINISTRATIVAS =====
         
-        // Cadastrar novo usuário (Firebase)
-        async function cadastrarUsuarioFirebase(dadosUsuario) {
-            try {
-                // Criar usuário no Firebase Auth
-                const userCredential = await firebaseModules.createUserWithEmailAndPassword(authInstance, dadosUsuario.email, dadosUsuario.senha);
-                const user = userCredential.user;
-                
-                // Salvar dados adicionais no Firestore
-                await firebaseModules.setDoc(firebaseModules.doc(dbInstance, 'usuarios', dadosUsuario.email), {
-                    nome: dadosUsuario.nome,
-                    email: dadosUsuario.email,
-                    cargo: dadosUsuario.cargo,
-                    titulo: dadosUsuario.titulo,
-                    permissoes: dadosUsuario.permissoes || [],
-                    isAdmin: dadosUsuario.isAdmin || false,
-                    oab: dadosUsuario.oab,
-                    nomeado: dadosUsuario.nomeado || false,
-                    nomeado_por: dadosUsuario.nomeado_por || null,
-                    data_nomeacao: dadosUsuario.data_nomeacao || null,
-                    pode_nomear: dadosUsuario.pode_nomear || [],
-                    ativo: true,
-                    data_criacao: new Date().toISOString()
-                });
-                
-                // Registrar log
-                await registrarLog('cadastro', `Usuário cadastrado: ${dadosUsuario.nome} (${dadosUsuario.email})`);
-                
-                console.log('✅ Usuário cadastrado com sucesso:', dadosUsuario.email);
-                return { sucesso: true, usuario: user };
-                
-            } catch (error) {
-                console.error('❌ Erro ao cadastrar usuário:', error);
-                
-                let mensagemErro = 'Erro ao cadastrar usuário';
-                
-                switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        mensagemErro = 'Este email já está em uso';
-                        break;
-                    case 'auth/invalid-email':
-                        mensagemErro = 'Email inválido';
-                        break;
-                    case 'auth/weak-password':
-                        mensagemErro = 'Senha muito fraca (mínimo 6 caracteres)';
-                        break;
-                    default:
-                        mensagemErro = error.message;
-                }
-                
-                return { sucesso: false, erro: mensagemErro };
-            }
-        }
-
         function getCargoIcon(cargo) {
             const icons = {
                 'administrador': '👑',
@@ -9358,7 +9431,7 @@ document.addEventListener('input', function(e) {
             } catch (e) {}
         }
 
-        // Inicializar sistema
+        // Inicialização do sistema quando carregar
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🏛️ Sistema Jurídico Completo carregado com sucesso!');
             
@@ -9366,6 +9439,15 @@ document.addEventListener('input', function(e) {
             const script = document.createElement('script');
             script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
             document.head.appendChild(script);
+
+            // Inicializar sistema de conectividade Firebase
+            setTimeout(() => {
+                if (window.firebaseConnectivity) {
+                    window.firebaseConnectivity.inicializar();
+                    // Forçar primeira verificação
+                    window.firebaseConnectivity.verificarConexao();
+                }
+            }, 2000);
         });
        document.querySelectorAll('.crime-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -9484,8 +9566,8 @@ document.addEventListener('DOMContentLoaded', function() {
     </script>
     
     <!-- Status do Firebase - Melhorado -->
-    <div id="firebase-status" class="firebase-status conectado">
-        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+    <div id="firebase-status" class="firebase-status desconectado">
+        <div class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
         <span class="text-white text-xs">🔥 Inicializando...</span>
     </div>
     
