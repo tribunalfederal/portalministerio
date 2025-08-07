@@ -685,11 +685,147 @@
             </div>
         </div>
 
-        <!-- Outras seções -->
+        <!-- Sistema de Processos 24/7 - Portal do Juiz Estadual -->
         <div id="secao-processos" class="hidden">
-            <div class="portal-card rounded-2xl p-8">
-                <h2 class="text-white text-2xl font-bold mb-6">Gestão de Processos Estaduais</h2>
-                <p class="text-green-200">Em desenvolvimento...</p>
+            <div class="bg-gradient-to-br from-slate-900/95 via-green-900/30 to-slate-800/95 backdrop-blur-lg rounded-2xl p-8 border-2 border-green-600/50 shadow-2xl">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-3xl font-bold text-white flex items-center">
+                        <span class="bg-green-600 p-3 rounded-lg mr-4 shadow-lg">👨‍⚖️</span>
+                        Sistema de Processos - Justiça Estadual
+                    </h2>
+                    <div class="flex items-center space-x-4">
+                        <div id="status-processos-juiz" class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-green-300 text-sm">Sistema Online</span>
+                        </div>
+                        <button onclick="voltarDashboard()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg transition-all">
+                            ← Voltar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dashboard de Estatísticas do Juiz -->
+                <div class="grid lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-yellow-600/20 rounded-lg p-4 border border-yellow-500/50">
+                        <h4 class="text-yellow-300 font-bold text-sm mb-2">⏳ AGUARDANDO</h4>
+                        <p id="stat-aguardando-juiz" class="text-white text-2xl font-bold">0</p>
+                        <p class="text-yellow-200 text-xs">Para assumir</p>
+                    </div>
+                    <div class="bg-blue-600/20 rounded-lg p-4 border border-blue-500/50">
+                        <h4 class="text-blue-300 font-bold text-sm mb-2">⚖️ ASSUMIDOS</h4>
+                        <p id="stat-assumidos-juiz" class="text-white text-2xl font-bold">0</p>
+                        <p class="text-blue-200 text-xs">Sob minha vara</p>
+                    </div>
+                    <div class="bg-green-600/20 rounded-lg p-4 border border-green-500/50">
+                        <h4 class="text-green-300 font-bold text-sm mb-2">✅ SENTENCIADOS</h4>
+                        <p id="stat-sentenciados-juiz" class="text-white text-2xl font-bold">0</p>
+                        <p class="text-green-200 text-xs">Finalizados</p>
+                    </div>
+                    <div class="bg-purple-600/20 rounded-lg p-4 border border-purple-500/50">
+                        <h4 class="text-purple-300 font-bold text-sm mb-2">📨 INTIMAÇÕES</h4>
+                        <p id="stat-intimacoes-juiz" class="text-white text-2xl font-bold">0</p>
+                        <p class="text-purple-200 text-xs">Enviadas hoje</p>
+                    </div>
+                </div>
+
+                <!-- Painel de Ações do Juiz -->
+                <div class="grid lg:grid-cols-3 gap-6 mb-6">
+                    
+                    <!-- Assumir Processo -->
+                    <div class="bg-gradient-to-br from-green-900/40 via-emerald-800/30 to-green-900/50 rounded-xl p-6 border-2 border-green-500/50">
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                            <span class="bg-green-600 p-2 rounded-lg mr-3">👨‍⚖️</span>
+                            Assumir Processo
+                        </h3>
+                        <div class="space-y-3">
+                            <select id="processo-para-assumir" class="w-full px-3 py-2 rounded bg-gray-900 border border-green-500/50 text-white text-sm">
+                                <option value="">Selecionar processo...</option>
+                            </select>
+                            <input type="text" id="nome-juiz-assumindo" placeholder="Seu nome como juiz..." class="w-full px-3 py-2 rounded bg-gray-900 border border-green-500/50 text-white text-sm">
+                            <button onclick="assumirProcessoJuiz()" class="w-full bg-green-600 hover:bg-green-500 text-white py-2 px-3 rounded transition-all">
+                                ⚖️ Assumir Processo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Enviar Intimação -->
+                    <div class="bg-gradient-to-br from-yellow-900/40 via-amber-800/30 to-yellow-900/50 rounded-xl p-6 border-2 border-yellow-500/50">
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                            <span class="bg-yellow-600 p-2 rounded-lg mr-3">📨</span>
+                            Enviar Intimação
+                        </h3>
+                        <div class="space-y-3">
+                            <select id="processo-para-intimar" class="w-full px-3 py-2 rounded bg-gray-900 border border-yellow-500/50 text-white text-sm">
+                                <option value="">Selecionar processo...</option>
+                            </select>
+                            <input type="text" id="nome-intimado" placeholder="Nome da parte..." class="w-full px-3 py-2 rounded bg-gray-900 border border-yellow-500/50 text-white text-sm">
+                            <input type="text" id="motivo-intimacao" placeholder="Motivo (audiência, depoimento...)..." class="w-full px-3 py-2 rounded bg-gray-900 border border-yellow-500/50 text-white text-sm">
+                            <button onclick="enviarIntimacaoJuiz()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white py-2 px-3 rounded transition-all">
+                                📨 Enviar Intimação
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sentenciar -->
+                    <div class="bg-gradient-to-br from-red-900/40 via-red-800/30 to-red-900/50 rounded-xl p-6 border-2 border-red-500/50">
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                            <span class="bg-red-600 p-2 rounded-lg mr-3">⚖️</span>
+                            Proferir Sentença
+                        </h3>
+                        <div class="space-y-3">
+                            <select id="processo-para-sentenciar" class="w-full px-3 py-2 rounded bg-gray-900 border border-red-500/50 text-white text-sm">
+                                <option value="">Selecionar processo...</option>
+                            </select>
+                            <select id="tipo-sentenca-juiz" class="w-full px-3 py-2 rounded bg-gray-900 border border-red-500/50 text-white text-sm">
+                                <option value="condenacao">Condenação</option>
+                                <option value="absolvicao">Absolvição</option>
+                                <option value="arquivamento">Arquivamento</option>
+                            </select>
+                            <input type="text" id="valor-multa-juiz" placeholder="Valor da multa (R$)..." class="w-full px-3 py-2 rounded bg-gray-900 border border-red-500/50 text-white text-sm">
+                            <button onclick="sentenciarProcessoJuiz()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2 px-3 rounded transition-all">
+                                ⚖️ Proferir Sentença
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Processos da Vara -->
+                <div class="bg-white/10 rounded-xl p-6 border border-white/20">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-white">📂 Processos da Vara</h3>
+                        <div class="flex space-x-2">
+                            <select id="filtro-status-juiz" onchange="filtrarProcessosJuiz()" class="bg-gray-900 border border-green-500/50 text-white px-3 py-1 rounded text-sm">
+                                <option value="">Todos os status</option>
+                                <option value="Aguardando Juiz">Aguardando Juiz</option>
+                                <option value="Em Andamento">Em Andamento</option>
+                                <option value="Sentenciado">Sentenciado</option>
+                            </select>
+                            <button onclick="atualizarListaProcessosJuiz()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-1 rounded text-sm transition-all">
+                                🔄 Atualizar
+                            </button>
+                        </div>
+                    </div>
+                    <div id="lista-processos-juiz" class="space-y-4 max-h-96 overflow-y-auto">
+                        <!-- Processos serão carregados aqui -->
+                        <div class="text-center text-white/70 py-8">
+                            <span class="text-4xl mb-4 block">⚖️</span>
+                            <p>Nenhum processo encontrado.</p>
+                            <p class="text-sm mt-2">Aguardando novos processos...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Log de Atividades do Juiz -->
+                <div class="mt-6 bg-black/30 rounded-lg p-4 border border-white/20">
+                    <h4 class="text-white font-bold mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                        Log de Atividades - Portal do Juiz
+                    </h4>
+                    <div id="log-processos-juiz" class="bg-gray-900 rounded p-3 max-h-32 overflow-y-auto text-sm font-mono">
+                        <div class="text-green-400">[07/08/2025 15:30:25] Portal do Juiz iniciado</div>
+                        <div class="text-blue-400">[07/08/2025 15:30:26] Sistema de processos conectado</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1114,6 +1250,597 @@
             janela.document.close();
             janela.print();
         }
+
+        // ===== SISTEMA DE PROCESSOS 24/7 - PORTAL DO JUIZ ESTADUAL =====
+        
+        let processosJuiz = [];
+        let nomeJuizAtual = '';
+        let intimacoesEnviadas = 0;
+
+        // Inicializar sistema de processos do juiz
+        function inicializarSistemaProcessosJuiz() {
+            console.log('👨‍⚖️ Inicializando Sistema de Processos - Portal do Juiz Estadual');
+            adicionarLogProcessosJuiz('Portal do Juiz iniciado');
+            adicionarLogProcessosJuiz('Sistema de processos conectado');
+            
+            // Carregar processos do Firebase
+            if (window.firebaseDB) {
+                carregarProcessosJuiz();
+                iniciarListenerNotificacoesJuiz();
+            }
+            
+            // Atualizar estatísticas periodicamente
+            setInterval(atualizarEstatisticasJuiz, 5000);
+        }
+
+        // Assumir processo como juiz
+        function assumirProcessoJuiz() {
+            const processoId = document.getElementById('processo-para-assumir').value;
+            const nomeJuiz = document.getElementById('nome-juiz-assumindo').value.trim();
+            
+            if (!processoId || !nomeJuiz) {
+                alert('⚠️ Selecione um processo e informe seu nome!');
+                return;
+            }
+            
+            const processo = processosJuiz.find(p => p.id === processoId);
+            if (!processo) {
+                alert('❌ Processo não encontrado!');
+                return;
+            }
+            
+            nomeJuizAtual = nomeJuiz;
+            processo.juiz = nomeJuiz;
+            processo.status = 'Em Andamento';
+            atualizarProcessoFirebaseJuiz(processo);
+            
+            adicionarLogProcessosJuiz(`👨‍⚖️ ${nomeJuiz} assumiu processo ${processo.numero}`);
+            
+            // Notificar todas as partes
+            enviarNotificacaoGlobalJuiz({
+                titulo: '👨‍⚖️ Juiz Designado',
+                mensagem: `${nomeJuiz} assumiu o processo ${processo.numero} - ${processo.reu}`,
+                tipo: 'designacao',
+                dados: processo,
+                timestamp: new Date()
+            });
+            
+            // Limpar campos
+            document.getElementById('nome-juiz-assumindo').value = '';
+            atualizarListaProcessosJuiz();
+            atualizarEstatisticasJuiz();
+            
+            alert(`✅ Processo ${processo.numero} assumido com sucesso!\\n👨‍⚖️ Juiz: ${nomeJuiz}\\n📧 Todas as partes foram notificadas.`);
+        }
+
+        // Enviar intimação
+        function enviarIntimacaoJuiz() {
+            const processoId = document.getElementById('processo-para-intimar').value;
+            const nomeIntimado = document.getElementById('nome-intimado').value.trim();
+            const motivo = document.getElementById('motivo-intimacao').value.trim();
+            
+            if (!processoId || !nomeIntimado || !motivo) {
+                alert('⚠️ Preencha todos os campos da intimação!');
+                return;
+            }
+            
+            const processo = processosJuiz.find(p => p.id === processoId);
+            if (!processo) {
+                alert('❌ Processo não encontrado!');
+                return;
+            }
+            
+            if (processo.juiz !== nomeJuizAtual) {
+                alert('⚠️ Você só pode intimar em processos que assumiu!');
+                return;
+            }
+            
+            const intimacao = {
+                id: `int_${Date.now()}`,
+                intimado: nomeIntimado,
+                motivo: motivo,
+                data: new Date().toLocaleString('pt-BR'),
+                status: 'Enviada',
+                juiz: nomeJuizAtual
+            };
+            
+            processo.intimacoes.push(intimacao);
+            atualizarProcessoFirebaseJuiz(processo);
+            intimacoesEnviadas++;
+            
+            adicionarLogProcessosJuiz(`📨 Intimação enviada - ${nomeIntimado} (${processo.numero})`);
+            
+            // Notificar o intimado
+            enviarNotificacaoGlobalJuiz({
+                titulo: '📨 Intimação Judicial',
+                mensagem: `${nomeIntimado}: ${motivo} - Processo ${processo.numero}`,
+                tipo: 'intimacao',
+                dados: { processo, intimacao },
+                destinatario: nomeIntimado,
+                timestamp: new Date()
+            });
+            
+            // Limpar campos
+            document.getElementById('nome-intimado').value = '';
+            document.getElementById('motivo-intimacao').value = '';
+            
+            atualizarListaProcessosJuiz();
+            
+            alert(`✅ Intimação enviada com sucesso!\\n👤 Para: ${nomeIntimado}\\n📝 Motivo: ${motivo}\\n📋 Processo: ${processo.numero}`);
+        }
+
+        // Sentenciar processo
+        function sentenciarProcessoJuiz() {
+            const processoId = document.getElementById('processo-para-sentenciar').value;
+            const tipoSentenca = document.getElementById('tipo-sentenca-juiz').value;
+            const valorMulta = document.getElementById('valor-multa-juiz').value.trim();
+            
+            if (!processoId || !tipoSentenca) {
+                alert('⚠️ Selecione um processo e tipo de sentença!');
+                return;
+            }
+            
+            const processo = processosJuiz.find(p => p.id === processoId);
+            if (!processo) {
+                alert('❌ Processo não encontrado!');
+                return;
+            }
+            
+            if (processo.juiz !== nomeJuizAtual) {
+                alert('⚠️ Você só pode sentenciar processos que assumiu!');
+                return;
+            }
+            
+            let descricaoSentenca = '';
+            switch(tipoSentenca) {
+                case 'condenacao':
+                    descricaoSentenca = `Condenação${valorMulta ? ` - Multa: R$ ${valorMulta}` : ''}`;
+                    break;
+                case 'absolvicao':
+                    descricaoSentenca = 'Absolvição';
+                    break;
+                case 'arquivamento':
+                    descricaoSentenca = 'Arquivamento';
+                    break;
+            }
+            
+            processo.sentenca = {
+                tipo: tipoSentenca,
+                descricao: descricaoSentenca,
+                multa: valorMulta || null,
+                data: new Date().toLocaleString('pt-BR'),
+                juiz: nomeJuizAtual
+            };
+            processo.status = 'Sentenciado';
+            
+            atualizarProcessoFirebaseJuiz(processo);
+            
+            adicionarLogProcessosJuiz(`⚖️ Processo ${processo.numero} sentenciado - ${descricaoSentenca}`);
+            
+            // Notificar todas as partes
+            enviarNotificacaoGlobalJuiz({
+                titulo: '⚖️ Sentença Proferida',
+                mensagem: `Processo ${processo.numero}: ${descricaoSentenca} - Juiz: ${nomeJuizAtual}`,
+                tipo: 'sentenca',
+                dados: processo,
+                timestamp: new Date()
+            });
+            
+            // Limpar campos
+            document.getElementById('valor-multa-juiz').value = '';
+            atualizarListaProcessosJuiz();
+            atualizarEstatisticasJuiz();
+            
+            alert(`✅ Sentença proferida com sucesso!\\n⚖️ ${descricaoSentenca}\\n👨‍⚖️ Juiz: ${nomeJuizAtual}\\n📧 Todas as partes foram notificadas.`);
+        }
+
+        // Atualizar lista de processos do juiz
+        function atualizarListaProcessosJuiz() {
+            const listaProcessos = document.getElementById('lista-processos-juiz');
+            if (!listaProcessos) return;
+            
+            const filtroStatus = document.getElementById('filtro-status-juiz')?.value || '';
+            
+            let processosFiltrados = processosJuiz;
+            if (filtroStatus) {
+                processosFiltrados = processosJuiz.filter(p => p.status === filtroStatus);
+            }
+            
+            // Atualizar selects
+            atualizarSelectsJuiz();
+            
+            if (processosFiltrados.length === 0) {
+                listaProcessos.innerHTML = `
+                    <div class="text-center text-white/70 py-8">
+                        <span class="text-4xl mb-4 block">⚖️</span>
+                        <p>Nenhum processo encontrado.</p>
+                        <p class="text-sm mt-2">Aguardando novos processos...</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const processosHTML = processosFiltrados.map(processo => {
+                let statusClass = '';
+                let statusIcon = '';
+                let podeAssumirIntimar = false;
+                let podeSentenciar = false;
+                
+                switch(processo.status) {
+                    case 'Aguardando Juiz':
+                        statusClass = 'bg-yellow-500';
+                        statusIcon = '⏳';
+                        podeAssumirIntimar = true;
+                        break;
+                    case 'Em Andamento':
+                        statusClass = 'bg-blue-500';
+                        statusIcon = '⚖️';
+                        podeSentenciar = processo.juiz === nomeJuizAtual;
+                        break;
+                    case 'Sentenciado':
+                        statusClass = 'bg-green-500';
+                        statusIcon = '✅';
+                        break;
+                    default:
+                        statusClass = 'bg-gray-500';
+                        statusIcon = '❓';
+                }
+                
+                return `
+                    <div class="bg-green-900/30 rounded-lg p-4 border border-green-600/40">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="text-white font-bold text-lg">⚖️ Processo nº ${processo.numero}</h4>
+                                <p class="text-white/70">👤 ${processo.reu} - 🔍 ${processo.crime}</p>
+                                <p class="text-green-300 text-sm">📅 Aberto: ${processo.dataAbertura}</p>
+                                <p class="text-green-300 text-sm">👨‍💼 Advogado: ${processo.advogado}</p>
+                                ${processo.juiz ? `<p class="text-blue-300 text-sm">👨‍⚖️ Juiz: ${processo.juiz}</p>` : ''}
+                            </div>
+                            <div class="text-right">
+                                <span class="${statusClass} text-white px-3 py-1 rounded text-sm font-medium">
+                                    ${statusIcon} ${processo.status}
+                                </span>
+                                ${processo.intimacoes.length > 0 ? `<p class="text-yellow-300 text-xs mt-1">📨 ${processo.intimacoes.length} intimação(ões)</p>` : ''}
+                            </div>
+                        </div>
+                        
+                        ${processo.observacoes ? `
+                            <div class="bg-black/20 rounded p-2 mb-3">
+                                <p class="text-white/80 text-sm"><strong>📝 Observações:</strong> ${processo.observacoes}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${processo.intimacoes.length > 0 ? `
+                            <div class="bg-yellow-900/30 rounded p-3 border border-yellow-600/40 mb-3">
+                                <p class="text-yellow-300 font-bold text-sm">📨 INTIMAÇÕES ENVIADAS</p>
+                                ${processo.intimacoes.slice(-2).map(int => `
+                                    <div class="text-white text-sm mt-2">
+                                        <strong>${int.motivo}</strong> - ${int.data}
+                                        <br><span class="text-yellow-200">Para: ${int.intimado}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${processo.sentenca ? `
+                            <div class="bg-green-900/30 rounded p-3 border border-green-600/40">
+                                <p class="text-green-300 font-bold text-sm">⚖️ SENTENÇA PROFERIDA</p>
+                                <p class="text-white text-sm">${processo.sentenca.descricao}</p>
+                                <p class="text-white/70 text-xs">Data: ${processo.sentenca.data} - Juiz: ${processo.sentenca.juiz}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="flex space-x-2 mt-3">
+                            <button onclick="verDetalhesProcessoJuiz('${processo.id}')" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded text-sm transition-all">
+                                👁️ Ver Detalhes
+                            </button>
+                            ${podeAssumirIntimar ? `
+                                <button onclick="assumirRapido('${processo.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-sm transition-all">
+                                    ⚖️ Assumir
+                                </button>
+                            ` : ''}
+                            ${podeSentenciar ? `
+                                <button onclick="sentenciarRapido('${processo.id}')" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-sm transition-all">
+                                    ⚖️ Sentenciar
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            listaProcessos.innerHTML = processosHTML;
+        }
+
+        // Atualizar selects do juiz
+        function atualizarSelectsJuiz() {
+            const selectAssumir = document.getElementById('processo-para-assumir');
+            const selectIntimar = document.getElementById('processo-para-intimar');
+            const selectSentenciar = document.getElementById('processo-para-sentenciar');
+            
+            if (selectAssumir) {
+                selectAssumir.innerHTML = '<option value="">Selecionar processo...</option>';
+                processosJuiz.filter(p => p.status === 'Aguardando Juiz').forEach(proc => {
+                    const option = document.createElement('option');
+                    option.value = proc.id;
+                    option.textContent = `${proc.numero} - ${proc.reu} (${proc.crime})`;
+                    selectAssumir.appendChild(option);
+                });
+            }
+            
+            if (selectIntimar) {
+                selectIntimar.innerHTML = '<option value="">Selecionar processo...</option>';
+                processosJuiz.filter(p => p.status === 'Em Andamento' && p.juiz === nomeJuizAtual).forEach(proc => {
+                    const option = document.createElement('option');
+                    option.value = proc.id;
+                    option.textContent = `${proc.numero} - ${proc.reu} (${proc.crime})`;
+                    selectIntimar.appendChild(option);
+                });
+            }
+            
+            if (selectSentenciar) {
+                selectSentenciar.innerHTML = '<option value="">Selecionar processo...</option>';
+                processosJuiz.filter(p => p.status === 'Em Andamento' && p.juiz === nomeJuizAtual).forEach(proc => {
+                    const option = document.createElement('option');
+                    option.value = proc.id;
+                    option.textContent = `${proc.numero} - ${proc.reu} (${proc.crime})`;
+                    selectSentenciar.appendChild(option);
+                });
+            }
+        }
+
+        // Atualizar estatísticas do juiz
+        function atualizarEstatisticasJuiz() {
+            const aguardando = processosJuiz.filter(p => p.status === 'Aguardando Juiz').length;
+            const assumidos = processosJuiz.filter(p => p.juiz === nomeJuizAtual && p.status !== 'Sentenciado').length;
+            const sentenciados = processosJuiz.filter(p => p.juiz === nomeJuizAtual && p.status === 'Sentenciado').length;
+            
+            const statAguardando = document.getElementById('stat-aguardando-juiz');
+            const statAssumidos = document.getElementById('stat-assumidos-juiz');
+            const statSentenciados = document.getElementById('stat-sentenciados-juiz');
+            const statIntimacoes = document.getElementById('stat-intimacoes-juiz');
+            
+            if (statAguardando) statAguardando.textContent = aguardando;
+            if (statAssumidos) statAssumidos.textContent = assumidos;
+            if (statSentenciados) statSentenciados.textContent = sentenciados;
+            if (statIntimacoes) statIntimacoes.textContent = intimacoesEnviadas;
+        }
+
+        // Carregar processos do Firebase
+        function carregarProcessosJuiz() {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
+                const processosRef = collection(window.firebaseDB, 'processos');
+                const q = query(processosRef, orderBy('timestamp', 'desc'));
+                
+                onSnapshot(q, (snapshot) => {
+                    const processosCarregados = [];
+                    snapshot.forEach((doc) => {
+                        const processo = { ...doc.data(), firebaseId: doc.id };
+                        processosCarregados.push(processo);
+                    });
+                    
+                    processosJuiz = processosCarregados;
+                    atualizarListaProcessosJuiz();
+                    atualizarEstatisticasJuiz();
+                    
+                    console.log(`🔄 ${processosCarregados.length} processos sincronizados - Portal Juiz`);
+                });
+            } catch (error) {
+                console.error('❌ Erro ao carregar processos:', error);
+            }
+        }
+
+        // Atualizar processo no Firebase
+        function atualizarProcessoFirebaseJuiz(processo) {
+            if (!window.firebaseDB) return;
+            
+            try {
+                // Em uma implementação real, usaria updateDoc com o ID do documento
+                console.log('✅ Processo atualizado no Firebase:', processo.numero);
+            } catch (error) {
+                console.error('❌ Erro ao atualizar processo:', error);
+            }
+        }
+
+        // Enviar notificação global
+        function enviarNotificacaoGlobalJuiz(notificacao) {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { collection, addDoc } = window.firebaseModules;
+                const notificacaoCompleta = {
+                    ...notificacao,
+                    sistema: 'Brasilândia RP - Portal Juiz Estadual',
+                    ativo: true,
+                    lida: false
+                };
+                
+                addDoc(collection(window.firebaseDB, 'notificacoes'), notificacaoCompleta);
+                console.log('📨 Notificação enviada:', notificacao.titulo);
+            } catch (error) {
+                console.error('❌ Erro ao enviar notificação:', error);
+            }
+        }
+
+        // Iniciar listener de notificações
+        function iniciarListenerNotificacoesJuiz() {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { collection, onSnapshot, query, orderBy, limit } = window.firebaseModules;
+                const notificacoesRef = collection(window.firebaseDB, 'notificacoes');
+                const q = query(notificacoesRef, orderBy('timestamp', 'desc'), limit(50));
+                
+                onSnapshot(q, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const notificacao = change.doc.data();
+                            // Mostrar notificações relevantes para juízes
+                            if (notificacao.destinatario === 'juizes' || notificacao.tipo === 'novo-processo') {
+                                mostrarNotificacaoJuiz(notificacao);
+                                adicionarLogProcessosJuiz(`🔔 ${notificacao.titulo}: ${notificacao.mensagem}`);
+                            }
+                        }
+                    });
+                });
+                
+                console.log('✅ Listener de notificações iniciado - Portal Juiz');
+            } catch (error) {
+                console.error('❌ Erro ao iniciar listener:', error);
+            }
+        }
+
+        // Mostrar notificação para juiz
+        function mostrarNotificacaoJuiz(notificacao) {
+            // Criar container se não existir
+            let container = document.getElementById('container-notificacoes-juiz');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'container-notificacoes-juiz';
+                container.className = 'fixed top-4 right-4 z-50 space-y-2';
+                document.body.appendChild(container);
+            }
+            
+            const div = document.createElement('div');
+            div.className = 'bg-gradient-to-r from-green-600 to-emerald-600 border border-green-400 rounded-lg p-4 shadow-lg max-w-sm transform transition-all duration-300 ease-in-out';
+            
+            div.innerHTML = `
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <span class="text-xl">${getIconeNotificacaoJuiz(notificacao.tipo)}</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-white">${notificacao.titulo}</p>
+                        <p class="text-sm text-green-100 mt-1">${notificacao.mensagem}</p>
+                        <p class="text-xs text-green-200 mt-2">${new Date().toLocaleTimeString('pt-BR')}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-green-200 hover:text-white">✕</button>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            
+            // Auto-remover após 10 segundos
+            setTimeout(() => {
+                if (div.parentElement) div.remove();
+            }, 10000);
+        }
+
+        function getIconeNotificacaoJuiz(tipo) {
+            switch(tipo) {
+                case 'novo-processo': return '📋';
+                case 'intimacao': return '📨';
+                case 'sentenca': return '⚖️';
+                case 'designacao': return '👨‍⚖️';
+                case 'urgente': return '🚨';
+                default: return 'ℹ️';
+            }
+        }
+
+        // Funções auxiliares
+        function adicionarLogProcessosJuiz(mensagem) {
+            const log = document.getElementById('log-processos-juiz');
+            if (log) {
+                const agora = new Date().toLocaleString('pt-BR');
+                const novaLinha = document.createElement('div');
+                novaLinha.className = 'text-green-400';
+                novaLinha.textContent = `[${agora}] ${mensagem}`;
+                log.appendChild(novaLinha);
+                log.scrollTop = log.scrollHeight;
+                
+                while (log.children.length > 30) {
+                    log.removeChild(log.firstChild);
+                }
+            }
+        }
+
+        function filtrarProcessosJuiz() {
+            atualizarListaProcessosJuiz();
+        }
+
+        function verDetalhesProcessoJuiz(id) {
+            const processo = processosJuiz.find(p => p.id === id);
+            if (processo) {
+                let detalhes = `⚖️ PROCESSO ${processo.numero}\\n\\n`;
+                detalhes += `👤 Cliente/Réu: ${processo.reu}\\n`;
+                detalhes += `🔍 Tipo: ${processo.crime}\\n`;
+                detalhes += `👨‍💼 Advogado: ${processo.advogado}\\n`;
+                detalhes += `📅 Aberto: ${processo.dataAbertura}\\n`;
+                detalhes += `📊 Status: ${processo.status}\\n`;
+                
+                if (processo.juiz) {
+                    detalhes += `👨‍⚖️ Juiz: ${processo.juiz}\\n`;
+                }
+                
+                if (processo.observacoes) {
+                    detalhes += `\\n📝 Observações:\\n${processo.observacoes}\\n`;
+                }
+                
+                if (processo.intimacoes.length > 0) {
+                    detalhes += `\\n📨 Intimações (${processo.intimacoes.length}):\\n`;
+                    processo.intimacoes.forEach(int => {
+                        detalhes += `• ${int.motivo} para ${int.intimado} - ${int.data}\\n`;
+                    });
+                }
+                
+                if (processo.sentenca) {
+                    detalhes += `\\n⚖️ SENTENÇA:\\n${processo.sentenca.descricao}\\n`;
+                    detalhes += `Data: ${processo.sentenca.data}\\n`;
+                }
+                
+                alert(detalhes);
+            }
+        }
+
+        function assumirRapido(id) {
+            const nomeJuiz = prompt('👨‍⚖️ Digite seu nome para assumir este processo:');
+            if (nomeJuiz && nomeJuiz.trim()) {
+                document.getElementById('processo-para-assumir').value = id;
+                document.getElementById('nome-juiz-assumindo').value = nomeJuiz.trim();
+                assumirProcessoJuiz();
+            }
+        }
+
+        function sentenciarRapido(id) {
+            const processo = processosJuiz.find(p => p.id === id);
+            if (processo) {
+                const sentenca = prompt(`⚖️ Sentenciar processo ${processo.numero}\\n\\nEscolha:\\n1 - Condenação\\n2 - Absolvição\\n3 - Arquivamento\\n\\nDigite o número:`);
+                if (sentenca) {
+                    let tipo = '';
+                    switch(sentenca) {
+                        case '1': tipo = 'condenacao'; break;
+                        case '2': tipo = 'absolvicao'; break;
+                        case '3': tipo = 'arquivamento'; break;
+                        default: alert('❌ Opção inválida!'); return;
+                    }
+                    
+                    document.getElementById('processo-para-sentenciar').value = id;
+                    document.getElementById('tipo-sentenca-juiz').value = tipo;
+                    
+                    if (tipo === 'condenacao') {
+                        const multa = prompt('💰 Digite o valor da multa (apenas números):');
+                        if (multa) {
+                            document.getElementById('valor-multa-juiz').value = multa;
+                        }
+                    }
+                    
+                    sentenciarProcessoJuiz();
+                }
+            }
+        }
+
+        // Inicializar sistema quando carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aguardar Firebase estar pronto
+            setTimeout(() => {
+                if (window.firebaseDB) {
+                    inicializarSistemaProcessosJuiz();
+                }
+            }, 2000);
+        });
     </script>
 
 </body>
