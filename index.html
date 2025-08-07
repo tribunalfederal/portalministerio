@@ -1078,61 +1078,6 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Seção de Acesso Universal aos Portais (Alexandre de Moraes) -->
-                <div class="mt-8 bg-gradient-to-br from-yellow-600/20 to-amber-600/30 rounded-xl p-6 border-2 border-yellow-500/60">
-                    <div class="text-center mb-6">
-                        <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                            <i class="fas fa-crown text-white text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2">👑 Acesso Universal aos Portais</h3>
-                        <p class="text-yellow-200 text-sm">Como Suprema Autoridade, você pode acessar qualquer portal do sistema</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <!-- Portal Federal -->
-                        <div class="bg-yellow-600/20 rounded-lg p-4 border border-yellow-500/50 hover:bg-yellow-600/30 transition-all cursor-pointer" onclick="acessarPortalEspecifico('portal-juiz-federal.html', 'Portal Federal')">
-                            <div class="text-center">
-                                <div class="text-2xl mb-2">👑</div>
-                                <h4 class="text-white font-semibold text-sm mb-1">Portal Federal</h4>
-                                <p class="text-yellow-200 text-xs">Níveis 1-2</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Portal Estadual -->
-                        <div class="bg-green-600/20 rounded-lg p-4 border border-green-500/50 hover:bg-green-600/30 transition-all cursor-pointer" onclick="acessarPortalEspecifico('portal-juiz-estadual.html', 'Portal Estadual')">
-                            <div class="text-center">
-                                <div class="text-2xl mb-2">⚖️</div>
-                                <h4 class="text-white font-semibold text-sm mb-1">Portal Estadual</h4>
-                                <p class="text-green-200 text-xs">Níveis 3-4</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Portal MP -->
-                        <div class="bg-red-600/20 rounded-lg p-4 border border-red-500/50 hover:bg-red-600/30 transition-all cursor-pointer" onclick="acessarPortalEspecifico('portal-promotor.html', 'Portal MP')">
-                            <div class="text-center">
-                                <div class="text-2xl mb-2">🏛️</div>
-                                <h4 class="text-white font-semibold text-sm mb-1">Portal MP</h4>
-                                <p class="text-red-200 text-xs">Níveis 5-8</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Portal Advocacia -->
-                        <div class="bg-blue-600/20 rounded-lg p-4 border border-blue-500/50 hover:bg-blue-600/30 transition-all cursor-pointer" onclick="acessarPortalEspecifico('portal-advogado.html', 'Portal Advocacia')">
-                            <div class="text-center">
-                                <div class="text-2xl mb-2">💼</div>
-                                <h4 class="text-white font-semibold text-sm mb-1">Portal Advocacia</h4>
-                                <p class="text-blue-200 text-xs">Nível 11</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 text-center">
-                        <button onclick="mostrarEscolhaPortalUniversal()" class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-6 py-3 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all font-semibold">
-                            <i class="fas fa-external-link-alt mr-2"></i>Ver Todos os Portais
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -3026,9 +2971,8 @@ document.addEventListener('input', function(e) {
                                 email: adminEmail,
                                 cargo: '1_juiz_federal',
                                 titulo: '1º Juiz Federal - Presidente do STF/STJ/STB',
-                                permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade', 'acesso_universal'],
+                                permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade'],
                                 isAdmin: true,
-                                acessoUniversal: true,
                                 nivel_hierarquico: 1,
                                 oab: 'STF-001',
                                 nomeado: true,
@@ -3138,9 +3082,8 @@ document.addEventListener('input', function(e) {
                     email: user.email,
                     cargo: '1_juiz_federal',
                     titulo: '1º Juiz Federal - Presidente do STF/STJ/STB',
-                    permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade', 'acesso_universal'],
+                    permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade'],
                     isAdmin: true,
-                    acessoUniversal: true,
                     nivel_hierarquico: 1,
                     oab: 'STF-001',
                     nomeado: true,
@@ -3190,9 +3133,8 @@ document.addEventListener('input', function(e) {
                     nome: 'Alexandre de Moraes',
                     titulo: '1º Juiz Federal - Presidente do STF/STJ/STB',
                     cargo: '1_juiz_federal',
-                    permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade', 'acesso_universal'],
+                    permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade'],
                     isAdmin: true,
-                    acessoUniversal: true,
                     oab: 'STF-001',
                     pode_nomear: ['2_juiz_federal', '3_juiz_federal', '1_desembargador', '2_desembargador', '3_desembargador'],
                     loginTime: new Date()
@@ -3713,16 +3655,6 @@ document.addEventListener('input', function(e) {
                 return;
             }
 
-            // Verificar se o usuário optou por ficar no portal principal
-            const ficarNoPortalPrincipal = localStorage.getItem('ficarNoPortalPrincipal');
-            if (ficarNoPortalPrincipal === 'true') {
-                console.log('🏠 Usuário optou por ficar no portal principal');
-                localStorage.removeItem('ficarNoPortalPrincipal'); // Limpar flag
-                esconderTelaLogin();
-                mostrarLoading(false);
-                return;
-            }
-
             const cargo = usuarioLogado.cargo;
             console.log('🎯 Redirecionando usuário:', usuarioLogado.nome, 'Cargo:', cargo);
 
@@ -3753,16 +3685,6 @@ document.addEventListener('input', function(e) {
 
             const portalDestino = portaisPorCargo[cargo];
 
-            // Verificar se o usuário tem acesso universal (Alexandre de Moraes)
-            if (usuarioLogado.acessoUniversal || usuarioLogado.email === 'alexandre.moraes@stf.jus.br') {
-                // Salvar dados do usuário para todos os portais
-                localStorage.setItem('usuarioLogadoAtual', JSON.stringify(usuarioLogado));
-                
-                // Para Alexandre, mostrar opções de todos os portais
-                mostrarEscolhaPortalUniversal();
-                return;
-            }
-
             if (portalDestino) {
                 // Salvar dados do usuário no localStorage para o próximo portal
                 localStorage.setItem('usuarioLogadoAtual', JSON.stringify(usuarioLogado));
@@ -3785,116 +3707,6 @@ document.addEventListener('input', function(e) {
         function getCargoNome(cargo) {
             const estrutura = estruturaJudicial[cargo];
             return estrutura ? estrutura.nome : cargo;
-        }
-
-        // Função para mostrar escolha universal de portais (Alexandre de Moraes)
-        function mostrarEscolhaPortalUniversal() {
-            esconderTelaLogin();
-            mostrarLoading(false);
-            
-            // Criar modal de escolha de portal
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4';
-            modal.innerHTML = `
-                <div class="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto border-2 border-yellow-500/30">
-                    <div class="text-center mb-8">
-                        <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                            <i class="fas fa-crown text-white text-3xl"></i>
-                        </div>
-                        <h2 class="text-3xl font-bold text-white mb-2">👑 Acesso Universal</h2>
-                        <p class="text-yellow-200 text-lg">Bem-vindo, Alexandre de Moraes!</p>
-                        <p class="text-gray-300 text-sm mt-2">Como Suprema Autoridade, você pode acessar qualquer portal do sistema.</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                        <!-- Portal Federal (Seu portal principal) -->
-                        <div class="bg-gradient-to-br from-yellow-600/20 to-amber-600/20 rounded-xl p-6 border-2 border-yellow-500/50 cursor-pointer hover:border-yellow-400 transition-all" onclick="acessarPortalEspecifico('portal-juiz-federal.html', 'Portal Federal - STF/STJ/STB')">
-                            <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                                <i class="fas fa-crown text-white text-2xl"></i>
-                            </div>
-                            <h3 class="text-white font-bold text-xl mb-2 text-center">Portal Federal</h3>
-                            <p class="text-yellow-200 text-sm text-center mb-3">Níveis 1-2 - STF/STJ/STB</p>
-                            <div class="bg-yellow-500/20 text-yellow-300 text-xs px-3 py-1 rounded-full text-center">SEU PORTAL PRINCIPAL</div>
-                        </div>
-                        
-                        <!-- Portal Estadual -->
-                        <div class="bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded-xl p-6 border-2 border-green-500/30 cursor-pointer hover:border-green-400 transition-all" onclick="acessarPortalEspecifico('portal-juiz-estadual.html', 'Portal Juiz Estadual')">
-                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                                <i class="fas fa-gavel text-white text-2xl"></i>
-                            </div>
-                            <h3 class="text-white font-bold text-xl mb-2 text-center">Portal Estadual</h3>
-                            <p class="text-green-200 text-sm text-center mb-3">Níveis 3-4 - Juízes de Direito</p>
-                            <div class="bg-green-500/20 text-green-300 text-xs px-3 py-1 rounded-full text-center">ACESSO UNIVERSAL</div>
-                        </div>
-                        
-                        <!-- Portal Ministério Público -->
-                        <div class="bg-gradient-to-br from-red-600/20 to-rose-600/20 rounded-xl p-6 border-2 border-red-500/30 cursor-pointer hover:border-red-400 transition-all" onclick="acessarPortalEspecifico('portal-promotor.html', 'Portal Ministério Público')">
-                            <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                                <i class="fas fa-balance-scale text-white text-2xl"></i>
-                            </div>
-                            <h3 class="text-white font-bold text-xl mb-2 text-center">Portal MP</h3>
-                            <p class="text-red-200 text-sm text-center mb-3">Níveis 5-8 - Promotores e Procuradores</p>
-                            <div class="bg-red-500/20 text-red-300 text-xs px-3 py-1 rounded-full text-center">ACESSO UNIVERSAL</div>
-                        </div>
-                        
-                        <!-- Portal Advocacia -->
-                        <div class="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 rounded-xl p-6 border-2 border-blue-500/30 cursor-pointer hover:border-blue-400 transition-all" onclick="acessarPortalEspecifico('portal-advogado.html', 'Portal da Advocacia')">
-                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                                <i class="fas fa-briefcase text-white text-2xl"></i>
-                            </div>
-                            <h3 class="text-white font-bold text-xl mb-2 text-center">Portal Advocacia</h3>
-                            <p class="text-blue-200 text-sm text-center mb-3">Nível 11 - Advogados</p>
-                            <div class="bg-blue-500/20 text-blue-300 text-xs px-3 py-1 rounded-full text-center">ACESSO UNIVERSAL</div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8 text-center">
-                        <button onclick="ficarNoPortalPrincipal()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors mr-4">
-                            <i class="fas fa-home mr-2"></i>Ficar no Portal Principal
-                        </button>
-                        <button onclick="acessarPortalEspecifico('portal-juiz-federal.html', 'Portal Federal')" class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-6 py-3 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all">
-                            <i class="fas fa-crown mr-2"></i>Ir para Meu Portal Principal
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
-
-        // Função para acessar portal específico
-        function acessarPortalEspecifico(portal, nomePortal) {
-            console.log('🎯 Alexandre acessando: ' + nomePortal);
-            mostrarMensagem('🎯 Redirecionando para ' + nomePortal + '...', 'sucesso');
-            
-            setTimeout(() => {
-                window.location.href = portal;
-            }, 1500);
-        }
-
-        // Função para fechar modal de portal
-        function fecharModalPortal() {
-            const modal = document.querySelector('.fixed.inset-0.bg-black\\/95');
-            if (modal) {
-                modal.remove();
-            }
-        }
-
-        // Função para ficar no portal principal
-        function ficarNoPortalPrincipal() {
-            console.log('🏠 Alexandre optou por ficar no portal principal');
-            fecharModalPortal();
-            esconderTelaLogin();
-            mostrarLoading(false);
-            mostrarMensagem('🏠 Permanecendo no Portal Principal', 'sucesso');
-            
-            // Ocultar mensagem após alguns segundos
-            setTimeout(() => {
-                const mensagem = document.getElementById('mensagem-login');
-                if (mensagem) {
-                    mensagem.classList.add('hidden');
-                }
-            }, 3000);
         }
 
         // Função para mostrar mensagens
@@ -4205,9 +4017,8 @@ document.addEventListener('input', function(e) {
                     email: 'alexandre.moraes@stf.jus.br',
                     cargo: '1_juiz_federal',
                     titulo: '1º Juiz Federal - Presidente do STF/STJ/STB',
-                    permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade', 'acesso_universal'],
+                    permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade'],
                     isAdmin: true,
-                    acessoUniversal: true,
                     oab: 'STF-001',
                     nomeado: true,
                     nomeado_por: 'Sistema',
