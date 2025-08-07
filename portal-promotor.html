@@ -203,6 +203,249 @@
                     Acessar
                 </button>
             </div>
+
+            <!-- Card Calculadora de Penas -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-calculator text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Calc. Penas</h3>
+                <p class="text-red-200 text-sm mb-4">Calcular penas para denúncias</p>
+                <button onclick="mostrarSecao('calculadora')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards SEGUNDA LINHA -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Card Sistema de Audiências -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-users text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Audiências</h3>
+                <p class="text-red-200 text-sm mb-4">Participar de audiências</p>
+                <button onclick="mostrarSecao('audiencias')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Ferramentas Advogado -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-briefcase text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Ferramentas</h3>
+                <p class="text-red-200 text-sm mb-4">Acesso às ferramentas de advogado</p>
+                <button onclick="mostrarSecao('ferramentas-advogado')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Espaços vazios para equilíbrio visual -->
+            <div></div>
+            <div></div>
+        </div>
+
+        <!-- Seção da Calculadora de Penas -->
+        <div id="secao-calculadora" class="hidden">
+            <div class="portal-card rounded-2xl p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <i class="fas fa-calculator mr-3 text-red-400"></i>
+                        Calculadora de Penas - Ministério Público
+                    </h2>
+                    <button onclick="voltarDashboard()" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Seleção de Crimes -->
+                    <div class="bg-red-500/10 rounded-xl p-6 border border-red-500/30">
+                        <h3 class="text-white font-bold text-xl mb-4">Selecionar Crimes</h3>
+                        
+                        <div class="mb-4">
+                            <input type="text" id="busca-crime" placeholder="Buscar crime..." class="w-full p-3 rounded-lg bg-gray-900 border border-red-500/50 text-white">
+                        </div>
+                        
+                        <div class="space-y-4 max-h-80 overflow-y-auto">
+                            <div class="bg-gray-800/50 rounded-lg p-3 space-y-2">
+                                <h4 class="text-red-300 font-semibold">Crimes Contra a Pessoa</h4>
+                                <div class="space-y-1">
+                                    <button onclick="adicionarCrime('Homicídio Simples', 30, 5000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 121 - Homicídio Simples</button>
+                                    <button onclick="adicionarCrime('Homicídio Qualificado', 45, 8000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 121 §2º - Homicídio Qualificado</button>
+                                    <button onclick="adicionarCrime('Lesão Corporal', 10, 1500)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 129 - Lesão Corporal</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-800/50 rounded-lg p-3 space-y-2">
+                                <h4 class="text-red-300 font-semibold">Crimes Contra o Patrimônio</h4>
+                                <div class="space-y-1">
+                                    <button onclick="adicionarCrime('Furto Simples', 15, 2000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 155 - Furto Simples</button>
+                                    <button onclick="adicionarCrime('Furto Qualificado', 20, 3000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 155 §4º - Furto Qualificado</button>
+                                    <button onclick="adicionarCrime('Roubo Simples', 25, 4000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 157 - Roubo Simples</button>
+                                    <button onclick="adicionarCrime('Roubo Majorado', 35, 6000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 157 §2º - Roubo Majorado</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-800/50 rounded-lg p-3 space-y-2">
+                                <h4 class="text-red-300 font-semibold">Crimes de Tráfico</h4>
+                                <div class="space-y-1">
+                                    <button onclick="adicionarCrime('Tráfico de Drogas', 25, 5000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 33 - Tráfico de Drogas</button>
+                                    <button onclick="adicionarCrime('Porte de Drogas', 8, 1000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 28 - Porte para Uso</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h4 class="text-white font-semibold mb-2">Crimes Selecionados:</h4>
+                            <div id="crimes-selecionados" class="min-h-[100px] bg-gray-900/50 rounded-lg p-3 border border-red-500/30">
+                                <p class="text-gray-400 text-sm">Nenhum crime selecionado</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cálculo e Resultado -->
+                    <div class="bg-green-500/10 rounded-xl p-6 border border-green-500/30">
+                        <h3 class="text-white font-bold text-xl mb-4">Cálculo da Pena</h3>
+                        
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label class="flex items-center text-white">
+                                    <input type="checkbox" id="confissao" class="mr-2 accent-green-500"> 
+                                    Confissão (-1/6 da pena)
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center text-white">
+                                    <input type="checkbox" id="primariedade" class="mr-2 accent-green-500"> 
+                                    Primariedade (redução)
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center text-white">
+                                    <input type="checkbox" id="colaboracao" class="mr-2 accent-green-500"> 
+                                    Colaboração (redução de 1/3)
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-white mb-2">Redução Extra (%)</label>
+                                <input type="number" id="reducaoExtra" min="0" max="50" value="0" class="w-full p-2 rounded bg-gray-900 border border-green-500/50 text-white">
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-500/20 rounded-lg p-4 border border-green-500/50 mb-4">
+                            <h4 class="text-white font-bold text-lg mb-2">Resultado Final</h4>
+                            <div class="space-y-2">
+                                <p class="text-green-200">Pena Total: <span id="pena-total" class="text-white font-bold">0 meses</span></p>
+                                <p class="text-green-200">Multa Total: <span id="multa-total" class="text-white font-bold">R$ 0,00</span></p>
+                                <p class="text-green-200">Regime: <span id="regime-prisional" class="text-white font-bold">-</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <button onclick="calcularPenaFinal()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition-all flex-1">
+                                <i class="fas fa-calculator mr-2"></i>Calcular
+                            </button>
+                            <button onclick="salvarCalculoMP()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all flex-1">
+                                <i class="fas fa-save mr-2"></i>Salvar
+                            </button>
+                            <button onclick="gerarDenunciaComPena()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-all flex-1">
+                                <i class="fas fa-file-alt mr-2"></i>Denúncia
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Audiências -->
+        <div id="secao-audiencias" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <i class="fas fa-users mr-3 text-blue-400"></i>
+                        Sistema de Audiências - MP
+                    </h2>
+                    <button onclick="voltarDashboard()" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-blue-500/20 rounded-lg p-4 border border-blue-500/30 text-center cursor-pointer hover:bg-blue-500/30 transition-all">
+                        <i class="fas fa-calendar-plus text-blue-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Solicitar Audiência</h3>
+                        <p class="text-blue-200 text-sm">Requerer nova audiência</p>
+                    </div>
+                    
+                    <div class="bg-green-500/20 rounded-lg p-4 border border-green-500/30 text-center cursor-pointer hover:bg-green-500/30 transition-all">
+                        <i class="fas fa-list text-green-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Audiências Agendadas</h3>
+                        <p class="text-green-200 text-sm">Ver agenda de audiências</p>
+                    </div>
+                    
+                    <div class="bg-purple-500/20 rounded-lg p-4 border border-purple-500/30 text-center cursor-pointer hover:bg-purple-500/30 transition-all">
+                        <i class="fas fa-microphone text-purple-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Participar Online</h3>
+                        <p class="text-purple-200 text-sm">Entrar em audiência virtual</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/30">
+                    <h3 class="text-yellow-300 font-bold mb-2">⚠️ Próximas Audiências</h3>
+                    <div class="space-y-2">
+                        <div class="bg-yellow-500/20 rounded p-3">
+                            <p class="text-white font-medium">Processo 001/2025 - 20/01 às 14h00</p>
+                            <p class="text-yellow-200 text-sm">Audiência de Instrução - Vara Criminal</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Ferramentas do Advogado -->
+        <div id="secao-ferramentas-advogado" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <i class="fas fa-briefcase mr-3 text-amber-400"></i>
+                        Ferramentas de Advocacia
+                    </h2>
+                    <button onclick="voltarDashboard()" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-amber-500/20 rounded-lg p-6 border border-amber-500/30 text-center cursor-pointer hover:bg-amber-500/30 transition-all" onclick="abrirCalculadoraHonorarios()">
+                        <i class="fas fa-calculator text-amber-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Calc. Honorários</h3>
+                        <p class="text-amber-200 text-sm">Calcular honorários advocatícios</p>
+                    </div>
+                    
+                    <div class="bg-purple-500/20 rounded-lg p-6 border border-purple-500/30 text-center cursor-pointer hover:bg-purple-500/30 transition-all" onclick="abrirJurisprudencia()">
+                        <i class="fas fa-book text-purple-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Jurisprudência</h3>
+                        <p class="text-purple-200 text-sm">Pesquisar jurisprudências</p>
+                    </div>
+                    
+                    <div class="bg-orange-500/20 rounded-lg p-6 border border-orange-500/30 text-center cursor-pointer hover:bg-orange-500/30 transition-all" onclick="abrirContratos()">
+                        <i class="fas fa-handshake text-orange-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Contratos</h3>
+                        <p class="text-orange-200 text-sm">Modelos de contratos</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-amber-500/10 rounded-lg p-4 border border-amber-500/30">
+                    <p class="text-amber-200 text-sm">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Como promotor, você também tem acesso às ferramentas básicas de advocacia para elaboração de peças processuais.
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- Seção de Documentos para Promotores -->
@@ -493,6 +736,209 @@
                 window.location.href = 'index.html';
             }
         }
+
+        // ===== SISTEMA CALCULADORA DE PENAS - MINISTÉRIO PÚBLICO =====
+        
+        let crimesSelecionadosMP = [];
+
+        function adicionarCrime(nome, pena, multa) {
+            const crime = { nome, pena, multa };
+            crimesSelecionadosMP.push(crime);
+            atualizarListaCrimes();
+        }
+
+        function removerCrime(index) {
+            crimesSelecionadosMP.splice(index, 1);
+            atualizarListaCrimes();
+        }
+
+        function atualizarListaCrimes() {
+            const container = document.getElementById('crimes-selecionados');
+            if (!container) return;
+
+            if (crimesSelecionadosMP.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-sm">Nenhum crime selecionado</p>';
+                return;
+            }
+
+            let html = '';
+            crimesSelecionadosMP.forEach((crime, index) => {
+                html += `
+                    <div class="bg-red-500/20 rounded-lg p-3 mb-2 flex justify-between items-center">
+                        <div>
+                            <h5 class="text-white font-medium">${crime.nome}</h5>
+                            <p class="text-red-200 text-sm">${crime.pena} meses • R$ ${crime.multa.toLocaleString('pt-BR')}</p>
+                        </div>
+                        <button onclick="removerCrime(${index})" class="text-red-400 hover:text-red-300">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function calcularPenaFinal() {
+            if (crimesSelecionadosMP.length === 0) {
+                alert('⚠️ Selecione pelo menos um crime!');
+                return;
+            }
+
+            let penaTotal = 0;
+            let multaTotal = 0;
+
+            // Somar penas e multas
+            crimesSelecionadosMP.forEach(crime => {
+                penaTotal += crime.pena;
+                multaTotal += crime.multa;
+            });
+
+            // Aplicar reduções
+            let reducaoTotal = 0;
+
+            if (document.getElementById('confissao')?.checked) {
+                reducaoTotal += 1/6; // 16.67%
+            }
+
+            if (document.getElementById('primariedade')?.checked) {
+                reducaoTotal += 0.1; // 10%
+            }
+
+            if (document.getElementById('colaboracao')?.checked) {
+                reducaoTotal += 1/3; // 33.33%
+            }
+
+            const reducaoExtra = parseFloat(document.getElementById('reducaoExtra')?.value || 0) / 100;
+            reducaoTotal += reducaoExtra;
+
+            // Aplicar redução (máximo 70%)
+            reducaoTotal = Math.min(reducaoTotal, 0.7);
+            
+            const penaFinal = Math.round(penaTotal * (1 - reducaoTotal));
+            const multaFinal = Math.round(multaTotal * (1 - reducaoTotal));
+
+            // Determinar regime
+            let regime = '';
+            if (penaFinal <= 4) {
+                regime = 'Pena alternativa ou multa';
+            } else if (penaFinal <= 8) {
+                regime = 'Regime aberto';
+            } else if (penaFinal <= 12) {
+                regime = 'Regime semiaberto';
+            } else {
+                regime = 'Regime fechado';
+            }
+
+            // Atualizar interface
+            document.getElementById('pena-total').textContent = `${penaFinal} meses`;
+            document.getElementById('multa-total').textContent = `R$ ${multaFinal.toLocaleString('pt-BR')}`;
+            document.getElementById('regime-prisional').textContent = regime;
+
+            console.log('📊 Cálculo de pena realizado:', {
+                crimesSelecionados: crimesSelecionadosMP.length,
+                penaOriginal: penaTotal,
+                reducaoAplicada: (reducaoTotal * 100).toFixed(1) + '%',
+                penaFinal: penaFinal,
+                regime: regime
+            });
+        }
+
+        async function salvarCalculoMP() {
+            try {
+                if (crimesSelecionadosMP.length === 0) {
+                    alert('⚠️ Selecione crimes antes de salvar!');
+                    return;
+                }
+
+                const calculo = {
+                    crimes: crimesSelecionadosMP,
+                    reducoes: {
+                        confissao: document.getElementById('confissao')?.checked || false,
+                        primariedade: document.getElementById('primariedade')?.checked || false,
+                        colaboracao: document.getElementById('colaboracao')?.checked || false,
+                        extra: parseFloat(document.getElementById('reducaoExtra')?.value || 0)
+                    },
+                    resultado: {
+                        penaTotal: document.getElementById('pena-total')?.textContent || '0',
+                        multaTotal: document.getElementById('multa-total')?.textContent || 'R$ 0',
+                        regime: document.getElementById('regime-prisional')?.textContent || '-'
+                    },
+                    promotor: usuarioLogado?.nome,
+                    dataCalculo: new Date().toISOString(),
+                    tipo: 'calculo-pena-mp'
+                };
+
+                if (window.firebaseDB && window.firebaseModules) {
+                    const docRef = await window.firebaseModules.addDoc(
+                        window.firebaseModules.collection(window.firebaseDB, 'calculos-penas'),
+                        calculo
+                    );
+                    alert(`✅ Cálculo salvo no Firebase!\nID: ${docRef.id}`);
+                } else {
+                    alert('⚠️ Firebase indisponível, mas cálculo realizado!');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao salvar cálculo:', error);
+                alert('❌ Erro ao salvar, mas cálculo realizado!');
+            }
+        }
+
+        function gerarDenunciaComPena() {
+            if (crimesSelecionadosMP.length === 0) {
+                alert('⚠️ Calcule a pena antes de gerar a denúncia!');
+                return;
+            }
+
+            const penaCalculada = document.getElementById('pena-total')?.textContent || '0';
+            const multa = document.getElementById('multa-total')?.textContent || 'R$ 0';
+            const regime = document.getElementById('regime-prisional')?.textContent || '-';
+
+            alert(`📄 Gerando Denúncia com Cálculo de Pena...\n\n` +
+                  `Crimes: ${crimesSelecionadosMP.length} selecionado(s)\n` +
+                  `Pena Sugerida: ${penaCalculada}\n` +
+                  `Multa: ${multa}\n` +
+                  `Regime: ${regime}\n\n` +
+                  `(Em desenvolvimento - integração com gerador de denúncias)`);
+        }
+
+        // ===== FERRAMENTAS DE ADVOGADO NO MP =====
+
+        // Calculadora de Honorários (herdada do portal advogado)
+        function abrirCalculadoraHonorarios() {
+            alert('💰 Calculadora de Honorários\n\n(Funcionalidade herdada do Portal do Advogado)\n\nEm desenvolvimento...');
+        }
+
+        // Jurisprudência (herdada do portal advogado)
+        function abrirJurisprudencia() {
+            alert('📚 Banco de Jurisprudência\n\n(Funcionalidade herdada do Portal do Advogado)\n\nEm desenvolvimento...');
+        }
+
+        // Contratos (herdada do portal advogado)
+        function abrirContratos() {
+            alert('📋 Modelos de Contratos\n\n(Funcionalidade herdada do Portal do Advogado)\n\nEm desenvolvimento...');
+        }
+
+        // Busca de crimes em tempo real
+        document.addEventListener('DOMContentLoaded', function() {
+            const buscaCrime = document.getElementById('busca-crime');
+            if (buscaCrime) {
+                buscaCrime.addEventListener('input', function() {
+                    const termo = this.value.toLowerCase();
+                    const botoesCrime = document.querySelectorAll('button[onclick*="adicionarCrime"]');
+                    
+                    botoesCrime.forEach(botao => {
+                        const texto = botao.textContent.toLowerCase();
+                        const container = botao.closest('.bg-gray-800\\/50');
+                        
+                        if (texto.includes(termo)) {
+                            botao.style.display = 'block';
+                        } else {
+                            botao.style.display = termo === '' ? 'block' : 'none';
+                        }
+                    });
+                });
+            }
+        });
     </script>
 
 </body>
