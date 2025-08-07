@@ -77,6 +77,114 @@
             color: transparent;
             -webkit-text-fill-color: transparent;
         }
+
+        /* Estilos para Modal da Hierarquia */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 248, 220, 0.95) 100%);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            border: 3px solid #d97706;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #d97706;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #a16207;
+        }
+
+        .hierarquia-container {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .nivel-hierarquia {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid;
+        }
+
+        .nivel-1 { 
+            background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 10%, #fef3c7 100%);
+            border-left-color: #d97706;
+            box-shadow: 0 8px 25px rgba(217, 119, 6, 0.2);
+        }
+
+        .nivel-2 { 
+            background: linear-gradient(135deg, #dbeafe 0%, #3b82f6 10%, #dbeafe 100%);
+            border-left-color: #2563eb;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.2);
+        }
+
+        .nivel-3 { 
+            background: linear-gradient(135deg, #dcfce7 0%, #22c55e 10%, #dcfce7 100%);
+            border-left-color: #16a34a;
+            box-shadow: 0 8px 25px rgba(22, 163, 74, 0.2);
+        }
+
+        .nivel-4 { 
+            background: linear-gradient(135deg, #fef2f2 0%, #ef4444 10%, #fef2f2 100%);
+            border-left-color: #dc2626;
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.2);
+        }
+
+        .nivel-5 { 
+            background: linear-gradient(135deg, #f3e8ff 0%, #8b5cf6 10%, #f3e8ff 100%);
+            border-left-color: #7c3aed;
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.2);
+        }
+
+        .cargo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .cargo:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(5px);
+        }
+
+        .status-ocupacao {
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .status-ocupacao span {
+            color: #059669;
+        }
     </style>
 
     <!-- Firebase SDK -->
@@ -136,6 +244,7 @@
                     <a href="#processos" class="text-white hover:text-yellow-200 transition-colors">Processos</a>
                     <a href="#sentencas" class="text-white hover:text-yellow-200 transition-colors">Sentenças</a>
                     <a href="#administracao" class="text-white hover:text-yellow-200 transition-colors">Administração</a>
+                    <a href="#hierarquia" onclick="mostrarHierarquiaJudicial()" class="text-white hover:text-yellow-200 transition-colors cursor-pointer">🏛️ Hierarquia</a>
                 </nav>
 
                 <!-- User Menu -->
@@ -1133,6 +1242,30 @@
             }
         }
 
+        // Função para mostrar hierarquia judicial
+        function mostrarHierarquiaJudicial() {
+            const modal = document.getElementById('hierarquia-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                console.log('🏛️ Hierarquia Judicial exibida');
+            }
+        }
+
+        // Função para fechar modal da hierarquia
+        function fecharModalHierarquia() {
+            const modal = document.getElementById('hierarquia-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Função para verificar ocupação dos cargos
+        function verificarOcupacao() {
+            // Simular status de ocupação (em produção seria consulta ao Firebase)
+            const status = ['Ocupado', 'Vago'];
+            return status[Math.floor(Math.random() * status.length)];
+        }
+
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🏛️ Portal do Juiz Federal carregado - Suprema Autoridade');
@@ -1141,6 +1274,84 @@
             setInterval(atualizarContadoresFirebase, 30000);
         });
     </script>
+
+    <!-- Modal Hierarquia Judicial -->
+    <div id="hierarquia-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+            <span class="close" onclick="fecharModalHierarquia()">&times;</span>
+            <h2>🏛️ Hierarquia Judicial Completa</h2>
+            <div class="hierarquia-container">
+                <!-- Nível 1-2: STF (Supremo Tribunal Federal) -->
+                <div class="nivel-hierarquia nivel-1">
+                    <h3>🔱 Nível 1-2: Supremo Tribunal Federal (STF)</h3>
+                    <div class="cargo">
+                        <strong>Suprema Autoridade Judicial</strong>
+                        <span class="status-ocupacao">Status: <span id="status-suprema">Ocupado</span></span>
+                    </div>
+                    <div class="cargo">
+                        <strong>Ministros do STF</strong>
+                        <span class="status-ocupacao">Status: <span id="status-ministros">Vago</span></span>
+                    </div>
+                </div>
+
+                <!-- Nível 3-4: TJBR (Tribunal de Justiça Brasilândia) -->
+                <div class="nivel-hierarquia nivel-2">
+                    <h3>⚖️ Nível 3-4: Tribunal de Justiça Brasilândia (TJBR)</h3>
+                    <div class="cargo">
+                        <strong>Desembargadores</strong>
+                        <span class="status-ocupacao">Status: <span id="status-desembargadores">Vago</span></span>
+                    </div>
+                    <div class="cargo">
+                        <strong>Juízes Estaduais</strong>
+                        <span class="status-ocupacao">Status: <span id="status-juizes-estaduais">Ocupado</span></span>
+                    </div>
+                </div>
+
+                <!-- Nível 5-8: Ministério Público -->
+                <div class="nivel-hierarquia nivel-3">
+                    <h3>🛡️ Nível 5-8: Ministério Público</h3>
+                    <div class="cargo">
+                        <strong>Procurador-Geral de Justiça</strong>
+                        <span class="status-ocupacao">Status: <span id="status-procurador-geral">Vago</span></span>
+                    </div>
+                    <div class="cargo">
+                        <strong>Procuradores de Justiça</strong>
+                        <span class="status-ocupacao">Status: <span id="status-procuradores">Ocupado</span></span>
+                    </div>
+                    <div class="cargo">
+                        <strong>Promotores de Justiça Especializados</strong>
+                        <span class="status-ocupacao">Status: <span id="status-promotores-esp">Vago</span></span>
+                    </div>
+                    <div class="cargo">
+                        <strong>Promotores de Justiça</strong>
+                        <span class="status-ocupacao">Status: <span id="status-promotores">Ocupado</span></span>
+                    </div>
+                </div>
+
+                <!-- Nível 9-10: Polícia e Corregedoria -->
+                <div class="nivel-hierarquia nivel-4">
+                    <h3>👮 Nível 9-10: Polícia e Corregedoria</h3>
+                    <div class="cargo">
+                        <strong>Corregedoria Judicial</strong>
+                        <span class="status-ocupacao">Status: <span id="status-corregedoria">Vago</span></span>
+                    </div>
+                    <div class="cargo">
+                        <strong>Chefe de Polícia</strong>
+                        <span class="status-ocupacao">Status: <span id="status-chefe-policia">Ocupado</span></span>
+                    </div>
+                </div>
+
+                <!-- Nível 11: Advocacia -->
+                <div class="nivel-hierarquia nivel-5">
+                    <h3>📋 Nível 11: Advocacia</h3>
+                    <div class="cargo">
+                        <strong>Ordem dos Advogados (OAB)</strong>
+                        <span class="status-ocupacao">Status: <span id="status-oab">Ocupado</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
