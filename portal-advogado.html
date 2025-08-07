@@ -310,17 +310,62 @@
         // Carregar dados do usuário
         window.addEventListener('load', async () => {
             try {
+                console.log('🔍 Verificando autenticação do usuário...');
+                
                 // Verificar se há dados do usuário no localStorage
                 const dadosUsuario = localStorage.getItem('usuarioLogadoAtual');
+                
                 if (dadosUsuario) {
-                    usuarioLogado = JSON.parse(dadosUsuario);
-                    atualizarInterfaceUsuario();
+                    try {
+                        usuarioLogado = JSON.parse(dadosUsuario);
+                        console.log('✅ Dados do usuário encontrados:', usuarioLogado.nome);
+                        atualizarInterfaceUsuario();
+                        return;
+                    } catch (parseError) {
+                        console.error('❌ Erro ao fazer parse dos dados do usuário:', parseError);
+                    }
+                }
+
+                // Se não há dados no localStorage, verificar Firebase Auth
+                if (window.firebaseAuth && window.firebaseModules) {
+                    console.log('🔍 Verificando autenticação no Firebase...');
+                    
+                    window.firebaseModules.onAuthStateChanged(window.firebaseAuth, (user) => {
+                        if (user) {
+                            console.log('✅ Usuário autenticado no Firebase:', user.email);
+                            // Usuário está logado, mas pode não ter dados no localStorage
+                            // Criar dados básicos para Alexandre se necessário
+                            if (user.email === 'alexandre.moraes@stf.jus.br') {
+                                usuarioLogado = {
+                                    uid: user.uid,
+                                    email: user.email,
+                                    nome: 'Alexandre de Moraes',
+                                    cargo: '1_juiz_federal',
+                                    titulo: '1º Juiz Federal - Suprema Autoridade',
+                                    oab: 'STF-001',
+                                    acessoUniversal: true,
+                                    permissoes: ['todas', 'admin', 'acesso_universal']
+                                };
+                                localStorage.setItem('usuarioLogadoAtual', JSON.stringify(usuarioLogado));
+                                atualizarInterfaceUsuario();
+                            } else {
+                                // Para outros usuários, redirecionar para configuração
+                                console.log('⚠️ Usuário sem dados completos, redirecionando...');
+                                localStorage.setItem('ficarNoPortalPrincipal', 'true');
+                                window.location.href = 'index.html';
+                            }
+                        } else {
+                            console.log('❌ Usuário não autenticado, redirecionando para login...');
+                            window.location.href = 'index.html';
+                        }
+                    });
                 } else {
-                    // Redirecionar para login se não há dados
+                    console.log('❌ Firebase não inicializado, redirecionando...');
                     window.location.href = 'index.html';
                 }
+                
             } catch (error) {
-                console.error('Erro ao carregar dados do usuário:', error);
+                console.error('❌ Erro ao carregar dados do usuário:', error);
                 window.location.href = 'index.html';
             }
         });
