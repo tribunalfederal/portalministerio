@@ -116,7 +116,7 @@
                         <p class="text-yellow-400 text-xs font-medium">⚖️ Justiça Estadual</p>
                     </div>
                     <div class="flex space-x-2">
-                        <button onclick="window.location.href='index.html'" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                        <button onclick="voltarParaPortalPrincipal()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm">
                             <i class="fas fa-home mr-1"></i>Portal Principal
                         </button>
                         <button onclick="fazerLogout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
@@ -452,6 +452,13 @@
             const nivel = tipo.includes('estadual') ? ' (JUSTIÇA ESTADUAL)' : '';
 
             alert(`🚧 Gerando ${nomeDoc}${nivel}... (Em desenvolvimento)\n\nEste será o sistema de documentos da Justiça Estadual com permissões específicas.`);
+        }
+
+        // Função para voltar ao portal principal
+        function voltarParaPortalPrincipal() {
+            // Definir flag para não fazer redirecionamento automático
+            localStorage.setItem('ficarNoPortalPrincipal', 'true');
+            window.location.href = 'index.html';
         }
 
         // Logout
