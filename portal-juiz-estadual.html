@@ -388,11 +388,11 @@
                     usuarioLogado = JSON.parse(dadosUsuario);
                     atualizarInterfaceUsuario();
                 } else {
-                    window.location.href = 'index (2).html';
+                    window.location.href = 'index.html';
                 }
             } catch (error) {
                 console.error('Erro ao carregar dados do usuário:', error);
-                window.location.href = 'index (2).html';
+                window.location.href = 'index.html';
             }
         });
 
@@ -461,11 +461,11 @@
                     await window.firebaseModules.signOut(window.firebaseAuth);
                 }
                 localStorage.removeItem('usuarioLogadoAtual');
-                window.location.href = 'index (2).html';
+                window.location.href = 'index.html';
             } catch (error) {
                 console.error('Erro no logout:', error);
                 localStorage.removeItem('usuarioLogadoAtual');
-                window.location.href = 'index (2).html';
+                window.location.href = 'index.html';
             }
         }
     </script>
