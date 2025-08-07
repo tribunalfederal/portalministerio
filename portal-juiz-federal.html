@@ -149,7 +149,7 @@
                         <p class="text-yellow-400 text-xs font-bold">👑 MÁXIMA AUTORIDADE</p>
                     </div>
                     <div class="flex space-x-2">
-                        <button onclick="window.location.href='index.html'" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                        <button onclick="voltarParaPortalPrincipal()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm">
                             <i class="fas fa-home mr-1"></i>Portal Principal
                         </button>
                         <button onclick="mostrarSecao('administracao')" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg transition-colors text-sm">
@@ -634,6 +634,13 @@
 
             const descricao = funcionalidades[tipo] || 'Funcionalidade em desenvolvimento';
             alert(`⚖️ ${descricao}\n\n🚧 Sistema em desenvolvimento...\n\n👑 Acesso exclusivo para Juízes Federais`);
+        }
+
+        // Função para voltar ao portal principal
+        function voltarParaPortalPrincipal() {
+            // Definir flag para não fazer redirecionamento automático
+            localStorage.setItem('ficarNoPortalPrincipal', 'true');
+            window.location.href = 'index.html';
         }
 
         // Logout
