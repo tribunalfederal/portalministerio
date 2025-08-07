@@ -300,11 +300,119 @@
             </div>
         </div>
 
-        <!-- Outras seções serão implementadas -->
+        <!-- Sistema de Processos 24/7 - Integrado -->
         <div id="secao-casos" class="hidden">
-            <div class="portal-card rounded-2xl p-8">
-                <h2 class="text-white text-2xl font-bold mb-6">Gestão de Casos</h2>
-                <p class="text-blue-200">Em desenvolvimento...</p>
+            <div class="bg-gradient-to-br from-slate-900/95 via-indigo-900/30 to-slate-800/95 backdrop-blur-lg rounded-2xl p-8 border-2 border-indigo-600/50 shadow-2xl">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-3xl font-bold text-white flex items-center">
+                        <span class="bg-indigo-600 p-3 rounded-lg mr-4 shadow-lg">⚖️</span>
+                        Sistema de Processos 24/7
+                    </h2>
+                    <div class="flex items-center space-x-4">
+                        <div id="status-processos" class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-green-300 text-sm">Sistema Online</span>
+                        </div>
+                        <button onclick="voltarDashboard()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg transition-all">
+                            ← Voltar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dashboard de Estatísticas -->
+                <div class="grid lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-blue-600/20 rounded-lg p-4 border border-blue-500/50">
+                        <h4 class="text-blue-300 font-bold text-sm mb-2">📋 TOTAL</h4>
+                        <p id="stat-total" class="text-white text-2xl font-bold">0</p>
+                        <p class="text-blue-200 text-xs">Processos ativos</p>
+                    </div>
+                    <div class="bg-yellow-600/20 rounded-lg p-4 border border-yellow-500/50">
+                        <h4 class="text-yellow-300 font-bold text-sm mb-2">⏳ AGUARDANDO</h4>
+                        <p id="stat-aguardando" class="text-white text-2xl font-bold">0</p>
+                        <p class="text-yellow-200 text-xs">Aguardando juiz</p>
+                    </div>
+                    <div class="bg-green-600/20 rounded-lg p-4 border border-green-500/50">
+                        <h4 class="text-green-300 font-bold text-sm mb-2">⚖️ ANDAMENTO</h4>
+                        <p id="stat-andamento" class="text-white text-2xl font-bold">0</p>
+                        <p class="text-green-200 text-xs">Em andamento</p>
+                    </div>
+                    <div class="bg-purple-600/20 rounded-lg p-4 border border-purple-500/50">
+                        <h4 class="text-purple-300 font-bold text-sm mb-2">✅ FINALIZADOS</h4>
+                        <p id="stat-finalizados" class="text-white text-2xl font-bold">0</p>
+                        <p class="text-purple-200 text-xs">Sentenciados</p>
+                    </div>
+                </div>
+
+                <!-- Painel de Novo Processo -->
+                <div class="bg-gradient-to-br from-blue-900/40 via-indigo-800/30 to-blue-900/50 rounded-xl p-6 border-2 border-blue-500/50 mb-6">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <span class="bg-blue-600 p-2 rounded-lg mr-3">📋</span>
+                        Abrir Novo Processo
+                    </h3>
+                    <div class="grid lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-blue-200 text-sm font-medium mb-2">Nome do Cliente/Réu</label>
+                            <input type="text" id="novo-processo-cliente" placeholder="Nome completo..." class="w-full px-3 py-2 rounded bg-gray-900 border border-blue-500/50 text-white text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-blue-200 text-sm font-medium mb-2">Tipo de Crime/Ação</label>
+                            <select id="novo-processo-tipo" class="w-full px-3 py-2 rounded bg-gray-900 border border-blue-500/50 text-white text-sm">
+                                <option value="">Selecione...</option>
+                                <option value="Furto">Furto</option>
+                                <option value="Roubo">Roubo</option>
+                                <option value="Homicídio">Homicídio</option>
+                                <option value="Lesão Corporal">Lesão Corporal</option>
+                                <option value="Tráfico">Tráfico de Drogas</option>
+                                <option value="Ação Civil">Ação Civil</option>
+                                <option value="Trabalhista">Ação Trabalhista</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-blue-200 text-sm font-medium mb-2">Seu Nome (Advogado)</label>
+                            <input type="text" id="novo-processo-advogado" placeholder="Seu nome..." class="w-full px-3 py-2 rounded bg-gray-900 border border-blue-500/50 text-white text-sm">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="abrirProcessoAdvogado()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 px-3 rounded transition-all">
+                                ⚖️ Abrir Processo
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-blue-200 text-sm font-medium mb-2">Observações Iniciais</label>
+                        <textarea id="novo-processo-obs" placeholder="Detalhes do caso, evidências, etc..." class="w-full px-3 py-2 rounded bg-gray-900 border border-blue-500/50 text-white text-sm h-20 resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- Lista de Processos -->
+                <div class="bg-white/10 rounded-xl p-6 border border-white/20">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-white">📂 Meus Processos</h3>
+                        <button onclick="atualizarListaProcessosAdvogado()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg transition-all text-sm">
+                            🔄 Atualizar
+                        </button>
+                    </div>
+                    <div id="lista-processos-advogado" class="space-y-4 max-h-96 overflow-y-auto">
+                        <!-- Processos serão carregados aqui -->
+                        <div class="text-center text-white/70 py-8">
+                            <span class="text-4xl mb-4 block">📋</span>
+                            <p>Nenhum processo encontrado.</p>
+                            <p class="text-sm mt-2">Abra um novo processo para começar.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Log de Atividades -->
+                <div class="mt-6 bg-black/30 rounded-lg p-4 border border-white/20">
+                    <h4 class="text-white font-bold mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                        Log de Atividades - Portal do Advogado
+                    </h4>
+                    <div id="log-processos-advogado" class="bg-gray-900 rounded p-3 max-h-32 overflow-y-auto text-sm font-mono">
+                        <div class="text-green-400">[07/08/2025 15:30:25] Portal do Advogado iniciado</div>
+                        <div class="text-blue-400">[07/08/2025 15:30:26] Sistema de processos 24/7 conectado</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -891,6 +999,435 @@
                 window.location.href = 'index.html';
             }
         }
+
+        // ===== SISTEMA DE PROCESSOS 24/7 - PORTAL DO ADVOGADO =====
+        
+        let processosAdvogado = [];
+        let proximoNumeroProcesso = 1;
+        let nomeAdvogadoAtual = '';
+
+        // Inicializar sistema de processos
+        function inicializarSistemaProcessosAdvogado() {
+            console.log('⚖️ Inicializando Sistema de Processos - Portal do Advogado');
+            adicionarLogProcessos('Portal do Advogado iniciado');
+            adicionarLogProcessos('Sistema de processos 24/7 conectado');
+            
+            // Carregar processos do Firebase
+            if (window.firebaseDB) {
+                carregarProcessosDoAdvogado();
+                iniciarListenerNotificacoesAdvogado();
+            }
+            
+            // Atualizar estatísticas periodicamente
+            setInterval(atualizarEstatisticasAdvogado, 5000);
+        }
+
+        // Abrir novo processo
+        function abrirProcessoAdvogado() {
+            const nomeCliente = document.getElementById('novo-processo-cliente').value.trim();
+            const tipoProcesso = document.getElementById('novo-processo-tipo').value;
+            const nomeAdvogado = document.getElementById('novo-processo-advogado').value.trim();
+            const observacoes = document.getElementById('novo-processo-obs').value.trim();
+            
+            if (!nomeCliente || !tipoProcesso || !nomeAdvogado) {
+                alert('⚠️ Preencha nome do cliente, tipo de processo e seu nome!');
+                return;
+            }
+            
+            nomeAdvogadoAtual = nomeAdvogado;
+            const numeroProcesso = String(proximoNumeroProcesso).padStart(3, '0') + '/2025';
+            proximoNumeroProcesso++;
+            
+            const novoProcesso = {
+                id: `proc_adv_${Date.now()}`,
+                numero: numeroProcesso,
+                reu: nomeCliente,
+                crime: tipoProcesso,
+                advogado: nomeAdvogado,
+                observacoes: observacoes,
+                status: 'Aguardando Juiz',
+                juiz: null,
+                dataAbertura: new Date().toLocaleString('pt-BR'),
+                intimacoes: [],
+                sentenca: null,
+                timestamp: Date.now(),
+                portalOrigem: 'advogado'
+            };
+            
+            processosAdvogado.push(novoProcesso);
+            salvarProcessoFirebaseAdvogado(novoProcesso);
+            
+            adicionarLogProcessos(`📋 Processo ${numeroProcesso} aberto por ${nomeAdvogado}`);
+            
+            // Notificar juízes disponíveis
+            enviarNotificacaoJuizesAdvogado(novoProcesso);
+            
+            // Limpar formulário
+            document.getElementById('novo-processo-cliente').value = '';
+            document.getElementById('novo-processo-tipo').value = '';
+            document.getElementById('novo-processo-obs').value = '';
+            
+            atualizarListaProcessosAdvogado();
+            atualizarEstatisticasAdvogado();
+            
+            alert(`✅ Processo ${numeroProcesso} criado com sucesso!\\n👨‍⚖️ Aguardando designação de juiz.\\n📧 Juízes foram notificados automaticamente.`);
+        }
+
+        // Atualizar lista de processos
+        function atualizarListaProcessosAdvogado() {
+            const listaProcessos = document.getElementById('lista-processos-advogado');
+            if (!listaProcessos) return;
+            
+            // Filtrar apenas processos deste advogado
+            const meusProcesos = processosAdvogado.filter(p => 
+                !nomeAdvogadoAtual || p.advogado === nomeAdvogadoAtual
+            );
+            
+            if (meusProcesos.length === 0) {
+                listaProcessos.innerHTML = `
+                    <div class="text-center text-white/70 py-8">
+                        <span class="text-4xl mb-4 block">📋</span>
+                        <p>Nenhum processo encontrado.</p>
+                        <p class="text-sm mt-2">Abra um novo processo para começar.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const processosHTML = meusProcesos.map(processo => {
+                let statusClass = '';
+                let statusIcon = '';
+                
+                switch(processo.status) {
+                    case 'Aguardando Juiz':
+                        statusClass = 'bg-yellow-500';
+                        statusIcon = '⏳';
+                        break;
+                    case 'Em Andamento':
+                        statusClass = 'bg-blue-500';
+                        statusIcon = '⚖️';
+                        break;
+                    case 'Sentenciado':
+                        statusClass = 'bg-green-500';
+                        statusIcon = '✅';
+                        break;
+                    default:
+                        statusClass = 'bg-gray-500';
+                        statusIcon = '❓';
+                }
+                
+                return `
+                    <div class="bg-indigo-900/30 rounded-lg p-4 border border-indigo-600/40">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Processo nº ${processo.numero}</h4>
+                                <p class="text-white/70">${processo.reu} - ${processo.crime}</p>
+                                <p class="text-indigo-300 text-sm">Aberto: ${processo.dataAbertura}</p>
+                                ${processo.juiz ? `<p class="text-green-300 text-sm">👨‍⚖️ Juiz: ${processo.juiz}</p>` : ''}
+                            </div>
+                            <div class="text-right">
+                                <span class="${statusClass} text-white px-3 py-1 rounded text-sm font-medium">
+                                    ${statusIcon} ${processo.status}
+                                </span>
+                                ${processo.intimacoes.length > 0 ? `<p class="text-yellow-300 text-xs mt-1">📨 ${processo.intimacoes.length} intimação(ões)</p>` : ''}
+                            </div>
+                        </div>
+                        
+                        ${processo.observacoes ? `
+                            <div class="bg-black/20 rounded p-2 mb-3">
+                                <p class="text-white/80 text-sm"><strong>📝 Observações:</strong> ${processo.observacoes}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${processo.intimacoes.length > 0 ? `
+                            <div class="bg-yellow-900/30 rounded p-3 border border-yellow-600/40 mb-3">
+                                <p class="text-yellow-300 font-bold text-sm">📨 INTIMAÇÕES RECEBIDAS</p>
+                                ${processo.intimacoes.map(int => `
+                                    <div class="text-white text-sm mt-2">
+                                        <strong>${int.motivo}</strong> - ${int.data}
+                                        ${int.intimado !== processo.reu ? `<br><span class="text-yellow-200">Para: ${int.intimado}</span>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${processo.sentenca ? `
+                            <div class="bg-green-900/30 rounded p-3 border border-green-600/40">
+                                <p class="text-green-300 font-bold text-sm">⚖️ SENTENÇA FINAL</p>
+                                <p class="text-white text-sm">${processo.sentenca.descricao}</p>
+                                <p class="text-white/70 text-xs">Data: ${processo.sentenca.data} - Juiz: ${processo.sentenca.juiz}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="flex space-x-2 mt-3">
+                            <button onclick="verDetalhesProcessoAdvogado('${processo.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded text-sm transition-all">
+                                👁️ Ver Detalhes
+                            </button>
+                            ${processo.status === 'Em Andamento' ? `
+                                <button onclick="solicitarInformacoesAdvogado('${processo.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-sm transition-all">
+                                    📞 Contatar Juiz
+                                </button>
+                            ` : ''}
+                            ${processo.status === 'Sentenciado' ? `
+                                <button onclick="interporRecurso('${processo.id}')" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1 rounded text-sm transition-all">
+                                    📄 Interpor Recurso
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            listaProcessos.innerHTML = processosHTML;
+        }
+
+        // Atualizar estatísticas
+        function atualizarEstatisticasAdvogado() {
+            const meusProcesos = processosAdvogado.filter(p => 
+                !nomeAdvogadoAtual || p.advogado === nomeAdvogadoAtual
+            );
+            
+            const total = meusProcesos.length;
+            const aguardando = meusProcesos.filter(p => p.status === 'Aguardando Juiz').length;
+            const andamento = meusProcesos.filter(p => p.status === 'Em Andamento').length;
+            const finalizados = meusProcesos.filter(p => p.status === 'Sentenciado').length;
+            
+            const statTotal = document.getElementById('stat-total');
+            const statAguardando = document.getElementById('stat-aguardando');
+            const statAndamento = document.getElementById('stat-andamento');
+            const statFinalizados = document.getElementById('stat-finalizados');
+            
+            if (statTotal) statTotal.textContent = total;
+            if (statAguardando) statAguardando.textContent = aguardando;
+            if (statAndamento) statAndamento.textContent = andamento;
+            if (statFinalizados) statFinalizados.textContent = finalizados;
+        }
+
+        // Notificar juízes sobre novo processo
+        function enviarNotificacaoJuizesAdvogado(processo) {
+            if (!window.firebaseDB) return;
+            
+            const notificacao = {
+                titulo: '📋 Novo Processo Disponível',
+                mensagem: `${processo.numero} - ${processo.reu} (${processo.crime}) - Advogado: ${processo.advogado}`,
+                tipo: 'novo-processo',
+                destinatario: 'juizes',
+                dados: processo,
+                timestamp: new Date(),
+                ativo: true,
+                sistema: 'Brasilândia RP - Portal Advogado'
+            };
+            
+            try {
+                const { collection, addDoc } = window.firebaseModules;
+                addDoc(collection(window.firebaseDB, 'notificacoes'), notificacao);
+                console.log('📨 Notificação enviada aos juízes:', processo.numero);
+                adicionarLogProcessos(`📨 Juízes notificados sobre processo ${processo.numero}`);
+            } catch (error) {
+                console.error('❌ Erro ao notificar juízes:', error);
+            }
+        }
+
+        // Carregar processos do Firebase
+        function carregarProcessosDoAdvogado() {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
+                const processosRef = collection(window.firebaseDB, 'processos');
+                const q = query(processosRef, orderBy('timestamp', 'desc'));
+                
+                onSnapshot(q, (snapshot) => {
+                    const processosCarregados = [];
+                    snapshot.forEach((doc) => {
+                        const processo = { ...doc.data(), firebaseId: doc.id };
+                        processosCarregados.push(processo);
+                    });
+                    
+                    processosAdvogado = processosCarregados;
+                    atualizarListaProcessosAdvogado();
+                    atualizarEstatisticasAdvogado();
+                    
+                    console.log(`🔄 ${processosCarregados.length} processos sincronizados - Portal Advogado`);
+                });
+            } catch (error) {
+                console.error('❌ Erro ao carregar processos:', error);
+            }
+        }
+
+        // Salvar processo no Firebase
+        function salvarProcessoFirebaseAdvogado(processo) {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { addDoc, collection } = window.firebaseModules;
+                addDoc(collection(window.firebaseDB, 'processos'), processo);
+                console.log('✅ Processo salvo no Firebase:', processo.numero);
+            } catch (error) {
+                console.error('❌ Erro ao salvar processo:', error);
+            }
+        }
+
+        // Iniciar listener de notificações específicas do advogado
+        function iniciarListenerNotificacoesAdvogado() {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { collection, onSnapshot, query, orderBy, limit } = window.firebaseModules;
+                const notificacoesRef = collection(window.firebaseDB, 'notificacoes');
+                const q = query(notificacoesRef, orderBy('timestamp', 'desc'), limit(50));
+                
+                onSnapshot(q, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const notificacao = change.doc.data();
+                            // Mostrar notificações relevantes para advogados
+                            if (notificacao.destinatario === 'advogados' || 
+                                notificacao.tipo === 'intimacao' || 
+                                notificacao.tipo === 'designacao' ||
+                                notificacao.tipo === 'sentenca') {
+                                mostrarNotificacaoAdvogado(notificacao);
+                                adicionarLogProcessos(`🔔 ${notificacao.titulo}: ${notificacao.mensagem}`);
+                            }
+                        }
+                    });
+                });
+                
+                console.log('✅ Listener de notificações iniciado - Portal Advogado');
+            } catch (error) {
+                console.error('❌ Erro ao iniciar listener:', error);
+            }
+        }
+
+        // Mostrar notificação específica do advogado
+        function mostrarNotificacaoAdvogado(notificacao) {
+            // Criar container se não existir
+            let container = document.getElementById('container-notificacoes-advogado');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'container-notificacoes-advogado';
+                container.className = 'fixed top-4 right-4 z-50 space-y-2';
+                document.body.appendChild(container);
+            }
+            
+            const div = document.createElement('div');
+            div.className = 'bg-gradient-to-r from-indigo-600 to-purple-600 border border-indigo-400 rounded-lg p-4 shadow-lg max-w-sm transform transition-all duration-300 ease-in-out';
+            
+            div.innerHTML = `
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <span class="text-xl">${getIconeNotificacaoAdvogado(notificacao.tipo)}</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-white">${notificacao.titulo}</p>
+                        <p class="text-sm text-indigo-100 mt-1">${notificacao.mensagem}</p>
+                        <p class="text-xs text-indigo-200 mt-2">${new Date().toLocaleTimeString('pt-BR')}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-indigo-200 hover:text-white">✕</button>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            
+            // Auto-remover após 10 segundos
+            setTimeout(() => {
+                if (div.parentElement) div.remove();
+            }, 10000);
+        }
+
+        function getIconeNotificacaoAdvogado(tipo) {
+            switch(tipo) {
+                case 'novo-processo': return '📋';
+                case 'intimacao': return '📨';
+                case 'sentenca': return '⚖️';
+                case 'designacao': return '👨‍⚖️';
+                case 'urgente': return '🚨';
+                default: return 'ℹ️';
+            }
+        }
+
+        // Funções auxiliares
+        function adicionarLogProcessos(mensagem) {
+            const log = document.getElementById('log-processos-advogado');
+            if (log) {
+                const agora = new Date().toLocaleString('pt-BR');
+                const novaLinha = document.createElement('div');
+                novaLinha.className = 'text-green-400';
+                novaLinha.textContent = `[${agora}] ${mensagem}`;
+                log.appendChild(novaLinha);
+                log.scrollTop = log.scrollHeight;
+                
+                while (log.children.length > 30) {
+                    log.removeChild(log.firstChild);
+                }
+            }
+        }
+
+        function verDetalhesProcessoAdvogado(id) {
+            const processo = processosAdvogado.find(p => p.id === id);
+            if (processo) {
+                let detalhes = `📋 PROCESSO ${processo.numero}\\n\\n`;
+                detalhes += `👤 Cliente: ${processo.reu}\\n`;
+                detalhes += `🔍 Tipo: ${processo.crime}\\n`;
+                detalhes += `⚖️ Advogado: ${processo.advogado}\\n`;
+                detalhes += `📅 Aberto: ${processo.dataAbertura}\\n`;
+                detalhes += `📊 Status: ${processo.status}\\n`;
+                
+                if (processo.juiz) {
+                    detalhes += `👨‍⚖️ Juiz: ${processo.juiz}\\n`;
+                }
+                
+                if (processo.observacoes) {
+                    detalhes += `\\n📝 Observações:\\n${processo.observacoes}\\n`;
+                }
+                
+                if (processo.intimacoes.length > 0) {
+                    detalhes += `\\n📨 Intimações (${processo.intimacoes.length}):\\n`;
+                    processo.intimacoes.forEach(int => {
+                        detalhes += `• ${int.motivo} - ${int.data}\\n`;
+                    });
+                }
+                
+                if (processo.sentenca) {
+                    detalhes += `\\n⚖️ SENTENÇA:\\n${processo.sentenca.descricao}\\n`;
+                    detalhes += `Data: ${processo.sentenca.data}\\n`;
+                }
+                
+                alert(detalhes);
+            }
+        }
+
+        function solicitarInformacoesAdvogado(id) {
+            const processo = processosAdvogado.find(p => p.id === id);
+            if (processo) {
+                const motivo = prompt(`📞 Enviar mensagem ao Juiz ${processo.juiz}\\n\\nProcesso: ${processo.numero}\\n\\nDigite sua mensagem:`);
+                if (motivo) {
+                    alert(`✅ Mensagem enviada ao Juiz ${processo.juiz}!\\n\\n"${motivo}"\\n\\nAguarde resposta via notificação.`);
+                    adicionarLogProcessos(`📞 Mensagem enviada ao juiz do processo ${processo.numero}`);
+                }
+            }
+        }
+
+        function interporRecurso(id) {
+            const processo = processosAdvogado.find(p => p.id === id);
+            if (processo) {
+                const confirmacao = confirm(`📄 Interpor recurso contra a sentença?\\n\\nProcesso: ${processo.numero}\\nSentença: ${processo.sentenca?.descricao}\\n\\nEsta ação criará um novo processo de recurso.`);
+                if (confirmacao) {
+                    alert(`📄 Recurso interposto com sucesso!\\n\\nUm novo processo de recurso será criado automaticamente.\\n\\nVocê será notificado quando for distribuído.`);
+                    adicionarLogProcessos(`📄 Recurso interposto contra processo ${processo.numero}`);
+                }
+            }
+        }
+
+        // Inicializar sistema quando carregar a seção
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aguardar Firebase estar pronto
+            setTimeout(() => {
+                if (window.firebaseDB) {
+                    inicializarSistemaProcessosAdvogado();
+                }
+            }, 2000);
+        });
     </script>
 
 </body>
