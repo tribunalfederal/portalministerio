@@ -431,7 +431,7 @@
                 ativo: true,
                 utilizada: false,
                 cargo: "1_juiz_federal",
-                cargoNome: "Juiz Federal Supremo",
+                cargoNome: "1º Juiz Federal",
                 nivel: 1,
                 dominio: "@stf.jus.br",
                 liberadoPor: "Admin",
@@ -439,140 +439,201 @@
             }
         };
 
-        // Estrutura judicial completa
+        // Estrutura judicial da cidade de BRASILÂNDIA (GTA RP)
         let estruturaJudicial = {
-            // SUPREMO TRIBUNAL FEDERAL (Níveis 1-2)
+            // SUPREMO TRIBUNAL FEDERAL (Nível 1)
             "1_juiz_federal": {
-                nome: "Suprema Autoridade Judicial",
-                titulo: "Supremo Magistrado Federal",
+                nome: "1º Juiz Federal",
+                titulo: "1º Juiz Federal - Presidente do STF/STJ/STB",
                 nivel: 1,
                 icon: "👑",
                 permissoes: ["todas", "suprema_autoridade", "nomeacao_geral"],
-                pode_nomear: ["2_juiz_federal", "3_juiz_federal", "desembargador", "juiz_direito", "promotor_justica", "advogado_criminal"],
-                dominio: "@stf.jus.br"
+                pode_nomear: ["2_juiz_federal", "3_juiz_federal", "1_desembargador", "2_desembargador", "3_desembargador", "1_juiz_estadual", "2_juiz_estadual", "3_juiz_estadual", "4_juiz_estadual", "1_procurador_geral_republica", "2_procurador_geral_justica", "3_procurador_geral_justica", "1_promotor", "2_promotor", "3_promotor", "4_promotor", "5_promotor", "6_promotor", "1_oficial_justica_2_instancia", "1_oficial_justica_1_instancia", "advogado", "defensor_publico"],
+                dominio: "@stf.brasilandia.gov.br",
+                salario: "R$ 9.500,00"
             },
+
             "2_juiz_federal": {
-                nome: "Ministro do STF",
-                titulo: "Ministro do Supremo Tribunal Federal",
+                nome: "2º Juiz Federal",
+                titulo: "2º Juiz Federal",
                 nivel: 2,
                 icon: "🏛️",
-                permissoes: ["federal", "constitucional", "supremo"],
-                pode_nomear: ["desembargador", "juiz_direito", "promotor_justica"],
-                dominio: "@stf.jus.br"
+                permissoes: ["federal", "alta_instancia"],
+                pode_nomear: [],
+                dominio: "@stj.brasilandia.gov.br",
+                salario: "R$ 8.500,00"
             },
 
-            // TRIBUNAL DE JUSTIÇA (Níveis 3-4)
-            "desembargador": {
-                nome: "Desembargador",
-                titulo: "Desembargador do TJSP",
+            "3_juiz_federal": {
+                nome: "3º Juiz Federal",
+                titulo: "3º Juiz Federal",
                 nivel: 3,
-                icon: "⚖️",
-                permissoes: ["estadual", "recursos", "segunda_instancia"],
-                pode_nomear: ["juiz_direito", "promotor_justica"],
-                dominio: "@tjsp.jus.br"
-            },
-            "juiz_direito": {
-                nome: "Juiz de Direito",
-                titulo: "Juiz de Direito",
-                nivel: 4,
                 icon: "🏛️",
-                permissoes: ["primeira_instancia", "sentencas", "audiencias"],
-                pode_nomear: ["promotor_justica"],
-                dominio: "@tjsp.jus.br"
+                permissoes: ["federal", "alta_instancia"],
+                pode_nomear: [],
+                dominio: "@stj.brasilandia.gov.br",
+                salario: "R$ 8.000,00"
             },
 
-            // MINISTÉRIO PÚBLICO (Níveis 5-8)
-            "procurador_geral": {
+            "1_desembargador": {
+                nome: "1º Desembargador",
+                titulo: "1º Desembargador - Líder do Tribunal",
+                nivel: 4,
+                icon: "⚖️",
+                permissoes: ["segunda_instancia", "lideranca_tribunal"],
+                pode_nomear: [],
+                dominio: "@tj.brasilandia.gov.br",
+                salario: "R$ 7.500,00"
+            },
+
+            "2_desembargador": {
+                nome: "2º Desembargador",
+                titulo: "2º Desembargador",
+                nivel: 5,
+                icon: "⚖️",
+                permissoes: ["segunda_instancia"],
+                pode_nomear: [],
+                dominio: "@tj.brasilandia.gov.br",
+                salario: "R$ 7.200,00"
+            },
+
+            "3_desembargador": {
+                nome: "3º Desembargador",
+                titulo: "3º Desembargador",
+                nivel: 6,
+                icon: "⚖️",
+                permissoes: ["segunda_instancia"],
+                pode_nomear: [],
+                dominio: "@tj.brasilandia.gov.br",
+                salario: "R$ 7.000,00"
+            },
+
+            "1_juiz_estadual": {
+                nome: "1º Juiz Estadual",
+                titulo: "1º Juiz Estadual - Líder da 1ª Instância",
+                nivel: 7,
+                icon: "👨‍⚖️",
+                permissoes: ["primeira_instancia", "lideranca", "civil", "criminal"],
+                pode_nomear: [],
+                dominio: "@tj.brasilandia.gov.br",
+                salario: "R$ 6.500,00"
+            },
+
+            "2_juiz_estadual": {
+                nome: "2º Juiz Estadual",
+                titulo: "2º Juiz Estadual - 1ª Instância",
+                nivel: 8,
+                icon: "👨‍⚖️",
+                permissoes: ["primeira_instancia", "civil", "criminal"],
+                pode_nomear: [],
+                dominio: "@tj.brasilandia.gov.br",
+                salario: "R$ 6.000,00"
+            },
+
+            "3_juiz_estadual": {
+                nome: "3º Juiz Estadual",
+                titulo: "3º Juiz Estadual - 1ª Instância",
+                nivel: 8,
+                icon: "👨‍⚖️",
+                permissoes: ["primeira_instancia", "civil", "criminal"],
+                pode_nomear: [],
+                dominio: "@tj.brasilandia.gov.br",
+                salario: "R$ 6.000,00"
+            },
+
+            "4_juiz_estadual": {
+                nome: "4º Juiz Estadual",
+                titulo: "4º Juiz Estadual - 1ª Instância",
+                nivel: 8,
+                icon: "👨‍⚖️",
+                permissoes: ["primeira_instancia", "civil", "criminal"],
+                pode_nomear: [],
+                dominio: "@tj.brasilandia.gov.br",
+                salario: "R$ 6.000,00"
+            },
+
+            // MINISTÉRIO PÚBLICO DA UNIÃO (Nível 5)
+            "1_procurador_geral_republica": {
+                nome: "1º Procurador Geral da República",
+                titulo: "1º Procurador Geral da República - Chefe do MP",
+                nivel: 9,
+                icon: "🛡️",
+                permissoes: ["mp_geral", "lideranca_mp"],
+                pode_nomear: [],
+                dominio: "@mp.brasilandia.gov.br",
+                salario: "R$ 5.000,00"
+            },
+
+            "2_procurador_geral_justica": {
+                nome: "2º Procurador Geral de Justiça",
+                titulo: "2º Procurador Geral de Justiça - 2ª Instância",
+                nivel: 10,
+                icon: "🛡️",
+                permissoes: ["mp_segunda_instancia", "supervisao"],
+                pode_nomear: [],
+                dominio: "@mp.brasilandia.gov.br",
+                salario: "R$ 4.500,00"
+            },
+
+            // MINISTÉRIO PÚBLICO ESTADUAL (Nível 5)
+            "procurador_geral_justica": {
                 nome: "Procurador-Geral de Justiça",
                 titulo: "Procurador-Geral de Justiça",
                 nivel: 5,
-                icon: "🛡️",
-                permissoes: ["mp_geral", "recursos_especiais"],
+                icon: "�️",
+                permissoes: ["mp_estadual", "segunda_instancia", "recursos"],
                 pode_nomear: ["procurador_justica", "promotor_justica"],
                 dominio: "@mp.sp.gov.br"
             },
+
             "procurador_justica": {
                 nome: "Procurador de Justiça",
                 titulo: "Procurador de Justiça",
                 nivel: 6,
-                icon: "🛡️",
-                permissoes: ["mp_segunda_instancia", "recursos"],
+                icon: "�️",
+                permissoes: ["mp_estadual", "segunda_instancia", "recursos"],
                 pode_nomear: ["promotor_justica"],
                 dominio: "@mp.sp.gov.br"
             },
-            "promotor_especializado": {
-                nome: "Promotor de Justiça Especializado",
-                titulo: "Promotor de Justiça Especializado",
-                nivel: 7,
-                icon: "🛡️",
-                permissoes: ["mp_especializado", "investigacao_avancada"],
-                pode_nomear: ["promotor_justica"],
-                dominio: "@mp.sp.gov.br"
-            },
+
             "promotor_justica": {
                 nome: "Promotor de Justiça",
                 titulo: "Promotor de Justiça",
-                nivel: 8,
-                icon: "🛡️",
-                permissoes: ["acusacao", "investigacao", "denuncia"],
+                nivel: 7,
+                icon: "�️",
+                permissoes: ["mp_estadual", "primeira_instancia", "denuncia", "investigacao"],
                 pode_nomear: [],
                 dominio: "@mp.sp.gov.br"
             },
 
-            // POLÍCIA E CORREGEDORIA (Níveis 9-10)
-            "corregedoria": {
-                nome: "Corregedoria Judicial",
-                titulo: "Corregedor Judicial",
-                nivel: 9,
-                icon: "👮",
-                permissoes: ["corregedoria", "disciplinar"],
-                pode_nomear: [],
-                dominio: "@corregedoria.sp.gov.br"
-            },
-            "chefe_policia": {
-                nome: "Chefe de Polícia",
-                titulo: "Delegado Chefe de Polícia",
-                nivel: 10,
-                icon: "👮‍♂️",
-                permissoes: ["policia_civil", "investigacao_policial"],
-                pode_nomear: [],
-                dominio: "@policiacivil.sp.gov.br"
+            // DEFENSORIA PÚBLICA (Nível 8)
+            "defensor_publico_geral": {
+                nome: "Defensor Público-Geral",
+                titulo: "Defensor Público-Geral",
+                nivel: 8,
+                icon: "�️",
+                permissoes: ["defensoria", "assistencia_juridica", "supervisao"],
+                pode_nomear: ["defensor_publico"],
+                dominio: "@defensoria.sp.gov.br"
             },
 
-            // ADVOCACIA (Nível 11)
-            "advogado_criminal": {
-                nome: "Advogado Criminal",
-                titulo: "Advogado(a) Criminal",
-                nivel: 11,
-                icon: "👨‍💼",
-                permissoes: ["defesa", "peticoes", "honorarios"],
+            "defensor_publico": {
+                nome: "Defensor Público",
+                titulo: "Defensor Público",
+                nivel: 9,
+                icon: "�️",
+                permissoes: ["defensoria", "assistencia_juridica", "defesa_necessitados"],
                 pode_nomear: [],
-                dominio: "@oab.org.br"
+                dominio: "@defensoria.sp.gov.br"
             },
-            "advogado_civil": {
-                nome: "Advogado Civil",
-                titulo: "Advogado(a) Civil",
-                nivel: 11,
-                icon: "👩‍💼",
-                permissoes: ["defesa", "peticoes", "honorarios"],
-                pode_nomear: [],
-                dominio: "@oab.org.br"
-            },
-            "advogado_trabalhista": {
-                nome: "Advogado Trabalhista",
-                titulo: "Advogado(a) Trabalhista",
-                nivel: 11,
-                icon: "👨‍💼",
-                permissoes: ["defesa", "peticoes", "honorarios"],
-                pode_nomear: [],
-                dominio: "@oab.org.br"
-            },
-            "advogado_tributario": {
-                nome: "Advogado Tributário",
-                titulo: "Advogado(a) Tributário",
-                nivel: 11,
-                icon: "👩‍💼",
-                permissoes: ["defesa", "peticoes", "honorarios"],
+
+            // ADVOCACIA (Nível 10)
+            "advogado": {
+                nome: "Advogado",
+                titulo: "Advogado(a)",
+                nivel: 10,
+                icon: "�‍💼",
+                permissoes: ["defesa", "peticoes", "representacao", "consultoria"],
                 pode_nomear: [],
                 dominio: "@oab.org.br"
             }
@@ -4065,230 +4126,6 @@ document.addEventListener('input', function(e) {
         // ===== FUNÇÃO PARA GERAR EMAILS AUTOMÁTICOS =====
         
         function gerarEmailPorCargo(nomeCompleto, cargo) {
-            // Estrutura de cargos judiciais
-            const estruturaJudicial = {
-                '1_juiz_federal': {
-                    nome: '1º Juiz Federal',
-                    titulo: '1º Juiz Federal - Presidente do STF/STJ/STB',
-                    descricao: 'Máxima Autoridade Judiciária',
-                    nivel: 1,
-                    icon: '👑',
-                    dominio: '@stf.jus.br',
-                    permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade'],
-                    pode_nomear: ['2_juiz_federal', '3_juiz_federal', '1_desembargador', '2_desembargador', '3_desembargador', '1_juiz_estadual', '2_juiz_estadual', '3_juiz_estadual', '4_juiz_estadual', '1_procurador_geral_republica', '2_procurador_geral_justica', '3_procurador_geral_justica', '1_promotor', '2_promotor', '3_promotor', '4_promotor', '5_promotor', '6_promotor', '1_oficial_justica_2_instancia', '1_oficial_justica_1_instancia', 'advogado']
-                },
-                '2_juiz_federal': {
-                    nome: '2º Juiz Federal',
-                    titulo: '2º Juiz Federal - Nomeado pelo 1º Juiz Federal',
-                    descricao: 'Presidente do STF',
-                    nivel: 2,
-                    icon: '⚖️',
-                    dominio: '@stj.jus.br',
-                    permissoes: ['federal', 'stf', 'nomeacoes_limitadas'],
-                    pode_nomear: []
-                },
-                '3_juiz_federal': {
-                    nome: '3º Juiz Federal',
-                    titulo: '3º Juiz Federal - Nomeado pelo 1º Juiz Federal',
-                    descricao: 'Presidente do STF',
-                    nivel: 2,
-                    icon: '⚖️',
-                    dominio: '@stj.jus.br',
-                    permissoes: ['federal', 'stf', 'nomeacoes_limitadas'],
-                    pode_nomear: []
-                },
-                '1_desembargador': {
-                    nome: '1º Desembargador',
-                    titulo: '1º Desembargador - Nomeado pelo 1º Juiz Federal',
-                    descricao: 'Tribunal de Justiça',
-                    nivel: 3,
-                    icon: '🏛️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['desembargo', 'recursos', 'segunda_instancia'],
-                    pode_nomear: []
-                },
-                '2_desembargador': {
-                    nome: '2º Desembargador',
-                    titulo: '2º Desembargador - Nomeado pelo 1º Juiz Federal',
-                    descricao: 'Tribunal de Justiça',
-                    nivel: 3,
-                    icon: '🏛️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['desembargo', 'recursos', 'segunda_instancia'],
-                    pode_nomear: []
-                },
-                '3_desembargador': {
-                    nome: '3º Desembargador',
-                    titulo: '3º Desembargador - Nomeado pelo 1º Juiz Federal',
-                    descricao: 'Tribunal de Justiça',
-                    nivel: 3,
-                    icon: '🏛️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['desembargo', 'recursos', 'segunda_instancia'],
-                    pode_nomear: []
-                },
-                '1_juiz_estadual': {
-                    nome: '1º Juiz Estadual',
-                    titulo: '1º Juiz Estadual - 1ª Instância',
-                    descricao: 'Civil/Criminal/Eleitoral/Trânsito',
-                    nivel: 4,
-                    icon: '👨‍⚖️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['primeira_instancia', 'civil', 'criminal', 'eleitoral', 'transito'],
-                    pode_nomear: []
-                },
-                '2_juiz_estadual': {
-                    nome: '2º Juiz Estadual',
-                    titulo: '2º Juiz Estadual - 1ª Instância',
-                    descricao: 'Civil/Criminal/Eleitoral/Trânsito',
-                    nivel: 4,
-                    icon: '👨‍⚖️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['primeira_instancia', 'civil', 'criminal', 'eleitoral', 'transito'],
-                    pode_nomear: []
-                },
-                '3_juiz_estadual': {
-                    nome: '3º Juiz Estadual',
-                    titulo: '3º Juiz Estadual - 1ª Instância',
-                    descricao: 'Civil/Criminal/Eleitoral/Trânsito',
-                    nivel: 4,
-                    icon: '👨‍⚖️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['primeira_instancia', 'civil', 'criminal', 'eleitoral', 'transito'],
-                    pode_nomear: []
-                },
-                '4_juiz_estadual': {
-                    nome: '4º Juiz Estadual',
-                    titulo: '4º Juiz Estadual - 1ª Instância',
-                    descricao: 'Civil/Criminal/Eleitoral/Trânsito',
-                    nivel: 4,
-                    icon: '👨‍⚖️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['primeira_instancia', 'civil', 'criminal', 'eleitoral', 'transito'],
-                    pode_nomear: []
-                },
-                '1_procurador_geral_republica': {
-                    nome: '1º Procurador Geral da República',
-                    titulo: '1º Procurador Geral da República',
-                    descricao: 'Presidente do Ministério Público',
-                    nivel: 5,
-                    icon: '🏛️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['ministerio_publico', 'acusacao', 'investigacao'],
-                    pode_nomear: []
-                },
-                '2_procurador_geral_justica': {
-                    nome: '2º Procurador Geral de Justiça',
-                    titulo: '2º Procurador Geral de Justiça - 1ª Instância',
-                    descricao: 'Ministério Público Estadual',
-                    nivel: 6,
-                    icon: '🏛️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['ministerio_publico', 'acusacao', 'investigacao'],
-                    pode_nomear: []
-                },
-                '3_procurador_geral_justica': {
-                    nome: '3º Procurador Geral de Justiça',
-                    titulo: '3º Procurador Geral de Justiça - 1ª Instância',
-                    descricao: 'Ministério Público Estadual',
-                    nivel: 6,
-                    icon: '🏛️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['ministerio_publico', 'acusacao', 'investigacao'],
-                    pode_nomear: []
-                },
-                '1_promotor': {
-                    nome: '1º Promotor',
-                    titulo: '1º Promotor - Líder da Promotoria Geral',
-                    descricao: 'Promotoria Geral',
-                    nivel: 7,
-                    icon: '👨‍💼',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['promotoria', 'acusacao', 'investigacao'],
-                    pode_nomear: []
-                },
-                '2_promotor': {
-                    nome: '2º Promotor',
-                    titulo: '2º Promotor - 1ª Instância',
-                    descricao: 'Promotoria',
-                    nivel: 8,
-                    icon: '👨‍💼',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['promotoria', 'acusacao'],
-                    pode_nomear: []
-                },
-                '3_promotor': {
-                    nome: '3º Promotor',
-                    titulo: '3º Promotor - 1ª Instância',
-                    descricao: 'Promotoria',
-                    nivel: 8,
-                    icon: '👨‍💼',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['promotoria', 'acusacao'],
-                    pode_nomear: []
-                },
-                '4_promotor': {
-                    nome: '4º Promotor',
-                    titulo: '4º Promotor - 1ª Instância',
-                    descricao: 'Promotoria',
-                    nivel: 8,
-                    icon: '👨‍💼',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['promotoria', 'acusacao'],
-                    pode_nomear: []
-                },
-                '5_promotor': {
-                    nome: '5º Promotor',
-                    titulo: '5º Promotor - 1ª Instância',
-                    descricao: 'Promotoria',
-                    nivel: 8,
-                    icon: '👨‍💼',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['promotoria', 'acusacao'],
-                    pode_nomear: []
-                },
-                '6_promotor': {
-                    nome: '6º Promotor',
-                    titulo: '6º Promotor - 1ª Instância',
-                    descricao: 'Promotoria',
-                    nivel: 8,
-                    icon: '👨‍💼',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['promotoria', 'acusacao'],
-                    pode_nomear: []
-                },
-                '1_oficial_justica_2_instancia': {
-                    nome: '1º Oficial de Justiça - 2ª Instância',
-                    titulo: '1º Oficial de Justiça - 2ª Instância',
-                    descricao: 'Cumprimento de Mandados',
-                    nivel: 9,
-                    icon: '👮‍♂️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['mandados', 'intimacoes', 'cumprimento'],
-                    pode_nomear: []
-                },
-                '1_oficial_justica_1_instancia': {
-                    nome: '1º Oficial de Justiça - 1ª Instância',
-                    titulo: '1º Oficial de Justiça - 1ª Instância',
-                    descricao: 'Cumprimento de Mandados',
-                    nivel: 10,
-                    icon: '👮‍♂️',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['mandados', 'intimacoes', 'cumprimento'],
-                    pode_nomear: []
-                },
-                'advogado': {
-                    nome: 'Advogado/Defensor',
-                    titulo: 'Advogado(a)/Defensor(a)',
-                    descricao: 'Defesa e Representação',
-                    nivel: 11,
-                    icon: '👨‍💼',
-                    dominio: '@tjsp.jus.br',
-                    permissoes: ['defesa', 'peticoes', 'honorarios'],
-                    pode_nomear: []
-                }
-            };
-            
             // Normalizar nome para email (remover acentos, espaços, etc.)
             const nomeNormalizado = nomeCompleto
                 .toLowerCase()
@@ -4298,9 +4135,9 @@ document.addEventListener('input', function(e) {
                 .trim()
                 .replace(/\s+/g, '.'); // Substitui espaços por pontos
             
-            // Obter domínio do cargo
+            // Obter domínio do cargo da estrutura principal
             const cargoInfo = estruturaJudicial[cargo];
-            const dominio = cargoInfo ? cargoInfo.dominio : '@tjsp.jus.br';
+            const dominio = cargoInfo ? cargoInfo.dominio : '@juridico.gov.br';
             
             return `${nomeNormalizado}${dominio}`;
         }
@@ -4339,16 +4176,16 @@ document.addEventListener('input', function(e) {
                             await firebaseModules.setDoc(firebaseModules.doc(dbInstance, 'usuarios', adminEmail), {
                                 nome: 'Alexandre de Moraes',
                                 email: adminEmail,
-                                cargo: '1_juiz_federal',
-                                titulo: '1º Juiz Federal - Presidente do STF/STJ/STB',
-                                permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade'],
+                                cargo: 'ministro_stf',
+                                titulo: 'Ministro do Supremo Tribunal Federal',
+                                permissoes: ['todas', 'suprema_autoridade', 'nomeacao_geral'],
                                 isAdmin: true,
                                 nivel_hierarquico: 1,
                                 oab: 'STF-001',
                                 nomeado: true,
                                 nomeado_por: 'Sistema',
                                 data_nomeacao: new Date().toISOString(),
-                                pode_nomear: ['2_juiz_federal', '3_juiz_federal', '1_desembargador', '2_desembargador', '3_desembargador'],
+                                pode_nomear: estruturaJudicial['ministro_stf'].pode_nomear,
                                 ativo: true,
                                 data_criacao: new Date().toISOString()
                             });
@@ -4456,9 +4293,9 @@ document.addEventListener('input', function(e) {
                 const dadosAdmin = {
                     nome: 'Alexandre de Moraes',
                     email: user.email,
-                    cargo: '1_juiz_federal',
-                    titulo: '1º Juiz Federal - Presidente do STF/STJ/STB',
-                    permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade'],
+                    cargo: 'ministro_stf',
+                    titulo: 'Ministro do Supremo Tribunal Federal',
+                    permissoes: ['todas', 'suprema_autoridade', 'nomeacao_geral'],
                     isAdmin: true,
                     nivel_hierarquico: 1,
                     oab: 'STF-001',
@@ -4507,12 +4344,12 @@ document.addEventListener('input', function(e) {
                     uid: user.uid,
                     email: user.email,
                     nome: 'Alexandre de Moraes',
-                    titulo: '1º Juiz Federal - Presidente do STF/STJ/STB',
-                    cargo: '1_juiz_federal',
-                    permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade'],
+                    titulo: 'Ministro do Supremo Tribunal Federal',
+                    cargo: 'ministro_stf',
+                    permissoes: ['todas', 'suprema_autoridade', 'nomeacao_geral'],
                     isAdmin: true,
                     oab: 'STF-001',
-                    pode_nomear: ['2_juiz_federal', '3_juiz_federal', '1_desembargador', '2_desembargador', '3_desembargador'],
+                    pode_nomear: estruturaJudicial['ministro_stf'].pode_nomear,
                     loginTime: new Date()
                 };
                 
@@ -4734,15 +4571,15 @@ document.addEventListener('input', function(e) {
                     
                     // Cores baseadas no cargo
                     const corAvatar = {
-                        '1_juiz_federal': 'from-yellow-500 to-yellow-600',
-                        '2_juiz_federal': 'from-yellow-400 to-yellow-500',
-                        '3_juiz_federal': 'from-yellow-400 to-yellow-500',
-                        '1_desembargador': 'from-blue-500 to-blue-600',
-                        '2_desembargador': 'from-blue-500 to-blue-600',
-                        '3_desembargador': 'from-blue-500 to-blue-600',
-                        '1_juiz_estadual': 'from-indigo-500 to-indigo-600',
-                        '2_juiz_estadual': 'from-indigo-500 to-indigo-600',
-                        '3_juiz_estadual': 'from-indigo-500 to-indigo-600',
+                        'ministro_stf': 'from-yellow-500 to-yellow-600',
+                        'ministro_stj': 'from-yellow-400 to-yellow-500',
+                        'desembargador_federal': 'from-blue-500 to-blue-600',
+                        'desembargador': 'from-blue-500 to-blue-600',
+                        'juiz_federal': 'from-indigo-500 to-indigo-600',
+                        'juiz_estadual': 'from-indigo-500 to-indigo-600',
+                        'procurador_geral_republica': 'from-green-500 to-green-600',
+                        'procurador_republica': 'from-green-400 to-green-500',
+                        'procurador_geral_justica': 'from-green-500 to-green-600',
                         '4_juiz_estadual': 'from-indigo-500 to-indigo-600',
                         '1_promotor': 'from-purple-500 to-purple-600',
                         '2_promotor': 'from-purple-400 to-purple-500',
@@ -5050,27 +4887,27 @@ document.addEventListener('input', function(e) {
 
             // Mapear cargos para portais específicos
             const portaisPorCargo = {
-                // Advogados - Portal Básico
-                'advogado_criminal': 'portal-advogado.html',
-                'advogado_civil': 'portal-advogado.html', 
-                'advogado_trabalhista': 'portal-advogado.html',
-                'advogado_tributario': 'portal-advogado.html',
+                // Advogados e Defensores - Portal Básico
+                'advogado': 'portal-advogado.html',
+                'defensor_publico_geral': 'portal-advogado.html',
+                'defensor_publico': 'portal-advogado.html',
 
-                // Promotores - Portal Intermediário
-                'promotor_justica': 'portal-promotor.html',
+                // Ministério Público - Portal Intermediário
+                'procurador_geral_republica': 'portal-promotor.html',
                 'procurador_republica': 'portal-promotor.html',
+                'procurador_geral_justica': 'portal-promotor.html',
+                'procurador_justica': 'portal-promotor.html',
+                'promotor_justica': 'portal-promotor.html',
 
-                // Juízes Estaduais - Portal Avançado
-                'juiz_direito': 'portal-juiz-estadual.html',
+                // Justiça Estadual - Portal Avançado
+                'juiz_estadual': 'portal-juiz-estadual.html',
                 'desembargador': 'portal-juiz-estadual.html',
 
-                // Juízes Federais - Portal Máximo
-                '1_juiz_federal': 'portal-juiz-federal.html',
-                '2_juiz_federal': 'portal-juiz-federal.html', 
-                '3_juiz_federal': 'portal-juiz-federal.html',
-                '1_desembargador': 'portal-juiz-federal.html',
-                '2_desembargador': 'portal-juiz-federal.html',
-                '3_desembargador': 'portal-juiz-federal.html'
+                // Justiça Federal - Portal Máximo
+                'ministro_stf': 'portal-juiz-federal.html',
+                'ministro_stj': 'portal-juiz-federal.html',
+                'desembargador_federal': 'portal-juiz-federal.html',
+                'juiz_federal': 'portal-juiz-federal.html'
             };
 
             const portalDestino = portaisPorCargo[cargo];
@@ -5405,7 +5242,7 @@ document.addEventListener('input', function(e) {
                 usuariosCadastrados['alexandre.moraes'] = {
                     nome: 'Alexandre de Moraes',
                     email: 'alexandre.moraes@stf.jus.br',
-                    cargo: '1_juiz_federal',
+                    cargo: 'ministro_stf',
                     titulo: '1º Juiz Federal - Presidente do STF/STJ/STB',
                     permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade'],
                     isAdmin: true,
@@ -5413,7 +5250,7 @@ document.addEventListener('input', function(e) {
                     nomeado: true,
                     nomeado_por: 'Sistema',
                     data_nomeacao: new Date().toISOString(),
-                    pode_nomear: estruturaJudicial['1_juiz_federal'].pode_nomear,
+                    pode_nomear: estruturaJudicial['ministro_stf'].pode_nomear,
                     ativo: true,
                     data_criacao: new Date().toISOString()
                 };
@@ -5959,7 +5796,7 @@ document.addEventListener('input', function(e) {
                     }
                     
                     // Verificar se é o Alexandre de Moraes (sempre ocupado)
-                    if (cargo.key === '1_juiz_federal') {
+                    if (cargo.key === 'ministro_stf') {
                         ocupado = true;
                         usuarioOcupante = { nome: 'Alexandre de Moraes' };
                     }
@@ -6762,25 +6599,9 @@ document.addEventListener('input', function(e) {
         }
 
         function obterNivelHierarquico(cargo) {
-            const hierarquia = {
-                '1_juiz_federal': 1,
-                '2_juiz_federal': 2,
-                '3_juiz_federal': 2,
-                '1_desembargador': 3,
-                '2_desembargador': 3,
-                '3_desembargador': 4,
-                'promotor_justica': 5,
-                'procurador_republica': 6,
-                '1_promotor': 7,
-                '2_promotor': 8,
-                'juiz_direito': 4,
-                'desembargador': 3,
-                'advogado_criminal': 11,
-                'advogado_civil': 11,
-                'advogado_trabalhista': 11,
-                'advogado_tributario': 11
-            };
-            return hierarquia[cargo] || 11;
+            // Usar a estrutura principal para obter nível
+            const cargoInfo = estruturaJudicial[cargo];
+            return cargoInfo ? cargoInfo.nivel : 99;
         }
 
         function redirecionarParaPortal(portal) {
@@ -6870,20 +6691,20 @@ document.addEventListener('input', function(e) {
                                     <label class="block text-white/90 font-medium text-sm mb-2">Cargo</label>
                                     <select id="cargo-oab" class="w-full px-3 py-2 rounded-lg bg-gray-800/80 border border-gray-600/60 text-white focus:border-green-500 text-sm">
                                         <option value="">Selecione o cargo...</option>
-                                        <option value="1_juiz_federal">🔱 Suprema Autoridade (Nível 1)</option>
-                                        <option value="2_juiz_federal">🏛️ Ministro STF (Nível 2)</option>
-                                        <option value="desembargador">⚖️ Desembargador (Nível 3)</option>
-                                        <option value="juiz_direito">🏛️ Juiz de Direito (Nível 4)</option>
-                                        <option value="procurador_geral">🛡️ Procurador-Geral (Nível 5)</option>
-                                        <option value="procurador_justica">🛡️ Procurador de Justiça (Nível 6)</option>
-                                        <option value="promotor_especializado">🛡️ Promotor Especializado (Nível 7)</option>
-                                        <option value="promotor_justica">🛡️ Promotor de Justiça (Nível 8)</option>
-                                        <option value="corregedoria">👮 Corregedoria (Nível 9)</option>
-                                        <option value="chefe_policia">👮‍♂️ Chefe de Polícia (Nível 10)</option>
-                                        <option value="advogado_criminal">👨‍💼 Advogado Criminal (Nível 11)</option>
-                                        <option value="advogado_civil">👩‍💼 Advogado Civil (Nível 11)</option>
-                                        <option value="advogado_trabalhista">👨‍💼 Advogado Trabalhista (Nível 11)</option>
-                                        <option value="advogado_tributario">👩‍💼 Advogado Tributário (Nível 11)</option>
+                                        <option value="ministro_stf">� Ministro do STF (Nível 1)</option>
+                                        <option value="ministro_stj">🏛️ Ministro do STJ (Nível 2)</option>
+                                        <option value="desembargador_federal">⚖️ Desembargador Federal (Nível 3)</option>
+                                        <option value="desembargador">⚖️ Desembargador Estadual (Nível 3)</option>
+                                        <option value="juiz_federal">🏛️ Juiz Federal (Nível 4)</option>
+                                        <option value="juiz_estadual">🏛️ Juiz de Direito (Nível 4)</option>
+                                        <option value="procurador_geral_republica">🛡️ Procurador-Geral da República (Nível 5)</option>
+                                        <option value="procurador_republica">🛡️ Procurador da República (Nível 6)</option>
+                                        <option value="procurador_geral_justica">�️ Procurador-Geral de Justiça (Nível 5)</option>
+                                        <option value="procurador_justica">�️ Procurador de Justiça (Nível 6)</option>
+                                        <option value="promotor_justica">�️ Promotor de Justiça (Nível 7)</option>
+                                        <option value="defensor_publico_geral">�️ Defensor Público-Geral (Nível 8)</option>
+                                        <option value="defensor_publico">�️ Defensor Público (Nível 9)</option>
+                                        <option value="advogado">�‍💼 Advogado (Nível 10)</option>
                                     </select>
                                 </div>
                                 <button onclick="liberarOAB()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-4 rounded-lg transition-all">
