@@ -4147,7 +4147,7 @@ document.addEventListener('input', function(e) {
         // Criar usuário admin inicial
         async function criarUsuarioAdminInicial() {
             try {
-                const adminEmail = 'alexandre.moraes@stf.jus.br';
+                const adminEmail = 'alexandre.moraes@stf.brasilandia.gov.br';
                 const adminPassword = 'STF2025@Seguro';
                 
                 console.log('🔍 Verificando se admin já existe...');
@@ -4261,7 +4261,7 @@ document.addEventListener('input', function(e) {
                     
                 } else {
                     // Se não encontrou dados, tentar criar admin se for o email correto
-                    if (user.email === 'alexandre.moraes@stf.jus.br') {
+                    if (user.email === 'alexandre.moraes@stf.brasilandia.gov.br') {
                         console.log('👑 Criando dados do admin...');
                         await criarUsuarioAdminCompleto(user);
                     } else {
@@ -4278,7 +4278,7 @@ document.addEventListener('input', function(e) {
                 console.log('⚠️ Erro geral ao carregar dados do usuário:', error.message);
                 
                 // Se for o admin, tentar criar dados mesmo com erro
-                if (user.email === 'alexandre.moraes@stf.jus.br') {
+                if (user.email === 'alexandre.moraes@stf.brasilandia.gov.br') {
                     console.log('👑 Tentando criar dados do admin mesmo com erro...');
                     await criarUsuarioAdminCompleto(user);
                 }
@@ -5256,12 +5256,12 @@ document.addEventListener('input', function(e) {
             if (!usuariosCadastrados['alexandre.moraes']) {
                 usuariosCadastrados['alexandre.moraes'] = {
                     nome: 'Alexandre de Moraes',
-                    email: 'alexandre.moraes@stf.jus.br',
-                    cargo: 'ministro_stf',
-                    titulo: '1º Juiz Federal - Presidente do STF/STJ/STB',
+                    email: 'alexandre.moraes@stf.brasilandia.gov.br',
+                    cargo: '1_juiz_federal',
+                    titulo: '1º Juiz Federal - Presidente STF/STJ/STB BRASILÂNDIA',
                     permissoes: ['todas', 'admin', 'nomeacoes', 'maxima_autoridade'],
                     isAdmin: true,
-                    oab: 'STF-001',
+                    oab: 'BRASILÂNDIA-001',
                     nomeado: true,
                     nomeado_por: 'Sistema',
                     data_nomeacao: new Date().toISOString(),
