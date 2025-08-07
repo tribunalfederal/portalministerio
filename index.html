@@ -4569,25 +4569,31 @@ document.addEventListener('input', function(e) {
                     const tempoOnline = Math.floor((Date.now() - (dados.loginTime || Date.now())) / 60000);
                     const tempoTexto = tempoOnline < 1 ? 'agora' : `${tempoOnline}min`;
                     
-                    // Cores baseadas no cargo
+                    // Cores baseadas no cargo BRASILÂNDIA
                     const corAvatar = {
-                        'ministro_stf': 'from-yellow-500 to-yellow-600',
-                        'ministro_stj': 'from-yellow-400 to-yellow-500',
-                        'desembargador_federal': 'from-blue-500 to-blue-600',
-                        'desembargador': 'from-blue-500 to-blue-600',
-                        'juiz_federal': 'from-indigo-500 to-indigo-600',
-                        'juiz_estadual': 'from-indigo-500 to-indigo-600',
-                        'procurador_geral_republica': 'from-green-500 to-green-600',
-                        'procurador_republica': 'from-green-400 to-green-500',
-                        'procurador_geral_justica': 'from-green-500 to-green-600',
-                        '4_juiz_estadual': 'from-indigo-500 to-indigo-600',
+                        '1_juiz_federal': 'from-yellow-500 to-yellow-600',
+                        '2_juiz_federal': 'from-yellow-400 to-yellow-500',
+                        '3_juiz_federal': 'from-yellow-300 to-yellow-400',
+                        '1_desembargador': 'from-blue-500 to-blue-600',
+                        '2_desembargador': 'from-blue-400 to-blue-500',
+                        '3_desembargador': 'from-blue-300 to-blue-400',
+                        '1_juiz_estadual': 'from-indigo-500 to-indigo-600',
+                        '2_juiz_estadual': 'from-indigo-400 to-indigo-500',
+                        '3_juiz_estadual': 'from-indigo-400 to-indigo-500',
+                        '4_juiz_estadual': 'from-indigo-300 to-indigo-400',
+                        '1_procurador_geral_republica': 'from-green-500 to-green-600',
+                        '2_procurador_geral_justica': 'from-green-400 to-green-500',
+                        '3_procurador_geral_justica': 'from-green-300 to-green-400',
                         '1_promotor': 'from-purple-500 to-purple-600',
                         '2_promotor': 'from-purple-400 to-purple-500',
                         '3_promotor': 'from-purple-400 to-purple-500',
                         '4_promotor': 'from-purple-400 to-purple-500',
                         '5_promotor': 'from-purple-400 to-purple-500',
                         '6_promotor': 'from-purple-400 to-purple-500',
-                        'advogado': 'from-green-500 to-green-600'
+                        '1_oficial_justica_2_instancia': 'from-orange-500 to-orange-600',
+                        '1_oficial_justica_1_instancia': 'from-orange-400 to-orange-500',
+                        'advogado': 'from-teal-500 to-teal-600',
+                        'defensor_publico': 'from-gray-500 to-gray-600'
                     }[dados.cargo] || 'from-slate-500 to-slate-600';
                     
                     listaHTML += `
@@ -4885,29 +4891,38 @@ document.addEventListener('input', function(e) {
             const cargo = usuarioLogado.cargo;
             console.log('🎯 Redirecionando usuário:', usuarioLogado.nome, 'Cargo:', cargo);
 
-            // Mapear cargos para portais específicos
+            // Mapear cargos BRASILÂNDIA para portais específicos
             const portaisPorCargo = {
                 // Advogados e Defensores - Portal Básico
                 'advogado': 'portal-advogado.html',
-                'defensor_publico_geral': 'portal-advogado.html',
                 'defensor_publico': 'portal-advogado.html',
 
-                // Ministério Público - Portal Intermediário
-                'procurador_geral_republica': 'portal-promotor.html',
-                'procurador_republica': 'portal-promotor.html',
-                'procurador_geral_justica': 'portal-promotor.html',
-                'procurador_justica': 'portal-promotor.html',
-                'promotor_justica': 'portal-promotor.html',
+                // Ministério Público BRASILÂNDIA - Portal Intermediário
+                '1_procurador_geral_republica': 'portal-promotor.html',
+                '2_procurador_geral_justica': 'portal-promotor.html',
+                '3_procurador_geral_justica': 'portal-promotor.html',
+                '1_promotor': 'portal-promotor.html',
+                '2_promotor': 'portal-promotor.html',
+                '3_promotor': 'portal-promotor.html',
+                '4_promotor': 'portal-promotor.html',
+                '5_promotor': 'portal-promotor.html',
+                '6_promotor': 'portal-promotor.html',
 
-                // Justiça Estadual - Portal Avançado
-                'juiz_estadual': 'portal-juiz-estadual.html',
-                'desembargador': 'portal-juiz-estadual.html',
+                // Justiça Estadual BRASILÂNDIA - Portal Avançado
+                '1_desembargador': 'portal-juiz-estadual.html',
+                '2_desembargador': 'portal-juiz-estadual.html',
+                '3_desembargador': 'portal-juiz-estadual.html',
+                '1_juiz_estadual': 'portal-juiz-estadual.html',
+                '2_juiz_estadual': 'portal-juiz-estadual.html',
+                '3_juiz_estadual': 'portal-juiz-estadual.html',
+                '4_juiz_estadual': 'portal-juiz-estadual.html',
+                '1_oficial_justica_2_instancia': 'portal-juiz-estadual.html',
+                '1_oficial_justica_1_instancia': 'portal-juiz-estadual.html',
 
-                // Justiça Federal - Portal Máximo
-                'ministro_stf': 'portal-juiz-federal.html',
-                'ministro_stj': 'portal-juiz-federal.html',
-                'desembargador_federal': 'portal-juiz-federal.html',
-                'juiz_federal': 'portal-juiz-federal.html'
+                // Justiça Federal BRASILÂNDIA - Portal Máximo
+                '1_juiz_federal': 'portal-juiz-federal.html',
+                '2_juiz_federal': 'portal-juiz-federal.html',
+                '3_juiz_federal': 'portal-juiz-federal.html'
             };
 
             const portalDestino = portaisPorCargo[cargo];
