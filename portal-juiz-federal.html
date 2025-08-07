@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>� Portal da Suprema Autoridade Federal - Níveis 1-2 - Sistema Jurídico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #a16207 0%, #d97706 50%, #f59e0b 100%);
+            min-height: 100vh;
+        }
+        
+        .portal-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.1);
+        }
+        
+        .portal-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(255, 215, 0, 0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #d97706 0%, #a16207 100%);
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .hierarchy-indicator {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #92400e;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
+        }
+
+        .crown-title {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b, #fbbf24);
+            background-size: 200% 200%;
+            animation: crown-glow 3s ease-in-out infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes crown-glow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .crown {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // Configuração Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7zTi6HQlDmkA6guBTXGw87njm5fu4ImA",
+            authDomain: "sistema-juridico-brasila-7c777.firebaseapp.com",
+            projectId: "sistema-juridico-brasila-7c777",
+            storageBucket: "sistema-juridico-brasila-7c777.firebasestorage.app",
+            messagingSenderId: "566082705177",
+            appId: "1:566082705177:web:9b1a7050e3b8c95c789788"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.firebaseModules = { signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc };
+        
+        console.log('🔥 Firebase inicializado no Portal do Juiz Federal');
+    </script>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header do Portal -->
+    <header class="bg-black/20 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo e Título -->
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center border-2 border-yellow-300/50">
+                        <i class="fas fa-crown text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="crown-title font-bold text-xl flex items-center">
+                            👑 Suprema Autoridade Federal
+                            <i class="fas fa-crown text-yellow-400 ml-2 text-lg"></i>
+                        </h1>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <span class="hierarchy-indicator">
+                                👑 Nível 1-2 - STF/STJ/STB
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navegação -->
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#documentos" class="text-white hover:text-yellow-200 transition-colors">Documentos</a>
+                    <a href="#processos" class="text-white hover:text-yellow-200 transition-colors">Processos</a>
+                    <a href="#sentencas" class="text-white hover:text-yellow-200 transition-colors">Sentenças</a>
+                    <a href="#administracao" class="text-white hover:text-yellow-200 transition-colors">Administração</a>
+                </nav>
+
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-white text-sm font-medium flex items-center" id="usuario-nome">
+                            <i class="fas fa-crown text-yellow-400 mr-1 text-xs"></i>
+                            Carregando...
+                        </p>
+                        <p class="text-yellow-200 text-xs" id="usuario-cargo">STF: ...</p>
+                        <p class="text-yellow-400 text-xs font-bold">👑 MÁXIMA AUTORIDADE</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="window.location.href='index.html'" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                            <i class="fas fa-home mr-1"></i>Portal Principal
+                        </button>
+                        <button onclick="window.location.href='portal-admin.html'" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                            <i class="fas fa-cog mr-1"></i>Admin
+                        </button>
+                        <button onclick="fazerLogout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Aviso de Suprema Autoridade -->
+        <div class="bg-gradient-to-r from-yellow-600/30 to-amber-600/30 border-2 border-yellow-500/70 rounded-xl p-6 mb-8 shadow-2xl">
+            <div class="flex items-center space-x-4">
+                <div class="text-yellow-400 text-4xl">👑</div>
+                <div>
+                    <h3 class="crown-title font-bold text-2xl mb-2">👑 SUPREMA AUTORIDADE FEDERAL - Níveis 1-2</h3>
+                    <p class="text-yellow-100 text-sm mb-3">Acesso TOTAL: Todos os documentos federais, estaduais, MP e advocacia. Habeas Corpus, nomeações e decisões supremas incluídas.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="text-yellow-300 font-bold text-sm mb-1">🏛️ SUPREMA HIERARQUIA:</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="bg-yellow-500/40 text-yellow-100 px-2 py-1 rounded text-xs">👑 Nível 1: 1º Juiz Federal</span>
+                                <span class="bg-yellow-500/30 text-yellow-200 px-2 py-1 rounded text-xs">⚖️ Nível 2: 2º/3º Juiz Federal</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-yellow-300 font-bold text-sm mb-1">⚖️ PODERES EXCLUSIVOS:</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="bg-amber-500/40 text-amber-100 px-2 py-1 rounded text-xs">👑 Nomeações</span>
+                                <span class="bg-amber-500/40 text-amber-100 px-2 py-1 rounded text-xs">🏛️ Habeas Corpus</span>
+                                <span class="bg-amber-500/40 text-amber-100 px-2 py-1 rounded text-xs">⚖️ Decisões Supremas</span>
+                                <span class="bg-amber-500/40 text-amber-100 px-2 py-1 rounded text-xs">🛡️ Admin Total</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Card Documentos Judiciais -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Documentos</h3>
+                <p class="text-blue-200 text-sm mb-4">Sentenças, despachos e decisões</p>
+                <button onclick="mostrarSecao('documentos')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Processos -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-briefcase text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Processos</h3>
+                <p class="text-blue-200 text-sm mb-4">Gestão de processos judiciais</p>
+                <button onclick="mostrarSecao('processos')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Sentenças -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-gavel text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Sentenças</h3>
+                <p class="text-blue-200 text-sm mb-4">Proferimento de sentenças</p>
+                <button onclick="mostrarSecao('sentencas')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Administração -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-crown text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Administração</h3>
+                <p class="text-blue-200 text-sm mb-4">Gestão do sistema judiciário</p>
+                <button onclick="mostrarSecao('administracao')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+        </div>
+
+        <!-- Seção de Documentos para Juízes Federais -->
+        <div id="secao-documentos" class="hidden">
+            <div class="portal-card rounded-2xl p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <i class="fas fa-file-alt mr-3 text-blue-400"></i>
+                        Documentos Judiciais - Juiz Federal
+                        <i class="fas fa-crown crown ml-2 text-lg"></i>
+                    </h2>
+                    <button onclick="voltarDashboard()" class="text-blue-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
+                </div>
+
+                <!-- Grid de Documentos Disponíveis para Juízes Federais -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <!-- DOCUMENTOS EXCLUSIVOS DE JUÍZES -->
+                    <div class="col-span-full mb-6">
+                        <h3 class="text-white text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-crown crown mr-2"></i>
+                            Documentos Exclusivos da Magistratura
+                        </h3>
+                    </div>
+
+                    <!-- Sentença -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-yellow-500/30" onclick="gerarDocumento('sentenca')">
+                        <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-gavel text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Sentença</h3>
+                        <p class="text-blue-200 text-sm">Decisão final do processo</p>
+                        <span class="inline-block bg-yellow-500/20 text-yellow-300 text-xs px-2 py-1 rounded-full mt-2">EXCLUSIVO</span>
+                    </div>
+
+                    <!-- Despacho -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-yellow-500/30" onclick="gerarDocumento('despacho')">
+                        <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-file-signature text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Despacho</h3>
+                        <p class="text-blue-200 text-sm">Determinação processual</p>
+                        <span class="inline-block bg-yellow-500/20 text-yellow-300 text-xs px-2 py-1 rounded-full mt-2">EXCLUSIVO</span>
+                    </div>
+
+                    <!-- Alvará -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-yellow-500/30" onclick="gerarDocumento('alvara')">
+                        <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-certificate text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Alvará</h3>
+                        <p class="text-blue-200 text-sm">Autorização judicial</p>
+                        <span class="inline-block bg-yellow-500/20 text-yellow-300 text-xs px-2 py-1 rounded-full mt-2">EXCLUSIVO</span>
+                    </div>
+
+                    <!-- Mandado -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-yellow-500/30" onclick="gerarDocumento('mandado')">
+                        <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-hand-paper text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Mandado</h3>
+                        <p class="text-blue-200 text-sm">Ordem judicial de cumprimento</p>
+                        <span class="inline-block bg-yellow-500/20 text-yellow-300 text-xs px-2 py-1 rounded-full mt-2">EXCLUSIVO</span>
+                    </div>
+
+                    <!-- Decisão Interlocutória -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-yellow-500/30" onclick="gerarDocumento('decisao')">
+                        <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-balance-scale text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Decisão Interlocutória</h3>
+                        <p class="text-blue-200 text-sm">Decisão durante o processo</p>
+                        <span class="inline-block bg-yellow-500/20 text-yellow-300 text-xs px-2 py-1 rounded-full mt-2">EXCLUSIVO</span>
+                    </div>
+
+                    <!-- Habeas Corpus -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-yellow-500/30" onclick="gerarDocumento('habeas')">
+                        <div class="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-unlock text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Habeas Corpus</h3>
+                        <p class="text-blue-200 text-sm">Decisão sobre liberdade</p>
+                        <span class="inline-block bg-yellow-500/20 text-yellow-300 text-xs px-2 py-1 rounded-full mt-2">EXCLUSIVO</span>
+                    </div>
+
+                    <!-- Ofício -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-yellow-500/30" onclick="gerarDocumento('oficio')">
+                        <div class="w-12 h-12 bg-teal-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-scroll text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Ofício</h3>
+                        <p class="text-blue-200 text-sm">Comunicação oficial</p>
+                        <span class="inline-block bg-yellow-500/20 text-yellow-300 text-xs px-2 py-1 rounded-full mt-2">EXCLUSIVO</span>
+                    </div>
+
+                    <!-- Certidão -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-yellow-500/30" onclick="gerarDocumento('certidao')">
+                        <div class="w-12 h-12 bg-pink-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-stamp text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Certidão</h3>
+                        <p class="text-blue-200 text-sm">Atestado de fatos processuais</p>
+                        <span class="inline-block bg-yellow-500/20 text-yellow-300 text-xs px-2 py-1 rounded-full mt-2">EXCLUSIVO</span>
+                    </div>
+
+                    <!-- Intimação -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-yellow-500/30" onclick="gerarDocumento('intimacao')">
+                        <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-bell text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Intimação</h3>
+                        <p class="text-blue-200 text-sm">Comunicação às partes</p>
+                        <span class="inline-block bg-yellow-500/20 text-yellow-300 text-xs px-2 py-1 rounded-full mt-2">EXCLUSIVO</span>
+                    </div>
+
+                    <!-- INCLUIR TAMBÉM: Documentos do MP -->
+                    <div class="col-span-full border-t border-white/20 pt-6 mt-6">
+                        <h3 class="text-white text-lg font-semibold mb-4">
+                            <i class="fas fa-plus-circle mr-2 text-red-400"></i>
+                            Também disponível: Documentos do Ministério Público
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('denuncia')">
+                                <span class="text-white text-sm">⚖️ Denúncia Criminal</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('parecer')">
+                                <span class="text-white text-sm">📋 Parecer Técnico</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('requisicao')">
+                                <span class="text-white text-sm">📄 Requisição</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('tac')">
+                                <span class="text-white text-sm">🤝 TAC</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INCLUIR TAMBÉM: Documentos de Advogado -->
+                    <div class="col-span-full border-t border-white/20 pt-6 mt-6">
+                        <h3 class="text-white text-lg font-semibold mb-4">
+                            <i class="fas fa-plus-circle mr-2 text-blue-400"></i>
+                            Também disponível: Documentos de Advogado
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('peticao')">
+                                <span class="text-white text-sm">📄 Petição Inicial</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('recurso')">
+                                <span class="text-white text-sm">🔄 Recurso</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('requerimento')">
+                                <span class="text-white text-sm">✋ Requerimento</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('procuracao')">
+                                <span class="text-white text-sm">👤 Procuração</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Outras seções serão implementadas -->
+        <div id="secao-processos" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-briefcase mr-3"></i>
+                    Gestão de Processos
+                    <i class="fas fa-crown crown ml-2"></i>
+                </h2>
+                <p class="text-blue-200">Em desenvolvimento...</p>
+            </div>
+        </div>
+
+        <div id="secao-sentencas" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-gavel mr-3"></i>
+                    Sentenças e Decisões
+                    <i class="fas fa-crown crown ml-2"></i>
+                </h2>
+                <p class="text-blue-200">Em desenvolvimento...</p>
+            </div>
+        </div>
+
+        <div id="secao-administracao" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-crown crown mr-3"></i>
+                    Administração do Sistema
+                </h2>
+                <p class="text-blue-200">Acesso total ao sistema de gestão judicial...</p>
+                
+                <!-- Link para portal administrativo -->
+                <div class="mt-6">
+                    <button onclick="abrirPortalAdmin()" class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-6 py-3 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all">
+                        <i class="fas fa-external-link-alt mr-2"></i>
+                        Acessar Portal Administrativo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 bg-black/20 backdrop-blur-xl border-t border-white/10 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-blue-200">&copy; 2025 Sistema Jurídico Brasileiro - Portal do Juiz Federal</p>
+        </div>
+    </footer>
+
+    <script>
+        let usuarioLogado = null;
+
+        // Carregar dados do usuário
+        window.addEventListener('load', async () => {
+            try {
+                const dadosUsuario = localStorage.getItem('usuarioLogadoAtual');
+                if (dadosUsuario) {
+                    usuarioLogado = JSON.parse(dadosUsuario);
+                    atualizarInterfaceUsuario();
+                } else {
+                    window.location.href = 'index (2).html';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados do usuário:', error);
+                window.location.href = 'index (2).html';
+            }
+        });
+
+        // Atualizar interface com dados do usuário
+        function atualizarInterfaceUsuario() {
+            if (usuarioLogado) {
+                document.getElementById('usuario-nome').textContent = usuarioLogado.nome;
+                document.getElementById('usuario-titulo').innerHTML = `<i class="fas fa-crown crown mr-1 text-xs"></i>${usuarioLogado.titulo || 'Juiz Federal'}`;
+                document.getElementById('usuario-oab').textContent = `STF: ${usuarioLogado.oab || 'N/A'}`;
+            }
+        }
+
+        // Navegação entre seções
+        function mostrarSecao(secao) {
+            const cards = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+            if (cards) cards.style.display = 'none';
+
+            document.querySelectorAll('[id^="secao-"]').forEach(s => s.classList.add('hidden'));
+            
+            const secaoElement = document.getElementById(`secao-${secao}`);
+            if (secaoElement) {
+                secaoElement.classList.remove('hidden');
+            }
+        }
+
+        function voltarDashboard() {
+            const cards = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+            if (cards) cards.style.display = 'grid';
+
+            document.querySelectorAll('[id^="secao-"]').forEach(s => s.classList.add('hidden'));
+        }
+
+        // Gerar documento específico
+        function gerarDocumento(tipo) {
+            const tiposDocumentos = {
+                // Documentos exclusivos de juízes
+                'sentenca': 'Sentença Judicial',
+                'despacho': 'Despacho',
+                'alvara': 'Alvará Judicial',
+                'mandado': 'Mandado',
+                'decisao': 'Decisão Interlocutória',
+                'habeas': 'Habeas Corpus',
+                'oficio': 'Ofício',
+                'certidao': 'Certidão',
+                'intimacao': 'Intimação',
+                
+                // Documentos do MP
+                'denuncia': 'Denúncia Criminal',
+                'parecer': 'Parecer Técnico do MP',
+                'requisicao': 'Requisição de Diligências',
+                'tac': 'Termo de Ajustamento de Conduta',
+                
+                // Documentos de advogado
+                'peticao': 'Petição Inicial',
+                'recurso': 'Recurso',
+                'requerimento': 'Requerimento',
+                'procuracao': 'Procuração'
+            };
+
+            const nomeDoc = tiposDocumentos[tipo] || tipo;
+            const nivelPermissao = ['sentenca', 'despacho', 'alvara', 'mandado', 'decisao', 'habeas', 'oficio', 'certidao', 'intimacao'].includes(tipo) ? 
+                ' (EXCLUSIVO DE JUÍZES)' : '';
+
+            alert(`🚧 Gerando ${nomeDoc}${nivelPermissao}... (Em desenvolvimento)\n\nEste será o sistema completo de geração de documentos com acesso total da magistratura.`);
+        }
+
+        // Abrir portal administrativo
+        function abrirPortalAdmin() {
+            window.open('portal.index.html', '_blank');
+        }
+
+        // Logout
+        async function fazerLogout() {
+            try {
+                if (window.firebaseModules && window.firebaseAuth) {
+                    await window.firebaseModules.signOut(window.firebaseAuth);
+                }
+                localStorage.removeItem('usuarioLogadoAtual');
+                window.location.href = 'index (2).html';
+            } catch (error) {
+                console.error('Erro no logout:', error);
+                localStorage.removeItem('usuarioLogadoAtual');
+                window.location.href = 'index (2).html';
+            }
+        }
+    </script>
+
+</body>
+</html>

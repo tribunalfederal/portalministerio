@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👨‍💼 Portal do Ministério Público - Níveis 5-8 - Sistema Jurídico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #7c2d12 0%, #991b1b 50%, #7f1d1d 100%);
+            min-height: 100vh;
+        }
+        
+        .portal-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .portal-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+            transform: translateY(-1px);
+        }
+
+        .hierarchy-indicator {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // Configuração Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7zTi6HQlDmkA6guBTXGw87njm5fu4ImA",
+            authDomain: "sistema-juridico-brasila-7c777.firebaseapp.com",
+            projectId: "sistema-juridico-brasila-7c777",
+            storageBucket: "sistema-juridico-brasila-7c777.firebasestorage.app",
+            messagingSenderId: "566082705177",
+            appId: "1:566082705177:web:9b1a7050e3b8c95c789788"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.firebaseModules = { signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc };
+        
+        console.log('🔥 Firebase inicializado no Portal do Promotor');
+    </script>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header do Portal -->
+    <header class="bg-black/20 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo e Título -->
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-gavel text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-white font-bold text-lg">Portal do Ministério Público</h1>
+                        <div class="flex items-center space-x-2">
+                            <span class="hierarchy-indicator">
+                                🏛️ Níveis 5-8 - MP Federal/Estadual
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navegação -->
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#documentos" class="text-white hover:text-red-200 transition-colors">Documentos</a>
+                    <a href="#denuncias" class="text-white hover:text-red-200 transition-colors">Denúncias</a>
+                    <a href="#investigacoes" class="text-white hover:text-red-200 transition-colors">Investigações</a>
+                    <a href="#pareceres" class="text-white hover:text-red-200 transition-colors">Pareceres</a>
+                </nav>
+
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-white text-sm font-medium" id="usuario-nome">Carregando...</p>
+                        <p class="text-red-200 text-xs" id="usuario-cargo">MP: ...</p>
+                        <p class="text-orange-400 text-xs font-medium">⚖️ Ministério Público</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="window.location.href='index.html'" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                            <i class="fas fa-home mr-1"></i>Portal Principal
+                        </button>
+                        <button onclick="fazerLogout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Aviso de Hierarquia MP -->
+        <div class="bg-gradient-to-r from-red-600/20 to-orange-600/20 border border-red-500/50 rounded-xl p-4 mb-8">
+            <div class="flex items-center space-x-3">
+                <div class="text-red-400 text-2xl">🏛️</div>
+                <div>
+                    <h3 class="text-white font-bold text-lg">Portal do Ministério Público - Níveis 5-8</h3>
+                    <p class="text-red-200 text-sm">Acesso ampliado: documentos do MP (denúncias, TAC, ACP) + documentos de advocacia. Hierarquia: PGR > PGJ > Promotores.</p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="bg-red-500/30 text-red-200 px-2 py-1 rounded text-xs">🏛️ Nível 5: Procurador Geral da República</span>
+                        <span class="bg-red-500/30 text-red-200 px-2 py-1 rounded text-xs">⚖️ Nível 6-7: Procuradores Gerais de Justiça</span>
+                        <span class="bg-red-500/30 text-red-200 px-2 py-1 rounded text-xs">👨‍💼 Nível 8: Promotores de Justiça</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="bg-orange-500/30 text-orange-200 px-2 py-1 rounded text-xs">📄 Acusação</span>
+                        <span class="bg-orange-500/30 text-orange-200 px-2 py-1 rounded text-xs">🔍 Investigação</span>
+                        <span class="bg-orange-500/30 text-orange-200 px-2 py-1 rounded text-xs">📝 Denúncias</span>
+                        <span class="bg-orange-500/30 text-orange-200 px-2 py-1 rounded text-xs">⚖️ TAC</span>
+                        <span class="bg-orange-500/30 text-orange-200 px-2 py-1 rounded text-xs">🏛️ ACP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Card Documentos -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Documentos MP</h3>
+                <p class="text-red-200 text-sm mb-4">Denúncias, pareceres e requisições</p>
+                <button onclick="mostrarSecao('documentos')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Denúncias -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Denúncias</h3>
+                <p class="text-red-200 text-sm mb-4">Oferecimento de denúncias criminais</p>
+                <button onclick="mostrarSecao('denuncias')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Investigações -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-search text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Investigações</h3>
+                <p class="text-red-200 text-sm mb-4">Acompanhar inquéritos policiais</p>
+                <button onclick="mostrarSecao('investigacoes')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Pareceres -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-clipboard-check text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Pareceres</h3>
+                <p class="text-red-200 text-sm mb-4">Pareceres técnicos e manifestações</p>
+                <button onclick="mostrarSecao('pareceres')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+        </div>
+
+        <!-- Seção de Documentos para Promotores -->
+        <div id="secao-documentos" class="hidden">
+            <div class="portal-card rounded-2xl p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <i class="fas fa-file-alt mr-3 text-red-400"></i>
+                        Documentos do Ministério Público
+                    </h2>
+                    <button onclick="voltarDashboard()" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
+                </div>
+
+                <!-- Grid de Documentos Disponíveis para Promotores -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Denúncia Criminal -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('denuncia')">
+                        <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-exclamation-triangle text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Denúncia Criminal</h3>
+                        <p class="text-red-200 text-sm">Oferecimento de denúncia por crime</p>
+                    </div>
+
+                    <!-- Parecer Técnico -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('parecer')">
+                        <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-clipboard-check text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Parecer Técnico</h3>
+                        <p class="text-red-200 text-sm">Manifestação técnica especializada</p>
+                    </div>
+
+                    <!-- Requisição -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('requisicao')">
+                        <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-file-medical text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Requisição</h3>
+                        <p class="text-red-200 text-sm">Solicitação de diligências</p>
+                    </div>
+
+                    <!-- Promoção de Arquivamento -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('arquivamento')">
+                        <div class="w-12 h-12 bg-gray-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-archive text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Promoção de Arquivamento</h3>
+                        <p class="text-red-200 text-sm">Arquivamento de inquérito policial</p>
+                    </div>
+
+                    <!-- Recurso do MP -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('recurso-mp')">
+                        <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-redo text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Recurso do MP</h3>
+                        <p class="text-red-200 text-sm">Recurso em nome do Ministério Público</p>
+                    </div>
+
+                    <!-- TAC - Termo de Ajustamento -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('tac')">
+                        <div class="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-handshake text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">TAC</h3>
+                        <p class="text-red-200 text-sm">Termo de Ajustamento de Conduta</p>
+                    </div>
+
+                    <!-- Recomendação -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('recomendacao')">
+                        <div class="w-12 h-12 bg-pink-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-lightbulb text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Recomendação</h3>
+                        <p class="text-red-200 text-sm">Recomendação administrativa</p>
+                    </div>
+
+                    <!-- Ação Civil Pública -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('acp')">
+                        <div class="w-12 h-12 bg-teal-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Ação Civil Pública</h3>
+                        <p class="text-red-200 text-sm">Defesa de direitos coletivos</p>
+                    </div>
+
+                    <!-- Manifestação Processual -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('manifestacao')">
+                        <div class="w-12 h-12 bg-cyan-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-comment text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Manifestação</h3>
+                        <p class="text-red-200 text-sm">Manifestação em processo</p>
+                    </div>
+
+                    <!-- INCLUIR TAMBÉM: Documentos que advogados podem gerar -->
+                    <div class="col-span-full border-t border-white/20 pt-6 mt-6">
+                        <h3 class="text-white text-lg font-semibold mb-4">
+                            <i class="fas fa-plus-circle mr-2 text-red-400"></i>
+                            Também disponível: Documentos de Advogado
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('peticao')">
+                                <span class="text-white text-sm">📄 Petição Inicial</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('recurso')">
+                                <span class="text-white text-sm">🔄 Recurso</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('requerimento')">
+                                <span class="text-white text-sm">✋ Requerimento</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Outras seções serão implementadas -->
+        <div id="secao-denuncias" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6">Controle de Denúncias</h2>
+                <p class="text-red-200">Em desenvolvimento...</p>
+            </div>
+        </div>
+
+        <div id="secao-investigacoes" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6">Acompanhamento de Investigações</h2>
+                <p class="text-red-200">Em desenvolvimento...</p>
+            </div>
+        </div>
+
+        <div id="secao-pareceres" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6">Gestão de Pareceres</h2>
+                <p class="text-red-200">Em desenvolvimento...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 bg-black/20 backdrop-blur-xl border-t border-white/10 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-red-200">&copy; 2025 Sistema Jurídico Brasileiro - Portal do Ministério Público</p>
+        </div>
+    </footer>
+
+    <script>
+        let usuarioLogado = null;
+
+        // Carregar dados do usuário
+        window.addEventListener('load', async () => {
+            try {
+                const dadosUsuario = localStorage.getItem('usuarioLogadoAtual');
+                if (dadosUsuario) {
+                    usuarioLogado = JSON.parse(dadosUsuario);
+                    atualizarInterfaceUsuario();
+                } else {
+                    window.location.href = 'index (2).html';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados do usuário:', error);
+                window.location.href = 'index (2).html';
+            }
+        });
+
+        // Atualizar interface com dados do usuário
+        function atualizarInterfaceUsuario() {
+            if (usuarioLogado) {
+                document.getElementById('usuario-nome').textContent = usuarioLogado.nome;
+                document.getElementById('usuario-titulo').textContent = usuarioLogado.titulo || 'Promotor de Justiça';
+                document.getElementById('usuario-oab').textContent = `MP: ${usuarioLogado.oab || 'N/A'}`;
+            }
+        }
+
+        // Navegação entre seções
+        function mostrarSecao(secao) {
+            const cards = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+            if (cards) cards.style.display = 'none';
+
+            document.querySelectorAll('[id^="secao-"]').forEach(s => s.classList.add('hidden'));
+            
+            const secaoElement = document.getElementById(`secao-${secao}`);
+            if (secaoElement) {
+                secaoElement.classList.remove('hidden');
+            }
+        }
+
+        function voltarDashboard() {
+            const cards = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+            if (cards) cards.style.display = 'grid';
+
+            document.querySelectorAll('[id^="secao-"]').forEach(s => s.classList.add('hidden'));
+        }
+
+        // Gerar documento específico
+        function gerarDocumento(tipo) {
+            const tiposDocumentos = {
+                'denuncia': 'Denúncia Criminal',
+                'parecer': 'Parecer Técnico do MP',
+                'requisicao': 'Requisição de Diligências',
+                'arquivamento': 'Promoção de Arquivamento',
+                'recurso-mp': 'Recurso do Ministério Público',
+                'tac': 'Termo de Ajustamento de Conduta',
+                'recomendacao': 'Recomendação Administrativa',
+                'acp': 'Ação Civil Pública',
+                'manifestacao': 'Manifestação Processual',
+                'peticao': 'Petição Inicial',
+                'recurso': 'Recurso',
+                'requerimento': 'Requerimento'
+            };
+
+            const nomeDoc = tiposDocumentos[tipo] || tipo;
+            alert(`🚧 Gerando ${nomeDoc}... (Em desenvolvimento)\n\nEste será o sistema de geração de documentos específicos para o Ministério Público.`);
+        }
+
+        // Logout
+        async function fazerLogout() {
+            try {
+                if (window.firebaseModules && window.firebaseAuth) {
+                    await window.firebaseModules.signOut(window.firebaseAuth);
+                }
+                localStorage.removeItem('usuarioLogadoAtual');
+                window.location.href = 'index (2).html';
+            } catch (error) {
+                console.error('Erro no logout:', error);
+                localStorage.removeItem('usuarioLogadoAtual');
+                window.location.href = 'index (2).html';
+            }
+        }
+    </script>
+
+</body>
+</html>

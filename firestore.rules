@@ -1,0 +1,149 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // === USUÁRIOS INDIVIDUAIS ===
+    match /usuarios/{userId} {
+      // Usuários podem ler/escrever apenas seus próprios dados
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // === DADOS ADMINISTRATIVOS ===
+    match /usuarios_cadastrados/{document} {
+      // Apenas admins podem gerenciar usuários cadastrados
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /registros_oab/{document} {
+      // Apenas admins podem gerenciar registros OAB
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /usuarios_online/{document} {
+      // Todos usuários autenticados podem ver quem está online
+      allow read: if request.auth != null;
+      // Apenas admins podem modificar
+      allow write: if request.auth != null && 
+        exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // === LOGS DO SISTEMA ===
+    match /logs/{document} {
+      // Todos podem ler logs
+      allow read: if request.auth != null;
+      // Todos podem criar logs (para auditoria)
+      allow create: if request.auth != null;
+      // Apenas admins podem modificar/deletar logs
+      allow update, delete: if request.auth != null && 
+        exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // === DOCUMENTOS GERADOS ===
+    match /documentos/{document} {
+      // Usuários podem ver documentos que criaram ou que têm permissão
+      allow read: if request.auth != null && (
+        // Criador do documento
+        resource.data.criado_por == request.auth.uid ||
+        // Ou é admin
+        (exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.isAdmin == true) ||
+        // Ou tem permissão específica baseada no cargo
+        isAuthorizedByRole(request.auth.uid, resource.data.tipo_documento)
+      );
+      
+      // Criar documentos baseado em permissões
+      allow create: if request.auth != null && 
+        exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+        canCreateDocument(request.auth.uid, request.resource.data.tipo_documento);
+      
+      // Apenas criador ou admin pode modificar
+      allow update, delete: if request.auth != null && (
+        resource.data.criado_por == request.auth.uid ||
+        (exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.isAdmin == true)
+      );
+    }
+    
+    // === PROCESSOS/CASOS ===
+    match /processos/{document} {
+      // Acesso baseado em envolvimento no processo
+      allow read: if request.auth != null && (
+        // Partes envolvidas
+        request.auth.uid in resource.data.partes_envolvidas ||
+        // Juiz responsável
+        resource.data.juiz_responsavel == request.auth.uid ||
+        // Admin
+        (exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.isAdmin == true)
+      );
+      
+      // Criar processos (apenas juízes e promotores)
+      allow create: if request.auth != null && 
+        exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+        canCreateProcess(request.auth.uid);
+      
+      // Modificar apenas pelo responsável
+      allow update: if request.auth != null && (
+        resource.data.juiz_responsavel == request.auth.uid ||
+        (exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.isAdmin == true)
+      );
+    }
+  }
+  
+  // === FUNÇÕES AUXILIARES ===
+  
+  // Verificar se usuário pode criar determinado tipo de documento
+  function canCreateDocument(userId, tipoDoc) {
+    let userData = get(/databases/$(database)/documents/usuarios/$(userId)).data;
+    let cargo = userData.cargo;
+    
+    // Documentos exclusivos de juízes
+    let docsJuizes = ['sentenca', 'despacho', 'alvara', 'mandado', 'decisao', 'habeas', 'oficio', 'certidao', 'intimacao'];
+    
+    // Documentos do MP
+    let docsMP = ['denuncia', 'parecer', 'requisicao', 'arquivamento', 'recurso-mp', 'tac', 'recomendacao', 'acp', 'manifestacao'];
+    
+    // Documentos de advogados
+    let docsAdvogados = ['peticao', 'recurso', 'requerimento', 'contrato', 'procuracao', 'contestacao'];
+    
+    return (
+      // Admins podem tudo
+      userData.isAdmin == true ||
+      // Juízes federais podem tudo
+      cargo in ['1_juiz_federal', '2_juiz_federal', '3_juiz_federal', '1_desembargador', '2_desembargador', '3_desembargador'] ||
+      // Juízes estaduais podem docs de juízes (exceto federais) + MP + advogado
+      (cargo in ['juiz_direito', 'desembargador'] && (tipoDoc in docsJuizes || tipoDoc in docsMP || tipoDoc in docsAdvogados)) ||
+      // Promotores podem docs do MP + advogado
+      (cargo in ['promotor_justica', 'procurador_republica'] && (tipoDoc in docsMP || tipoDoc in docsAdvogados)) ||
+      // Advogados podem apenas docs de advogado
+      (cargo in ['advogado_criminal', 'advogado_civil', 'advogado_trabalhista', 'advogado_tributario'] && tipoDoc in docsAdvogados)
+    );
+  }
+  
+  // Verificar se usuário pode ver documento baseado no cargo
+  function isAuthorizedByRole(userId, tipoDoc) {
+    let userData = get(/databases/$(database)/documents/usuarios/$(userId)).data;
+    let cargo = userData.cargo;
+    
+    // Mesma lógica de canCreateDocument, mas para leitura
+    return canCreateDocument(userId, tipoDoc);
+  }
+  
+  // Verificar se pode criar processos
+  function canCreateProcess(userId) {
+    let userData = get(/databases/$(database)/documents/usuarios/$(userId)).data;
+    let cargo = userData.cargo;
+    
+    return (
+      userData.isAdmin == true ||
+      cargo in ['1_juiz_federal', '2_juiz_federal', '3_juiz_federal', '1_desembargador', '2_desembargador', '3_desembargador', 'juiz_direito', 'desembargador', 'promotor_justica', 'procurador_republica']
+    );
+  }
+}

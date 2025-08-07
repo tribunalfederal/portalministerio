@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👨‍⚖️ Portal da Justiça Estadual - Níveis 3-4 - Sistema Jurídico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%);
+            min-height: 100vh;
+        }
+        
+        .portal-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .portal-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+            transform: translateY(-1px);
+        }
+
+        .hierarchy-indicator {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // Configuração Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7zTi6HQlDmkA6guBTXGw87njm5fu4ImA",
+            authDomain: "sistema-juridico-brasila-7c777.firebaseapp.com",
+            projectId: "sistema-juridico-brasila-7c777",
+            storageBucket: "sistema-juridico-brasila-7c777.firebasestorage.app",
+            messagingSenderId: "566082705177",
+            appId: "1:566082705177:web:9b1a7050e3b8c95c789788"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.firebaseModules = { signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc };
+        
+        console.log('🔥 Firebase inicializado no Portal do Juiz Estadual');
+    </script>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header do Portal -->
+    <header class="bg-black/20 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo e Título -->
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-balance-scale text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-white font-bold text-lg">Portal da Justiça Estadual</h1>
+                        <div class="flex items-center space-x-2">
+                            <span class="hierarchy-indicator">
+                                👨‍⚖️ Níveis 3-4 - TJ Estadual
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navegação -->
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#documentos" class="text-white hover:text-green-200 transition-colors">Documentos</a>
+                    <a href="#processos" class="text-white hover:text-green-200 transition-colors">Processos</a>
+                    <a href="#sentencas" class="text-white hover:text-green-200 transition-colors">Sentenças</a>
+                    <a href="#vara" class="text-white hover:text-green-200 transition-colors">Gestão da Vara</a>
+                </nav>
+
+                <!-- User Menu -->
+                <div class="flex items-center space-x-4">
+                    <div class="text-right">
+                        <p class="text-white text-sm font-medium" id="usuario-nome">Carregando...</p>
+                        <p class="text-green-200 text-xs" id="usuario-cargo">TJ: ...</p>
+                        <p class="text-yellow-400 text-xs font-medium">⚖️ Justiça Estadual</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="window.location.href='index.html'" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm">
+                            <i class="fas fa-home mr-1"></i>Portal Principal
+                        </button>
+                        <button onclick="fazerLogout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Aviso de Hierarquia Estadual -->
+        <div class="bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/50 rounded-xl p-4 mb-8">
+            <div class="flex items-center space-x-3">
+                <div class="text-green-400 text-2xl">👨‍⚖️</div>
+                <div>
+                    <h3 class="text-white font-bold text-lg">Portal da Justiça Estadual - Níveis 3-4</h3>
+                    <p class="text-green-200 text-sm">Acesso avançado: documentos estaduais + MP + advocacia. <span class="text-yellow-300 font-medium">⚠️ Limitações federais:</span> sem Habeas Corpus federais ou Supremas Decisões.</p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="bg-green-500/30 text-green-200 px-2 py-1 rounded text-xs">🏛️ Nível 3: Desembargadores TJ</span>
+                        <span class="bg-green-500/30 text-green-200 px-2 py-1 rounded text-xs">👨‍⚖️ Nível 4: Juízes Estaduais</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="bg-emerald-500/30 text-emerald-200 px-2 py-1 rounded text-xs">⚖️ Civil</span>
+                        <span class="bg-emerald-500/30 text-emerald-200 px-2 py-1 rounded text-xs">🚔 Criminal</span>
+                        <span class="bg-emerald-500/30 text-emerald-200 px-2 py-1 rounded text-xs">🗳️ Eleitoral</span>
+                        <span class="bg-emerald-500/30 text-emerald-200 px-2 py-1 rounded text-xs">🚗 Trânsito</span>
+                        <span class="bg-yellow-500/30 text-yellow-200 px-2 py-1 rounded text-xs">🚫 Sem Fed. Habeas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Card Documentos -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Documentos</h3>
+                <p class="text-green-200 text-sm mb-4">Sentenças e decisões estaduais</p>
+                <button onclick="mostrarSecao('documentos')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Processos -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-briefcase text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Processos</h3>
+                <p class="text-green-200 text-sm mb-4">Gestão processual estadual</p>
+                <button onclick="mostrarSecao('processos')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Sentenças -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-gavel text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Sentenças</h3>
+                <p class="text-green-200 text-sm mb-4">Decisões da justiça estadual</p>
+                <button onclick="mostrarSecao('sentencas')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Vara -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-building text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Gestão da Vara</h3>
+                <p class="text-green-200 text-sm mb-4">Administração da vara judicial</p>
+                <button onclick="mostrarSecao('vara')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+        </div>
+
+        <!-- Seção de Documentos para Juízes Estaduais -->
+        <div id="secao-documentos" class="hidden">
+            <div class="portal-card rounded-2xl p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <i class="fas fa-file-alt mr-3 text-green-400"></i>
+                        Documentos Judiciais - Justiça Estadual
+                    </h2>
+                    <button onclick="voltarDashboard()" class="text-green-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
+                </div>
+
+                <!-- Grid de Documentos Disponíveis para Juízes Estaduais -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <!-- DOCUMENTOS EXCLUSIVOS DE JUÍZES -->
+                    <div class="col-span-full mb-6">
+                        <h3 class="text-white text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-balance-scale mr-2 text-green-400"></i>
+                            Documentos da Magistratura Estadual
+                        </h3>
+                    </div>
+
+                    <!-- Sentença Estadual -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-green-500/30" onclick="gerarDocumento('sentenca-estadual')">
+                        <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-gavel text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Sentença Estadual</h3>
+                        <p class="text-green-200 text-sm">Decisão final da justiça estadual</p>
+                        <span class="inline-block bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full mt-2">ESTADUAL</span>
+                    </div>
+
+                    <!-- Despacho Estadual -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-green-500/30" onclick="gerarDocumento('despacho-estadual')">
+                        <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-file-signature text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Despacho</h3>
+                        <p class="text-green-200 text-sm">Determinação processual estadual</p>
+                        <span class="inline-block bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full mt-2">ESTADUAL</span>
+                    </div>
+
+                    <!-- Alvará Estadual -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-green-500/30" onclick="gerarDocumento('alvara-estadual')">
+                        <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-certificate text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Alvará Judicial</h3>
+                        <p class="text-green-200 text-sm">Autorização da justiça estadual</p>
+                        <span class="inline-block bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full mt-2">ESTADUAL</span>
+                    </div>
+
+                    <!-- Decisão Interlocutória -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-green-500/30" onclick="gerarDocumento('decisao-estadual')">
+                        <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-balance-scale text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Decisão Interlocutória</h3>
+                        <p class="text-green-200 text-sm">Decisão durante o processo</p>
+                        <span class="inline-block bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full mt-2">ESTADUAL</span>
+                    </div>
+
+                    <!-- Mandado Estadual -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-green-500/30" onclick="gerarDocumento('mandado-estadual')">
+                        <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-hand-paper text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Mandado</h3>
+                        <p class="text-green-200 text-sm">Ordem judicial estadual</p>
+                        <span class="inline-block bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full mt-2">ESTADUAL</span>
+                    </div>
+
+                    <!-- Intimação Estadual -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer border-2 border-green-500/30" onclick="gerarDocumento('intimacao-estadual')">
+                        <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-bell text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Intimação</h3>
+                        <p class="text-green-200 text-sm">Comunicação às partes</p>
+                        <span class="inline-block bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full mt-2">ESTADUAL</span>
+                    </div>
+
+                    <!-- NOTA: Juízes estaduais NÃO têm acesso aos documentos federais exclusivos -->
+                    <div class="col-span-full border-t border-white/20 pt-6 mt-6">
+                        <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle text-yellow-400 mr-3"></i>
+                                <p class="text-yellow-200 text-sm">
+                                    <strong>Nota:</strong> Como juiz estadual, você tem acesso limitado aos documentos federais. 
+                                    Documentos como Habeas Corpus federais são exclusivos da Justiça Federal.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INCLUIR: Documentos do MP (limitados) -->
+                    <div class="col-span-full border-t border-white/20 pt-6 mt-6">
+                        <h3 class="text-white text-lg font-semibold mb-4">
+                            <i class="fas fa-plus-circle mr-2 text-red-400"></i>
+                            Disponível: Documentos do MP Estadual
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('denuncia-estadual')">
+                                <span class="text-white text-sm">⚖️ Denúncia Estadual</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('parecer-estadual')">
+                                <span class="text-white text-sm">📋 Parecer MP Estadual</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('recurso-mp-estadual')">
+                                <span class="text-white text-sm">🔄 Recurso MP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INCLUIR: Documentos de Advogado -->
+                    <div class="col-span-full border-t border-white/20 pt-6 mt-6">
+                        <h3 class="text-white text-lg font-semibold mb-4">
+                            <i class="fas fa-plus-circle mr-2 text-blue-400"></i>
+                            Disponível: Documentos de Advogado
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('peticao')">
+                                <span class="text-white text-sm">📄 Petição Inicial</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('recurso')">
+                                <span class="text-white text-sm">🔄 Recurso</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('contestacao')">
+                                <span class="text-white text-sm">❌ Contestação</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('requerimento')">
+                                <span class="text-white text-sm">✋ Requerimento</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Outras seções -->
+        <div id="secao-processos" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6">Gestão de Processos Estaduais</h2>
+                <p class="text-green-200">Em desenvolvimento...</p>
+            </div>
+        </div>
+
+        <div id="secao-sentencas" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6">Sentenças da Justiça Estadual</h2>
+                <p class="text-green-200">Em desenvolvimento...</p>
+            </div>
+        </div>
+
+        <div id="secao-vara" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6">Gestão da Vara Judicial</h2>
+                <p class="text-green-200">Administração da vara, pautas, audiências...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 bg-black/20 backdrop-blur-xl border-t border-white/10 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-green-200">&copy; 2025 Sistema Jurídico Brasileiro - Portal da Justiça Estadual</p>
+        </div>
+    </footer>
+
+    <script>
+        let usuarioLogado = null;
+
+        // Carregar dados do usuário
+        window.addEventListener('load', async () => {
+            try {
+                const dadosUsuario = localStorage.getItem('usuarioLogadoAtual');
+                if (dadosUsuario) {
+                    usuarioLogado = JSON.parse(dadosUsuario);
+                    atualizarInterfaceUsuario();
+                } else {
+                    window.location.href = 'index (2).html';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados do usuário:', error);
+                window.location.href = 'index (2).html';
+            }
+        });
+
+        // Atualizar interface com dados do usuário
+        function atualizarInterfaceUsuario() {
+            if (usuarioLogado) {
+                document.getElementById('usuario-nome').textContent = usuarioLogado.nome;
+                document.getElementById('usuario-titulo').textContent = usuarioLogado.titulo || 'Juiz de Direito';
+                document.getElementById('usuario-oab').textContent = `TJ: ${usuarioLogado.oab || 'N/A'}`;
+            }
+        }
+
+        // Navegação entre seções
+        function mostrarSecao(secao) {
+            const cards = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+            if (cards) cards.style.display = 'none';
+
+            document.querySelectorAll('[id^="secao-"]').forEach(s => s.classList.add('hidden'));
+            
+            const secaoElement = document.getElementById(`secao-${secao}`);
+            if (secaoElement) {
+                secaoElement.classList.remove('hidden');
+            }
+        }
+
+        function voltarDashboard() {
+            const cards = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+            if (cards) cards.style.display = 'grid';
+
+            document.querySelectorAll('[id^="secao-"]').forEach(s => s.classList.add('hidden'));
+        }
+
+        // Gerar documento específico
+        function gerarDocumento(tipo) {
+            const tiposDocumentos = {
+                // Documentos estaduais
+                'sentenca-estadual': 'Sentença da Justiça Estadual',
+                'despacho-estadual': 'Despacho Estadual',
+                'alvara-estadual': 'Alvará Judicial Estadual',
+                'decisao-estadual': 'Decisão Interlocutória Estadual',
+                'mandado-estadual': 'Mandado Estadual',
+                'intimacao-estadual': 'Intimação Estadual',
+                
+                // MP Estadual
+                'denuncia-estadual': 'Denúncia do MP Estadual',
+                'parecer-estadual': 'Parecer do MP Estadual',
+                'recurso-mp-estadual': 'Recurso do MP Estadual',
+                
+                // Advogado
+                'peticao': 'Petição Inicial',
+                'recurso': 'Recurso',
+                'contestacao': 'Contestação',
+                'requerimento': 'Requerimento'
+            };
+
+            const nomeDoc = tiposDocumentos[tipo] || tipo;
+            const nivel = tipo.includes('estadual') ? ' (JUSTIÇA ESTADUAL)' : '';
+
+            alert(`🚧 Gerando ${nomeDoc}${nivel}... (Em desenvolvimento)\n\nEste será o sistema de documentos da Justiça Estadual com permissões específicas.`);
+        }
+
+        // Logout
+        async function fazerLogout() {
+            try {
+                if (window.firebaseModules && window.firebaseAuth) {
+                    await window.firebaseModules.signOut(window.firebaseAuth);
+                }
+                localStorage.removeItem('usuarioLogadoAtual');
+                window.location.href = 'index (2).html';
+            } catch (error) {
+                console.error('Erro no logout:', error);
+                localStorage.removeItem('usuarioLogadoAtual');
+                window.location.href = 'index (2).html';
+            }
+        }
+    </script>
+
+</body>
+</html>
