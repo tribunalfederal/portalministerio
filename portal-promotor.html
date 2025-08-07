@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👨‍💼 Portal do Ministério Público - Níveis 5-8 - Sistema Jurídico</title>
+    <title>🏛️ Ministério Público - Níveis 5-6 - Sistema Jurídico</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -12,7 +12,7 @@
         
         body { 
             font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, #7c2d12 0%, #991b1b 50%, #7f1d1d 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
             min-height: 100vh;
         }
         
@@ -29,18 +29,18 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
             border: none;
             transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
-            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
             transform: translateY(-1px);
         }
 
         .hierarchy-indicator {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 9999px;
@@ -81,47 +81,129 @@
 </head>
 <body class="overflow-x-hidden">
 
+    <!-- Header do Sistema com Design Uniforme -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-lg border-b border-slate-700/50">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo e Título Principal -->
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L13.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L10.91 8.26L12 2Z"/>
+                            </svg>
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-slate-800"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="text-xl font-bold text-white tracking-tight">Ministério Público</h1>
+                        <p class="text-sm text-slate-400">Brasilândia RP - Guardião da Lei e da Ordem</p>
+                    </div>
+                </div>
+
+                <!-- Status e Controles do Usuário -->
+                <div class="flex items-center space-x-3">
+                    <!-- Informações do Usuário -->
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <div class="w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                            <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-slate-800"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-medium text-white truncate" id="nome-usuario"></div>
+                            <div class="text-xs text-slate-400 truncate" id="cargo-usuario"></div>
+                        </div>
+                    </div>
+
+                    <!-- Botão Admin -->
+                    <button onclick="mostrarPainelAdmin()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 px-3 py-2.5 rounded-lg border border-red-500/20 transition-all hidden text-sm h-12 flex items-center" id="btn-admin">
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Admin</span>
+                    </button>
+
+                    <!-- Botão Escolher Portais -->
+                    <button onclick="mostrarEscolhaPortalUniversal()" class="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 px-3 py-2.5 rounded-lg border border-blue-500/20 transition-all hidden text-sm h-12 flex items-center" id="btn-portais">
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l8 4v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V6l8-4m0 2.18L6 8.14v5.86c0 3.05 1.92 6.05 6 7.74 4.08-1.69 6-4.69 6-7.74V8.14l-6-4.96z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Portais</span>
+                    </button>
+
+                    <!-- Botão Logout -->
+                    <button onclick="logout()" class="bg-slate-600/50 hover:bg-slate-600 text-slate-300 hover:text-white px-3 py-2.5 rounded-lg border border-slate-600/50 transition-all hidden text-sm h-12 flex items-center" id="btn-logout">
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Sair</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Espaçamento para header fixo -->
+    <div class="h-16"></div>
+
+    <!-- Painel de Navegação entre Portais -->
+    <div id="painel-portais" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-2xl p-6 max-w-md w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-white font-bold text-lg">Navegar entre Portais</h3>
+                <button onclick="fecharPainelPortais()" class="text-slate-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-3">
+                <button onclick="window.location.href='index.html'" class="w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-lg p-3 text-left transition-all">
+                    ⚖️ Portal Principal - Sistema Central
+                </button>
+                <button onclick="window.location.href='portal-advogado.html'" class="w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 rounded-lg p-3 text-left transition-all">
+                    👨‍💼 OAB - Ordem dos Advogados
+                </button>
+                <button onclick="window.location.href='portal-juiz-estadual.html'" class="w-full bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20 rounded-lg p-3 text-left transition-all">
+                    🏛️ TJBR - Tribunal de Justiça
+                </button>
+                <button onclick="window.location.href='portal-juiz-federal.html'" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg p-3 text-left transition-all">
+                    🏛️ STF - Supremo Tribunal Federal
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header do Portal -->
-    <header class="bg-black/20 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
+    <header class="bg-black/20 backdrop-blur-xl border-b border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo e Título -->
                 <div class="flex items-center space-x-4">
                     <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-gavel text-white text-lg"></i>
+                        <i class="fas fa-shield-alt text-white text-lg"></i>
                     </div>
                     <div>
-                        <h1 class="text-white font-bold text-lg">Portal do Ministério Público</h1>
+                        <h1 class="text-white font-bold text-lg">Ministério Público</h1>
                         <div class="flex items-center space-x-2">
                             <span class="hierarchy-indicator">
-                                🏛️ Níveis 5-8 - MP Federal/Estadual
+                                🏛️ Níveis 5-6 - MP/BR
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Navegação -->
-                <nav class="hidden md:flex space-x-6">
-                    <a href="#documentos" class="text-white hover:text-red-200 transition-colors">Documentos</a>
-                    <a href="#denuncias" class="text-white hover:text-red-200 transition-colors">Denúncias</a>
-                    <a href="#investigacoes" class="text-white hover:text-red-200 transition-colors">Investigações</a>
-                    <a href="#pareceres" class="text-white hover:text-red-200 transition-colors">Pareceres</a>
-                </nav>
-
-                <!-- User Menu -->
+                <!-- Navegação e Status -->
                 <div class="flex items-center space-x-4">
-                    <div class="text-right">
-                        <p class="text-white text-sm font-medium" id="usuario-nome">Carregando...</p>
-                        <p class="text-red-200 text-xs" id="usuario-cargo">MP: ...</p>
-                        <p class="text-orange-400 text-xs font-medium">⚖️ Ministério Público</p>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button onclick="voltarParaPortalPrincipal()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm">
-                            <i class="fas fa-home mr-1"></i>Portal Principal
-                        </button>
-                        <button onclick="fazerLogout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
-                            <i class="fas fa-sign-out-alt mr-2"></i>Sair
-                        </button>
+                    <button onclick="mostrarHierarquiaJudicial()" class="text-white hover:text-red-200 transition-colors text-sm bg-red-500/20 px-3 py-2 rounded-lg border border-red-500/30">
+                        🏛️ Hierarquia
+                    </button>
+                    <div class="text-white/60 text-sm">
+                        Status: <span class="text-green-400 font-semibold">Ativo</span>
                     </div>
                 </div>
             </div>
@@ -939,6 +1021,304 @@
                 });
             }
         });
+
+        // ======================================
+        // FUNÇÕES DO SISTEMA DE NAVEGAÇÃO
+        // ======================================
+
+        // Mostrar painel de escolha de portais
+        function mostrarEscolhaPortalUniversal() {
+            document.getElementById('painel-portais').classList.remove('hidden');
+        }
+
+        // Fechar painel de portais
+        function fecharPainelPortais() {
+            document.getElementById('painel-portais').classList.add('hidden');
+        }
+
+        // Função de logout
+        function logout() {
+            if (confirm('Deseja realmente sair do sistema?')) {
+                localStorage.removeItem('usuarioLogado');
+                
+                if (window.firebaseAuth && window.firebaseModules) {
+                    window.firebaseModules.signOut(window.firebaseAuth).then(() => {
+                        console.log('🚪 Logout realizado com sucesso');
+                    }).catch((error) => {
+                        console.error('❌ Erro no logout:', error);
+                    });
+                }
+                
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Mostrar painel admin
+        function mostrarPainelAdmin() {
+            alert('🔧 Painel administrativo em desenvolvimento.\n\nRecursos disponíveis:\n• Gestão de usuários\n• Configurações do sistema\n• Relatórios gerenciais\n• Backup de dados');
+        }
+
+        // Inicializar informações do usuário no header
+        function inicializarUsuarioHeader() {
+            const usuario = JSON.parse(localStorage.getItem('usuarioLogado') || '{}');
+            
+            if (usuario.nome) {
+                document.getElementById('nome-usuario').textContent = usuario.nome;
+                document.getElementById('cargo-usuario').textContent = 'Promotor(a) - MP/BR';
+                
+                // Mostrar botões baseado no nível de acesso
+                if (usuario.nivel >= 5) {
+                    document.getElementById('btn-portais').classList.remove('hidden');
+                    document.getElementById('btn-logout').classList.remove('hidden');
+                }
+                
+                if (usuario.nivel >= 6 || usuario.admin) {
+                    document.getElementById('btn-admin').classList.remove('hidden');
+                }
+            }
+        }
+
+        // Funções de compatibilidade (antigas)
+        function voltarParaPortalPrincipal() {
+            window.location.href = 'index.html';
+        }
+
+        function fazerLogout() {
+            logout();
+        }
+
+        // Inicializar quando a página carrega
+        document.addEventListener('DOMContentLoaded', () => {
+            inicializarUsuarioHeader();
+        });
+
+        // ======================================
+        // SISTEMA DE HIERARQUIA JUDICIAL - MP
+        // ======================================
+
+        // Mostrar modal da hierarquia judicial
+        function mostrarHierarquiaJudicial() {
+            const modal = document.getElementById('modal-hierarquia');
+            if (modal) {
+                modal.classList.remove('hidden');
+            } else {
+                criarModalHierarquia();
+            }
+        }
+
+        // Criar modal da hierarquia
+        function criarModalHierarquia() {
+            const modal = document.createElement('div');
+            modal.id = 'modal-hierarquia';
+            modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-slate-800 rounded-2xl p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <span class="mr-3">🏛️</span>
+                            Hierarquia Judicial Completa - Brasilândia RP
+                        </h2>
+                        <button onclick="fecharModalHierarquia()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- Nível 1 - SUPREMA AUTORIDADE JUDICIAL -->
+                        <div class="bg-gradient-to-r from-yellow-600/20 to-amber-600/20 border border-yellow-500/30 rounded-lg p-4">
+                            <h3 class="text-yellow-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">👑</span>Nível 1 - SUPREMA AUTORIDADE JUDICIAL
+                            </h3>
+                            <div class="bg-slate-700/50 rounded-lg p-3">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <div class="text-white font-semibold">1º Juiz Federal</div>
+                                        <div class="text-yellow-300 text-sm">Presidente do STF/STJ/STB</div>
+                                        <div class="text-slate-400 text-xs">Máxima Autoridade Judiciária</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">✅ Ocupado</span>
+                                        <div class="text-white text-sm mt-1">Alexandre de Moraes</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nível 2-3 - TRIBUNAIS SUPERIORES FEDERAIS -->
+                        <div class="bg-gradient-to-r from-red-600/20 to-red-700/20 border border-red-500/30 rounded-lg p-4">
+                            <h3 class="text-red-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">⚖️</span>Níveis 2-3 - TRIBUNAIS SUPERIORES FEDERAIS
+                            </h3>
+                            <div class="space-y-2">
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-white font-semibold">2º Juiz Federal</div>
+                                            <div class="text-red-300 text-sm">Presidente do STF</div>
+                                            <div class="text-slate-400 text-xs">Nomeado pelo 1º Juiz Federal</div>
+                                        </div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago 👑 Nomear</span>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-white font-semibold">3º Juiz Federal</div>
+                                            <div class="text-red-300 text-sm">Presidente do STF</div>
+                                            <div class="text-slate-400 text-xs">Nomeado pelo 1º Juiz Federal</div>
+                                        </div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago 👑 Nomear</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nível 3-4 - TRIBUNAIS DE SEGUNDA INSTÂNCIA -->
+                        <div class="bg-gradient-to-r from-purple-600/20 to-purple-700/20 border border-purple-500/30 rounded-lg p-4">
+                            <h3 class="text-purple-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">🏛️</span>Níveis 3-4 - TRIBUNAIS DE SEGUNDA INSTÂNCIA E PRIMEIRA INSTÂNCIA ESTADUAL
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <h4 class="text-purple-300 font-semibold">Desembargadores (Nível 3)</h4>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">1º Desembargador</div>
+                                        <div class="text-purple-300 text-sm">Tribunal de Justiça</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago 👑 Nomear</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">2º Desembargador</div>
+                                        <div class="text-purple-300 text-sm">Tribunal de Justiça</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago 👑 Nomear</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">3º Desembargador</div>
+                                        <div class="text-purple-300 text-sm">Tribunal de Justiça</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago 👑 Nomear</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="text-purple-300 font-semibold">Juízes Estaduais (Nível 4)</h4>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">1º Juiz Estadual</div>
+                                        <div class="text-purple-300 text-sm">Civil/Criminal/Eleitoral/Trânsito</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">2º Juiz Estadual</div>
+                                        <div class="text-purple-300 text-sm">Civil/Criminal/Eleitoral/Trânsito</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">3º Juiz Estadual</div>
+                                        <div class="text-purple-300 text-sm">Civil/Criminal/Eleitoral/Trânsito</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">4º Juiz Estadual</div>
+                                        <div class="text-purple-300 text-sm">Civil/Criminal/Eleitoral/Trânsito</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Níveis 5-8 - MINISTÉRIO PÚBLICO -->
+                        <div class="bg-gradient-to-r from-red-600/20 to-red-700/20 border-2 border-red-400/50 rounded-lg p-4">
+                            <h3 class="text-red-300 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">🏛️</span>Níveis 5-8 - MINISTÉRIO PÚBLICO (SEU PORTAL)
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <h4 class="text-red-300 font-semibold">Procuradores (Níveis 5-6)</h4>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">1º Procurador Geral da República</div>
+                                        <div class="text-red-300 text-sm">Presidente do Ministério Público (Nível 5)</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">2º Procurador Geral de Justiça</div>
+                                        <div class="text-red-300 text-sm">Ministério Público Estadual (Nível 6)</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">3º Procurador Geral de Justiça</div>
+                                        <div class="text-red-300 text-sm">Ministério Público Estadual (Nível 6)</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="text-red-300 font-semibold">Promotores (Níveis 7-8)</h4>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">1º Promotor</div>
+                                        <div class="text-red-300 text-sm">Líder da Promotoria Geral (Nível 7)</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="text-red-300 text-sm">Promotores 1ª Instância (Nível 8):</div>
+                                        <div class="bg-slate-700/50 rounded-lg p-2">
+                                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                                <div class="text-white">2º Promotor <span class="text-yellow-400">⏳ Vago</span></div>
+                                                <div class="text-white">3º Promotor <span class="text-yellow-400">⏳ Vago</span></div>
+                                                <div class="text-white">4º Promotor <span class="text-yellow-400">⏳ Vago</span></div>
+                                                <div class="text-white">5º Promotor <span class="text-yellow-400">⏳ Vago</span></div>
+                                                <div class="text-white">6º Promotor <span class="text-yellow-400">⏳ Vago</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Níveis 9-10 - OFICIAIS DE JUSTIÇA -->
+                        <div class="bg-gradient-to-r from-blue-600/20 to-blue-700/20 border border-blue-500/30 rounded-lg p-4">
+                            <h3 class="text-blue-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">👮‍♂️</span>Níveis 9-10 - OFICIAIS DE JUSTIÇA
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="text-white font-semibold">1º Oficial de Justiça - 2ª Instância</div>
+                                    <div class="text-blue-300 text-sm">Cumprimento de Mandados (Nível 9)</div>
+                                    <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                </div>
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="text-white font-semibold">1º Oficial de Justiça - 1ª Instância</div>
+                                    <div class="text-blue-300 text-sm">Cumprimento de Mandados (Nível 10)</div>
+                                    <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nível 11 - ADVOCACIA E DEFENSORIA -->
+                        <div class="bg-gradient-to-r from-indigo-600/20 to-indigo-700/20 border border-indigo-500/30 rounded-lg p-4">
+                            <h3 class="text-indigo-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">👨‍💼</span>Nível 11 - ADVOCACIA E DEFENSORIA
+                            </h3>
+                            <div class="bg-slate-700/50 rounded-lg p-3">
+                                <div class="text-white font-semibold">Advogado/Defensor</div>
+                                <div class="text-indigo-300 text-sm">Defesa e Representação</div>
+                                <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <button onclick="fecharModalHierarquia()" class="bg-slate-600 hover:bg-slate-700 text-white px-6 py-2 rounded-lg">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Fechar modal da hierarquia
+        function fecharModalHierarquia() {
+            const modal = document.getElementById('modal-hierarquia');
+            if (modal) {
+                modal.remove();
+            }
+        }
     </script>
 
 </body>
