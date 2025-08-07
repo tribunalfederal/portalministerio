@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ Ministério Público - Níveis 5-6 - Sistema Jurídico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+            min-height: 100vh;
+        }
+        
+        .portal-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .portal-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+            transform: translateY(-1px);
+        }
+
+        .hierarchy-indicator {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // Configuração Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7zTi6HQlDmkA6guBTXGw87njm5fu4ImA",
+            authDomain: "sistema-juridico-brasila-7c777.firebaseapp.com",
+            projectId: "sistema-juridico-brasila-7c777",
+            storageBucket: "sistema-juridico-brasila-7c777.firebasestorage.app",
+            messagingSenderId: "566082705177",
+            appId: "1:566082705177:web:9b1a7050e3b8c95c789788"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.firebaseModules = { signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc };
+        
+        console.log('🔥 Firebase inicializado no Portal do Promotor');
+
+        // Sistema de conectividade simplificado para portais
+        let firebaseStatus = { isOnline: false };
+        
+        function verificarConexaoPortal() {
+            setInterval(async () => {
+                try {
+                    if (!window.firebaseDB) return;
+                    const testRef = doc(window.firebaseDB, 'sistema', 'heartbeat');
+                    await getDoc(testRef);
+                    
+                    if (!firebaseStatus.isOnline) {
+                        firebaseStatus.isOnline = true;
+                        console.log('🔥✅ Portal: Firebase reconectado');
+                        atualizarStatusPortal('conectado');
+                    }
+                } catch (error) {
+                    if (firebaseStatus.isOnline) {
+                        firebaseStatus.isOnline = false;
+                        console.log('🔥❌ Portal: Firebase desconectado');
+                        atualizarStatusPortal('desconectado');
+                    }
+                }
+            }, 10000); // Verificar a cada 10 segundos
+        }
+        
+        function atualizarStatusPortal(status) {
+            const indicator = document.querySelector('.firebase-status');
+            if (!indicator) return;
+            
+            if (status === 'conectado') {
+                indicator.innerHTML = '<div class="w-2 h-2 bg-green-400 rounded-full"></div><span class="text-white text-xs">🔥 Online</span>';
+                indicator.className = 'firebase-status conectado';
+            } else {
+                indicator.innerHTML = '<div class="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div><span class="text-white text-xs">🔥 Offline</span>';
+                indicator.className = 'firebase-status desconectado';
+            }
+        }
+        
+        // Iniciar verificação após 3 segundos
+        setTimeout(verificarConexaoPortal, 3000);
+    </script>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header do Sistema com Design Uniforme -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-lg border-b border-slate-700/50">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo e Título Principal -->
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L13.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L10.91 8.26L12 2Z"/>
+                            </svg>
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-slate-800"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="text-xl font-bold text-white tracking-tight">Ministério Público</h1>
+                        <p class="text-sm text-slate-400">Brasilândia RP - Guardião da Lei e da Ordem</p>
+                    </div>
+                </div>
+
+                <!-- Status e Controles do Usuário -->
+                <div class="flex items-center space-x-3">
+                    <!-- Informações do Usuário -->
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <div class="w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                            <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-slate-800"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-medium text-white truncate" id="nome-usuario"></div>
+                            <div class="text-xs text-slate-400 truncate" id="cargo-usuario"></div>
+                        </div>
+                    </div>
+
+                    <!-- Botão Admin -->
+                    <button onclick="mostrarPainelAdmin()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 px-3 py-2.5 rounded-lg border border-red-500/20 transition-all hidden text-sm h-12 flex items-center" id="btn-admin">
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Admin</span>
+                    </button>
+
+                    <!-- Botão Escolher Portais -->
+                    <button onclick="mostrarEscolhaPortalUniversal()" class="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 px-3 py-2.5 rounded-lg border border-blue-500/20 transition-all hidden text-sm h-12 flex items-center" id="btn-portais">
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l8 4v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V6l8-4m0 2.18L6 8.14v5.86c0 3.05 1.92 6.05 6 7.74 4.08-1.69 6-4.69 6-7.74V8.14l-6-4.96z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Portais</span>
+                    </button>
+
+                    <!-- Botão Logout -->
+                    <button onclick="logout()" class="bg-slate-600/50 hover:bg-slate-600 text-slate-300 hover:text-white px-3 py-2.5 rounded-lg border border-slate-600/50 transition-all hidden text-sm h-12 flex items-center" id="btn-logout">
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Sair</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Espaçamento para header fixo -->
+    <div class="h-16"></div>
+
+    <!-- Painel de Navegação entre Portais -->
+    <div id="painel-portais" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-2xl p-6 max-w-md w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-white font-bold text-lg">Navegar entre Portais</h3>
+                <button onclick="fecharPainelPortais()" class="text-slate-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-3">
+                <button onclick="window.location.href='index.html'" class="w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-lg p-3 text-left transition-all">
+                    ⚖️ Portal Principal - Sistema Central
+                </button>
+                <button onclick="window.location.href='portal-advogado.html'" class="w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 rounded-lg p-3 text-left transition-all">
+                    👨‍💼 OAB - Ordem dos Advogados
+                </button>
+                <button onclick="window.location.href='portal-juiz-estadual.html'" class="w-full bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20 rounded-lg p-3 text-left transition-all">
+                    🏛️ TJBR - Tribunal de Justiça
+                </button>
+                <button onclick="window.location.href='portal-juiz-federal.html'" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg p-3 text-left transition-all">
+                    🏛️ STF - Supremo Tribunal Federal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header do Portal -->
+    <header class="bg-black/20 backdrop-blur-xl border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo e Título -->
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-white font-bold text-lg">Ministério Público</h1>
+                        <div class="flex items-center space-x-2">
+                            <span class="hierarchy-indicator">
+                                🏛️ Níveis 5-6 - MP/BR
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navegação e Status -->
+                <div class="flex items-center space-x-4">
+                    <button onclick="mostrarHierarquiaJudicial()" class="text-white hover:text-red-200 transition-colors text-sm bg-red-500/20 px-3 py-2 rounded-lg border border-red-500/30">
+                        🏛️ Hierarquia
+                    </button>
+                    <div class="text-white/60 text-sm">
+                        Status: <span class="text-green-400 font-semibold">Ativo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Aviso de Hierarquia MP -->
+        <div class="bg-gradient-to-r from-red-600/20 to-orange-600/20 border border-red-500/50 rounded-xl p-4 mb-8">
+            <div class="flex items-center space-x-3">
+                <div class="text-red-400 text-2xl">🏛️</div>
+                <div>
+                    <h3 class="text-white font-bold text-lg">Portal do Ministério Público - Níveis 5-8</h3>
+                    <p class="text-red-200 text-sm">Acesso ampliado: documentos do MP (denúncias, TAC, ACP) + documentos de advocacia. Hierarquia: PGR > PGJ > Promotores.</p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="bg-red-500/30 text-red-200 px-2 py-1 rounded text-xs">🏛️ Nível 5: Procurador Geral da República</span>
+                        <span class="bg-red-500/30 text-red-200 px-2 py-1 rounded text-xs">⚖️ Nível 6-7: Procuradores Gerais de Justiça</span>
+                        <span class="bg-red-500/30 text-red-200 px-2 py-1 rounded text-xs">👨‍💼 Nível 8: Promotores de Justiça</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="bg-orange-500/30 text-orange-200 px-2 py-1 rounded text-xs">📄 Acusação</span>
+                        <span class="bg-orange-500/30 text-orange-200 px-2 py-1 rounded text-xs">🔍 Investigação</span>
+                        <span class="bg-orange-500/30 text-orange-200 px-2 py-1 rounded text-xs">📝 Denúncias</span>
+                        <span class="bg-orange-500/30 text-orange-200 px-2 py-1 rounded text-xs">⚖️ TAC</span>
+                        <span class="bg-orange-500/30 text-orange-200 px-2 py-1 rounded text-xs">🏛️ ACP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Card Documentos -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Documentos MP</h3>
+                <p class="text-red-200 text-sm mb-4">Denúncias, pareceres e requisições</p>
+                <button onclick="mostrarSecao('documentos')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Denúncias -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Denúncias</h3>
+                <p class="text-red-200 text-sm mb-4">Oferecimento de denúncias criminais</p>
+                <button onclick="mostrarSecao('denuncias')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Investigações -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-search text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Investigações</h3>
+                <p class="text-red-200 text-sm mb-4">Acompanhar inquéritos policiais</p>
+                <button onclick="mostrarSecao('investigacoes')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Pareceres -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-clipboard-check text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Pareceres</h3>
+                <p class="text-red-200 text-sm mb-4">Pareceres técnicos e manifestações</p>
+                <button onclick="mostrarSecao('pareceres')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Calculadora de Penas -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-calculator text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Calc. Penas</h3>
+                <p class="text-red-200 text-sm mb-4">Calcular penas para denúncias</p>
+                <button onclick="mostrarSecao('calculadora')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards SEGUNDA LINHA -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Card Sistema de Audiências -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-users text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Audiências</h3>
+                <p class="text-red-200 text-sm mb-4">Participar de audiências</p>
+                <button onclick="mostrarSecao('audiencias')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Card Ferramentas Advogado -->
+            <div class="portal-card rounded-2xl p-6 text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-briefcase text-white text-2xl"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">Ferramentas</h3>
+                <p class="text-red-200 text-sm mb-4">Acesso às ferramentas de advogado</p>
+                <button onclick="mostrarSecao('ferramentas-advogado')" class="btn-primary text-white px-4 py-2 rounded-lg w-full">
+                    Acessar
+                </button>
+            </div>
+
+            <!-- Espaços vazios para equilíbrio visual -->
+            <div></div>
+            <div></div>
+        </div>
+
+        <!-- Seção da Calculadora de Penas -->
+        <div id="secao-calculadora" class="hidden">
+            <div class="portal-card rounded-2xl p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <i class="fas fa-calculator mr-3 text-red-400"></i>
+                        Calculadora de Penas - Ministério Público
+                    </h2>
+                    <button onclick="voltarDashboard()" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Seleção de Crimes -->
+                    <div class="bg-red-500/10 rounded-xl p-6 border border-red-500/30">
+                        <h3 class="text-white font-bold text-xl mb-4">Selecionar Crimes</h3>
+                        
+                        <div class="mb-4">
+                            <input type="text" id="busca-crime" placeholder="Buscar crime..." class="w-full p-3 rounded-lg bg-gray-900 border border-red-500/50 text-white">
+                        </div>
+                        
+                        <div class="space-y-4 max-h-80 overflow-y-auto">
+                            <div class="bg-gray-800/50 rounded-lg p-3 space-y-2">
+                                <h4 class="text-red-300 font-semibold">Crimes Contra a Pessoa</h4>
+                                <div class="space-y-1">
+                                    <button onclick="adicionarCrime('Homicídio Simples', 30, 5000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 121 - Homicídio Simples</button>
+                                    <button onclick="adicionarCrime('Homicídio Qualificado', 45, 8000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 121 §2º - Homicídio Qualificado</button>
+                                    <button onclick="adicionarCrime('Lesão Corporal', 10, 1500)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 129 - Lesão Corporal</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-800/50 rounded-lg p-3 space-y-2">
+                                <h4 class="text-red-300 font-semibold">Crimes Contra o Patrimônio</h4>
+                                <div class="space-y-1">
+                                    <button onclick="adicionarCrime('Furto Simples', 15, 2000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 155 - Furto Simples</button>
+                                    <button onclick="adicionarCrime('Furto Qualificado', 20, 3000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 155 §4º - Furto Qualificado</button>
+                                    <button onclick="adicionarCrime('Roubo Simples', 25, 4000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 157 - Roubo Simples</button>
+                                    <button onclick="adicionarCrime('Roubo Majorado', 35, 6000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 157 §2º - Roubo Majorado</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-800/50 rounded-lg p-3 space-y-2">
+                                <h4 class="text-red-300 font-semibold">Crimes de Tráfico</h4>
+                                <div class="space-y-1">
+                                    <button onclick="adicionarCrime('Tráfico de Drogas', 25, 5000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 33 - Tráfico de Drogas</button>
+                                    <button onclick="adicionarCrime('Porte de Drogas', 8, 1000)" class="w-full text-left p-2 text-white hover:bg-red-500/20 rounded transition-colors text-sm">Art. 28 - Porte para Uso</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h4 class="text-white font-semibold mb-2">Crimes Selecionados:</h4>
+                            <div id="crimes-selecionados" class="min-h-[100px] bg-gray-900/50 rounded-lg p-3 border border-red-500/30">
+                                <p class="text-gray-400 text-sm">Nenhum crime selecionado</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cálculo e Resultado -->
+                    <div class="bg-green-500/10 rounded-xl p-6 border border-green-500/30">
+                        <h3 class="text-white font-bold text-xl mb-4">Cálculo da Pena</h3>
+                        
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label class="flex items-center text-white">
+                                    <input type="checkbox" id="confissao" class="mr-2 accent-green-500"> 
+                                    Confissão (-1/6 da pena)
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center text-white">
+                                    <input type="checkbox" id="primariedade" class="mr-2 accent-green-500"> 
+                                    Primariedade (redução)
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center text-white">
+                                    <input type="checkbox" id="colaboracao" class="mr-2 accent-green-500"> 
+                                    Colaboração (redução de 1/3)
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-white mb-2">Redução Extra (%)</label>
+                                <input type="number" id="reducaoExtra" min="0" max="50" value="0" class="w-full p-2 rounded bg-gray-900 border border-green-500/50 text-white">
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-500/20 rounded-lg p-4 border border-green-500/50 mb-4">
+                            <h4 class="text-white font-bold text-lg mb-2">Resultado Final</h4>
+                            <div class="space-y-2">
+                                <p class="text-green-200">Pena Total: <span id="pena-total" class="text-white font-bold">0 meses</span></p>
+                                <p class="text-green-200">Multa Total: <span id="multa-total" class="text-white font-bold">R$ 0,00</span></p>
+                                <p class="text-green-200">Regime: <span id="regime-prisional" class="text-white font-bold">-</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <button onclick="calcularPenaFinal()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition-all flex-1">
+                                <i class="fas fa-calculator mr-2"></i>Calcular
+                            </button>
+                            <button onclick="salvarCalculoMP()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all flex-1">
+                                <i class="fas fa-save mr-2"></i>Salvar
+                            </button>
+                            <button onclick="gerarDenunciaComPena()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-all flex-1">
+                                <i class="fas fa-file-alt mr-2"></i>Denúncia
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Audiências -->
+        <div id="secao-audiencias" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <i class="fas fa-users mr-3 text-blue-400"></i>
+                        Sistema de Audiências - MP
+                    </h2>
+                    <button onclick="voltarDashboard()" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-blue-500/20 rounded-lg p-4 border border-blue-500/30 text-center cursor-pointer hover:bg-blue-500/30 transition-all">
+                        <i class="fas fa-calendar-plus text-blue-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Solicitar Audiência</h3>
+                        <p class="text-blue-200 text-sm">Requerer nova audiência</p>
+                    </div>
+                    
+                    <div class="bg-green-500/20 rounded-lg p-4 border border-green-500/30 text-center cursor-pointer hover:bg-green-500/30 transition-all">
+                        <i class="fas fa-list text-green-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Audiências Agendadas</h3>
+                        <p class="text-green-200 text-sm">Ver agenda de audiências</p>
+                    </div>
+                    
+                    <div class="bg-purple-500/20 rounded-lg p-4 border border-purple-500/30 text-center cursor-pointer hover:bg-purple-500/30 transition-all">
+                        <i class="fas fa-microphone text-purple-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Participar Online</h3>
+                        <p class="text-purple-200 text-sm">Entrar em audiência virtual</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/30">
+                    <h3 class="text-yellow-300 font-bold mb-2">⚠️ Próximas Audiências</h3>
+                    <div class="space-y-2">
+                        <div class="bg-yellow-500/20 rounded p-3">
+                            <p class="text-white font-medium">Processo 001/2025 - 20/01 às 14h00</p>
+                            <p class="text-yellow-200 text-sm">Audiência de Instrução - Vara Criminal</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Ferramentas do Advogado -->
+        <div id="secao-ferramentas-advogado" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <i class="fas fa-briefcase mr-3 text-amber-400"></i>
+                        Ferramentas de Advocacia
+                    </h2>
+                    <button onclick="voltarDashboard()" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-amber-500/20 rounded-lg p-6 border border-amber-500/30 text-center cursor-pointer hover:bg-amber-500/30 transition-all" onclick="abrirCalculadoraHonorarios()">
+                        <i class="fas fa-calculator text-amber-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Calc. Honorários</h3>
+                        <p class="text-amber-200 text-sm">Calcular honorários advocatícios</p>
+                    </div>
+                    
+                    <div class="bg-purple-500/20 rounded-lg p-6 border border-purple-500/30 text-center cursor-pointer hover:bg-purple-500/30 transition-all" onclick="abrirJurisprudencia()">
+                        <i class="fas fa-book text-purple-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Jurisprudência</h3>
+                        <p class="text-purple-200 text-sm">Pesquisar jurisprudências</p>
+                    </div>
+                    
+                    <div class="bg-orange-500/20 rounded-lg p-6 border border-orange-500/30 text-center cursor-pointer hover:bg-orange-500/30 transition-all" onclick="abrirContratos()">
+                        <i class="fas fa-handshake text-orange-400 text-3xl mb-3"></i>
+                        <h3 class="text-white font-bold mb-2">Contratos</h3>
+                        <p class="text-orange-200 text-sm">Modelos de contratos</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-amber-500/10 rounded-lg p-4 border border-amber-500/30">
+                    <p class="text-amber-200 text-sm">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Como promotor, você também tem acesso às ferramentas básicas de advocacia para elaboração de peças processuais.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Documentos para Promotores -->
+        <div id="secao-documentos" class="hidden">
+            <div class="portal-card rounded-2xl p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-2xl font-bold flex items-center">
+                        <i class="fas fa-file-alt mr-3 text-red-400"></i>
+                        Documentos do Ministério Público
+                    </h2>
+                    <button onclick="voltarDashboard()" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </button>
+                </div>
+
+                <!-- Grid de Documentos Disponíveis para Promotores -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Denúncia Criminal -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('denuncia')">
+                        <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-exclamation-triangle text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Denúncia Criminal</h3>
+                        <p class="text-red-200 text-sm">Oferecimento de denúncia por crime</p>
+                    </div>
+
+                    <!-- Parecer Técnico -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('parecer')">
+                        <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-clipboard-check text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Parecer Técnico</h3>
+                        <p class="text-red-200 text-sm">Manifestação técnica especializada</p>
+                    </div>
+
+                    <!-- Requisição -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('requisicao')">
+                        <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-file-medical text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Requisição</h3>
+                        <p class="text-red-200 text-sm">Solicitação de diligências</p>
+                    </div>
+
+                    <!-- Promoção de Arquivamento -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('arquivamento')">
+                        <div class="w-12 h-12 bg-gray-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-archive text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Promoção de Arquivamento</h3>
+                        <p class="text-red-200 text-sm">Arquivamento de inquérito policial</p>
+                    </div>
+
+                    <!-- Recurso do MP -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('recurso-mp')">
+                        <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-redo text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Recurso do MP</h3>
+                        <p class="text-red-200 text-sm">Recurso em nome do Ministério Público</p>
+                    </div>
+
+                    <!-- TAC - Termo de Ajustamento -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('tac')">
+                        <div class="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-handshake text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">TAC</h3>
+                        <p class="text-red-200 text-sm">Termo de Ajustamento de Conduta</p>
+                    </div>
+
+                    <!-- Recomendação -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('recomendacao')">
+                        <div class="w-12 h-12 bg-pink-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-lightbulb text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Recomendação</h3>
+                        <p class="text-red-200 text-sm">Recomendação administrativa</p>
+                    </div>
+
+                    <!-- Ação Civil Pública -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('acp')">
+                        <div class="w-12 h-12 bg-teal-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Ação Civil Pública</h3>
+                        <p class="text-red-200 text-sm">Defesa de direitos coletivos</p>
+                    </div>
+
+                    <!-- Manifestação Processual -->
+                    <div class="bg-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('manifestacao')">
+                        <div class="w-12 h-12 bg-cyan-500 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-comment text-white"></i>
+                        </div>
+                        <h3 class="text-white font-semibold mb-2">Manifestação</h3>
+                        <p class="text-red-200 text-sm">Manifestação em processo</p>
+                    </div>
+
+                    <!-- INCLUIR TAMBÉM: Documentos que advogados podem gerar -->
+                    <div class="col-span-full border-t border-white/20 pt-6 mt-6">
+                        <h3 class="text-white text-lg font-semibold mb-4">
+                            <i class="fas fa-plus-circle mr-2 text-red-400"></i>
+                            Também disponível: Documentos de Advogado
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('peticao')">
+                                <span class="text-white text-sm">📄 Petição Inicial</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('recurso')">
+                                <span class="text-white text-sm">🔄 Recurso</span>
+                            </div>
+                            <div class="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors cursor-pointer" onclick="gerarDocumento('requerimento')">
+                                <span class="text-white text-sm">✋ Requerimento</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Outras seções serão implementadas -->
+        <div id="secao-denuncias" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6">Controle de Denúncias</h2>
+                <p class="text-red-200">Em desenvolvimento...</p>
+            </div>
+        </div>
+
+        <div id="secao-investigacoes" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6">Acompanhamento de Investigações</h2>
+                <p class="text-red-200">Em desenvolvimento...</p>
+            </div>
+        </div>
+
+        <div id="secao-pareceres" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <h2 class="text-white text-2xl font-bold mb-6">Gestão de Pareceres</h2>
+                <p class="text-red-200">Em desenvolvimento...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 bg-black/20 backdrop-blur-xl border-t border-white/10 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-red-200">&copy; 2025 Sistema Jurídico Brasileiro - Portal do Ministério Público</p>
+        </div>
+    </footer>
+
+    <script>
+        let usuarioLogado = null;
+
+        // Carregar dados do usuário
+        window.addEventListener('load', async () => {
+            try {
+                console.log('🔍 Verificando autenticação do usuário...');
+                
+                // Verificar se há dados do usuário no localStorage
+                const dadosUsuario = localStorage.getItem('usuarioLogadoAtual');
+                
+                if (dadosUsuario) {
+                    try {
+                        usuarioLogado = JSON.parse(dadosUsuario);
+                        console.log('✅ Dados do usuário encontrados:', usuarioLogado.nome);
+                        atualizarInterfaceUsuario();
+                        return;
+                    } catch (parseError) {
+                        console.error('❌ Erro ao fazer parse dos dados do usuário:', parseError);
+                    }
+                }
+
+                // Se não há dados no localStorage, verificar Firebase Auth
+                if (window.firebaseAuth && window.firebaseModules) {
+                    console.log('🔍 Verificando autenticação no Firebase...');
+                    
+                    window.firebaseModules.onAuthStateChanged(window.firebaseAuth, (user) => {
+                        if (user) {
+                            console.log('✅ Usuário autenticado no Firebase:', user.email);
+                            // Usuário está logado, mas pode não ter dados no localStorage
+                            // Criar dados básicos para Alexandre se necessário
+                            if (user.email === 'alexandre.moraes@stf.jus.br') {
+                                usuarioLogado = {
+                                    uid: user.uid,
+                                    email: user.email,
+                                    nome: 'Alexandre de Moraes',
+                                    cargo: '1_juiz_federal',
+                                    titulo: '1º Juiz Federal - Suprema Autoridade',
+                                    oab: 'STF-001',
+                                    acessoUniversal: true,
+                                    permissoes: ['todas', 'admin', 'acesso_universal']
+                                };
+                                localStorage.setItem('usuarioLogadoAtual', JSON.stringify(usuarioLogado));
+                                atualizarInterfaceUsuario();
+                            } else {
+                                // Para outros usuários, redirecionar para configuração
+                                console.log('⚠️ Usuário sem dados completos, redirecionando...');
+                                localStorage.setItem('ficarNoPortalPrincipal', 'true');
+                                window.location.href = 'index.html';
+                            }
+                        } else {
+                            console.log('❌ Usuário não autenticado, redirecionando para login...');
+                            window.location.href = 'index.html';
+                        }
+                    });
+                } else {
+                    console.log('❌ Firebase não inicializado, redirecionando...');
+                    window.location.href = 'index.html';
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados do usuário:', error);
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Atualizar interface com dados do usuário
+        function atualizarInterfaceUsuario() {
+            if (usuarioLogado) {
+                document.getElementById('usuario-nome').textContent = usuarioLogado.nome;
+                document.getElementById('usuario-titulo').textContent = usuarioLogado.titulo || 'Promotor de Justiça';
+                document.getElementById('usuario-oab').textContent = `MP: ${usuarioLogado.oab || 'N/A'}`;
+            }
+        }
+
+        // Navegação entre seções
+        function mostrarSecao(secao) {
+            const cards = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+            if (cards) cards.style.display = 'none';
+
+            document.querySelectorAll('[id^="secao-"]').forEach(s => s.classList.add('hidden'));
+            
+            const secaoElement = document.getElementById(`secao-${secao}`);
+            if (secaoElement) {
+                secaoElement.classList.remove('hidden');
+            }
+        }
+
+        function voltarDashboard() {
+            const cards = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+            if (cards) cards.style.display = 'grid';
+
+            document.querySelectorAll('[id^="secao-"]').forEach(s => s.classList.add('hidden'));
+        }
+
+        // Gerar documento específico
+        function gerarDocumento(tipo) {
+            const tiposDocumentos = {
+                'denuncia': 'Denúncia Criminal',
+                'parecer': 'Parecer Técnico do MP',
+                'requisicao': 'Requisição de Diligências',
+                'arquivamento': 'Promoção de Arquivamento',
+                'recurso-mp': 'Recurso do Ministério Público',
+                'tac': 'Termo de Ajustamento de Conduta',
+                'recomendacao': 'Recomendação Administrativa',
+                'acp': 'Ação Civil Pública',
+                'manifestacao': 'Manifestação Processual',
+                'peticao': 'Petição Inicial',
+                'recurso': 'Recurso',
+                'requerimento': 'Requerimento'
+            };
+
+            const nomeDoc = tiposDocumentos[tipo] || tipo;
+            alert(`🚧 Gerando ${nomeDoc}... (Em desenvolvimento)\n\nEste será o sistema de geração de documentos específicos para o Ministério Público.`);
+        }
+
+        // Função para voltar ao portal principal
+        function voltarParaPortalPrincipal() {
+            // Definir flag para não fazer redirecionamento automático
+            localStorage.setItem('ficarNoPortalPrincipal', 'true');
+            window.location.href = 'index.html';
+        }
+
+        // Logout
+        async function fazerLogout() {
+            try {
+                if (window.firebaseModules && window.firebaseAuth) {
+                    await window.firebaseModules.signOut(window.firebaseAuth);
+                }
+                localStorage.removeItem('usuarioLogadoAtual');
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Erro no logout:', error);
+                localStorage.removeItem('usuarioLogadoAtual');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // ===== SISTEMA CALCULADORA DE PENAS - MINISTÉRIO PÚBLICO =====
+        
+        let crimesSelecionadosMP = [];
+
+        function adicionarCrime(nome, pena, multa) {
+            const crime = { nome, pena, multa };
+            crimesSelecionadosMP.push(crime);
+            atualizarListaCrimes();
+        }
+
+        function removerCrime(index) {
+            crimesSelecionadosMP.splice(index, 1);
+            atualizarListaCrimes();
+        }
+
+        function atualizarListaCrimes() {
+            const container = document.getElementById('crimes-selecionados');
+            if (!container) return;
+
+            if (crimesSelecionadosMP.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-sm">Nenhum crime selecionado</p>';
+                return;
+            }
+
+            let html = '';
+            crimesSelecionadosMP.forEach((crime, index) => {
+                html += `
+                    <div class="bg-red-500/20 rounded-lg p-3 mb-2 flex justify-between items-center">
+                        <div>
+                            <h5 class="text-white font-medium">${crime.nome}</h5>
+                            <p class="text-red-200 text-sm">${crime.pena} meses • R$ ${crime.multa.toLocaleString('pt-BR')}</p>
+                        </div>
+                        <button onclick="removerCrime(${index})" class="text-red-400 hover:text-red-300">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function calcularPenaFinal() {
+            if (crimesSelecionadosMP.length === 0) {
+                alert('⚠️ Selecione pelo menos um crime!');
+                return;
+            }
+
+            let penaTotal = 0;
+            let multaTotal = 0;
+
+            // Somar penas e multas
+            crimesSelecionadosMP.forEach(crime => {
+                penaTotal += crime.pena;
+                multaTotal += crime.multa;
+            });
+
+            // Aplicar reduções
+            let reducaoTotal = 0;
+
+            if (document.getElementById('confissao')?.checked) {
+                reducaoTotal += 1/6; // 16.67%
+            }
+
+            if (document.getElementById('primariedade')?.checked) {
+                reducaoTotal += 0.1; // 10%
+            }
+
+            if (document.getElementById('colaboracao')?.checked) {
+                reducaoTotal += 1/3; // 33.33%
+            }
+
+            const reducaoExtra = parseFloat(document.getElementById('reducaoExtra')?.value || 0) / 100;
+            reducaoTotal += reducaoExtra;
+
+            // Aplicar redução (máximo 70%)
+            reducaoTotal = Math.min(reducaoTotal, 0.7);
+            
+            const penaFinal = Math.round(penaTotal * (1 - reducaoTotal));
+            const multaFinal = Math.round(multaTotal * (1 - reducaoTotal));
+
+            // Determinar regime
+            let regime = '';
+            if (penaFinal <= 4) {
+                regime = 'Pena alternativa ou multa';
+            } else if (penaFinal <= 8) {
+                regime = 'Regime aberto';
+            } else if (penaFinal <= 12) {
+                regime = 'Regime semiaberto';
+            } else {
+                regime = 'Regime fechado';
+            }
+
+            // Atualizar interface
+            document.getElementById('pena-total').textContent = `${penaFinal} meses`;
+            document.getElementById('multa-total').textContent = `R$ ${multaFinal.toLocaleString('pt-BR')}`;
+            document.getElementById('regime-prisional').textContent = regime;
+
+            console.log('📊 Cálculo de pena realizado:', {
+                crimesSelecionados: crimesSelecionadosMP.length,
+                penaOriginal: penaTotal,
+                reducaoAplicada: (reducaoTotal * 100).toFixed(1) + '%',
+                penaFinal: penaFinal,
+                regime: regime
+            });
+        }
+
+        async function salvarCalculoMP() {
+            try {
+                if (crimesSelecionadosMP.length === 0) {
+                    alert('⚠️ Selecione crimes antes de salvar!');
+                    return;
+                }
+
+                const calculo = {
+                    crimes: crimesSelecionadosMP,
+                    reducoes: {
+                        confissao: document.getElementById('confissao')?.checked || false,
+                        primariedade: document.getElementById('primariedade')?.checked || false,
+                        colaboracao: document.getElementById('colaboracao')?.checked || false,
+                        extra: parseFloat(document.getElementById('reducaoExtra')?.value || 0)
+                    },
+                    resultado: {
+                        penaTotal: document.getElementById('pena-total')?.textContent || '0',
+                        multaTotal: document.getElementById('multa-total')?.textContent || 'R$ 0',
+                        regime: document.getElementById('regime-prisional')?.textContent || '-'
+                    },
+                    promotor: usuarioLogado?.nome,
+                    dataCalculo: new Date().toISOString(),
+                    tipo: 'calculo-pena-mp'
+                };
+
+                if (window.firebaseDB && window.firebaseModules) {
+                    const docRef = await window.firebaseModules.addDoc(
+                        window.firebaseModules.collection(window.firebaseDB, 'calculos-penas'),
+                        calculo
+                    );
+                    alert(`✅ Cálculo salvo no Firebase!\nID: ${docRef.id}`);
+                } else {
+                    alert('⚠️ Firebase indisponível, mas cálculo realizado!');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao salvar cálculo:', error);
+                alert('❌ Erro ao salvar, mas cálculo realizado!');
+            }
+        }
+
+        function gerarDenunciaComPena() {
+            if (crimesSelecionadosMP.length === 0) {
+                alert('⚠️ Calcule a pena antes de gerar a denúncia!');
+                return;
+            }
+
+            const penaCalculada = document.getElementById('pena-total')?.textContent || '0';
+            const multa = document.getElementById('multa-total')?.textContent || 'R$ 0';
+            const regime = document.getElementById('regime-prisional')?.textContent || '-';
+
+            alert(`📄 Gerando Denúncia com Cálculo de Pena...\n\n` +
+                  `Crimes: ${crimesSelecionadosMP.length} selecionado(s)\n` +
+                  `Pena Sugerida: ${penaCalculada}\n` +
+                  `Multa: ${multa}\n` +
+                  `Regime: ${regime}\n\n` +
+                  `(Em desenvolvimento - integração com gerador de denúncias)`);
+        }
+
+        // ===== FERRAMENTAS DE ADVOGADO NO MP =====
+
+        // Calculadora de Honorários (herdada do portal advogado)
+        function abrirCalculadoraHonorarios() {
+            alert('💰 Calculadora de Honorários\n\n(Funcionalidade herdada do Portal do Advogado)\n\nEm desenvolvimento...');
+        }
+
+        // Jurisprudência (herdada do portal advogado)
+        function abrirJurisprudencia() {
+            alert('📚 Banco de Jurisprudência\n\n(Funcionalidade herdada do Portal do Advogado)\n\nEm desenvolvimento...');
+        }
+
+        // Contratos (herdada do portal advogado)
+        function abrirContratos() {
+            alert('📋 Modelos de Contratos\n\n(Funcionalidade herdada do Portal do Advogado)\n\nEm desenvolvimento...');
+        }
+
+        // Busca de crimes em tempo real
+        document.addEventListener('DOMContentLoaded', function() {
+            const buscaCrime = document.getElementById('busca-crime');
+            if (buscaCrime) {
+                buscaCrime.addEventListener('input', function() {
+                    const termo = this.value.toLowerCase();
+                    const botoesCrime = document.querySelectorAll('button[onclick*="adicionarCrime"]');
+                    
+                    botoesCrime.forEach(botao => {
+                        const texto = botao.textContent.toLowerCase();
+                        const container = botao.closest('.bg-gray-800\\/50');
+                        
+                        if (texto.includes(termo)) {
+                            botao.style.display = 'block';
+                        } else {
+                            botao.style.display = termo === '' ? 'block' : 'none';
+                        }
+                    });
+                });
+            }
+        });
+
+        // ======================================
+        // FUNÇÕES DO SISTEMA DE NAVEGAÇÃO
+        // ======================================
+
+        // Mostrar painel de escolha de portais
+        function mostrarEscolhaPortalUniversal() {
+            document.getElementById('painel-portais').classList.remove('hidden');
+        }
+
+        // Fechar painel de portais
+        function fecharPainelPortais() {
+            document.getElementById('painel-portais').classList.add('hidden');
+        }
+
+        // Função de logout
+        function logout() {
+            if (confirm('Deseja realmente sair do sistema?')) {
+                localStorage.removeItem('usuarioLogado');
+                
+                if (window.firebaseAuth && window.firebaseModules) {
+                    window.firebaseModules.signOut(window.firebaseAuth).then(() => {
+                        console.log('🚪 Logout realizado com sucesso');
+                    }).catch((error) => {
+                        console.error('❌ Erro no logout:', error);
+                    });
+                }
+                
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Mostrar painel admin
+        function mostrarPainelAdmin() {
+            alert('🔧 Painel administrativo em desenvolvimento.\n\nRecursos disponíveis:\n• Gestão de usuários\n• Configurações do sistema\n• Relatórios gerenciais\n• Backup de dados');
+        }
+
+        // Inicializar informações do usuário no header
+        function inicializarUsuarioHeader() {
+            const usuario = JSON.parse(localStorage.getItem('usuarioLogado') || '{}');
+            
+            if (usuario.nome) {
+                document.getElementById('nome-usuario').textContent = usuario.nome;
+                document.getElementById('cargo-usuario').textContent = 'Promotor(a) - MP/BR';
+                
+                // Mostrar botões baseado no nível de acesso
+                if (usuario.nivel >= 5) {
+                    document.getElementById('btn-portais').classList.remove('hidden');
+                    document.getElementById('btn-logout').classList.remove('hidden');
+                }
+                
+                if (usuario.nivel >= 6 || usuario.admin) {
+                    document.getElementById('btn-admin').classList.remove('hidden');
+                }
+            }
+        }
+
+        // Funções de compatibilidade (antigas)
+        function voltarParaPortalPrincipal() {
+            window.location.href = 'index.html';
+        }
+
+        function fazerLogout() {
+            logout();
+        }
+
+        // Inicializar quando a página carrega
+        document.addEventListener('DOMContentLoaded', () => {
+            inicializarUsuarioHeader();
+        });
+
+        // ======================================
+        // SISTEMA DE HIERARQUIA JUDICIAL - MP
+        // ======================================
+
+        // Mostrar modal da hierarquia judicial
+        function mostrarHierarquiaJudicial() {
+            const modal = document.getElementById('modal-hierarquia');
+            if (modal) {
+                modal.classList.remove('hidden');
+            } else {
+                criarModalHierarquia();
+            }
+        }
+
+        // Criar modal da hierarquia
+        function criarModalHierarquia() {
+            const modal = document.createElement('div');
+            modal.id = 'modal-hierarquia';
+            modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+            
+            modal.innerHTML = `
+                <div class="bg-slate-800 rounded-2xl p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <span class="mr-3">🏛️</span>
+                            Hierarquia Judicial Completa - Brasilândia RP
+                        </h2>
+                        <button onclick="fecharModalHierarquia()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- Nível 1 - SUPREMA AUTORIDADE JUDICIAL -->
+                        <div class="bg-gradient-to-r from-yellow-600/20 to-amber-600/20 border border-yellow-500/30 rounded-lg p-4">
+                            <h3 class="text-yellow-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">👑</span>Nível 1 - SUPREMA AUTORIDADE JUDICIAL
+                            </h3>
+                            <div class="bg-slate-700/50 rounded-lg p-3">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <div class="text-white font-semibold">1º Juiz Federal</div>
+                                        <div class="text-yellow-300 text-sm">Presidente do STF/STJ/STB</div>
+                                        <div class="text-slate-400 text-xs">Máxima Autoridade Judiciária</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">✅ Ocupado</span>
+                                        <div class="text-white text-sm mt-1">Alexandre de Moraes</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nível 2-3 - TRIBUNAIS SUPERIORES FEDERAIS -->
+                        <div class="bg-gradient-to-r from-red-600/20 to-red-700/20 border border-red-500/30 rounded-lg p-4">
+                            <h3 class="text-red-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">⚖️</span>Níveis 2-3 - TRIBUNAIS SUPERIORES FEDERAIS
+                            </h3>
+                            <div class="space-y-2">
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-white font-semibold">2º Juiz Federal</div>
+                                            <div class="text-red-300 text-sm">Presidente do STF</div>
+                                            <div class="text-slate-400 text-xs">Nomeado pelo 1º Juiz Federal</div>
+                                        </div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago 👑 Nomear</span>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-white font-semibold">3º Juiz Federal</div>
+                                            <div class="text-red-300 text-sm">Presidente do STF</div>
+                                            <div class="text-slate-400 text-xs">Nomeado pelo 1º Juiz Federal</div>
+                                        </div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago 👑 Nomear</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nível 3-4 - TRIBUNAIS DE SEGUNDA INSTÂNCIA -->
+                        <div class="bg-gradient-to-r from-purple-600/20 to-purple-700/20 border border-purple-500/30 rounded-lg p-4">
+                            <h3 class="text-purple-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">🏛️</span>Níveis 3-4 - TRIBUNAIS DE SEGUNDA INSTÂNCIA E PRIMEIRA INSTÂNCIA ESTADUAL
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <h4 class="text-purple-300 font-semibold">Desembargadores (Nível 3)</h4>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">1º Desembargador</div>
+                                        <div class="text-purple-300 text-sm">Tribunal de Justiça</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago 👑 Nomear</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">2º Desembargador</div>
+                                        <div class="text-purple-300 text-sm">Tribunal de Justiça</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago 👑 Nomear</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">3º Desembargador</div>
+                                        <div class="text-purple-300 text-sm">Tribunal de Justiça</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago 👑 Nomear</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="text-purple-300 font-semibold">Juízes Estaduais (Nível 4)</h4>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">1º Juiz Estadual</div>
+                                        <div class="text-purple-300 text-sm">Civil/Criminal/Eleitoral/Trânsito</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">2º Juiz Estadual</div>
+                                        <div class="text-purple-300 text-sm">Civil/Criminal/Eleitoral/Trânsito</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">3º Juiz Estadual</div>
+                                        <div class="text-purple-300 text-sm">Civil/Criminal/Eleitoral/Trânsito</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">4º Juiz Estadual</div>
+                                        <div class="text-purple-300 text-sm">Civil/Criminal/Eleitoral/Trânsito</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Níveis 5-8 - MINISTÉRIO PÚBLICO -->
+                        <div class="bg-gradient-to-r from-red-600/20 to-red-700/20 border-2 border-red-400/50 rounded-lg p-4">
+                            <h3 class="text-red-300 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">🏛️</span>Níveis 5-8 - MINISTÉRIO PÚBLICO (SEU PORTAL)
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <h4 class="text-red-300 font-semibold">Procuradores (Níveis 5-6)</h4>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">1º Procurador Geral da República</div>
+                                        <div class="text-red-300 text-sm">Presidente do Ministério Público (Nível 5)</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">2º Procurador Geral de Justiça</div>
+                                        <div class="text-red-300 text-sm">Ministério Público Estadual (Nível 6)</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">3º Procurador Geral de Justiça</div>
+                                        <div class="text-red-300 text-sm">Ministério Público Estadual (Nível 6)</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="text-red-300 font-semibold">Promotores (Níveis 7-8)</h4>
+                                    <div class="bg-slate-700/50 rounded-lg p-3">
+                                        <div class="text-white font-semibold">1º Promotor</div>
+                                        <div class="text-red-300 text-sm">Líder da Promotoria Geral (Nível 7)</div>
+                                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="text-red-300 text-sm">Promotores 1ª Instância (Nível 8):</div>
+                                        <div class="bg-slate-700/50 rounded-lg p-2">
+                                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                                <div class="text-white">2º Promotor <span class="text-yellow-400">⏳ Vago</span></div>
+                                                <div class="text-white">3º Promotor <span class="text-yellow-400">⏳ Vago</span></div>
+                                                <div class="text-white">4º Promotor <span class="text-yellow-400">⏳ Vago</span></div>
+                                                <div class="text-white">5º Promotor <span class="text-yellow-400">⏳ Vago</span></div>
+                                                <div class="text-white">6º Promotor <span class="text-yellow-400">⏳ Vago</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Níveis 9-10 - OFICIAIS DE JUSTIÇA -->
+                        <div class="bg-gradient-to-r from-blue-600/20 to-blue-700/20 border border-blue-500/30 rounded-lg p-4">
+                            <h3 class="text-blue-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">👮‍♂️</span>Níveis 9-10 - OFICIAIS DE JUSTIÇA
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="text-white font-semibold">1º Oficial de Justiça - 2ª Instância</div>
+                                    <div class="text-blue-300 text-sm">Cumprimento de Mandados (Nível 9)</div>
+                                    <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                </div>
+                                <div class="bg-slate-700/50 rounded-lg p-3">
+                                    <div class="text-white font-semibold">1º Oficial de Justiça - 1ª Instância</div>
+                                    <div class="text-blue-300 text-sm">Cumprimento de Mandados (Nível 10)</div>
+                                    <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nível 11 - ADVOCACIA E DEFENSORIA -->
+                        <div class="bg-gradient-to-r from-indigo-600/20 to-indigo-700/20 border border-indigo-500/30 rounded-lg p-4">
+                            <h3 class="text-indigo-400 font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">👨‍💼</span>Nível 11 - ADVOCACIA E DEFENSORIA
+                            </h3>
+                            <div class="bg-slate-700/50 rounded-lg p-3">
+                                <div class="text-white font-semibold">Advogado/Defensor</div>
+                                <div class="text-indigo-300 text-sm">Defesa e Representação</div>
+                                <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs">⏳ Vago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <button onclick="fecharModalHierarquia()" class="bg-slate-600 hover:bg-slate-700 text-white px-6 py-2 rounded-lg">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Fechar modal da hierarquia
+        function fecharModalHierarquia() {
+            const modal = document.getElementById('modal-hierarquia');
+            if (modal) {
+                modal.remove();
+            }
+        }
+    </script>
+
+</body>
+</html>
