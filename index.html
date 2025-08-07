@@ -3713,6 +3713,16 @@ document.addEventListener('input', function(e) {
                 return;
             }
 
+            // Verificar se o usuário optou por ficar no portal principal
+            const ficarNoPortalPrincipal = localStorage.getItem('ficarNoPortalPrincipal');
+            if (ficarNoPortalPrincipal === 'true') {
+                console.log('🏠 Usuário optou por ficar no portal principal');
+                localStorage.removeItem('ficarNoPortalPrincipal'); // Limpar flag
+                esconderTelaLogin();
+                mostrarLoading(false);
+                return;
+            }
+
             const cargo = usuarioLogado.cargo;
             console.log('🎯 Redirecionando usuário:', usuarioLogado.nome, 'Cargo:', cargo);
 
@@ -3839,8 +3849,8 @@ document.addEventListener('input', function(e) {
                     </div>
                     
                     <div class="mt-8 text-center">
-                        <button onclick="fecharModalPortal()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors mr-4">
-                            <i class="fas fa-arrow-left mr-2"></i>Voltar ao Portal Principal
+                        <button onclick="ficarNoPortalPrincipal()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors mr-4">
+                            <i class="fas fa-home mr-2"></i>Ficar no Portal Principal
                         </button>
                         <button onclick="acessarPortalEspecifico('portal-juiz-federal.html', 'Portal Federal')" class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-6 py-3 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all">
                             <i class="fas fa-crown mr-2"></i>Ir para Meu Portal Principal
@@ -3868,6 +3878,23 @@ document.addEventListener('input', function(e) {
             if (modal) {
                 modal.remove();
             }
+        }
+
+        // Função para ficar no portal principal
+        function ficarNoPortalPrincipal() {
+            console.log('🏠 Alexandre optou por ficar no portal principal');
+            fecharModalPortal();
+            esconderTelaLogin();
+            mostrarLoading(false);
+            mostrarMensagem('🏠 Permanecendo no Portal Principal', 'sucesso');
+            
+            // Ocultar mensagem após alguns segundos
+            setTimeout(() => {
+                const mensagem = document.getElementById('mensagem-login');
+                if (mensagem) {
+                    mensagem.classList.add('hidden');
+                }
+            }, 3000);
         }
 
         // Função para mostrar mensagens
