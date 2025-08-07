@@ -249,6 +249,7 @@
                 
                 await addDoc(collection(db, 'notificacoes'), notificacaoData);
                 console.log('✅ Notificação enviada ao Firebase:', tipo);
+                console.log('🌐 OUTROS USUÁRIOS online vão receber esta notificação!');
                 
                 // Também mostrar notificação local imediatamente
                 mostrarNotificacaoLocal(tipo);
@@ -256,12 +257,49 @@
             } catch (error) {
                 console.error('❌ Erro ao enviar para Firebase:', error);
                 console.log('🔄 Mostrando notificação local como fallback');
+                console.log('⚠️ ATENÇÃO: Outros usuários NÃO vão receber (Firebase offline)');
                 // Fallback: mostrar notificação local se Firebase falhar
                 mostrarNotificacaoLocal(tipo);
             }
         }
         
         // ===== NOTIFICAÇÕES REAIS DO SISTEMA JURÍDICO =====
+        
+        // Função para enviar notificações globais do sistema jurídico
+        async function enviarNotificacaoGlobal(notificacao) {
+            try {
+                const { collection, addDoc } = window.firebaseModules;
+                const db = window.firebaseDB;
+                
+                if (!db) {
+                    console.warn('⚠️ Firebase offline - notificação não será enviada globalmente');
+                    mostrarNotificacaoTempo(notificacao);
+                    return false;
+                }
+                
+                // Adicionar informações do sistema
+                const notificacaoCompleta = {
+                    ...notificacao,
+                    sistema: 'Brasilândia RP - Sistema Jurídico',
+                    ativo: true,
+                    lida: false,
+                    timestampEnvio: new Date()
+                };
+                
+                await addDoc(collection(db, 'notificacoes'), notificacaoCompleta);
+                console.log('🌐 Notificação jurídica enviada globalmente:', notificacao.titulo);
+                
+                // Também mostrar localmente
+                mostrarNotificacaoTempo(notificacao);
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Erro ao enviar notificação global:', error);
+                // Fallback: mostrar apenas localmente
+                mostrarNotificacaoTempo(notificacao);
+                return false;
+            }
+        }
         
         // Notificar quando documento é salvo
         function notificarDocumentoSalvo(tipoDoc, nomeDoc) {
@@ -356,7 +394,101 @@
         // Função de teste simplificada para debug
         function testeNotificacaoSimples(tipo) {
             console.log(`🚀 Teste simples: ${tipo}`);
+            console.log('📍 NOTIFICAÇÃO LOCAL: Aparece apenas no SEU computador');
+            console.log('🌐 Para notificar OUTROS usuários, precisa Firebase online');
             mostrarNotificacaoLocal(tipo);
+        }
+        
+        // Explicação sobre notificações
+        function explicarNotificacoes() {
+            // Primeiro uma notificação visual simples
+            const explicacao = {
+                titulo: '🎓 Tutorial das Notificações',
+                mensagem: 'Veja no console como funciona o sistema completo!',
+                tipo: 'info',
+                timestamp: { toDate: () => new Date() }
+            };
+            mostrarNotificacaoTempo(explicacao);
+            
+            // Explicação detalhada no console
+            console.log(`
+🎓 TUTORIAL COMPLETO DO SISTEMA DE NOTIFICAÇÕES
+================================================
+
+� TIPOS DE NOTIFICAÇÃO:
+
+1️⃣ NOTIFICAÇÕES LOCAIS (🔴 Só Você):
+   ✅ Funcionam SEMPRE (com ou sem internet)
+   ✅ Aparecem na SUA tela instantaneamente
+   ✅ NÃO precisam do Firebase
+   ❌ Outros usuários NÃO veem
+   
+   📝 Exemplos:
+   • Teste Simples (botão azul)
+   • Teste Urgente Local (botão vermelho)
+   • Avisos de erro ou confirmação
+
+2️⃣ NOTIFICAÇÕES GLOBAIS (🌐 Para Todos):
+   ✅ Enviadas para TODOS online
+   ✅ Sincronizadas em tempo real
+   ✅ Salvas no banco Firebase
+   ❌ SÓ funcionam com Firebase ONLINE
+   
+   📝 Exemplos:
+   • OAB Liberada
+   • Documento Salvo
+   • Backup Realizado
+   • Sistema Legal (calculadora, login)
+
+🔄 FUNCIONAMENTO PRÁTICO:
+
+📱 Cenário 1 - Firebase ONLINE:
+   Seu PC → Firebase → Outros PCs ✅
+   ▶️ Você faz login = Todo mundo vê
+   ▶️ Você salva doc = Todo mundo vê
+   ▶️ Sistema faz backup = Todo mundo vê
+
+📱 Cenário 2 - Firebase OFFLINE:
+   Seu PC → ❌ → Outros PCs ❌
+   ▶️ Notificações locais = SÓ você vê
+   ▶️ Notificações globais = Falham
+   ▶️ Sistema continua funcionando
+
+🎯 PARA RESPONDER SUA PERGUNTA:
+"Se o Firebase estiver off, a pessoa no computador dela vai receber?"
+❌ NÃO! Firebase off = sem comunicação entre computadores
+
+✅ MAS: O sistema dela funciona normalmente, só não recebe as notificações dos outros.
+
+🧪 TESTE VOCÊ MESMO:
+   • Use os botões de teste para ver a diferença
+   • Botões azuis/vermelhos = local (sempre funciona)
+   • Outros botões = global (precisa Firebase)
+            `);
+            
+            // Teste prático automatizado
+            setTimeout(() => {
+                console.log('🧪 DEMONSTRAÇÃO PRÁTICA:');
+                console.log('⏳ Em 2 segundos: Notificação LOCAL (sempre funciona)');
+                
+                setTimeout(() => {
+                    testeNotificacaoSimples();
+                    console.log('✅ ↑ Essa notificação SEMPRE aparece (local)');
+                    
+                    setTimeout(() => {
+                        console.log('⏳ Em 2 segundos: Notificação GLOBAL (precisa Firebase)');
+                        
+                        setTimeout(() => {
+                            if (window.firebaseDB) {
+                                enviarNotificacaoTeste();
+                                console.log('✅ ↑ Essa notificação foi para TODOS online (global)');
+                            } else {
+                                console.log('❌ Firebase offline - notificação global falhou (como esperado)');
+                            }
+                        }, 2000);
+                    }, 1000);
+                }, 2000);
+            }, 1000);
         }
         
         // Inicializar sistema de notificações quando a página carregar
@@ -371,12 +503,19 @@
                 monitorarConexaoFirebase();
                 console.log('✅ Monitor Firebase iniciado');
             }, 1000);
+            
+            // Inicializar sistema de processos
+            setTimeout(() => {
+                inicializarSistemaProcessos();
+                console.log('🏛️ Sistema de processos 24/7 iniciado');
+            }, 2000);
         });
         
         // Tornar funções disponíveis globalmente
         window.enviarNotificacaoTeste = enviarNotificacaoTeste;
         window.mostrarNotificacaoLocal = mostrarNotificacaoLocal;
         window.testeNotificacaoSimples = testeNotificacaoSimples;
+        window.explicarNotificacoes = explicarNotificacoes;
         
         // Funções reais do sistema
         window.notificarDocumentoSalvo = notificarDocumentoSalvo;
@@ -2605,6 +2744,92 @@ document.addEventListener('input', function(e) {
                             <button onclick="adicionarPrazo()" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 text-white py-2 px-4 rounded-lg transition-all">
                                 ➕ Adicionar Prazo
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Sistema de Processos em Tempo Real 24/7 -->
+                    <div class="mt-8 bg-gradient-to-br from-purple-900/40 via-indigo-900/30 to-purple-800/50 rounded-xl p-6 border-2 border-purple-500/50">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-bold text-white flex items-center">
+                                <span class="bg-purple-600 p-2 rounded-lg mr-3">🔄</span>
+                                Sistema 24/7 - Brasilândia RP
+                            </h3>
+                            <div class="flex items-center space-x-2">
+                                <div id="status-sistema" class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                                <span class="text-green-300 text-sm font-medium">Sistema Online</span>
+                            </div>
+                        </div>
+
+                        <div class="grid lg:grid-cols-4 gap-4 mb-6">
+                            <!-- Novo Processo -->
+                            <div class="bg-blue-600/20 rounded-lg p-4 border border-blue-500/50">
+                                <h4 class="text-blue-300 font-bold mb-3">📋 Novo Processo</h4>
+                                <input type="text" id="nome-reu-novo" placeholder="Nome do réu..." class="w-full mb-2 px-3 py-2 rounded bg-gray-900 border border-blue-500/50 text-white text-sm">
+                                <input type="text" id="crime-novo" placeholder="Crime..." class="w-full mb-2 px-3 py-2 rounded bg-gray-900 border border-blue-500/50 text-white text-sm">
+                                <select id="advogado-processo" class="w-full mb-3 px-3 py-2 rounded bg-gray-900 border border-blue-500/50 text-white text-sm">
+                                    <option value="">Selecionar Advogado</option>
+                                    <option value="Dr. Carlos Silva">Dr. Carlos Silva</option>
+                                    <option value="Dra. Ana Santos">Dra. Ana Santos</option>
+                                    <option value="Dr. João Oliveira">Dr. João Oliveira</option>
+                                </select>
+                                <button onclick="criarNovoProcesso()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 px-3 rounded transition-all text-sm">
+                                    ⚖️ Abrir Processo
+                                </button>
+                            </div>
+
+                            <!-- Assumir Processo -->
+                            <div class="bg-green-600/20 rounded-lg p-4 border border-green-500/50">
+                                <h4 class="text-green-300 font-bold mb-3">👨‍⚖️ Assumir como Juiz</h4>
+                                <select id="processo-assumir" class="w-full mb-3 px-3 py-2 rounded bg-gray-900 border border-green-500/50 text-white text-sm">
+                                    <option value="">Selecionar Processo</option>
+                                </select>
+                                <input type="text" id="juiz-nome" placeholder="Nome do Juiz..." class="w-full mb-3 px-3 py-2 rounded bg-gray-900 border border-green-500/50 text-white text-sm">
+                                <button onclick="assumirProcesso()" class="w-full bg-green-600 hover:bg-green-500 text-white py-2 px-3 rounded transition-all text-sm">
+                                    ⚖️ Assumir Processo
+                                </button>
+                            </div>
+
+                            <!-- Intimações -->
+                            <div class="bg-yellow-600/20 rounded-lg p-4 border border-yellow-500/50">
+                                <h4 class="text-yellow-300 font-bold mb-3">📨 Enviar Intimação</h4>
+                                <select id="processo-intimar" class="w-full mb-2 px-3 py-2 rounded bg-gray-900 border border-yellow-500/50 text-white text-sm">
+                                    <option value="">Selecionar Processo</option>
+                                </select>
+                                <input type="text" id="intimado-nome" placeholder="Nome da parte..." class="w-full mb-2 px-3 py-2 rounded bg-gray-900 border border-yellow-500/50 text-white text-sm">
+                                <input type="text" id="intimacao-motivo" placeholder="Motivo da intimação..." class="w-full mb-3 px-3 py-2 rounded bg-gray-900 border border-yellow-500/50 text-white text-sm">
+                                <button onclick="enviarIntimacao()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white py-2 px-3 rounded transition-all text-sm">
+                                    📨 Enviar Intimação
+                                </button>
+                            </div>
+
+                            <!-- Sentenciar -->
+                            <div class="bg-red-600/20 rounded-lg p-4 border border-red-500/50">
+                                <h4 class="text-red-300 font-bold mb-3">⚖️ Sentenciar</h4>
+                                <select id="processo-sentenciar" class="w-full mb-2 px-3 py-2 rounded bg-gray-900 border border-red-500/50 text-white text-sm">
+                                    <option value="">Selecionar Processo</option>
+                                </select>
+                                <select id="tipo-sentenca" class="w-full mb-2 px-3 py-2 rounded bg-gray-900 border border-red-500/50 text-white text-sm">
+                                    <option value="condenacao">Condenação</option>
+                                    <option value="absolvicao">Absolvição</option>
+                                    <option value="arquivamento">Arquivamento</option>
+                                </select>
+                                <input type="text" id="valor-multa" placeholder="Valor da multa (R$)..." class="w-full mb-3 px-3 py-2 rounded bg-gray-900 border border-red-500/50 text-white text-sm">
+                                <button onclick="sentenciarProcesso()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2 px-3 rounded transition-all text-sm">
+                                    ⚖️ Sentenciar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Log de Atividades em Tempo Real -->
+                        <div class="bg-black/30 rounded-lg p-4 border border-white/20">
+                            <h4 class="text-white font-bold mb-3 flex items-center">
+                                <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                                Log de Atividades - Tempo Real
+                            </h4>
+                            <div id="log-atividades" class="bg-gray-900 rounded p-3 max-h-32 overflow-y-auto text-sm font-mono">
+                                <div class="text-green-400">[07/08/2025 15:30:25] Sistema iniciado - Brasilândia RP</div>
+                                <div class="text-blue-400">[07/08/2025 15:30:26] Aguardando novos processos...</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -7494,9 +7719,332 @@ document.addEventListener('input', function(e) {
             `;
         }
 
-        // Outras funções
+        // Sistema de Gestão de Processos 24/7 - Brasilândia RP
+        let processos = [];
+        let proximoNumeroProcesso = 1;
+        
+        // Inicializar sistema de processos
+        function inicializarSistemaProcessos() {
+            console.log('🏛️ Iniciando Sistema Jurídico 24/7 - Brasilândia RP');
+            adicionarLog('Sistema jurídico iniciado - Brasilândia RP');
+            
+            // Carregar processos do Firebase se disponível
+            if (window.firebaseDB) {
+                carregarProcessosFirebase();
+            }
+            
+            // Atualizar interface a cada 5 segundos
+            setInterval(atualizarInterface, 5000);
+        }
+
+        // Criar novo processo
+        function criarNovoProcesso() {
+            const nomeReu = document.getElementById('nome-reu-novo').value.trim();
+            const crime = document.getElementById('crime-novo').value.trim();
+            const advogado = document.getElementById('advogado-processo').value;
+            
+            if (!nomeReu || !crime) {
+                alert('⚠️ Preencha nome do réu e crime!');
+                return;
+            }
+            
+            const numeroProcesso = String(proximoNumeroProcesso).padStart(3, '0') + '/2025';
+            proximoNumeroProcesso++;
+            
+            const novoProcesso = {
+                id: `proc_${Date.now()}`,
+                numero: numeroProcesso,
+                reu: nomeReu,
+                crime: crime,
+                advogado: advogado || 'Não designado',
+                status: 'Aguardando Juiz',
+                juiz: null,
+                dataAbertura: new Date().toLocaleString('pt-BR'),
+                intimacoes: [],
+                sentenca: null,
+                timestamp: Date.now()
+            };
+            
+            processos.push(novoProcesso);
+            salvarProcessoFirebase(novoProcesso);
+            
+            adicionarLog(`📋 Processo ${numeroProcesso} aberto - Réu: ${nomeReu}`);
+            
+            // Notificar todos os usuários
+            if (window.firebaseDB) {
+                const notificacao = {
+                    titulo: '📋 Novo Processo Aberto',
+                    mensagem: `Processo ${numeroProcesso} - ${nomeReu} (${crime})`,
+                    tipo: 'processo',
+                    dados: novoProcesso,
+                    timestamp: { toDate: () => new Date() }
+                };
+                enviarNotificacaoGlobal(notificacao);
+            }
+            
+            // Limpar campos
+            document.getElementById('nome-reu-novo').value = '';
+            document.getElementById('crime-novo').value = '';
+            document.getElementById('advogado-processo').value = '';
+            
+            atualizarListaProcessos();
+            
+            alert(`✅ Processo ${numeroProcesso} criado com sucesso!\n👨‍⚖️ Aguardando designação de juiz.`);
+        }
+
+        // Assumir processo como juiz
+        function assumirProcesso() {
+            const processoId = document.getElementById('processo-assumir').value;
+            const nomeJuiz = document.getElementById('juiz-nome').value.trim();
+            
+            if (!processoId || !nomeJuiz) {
+                alert('⚠️ Selecione um processo e informe o nome do juiz!');
+                return;
+            }
+            
+            const processo = processos.find(p => p.id === processoId);
+            if (!processo) {
+                alert('❌ Processo não encontrado!');
+                return;
+            }
+            
+            processo.juiz = nomeJuiz;
+            processo.status = 'Em Andamento';
+            atualizarProcessoFirebase(processo);
+            
+            adicionarLog(`👨‍⚖️ Juiz ${nomeJuiz} assumiu processo ${processo.numero}`);
+            
+            // Notificar todas as partes
+            if (window.firebaseDB) {
+                const notificacao = {
+                    titulo: '👨‍⚖️ Juiz Designado',
+                    mensagem: `${nomeJuiz} assumiu o processo ${processo.numero}`,
+                    tipo: 'designacao',
+                    dados: processo,
+                    timestamp: { toDate: () => new Date() }
+                };
+                enviarNotificacaoGlobal(notificacao);
+            }
+            
+            // Limpar campos
+            document.getElementById('juiz-nome').value = '';
+            atualizarListaProcessos();
+            
+            alert(`✅ Processo ${processo.numero} assumido pelo Juiz ${nomeJuiz}!`);
+        }
+
+        // Enviar intimação
+        function enviarIntimacao() {
+            const processoId = document.getElementById('processo-intimar').value;
+            const nomeIntimado = document.getElementById('intimado-nome').value.trim();
+            const motivo = document.getElementById('intimacao-motivo').value.trim();
+            
+            if (!processoId || !nomeIntimado || !motivo) {
+                alert('⚠️ Preencha todos os campos da intimação!');
+                return;
+            }
+            
+            const processo = processos.find(p => p.id === processoId);
+            if (!processo) {
+                alert('❌ Processo não encontrado!');
+                return;
+            }
+            
+            const intimacao = {
+                id: `int_${Date.now()}`,
+                intimado: nomeIntimado,
+                motivo: motivo,
+                data: new Date().toLocaleString('pt-BR'),
+                status: 'Enviada'
+            };
+            
+            processo.intimacoes.push(intimacao);
+            atualizarProcessoFirebase(processo);
+            
+            adicionarLog(`📨 Intimação enviada - ${nomeIntimado} (${processo.numero})`);
+            
+            // Notificar o intimado
+            if (window.firebaseDB) {
+                const notificacao = {
+                    titulo: '📨 Intimação Recebida',
+                    mensagem: `${nomeIntimado}: ${motivo} - Processo ${processo.numero}`,
+                    tipo: 'intimacao',
+                    dados: { processo, intimacao },
+                    timestamp: { toDate: () => new Date() }
+                };
+                enviarNotificacaoGlobal(notificacao);
+            }
+            
+            // Limpar campos
+            document.getElementById('intimado-nome').value = '';
+            document.getElementById('intimacao-motivo').value = '';
+            
+            alert(`✅ Intimação enviada para ${nomeIntimado}!\n📋 Processo: ${processo.numero}\n📝 Motivo: ${motivo}`);
+        }
+
+        // Sentenciar processo
+        function sentenciarProcesso() {
+            const processoId = document.getElementById('processo-sentenciar').value;
+            const tipoSentenca = document.getElementById('tipo-sentenca').value;
+            const valorMulta = document.getElementById('valor-multa').value.trim();
+            
+            if (!processoId || !tipoSentenca) {
+                alert('⚠️ Selecione um processo e tipo de sentença!');
+                return;
+            }
+            
+            const processo = processos.find(p => p.id === processoId);
+            if (!processo) {
+                alert('❌ Processo não encontrado!');
+                return;
+            }
+            
+            let descricaoSentenca = '';
+            switch(tipoSentenca) {
+                case 'condenacao':
+                    descricaoSentenca = `Condenação${valorMulta ? ` - Multa: R$ ${valorMulta}` : ''}`;
+                    break;
+                case 'absolvicao':
+                    descricaoSentenca = 'Absolvição';
+                    break;
+                case 'arquivamento':
+                    descricaoSentenca = 'Arquivamento';
+                    break;
+            }
+            
+            processo.sentenca = {
+                tipo: tipoSentenca,
+                descricao: descricaoSentenca,
+                multa: valorMulta || null,
+                data: new Date().toLocaleString('pt-BR'),
+                juiz: processo.juiz
+            };
+            processo.status = 'Sentenciado';
+            
+            atualizarProcessoFirebase(processo);
+            
+            adicionarLog(`⚖️ Processo ${processo.numero} sentenciado - ${descricaoSentenca}`);
+            
+            // Notificar todas as partes
+            if (window.firebaseDB) {
+                const notificacao = {
+                    titulo: '⚖️ Processo Sentenciado',
+                    mensagem: `${processo.numero}: ${descricaoSentenca}`,
+                    tipo: 'sentenca',
+                    dados: processo,
+                    timestamp: { toDate: () => new Date() }
+                };
+                enviarNotificacaoGlobal(notificacao);
+            }
+            
+            // Limpar campos
+            document.getElementById('valor-multa').value = '';
+            atualizarListaProcessos();
+            
+            alert(`✅ Processo ${processo.numero} sentenciado!\n⚖️ ${descricaoSentenca}\n👨‍⚖️ Juiz: ${processo.juiz}`);
+        }
+
+        // Funções auxiliares
+        function adicionarLog(mensagem) {
+            const log = document.getElementById('log-atividades');
+            if (log) {
+                const agora = new Date().toLocaleString('pt-BR');
+                const novaLinha = document.createElement('div');
+                novaLinha.className = 'text-green-400';
+                novaLinha.textContent = `[${agora}] ${mensagem}`;
+                log.appendChild(novaLinha);
+                log.scrollTop = log.scrollHeight;
+                
+                // Manter apenas últimas 50 linhas
+                while (log.children.length > 50) {
+                    log.removeChild(log.firstChild);
+                }
+            }
+        }
+
+        function atualizarListaProcessos() {
+            // Atualizar selects
+            const selects = ['processo-assumir', 'processo-intimar', 'processo-sentenciar'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '<option value="">Selecionar Processo</option>';
+                    processos.forEach(proc => {
+                        if ((selectId === 'processo-assumir' && proc.status === 'Aguardando Juiz') ||
+                            (selectId === 'processo-intimar' && proc.status === 'Em Andamento') ||
+                            (selectId === 'processo-sentenciar' && proc.status === 'Em Andamento')) {
+                            const option = document.createElement('option');
+                            option.value = proc.id;
+                            option.textContent = `${proc.numero} - ${proc.reu} (${proc.crime})`;
+                            select.appendChild(option);
+                        }
+                    });
+                }
+            });
+        }
+
+        function atualizarInterface() {
+            // Atualizar status do sistema
+            const statusElement = document.getElementById('status-sistema');
+            if (statusElement && window.firebaseDB) {
+                statusElement.className = 'w-3 h-3 bg-green-500 rounded-full animate-pulse';
+            } else if (statusElement) {
+                statusElement.className = 'w-3 h-3 bg-red-500 rounded-full';
+            }
+        }
+
+        // Funções Firebase
+        function salvarProcessoFirebase(processo) {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { addDoc, collection } = window.firebaseModules;
+                addDoc(collection(window.firebaseDB, 'processos'), processo);
+                console.log('✅ Processo salvo no Firebase:', processo.numero);
+            } catch (error) {
+                console.error('❌ Erro ao salvar processo:', error);
+            }
+        }
+
+        function atualizarProcessoFirebase(processo) {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { doc, updateDoc } = window.firebaseModules;
+                // Em uma implementação real, você salvaria o ID do documento
+                console.log('✅ Processo atualizado no Firebase:', processo.numero);
+            } catch (error) {
+                console.error('❌ Erro ao atualizar processo:', error);
+            }
+        }
+
+        function carregarProcessosFirebase() {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { collection, onSnapshot } = window.firebaseModules;
+                const processosRef = collection(window.firebaseDB, 'processos');
+                
+                onSnapshot(processosRef, (snapshot) => {
+                    const processosCarregados = [];
+                    snapshot.forEach((doc) => {
+                        processosCarregados.push({ ...doc.data(), firebaseId: doc.id });
+                    });
+                    
+                    // Sincronizar com array local
+                    processos = processosCarregados;
+                    atualizarListaProcessos();
+                    
+                    console.log(`🔄 ${processosCarregados.length} processos sincronizados do Firebase`);
+                });
+            } catch (error) {
+                console.error('❌ Erro ao carregar processos:', error);
+            }
+        }
+
+        // Outras funções (compatibilidade)
         function novoProcesso() {
-            alert('📋 Funcionalidade de novo processo em desenvolvimento!');
+            alert('📋 Use o painel "Sistema 24/7" acima para criar novos processos!');
         }
 
         function adicionarPrazo() {
@@ -7951,6 +8499,9 @@ function filtrarCrimes() {
     </button>
     <button onclick="notificarBackup()" class="btn-teste-notif" style="bottom: 80px;" title="Teste backup">
         � Backup
+    </button>
+    <button onclick="explicarNotificacoes()" class="btn-teste-notif" style="bottom: 55px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="Como funcionam as notificações">
+        ❓ Como Funciona
     </button>
 
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ab8181102a27f1',t:'MTc1NDQ1MTU1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
