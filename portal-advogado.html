@@ -629,6 +629,13 @@
                         console.log('✅ Dados do usuário encontrados:', usuarioLogado.nome);
                         atualizarInterfaceUsuario();
                         inicializarSistemaProcessosAdvogado(); // Inicializar sistema de processos após login
+                        
+                        // Inicializar sistema de membros online
+                        setTimeout(() => {
+                            inicializarSistemaMembrosOnline();
+                            console.log('👥 Sistema de membros online iniciado - Portal Advogado');
+                        }, 2000);
+                        
                         return;
                     } catch (parseError) {
                         console.error('❌ Erro ao fazer parse dos dados do usuário:', parseError);
@@ -657,6 +664,12 @@
                                 localStorage.setItem('usuarioLogadoAtual', JSON.stringify(usuarioLogado));
                                 atualizarInterfaceUsuario();
                                 inicializarSistemaProcessosAdvogado();
+                                
+                                // Inicializar sistema de membros online para admin
+                                setTimeout(() => {
+                                    inicializarSistemaMembrosOnline();
+                                    console.log('👥 Sistema de membros online iniciado - Admin');
+                                }, 2000);
                             } else {
                                 // Para outros usuários, redirecionar para configuração
                                 console.log('⚠️ Usuário sem dados completos, redirecionando...');
@@ -2573,7 +2586,39 @@
             
             // Mostrar/ocultar botão baseado na quantidade
             if (btnMembrosOnline) {
-                if (totalOnline > 1) { // Mostrar se há outros usuários online além do atual
+                if (totalOnline >= 1) { // Mostrar sempre que houver usuários online
+                    btnMembrosOnline.classList.remove('hidden');
+                } else {
+                    btnMembrosOnline.classList.add('hidden');
+                }
+            }
+        }
+
+        // Atualizar contador de membros online (função específica do advogado)
+        function atualizarContadorMembrosOnlineAdvogado() {
+            if (!usuariosOnline) return;
+            
+            const agora = new Date();
+            const usuariosAtivos = Object.values(usuariosOnline).filter(usuario => {
+                if (!usuario.timestamp) return false;
+                const timestamp = usuario.timestamp?.toDate ? usuario.timestamp.toDate() : new Date(usuario.timestamp);
+                const diffMinutos = (agora - timestamp) / (1000 * 60);
+                return diffMinutos <= 2; // Considerado online se ativo nos últimos 2 minutos
+            });
+            
+            const totalOnline = usuariosAtivos.length;
+            
+            // Atualizar contadores
+            const contadorBtn = document.getElementById('contador-btn');
+            const contadorMembros = document.getElementById('contador-membros');
+            const btnMembrosOnline = document.getElementById('btn-membros-online');
+            
+            if (contadorBtn) contadorBtn.textContent = totalOnline;
+            if (contadorMembros) contadorMembros.textContent = totalOnline;
+            
+            // Mostrar/ocultar botão baseado na quantidade
+            if (btnMembrosOnline) {
+                if (totalOnline >= 1) { // Mostrar sempre que houver usuários online
                     btnMembrosOnline.classList.remove('hidden');
                 } else {
                     btnMembrosOnline.classList.add('hidden');
@@ -2642,6 +2687,75 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        // Inicializar sistema de membros online
+        function inicializarSistemaMembrosOnline() {
+            try {
+                console.log('👥 [ADVOGADO] Inicializando sistema de membros online...');
+                
+                if (!window.firebaseDB || !window.firebaseModules) {
+                    console.warn('⚠️ [ADVOGADO] Firebase não disponível para membros online');
+                    return;
+                }
+                
+                // Registrar presença online
+                registrarPresencaOnline();
+                
+                // Configurar listener para usuários online
+                configurarListenerUsuariosOnline();
+                
+                // Atualizar a cada 30 segundos
+                setInterval(() => {
+                    registrarPresencaOnline();
+                    atualizarContadorMembrosOnlineAdvogado();
+                }, 30000);
+                
+                console.log('✅ [ADVOGADO] Sistema de membros online iniciado');
+            } catch (error) {
+                console.error('❌ [ADVOGADO] Erro ao inicializar membros online:', error);
+            }
+        }
+        
+        // Registrar presença online
+        function registrarPresencaOnline() {
+            if (!usuarioLogado || !window.firebaseDB) return;
+            
+            try {
+                const { doc, setDoc } = window.firebaseModules;
+                const presencaRef = doc(window.firebaseDB, 'usuariosOnline', usuarioLogado.email || 'anonimo');
+                
+                setDoc(presencaRef, {
+                    nome: usuarioLogado.nome || 'Usuário',
+                    cargo: usuarioLogado.cargo || 'Advogado',
+                    portal: 'Portal do Advogado',
+                    nivel: usuarioLogado.nivel || 11,
+                    timestamp: new Date(),
+                    ativo: true
+                }, { merge: true });
+                
+            } catch (error) {
+                console.warn('⚠️ [ADVOGADO] Erro ao registrar presença:', error);
+            }
+        }
+        
+        // Configurar listener para usuários online
+        function configurarListenerUsuariosOnline() {
+            try {
+                const { collection, onSnapshot } = window.firebaseModules;
+                const usuariosRef = collection(window.firebaseDB, 'usuariosOnline');
+                
+                onSnapshot(usuariosRef, (snapshot) => {
+                    usuariosOnline = {};
+                    snapshot.docs.forEach(doc => {
+                        usuariosOnline[doc.id] = doc.data();
+                    });
+                    atualizarContadorMembrosOnlineAdvogado();
+                });
+                
+            } catch (error) {
+                console.warn('⚠️ [ADVOGADO] Erro no listener de usuários:', error);
+            }
         }
 
         // Abrir sidebar de membros online

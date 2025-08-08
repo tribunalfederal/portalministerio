@@ -2088,7 +2088,7 @@
             
             // Mostrar/ocultar botão baseado na quantidade
             if (btnMembrosOnline) {
-                if (totalOnline > 1) { // Mostrar se há outros usuários online além do atual
+                if (totalOnline >= 1) { // Mostrar sempre que houver usuários online
                     btnMembrosOnline.classList.remove('hidden');
                 } else {
                     btnMembrosOnline.classList.add('hidden');
