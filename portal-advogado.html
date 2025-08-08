@@ -463,9 +463,6 @@
                     <button onclick="showSection('casos')" class="text-blue-200 hover:text-white transition-colors">
                         <i class="fas fa-folder mr-2"></i>Casos
                     </button>
-                    <button onclick="showSection('clientes')" class="text-blue-200 hover:text-white transition-colors">
-                        <i class="fas fa-users mr-2"></i>Clientes
-                    </button>
                     <button onclick="showSection('agenda')" class="text-blue-200 hover:text-white transition-colors">
                         <i class="fas fa-calendar mr-2"></i>Agenda
                     </button>
@@ -493,9 +490,6 @@
                     </button>
                     <button onclick="showSection('casos'); toggleMobileMenu()" class="w-full text-left text-blue-200 hover:text-white transition-colors py-2">
                         <i class="fas fa-folder mr-3"></i>Casos
-                    </button>
-                    <button onclick="showSection('clientes'); toggleMobileMenu()" class="w-full text-left text-blue-200 hover:text-white transition-colors py-2">
-                        <i class="fas fa-users mr-3"></i>Clientes
                     </button>
                     <button onclick="showSection('agenda'); toggleMobileMenu()" class="w-full text-left text-blue-200 hover:text-white transition-colors py-2">
                         <i class="fas fa-calendar mr-3"></i>Agenda
@@ -575,7 +569,7 @@
             
             <div class="mb-8">
                 <h2 class="text-white text-3xl font-bold mb-2">Bem-vindo ao Portal</h2>
-                <p class="text-blue-200">Gerencie seus casos, clientes e documentos jurídicos</p>
+                <p class="text-blue-200">Gerencie seus casos, processos e documentos jurídicos</p>
             </div>
             
             <!-- Cards Dashboard -->
@@ -612,18 +606,6 @@
                     <h3 class="text-white font-bold text-lg mb-2">Casos</h3>
                     <p class="text-blue-200 text-sm mb-4">Gerencie processos ativos</p>
                     <button onclick="showSection('casos')" class="btn btn-primary w-full">
-                        Acessar
-                    </button>
-                </div>
-                
-                <!-- Card Clientes -->
-                <div class="card p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                        <i class="fas fa-users text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-white font-bold text-lg mb-2">Clientes</h3>
-                    <p class="text-blue-200 text-sm mb-4">Cadastro e acompanhamento</p>
-                    <button onclick="showSection('clientes')" class="btn btn-primary w-full">
                         Acessar
                     </button>
                 </div>
@@ -1399,25 +1381,49 @@
                                     <i class="fas fa-plus mr-2"></i>Criar Primeiro Processo
                                 </button>
                             </div>
+
+                            <!-- Lista dinâmica de processos será inserida aqui -->
+                            <div id="processos-list" class="space-y-4">
+                                <!-- Os processos serão carregados dinamicamente via JavaScript -->
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        
-        <!-- Clientes Section -->
-        <section id="clientes" class="section">
-            <div class="card p-8">
-                <h2 class="text-white text-2xl font-bold mb-6">
-                    <i class="fas fa-users mr-3 text-yellow-400"></i>
-                    Gestão de Clientes
-                </h2>
-                <p class="text-blue-200 mb-6">Em desenvolvimento...</p>
-                <button onclick="showSection('dashboard')" class="btn btn-primary">
-                    <i class="fas fa-arrow-left mr-2"></i>Voltar ao Dashboard
-                </button>
+
+        <!-- Modal de Visualização/Edição de Processo -->
+        <div id="modal-processo" class="modal">
+            <div class="modal-content max-w-4xl">
+                <div class="modal-header">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <i class="fas fa-eye text-blue-400"></i>
+                        <span id="modal-titulo">Detalhes do Processo</span>
+                    </h3>
+                    <button onclick="closeProcessModal()" class="text-gray-400 hover:text-white text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="processo-detalhes">
+                        <!-- Conteúdo dinâmico do processo -->
+                    </div>
+                    
+                    <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-blue-300/20">
+                        <button onclick="editProcess()" id="btn-editar" class="btn bg-yellow-600 hover:bg-yellow-700 text-white">
+                            <i class="fas fa-edit mr-2"></i>Editar
+                        </button>
+                        <button onclick="deleteProcess()" id="btn-excluir" class="btn bg-red-600 hover:bg-red-700 text-white">
+                            <i class="fas fa-trash mr-2"></i>Excluir
+                        </button>
+                        <button onclick="closeProcessModal()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                            <i class="fas fa-times mr-2"></i>Fechar
+                        </button>
+                    </div>
+                </div>
             </div>
-        </section>
+        </div>
+
         
         <!-- Agenda Section -->
         <section id="agenda" class="section">
@@ -1454,6 +1460,11 @@
             if (targetSection) {
                 targetSection.classList.add('active');
                 AppState.currentSection = sectionName;
+                
+                // Carregar dados específicos da seção
+                if (sectionName === 'casos') {
+                    loadProcessesSection();
+                }
                 
                 // Adicionar animação
                 targetSection.classList.add('fade-in');
@@ -2594,6 +2605,11 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.getElementById('novo-processo-form').classList.add('hidden');
             document.getElementById('lista-processos').classList.remove('hidden');
             clearProcessForm();
+            
+            // Reset modo de edição
+            isEditingProcess = false;
+            currentProcessId = null;
+            updateFormButtons(false);
         }
 
         // Limpar formulário
@@ -3351,6 +3367,387 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 'finalizado': 'bg-green-600 text-white'
             };
             return classes[status] || 'bg-gray-600 text-white';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'rascunho': 'Rascunho',
+                'protocolado': 'Protocolado',
+                'em-andamento': 'Em Andamento',
+                'finalizado': 'Finalizado'
+            };
+            return texts[status] || 'Desconhecido';
+        }
+
+        // === SISTEMA DE GESTÃO COMPLETA DE PROCESSOS ===
+
+        let currentProcessId = null;
+        let isEditingProcess = false;
+
+        // Carregar processos ao iniciar a seção
+        function loadProcessesSection() {
+            updateProcessList();
+            updateProcessStats();
+        }
+
+        // Atualizar lista de processos
+        function updateProcessList() {
+            const container = document.getElementById('processos-list');
+            const semProcessos = document.getElementById('sem-processos');
+            
+            if (processosData.length === 0) {
+                container.style.display = 'none';
+                semProcessos.style.display = 'block';
+                return;
+            }
+            
+            container.style.display = 'block';
+            semProcessos.style.display = 'none';
+
+            const filteredProcesses = filterProcessesByStatus();
+            
+            const processosHtml = filteredProcesses.map(processo => `
+                <div class="bg-slate-800/50 border border-blue-300/20 rounded-lg p-6 hover:border-blue-400/40 transition-colors cursor-pointer"
+                     onclick="viewProcess('${processo.id}')">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="text-white font-semibold text-lg">${safeData(processo.assunto)}</h4>
+                                <span class="px-3 py-1 rounded-full text-sm ${getStatusBadgeClass(processo.status)}">
+                                    ${getStatusText(processo.status)}
+                                </span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                                <div class="text-blue-200">
+                                    <i class="fas fa-user mr-2"></i>
+                                    <strong>Requerente:</strong><br>
+                                    ${safeData(processo.requerente)}
+                                </div>
+                                <div class="text-green-200">
+                                    <i class="fas fa-balance-scale mr-2"></i>
+                                    <strong>Tipo:</strong><br>
+                                    ${safeData(processo.tipoProcesso)}
+                                </div>
+                                <div class="text-yellow-200">
+                                    <i class="fas fa-calendar mr-2"></i>
+                                    <strong>Data:</strong><br>
+                                    ${new Date(processo.dataAberto).toLocaleDateString('pt-BR')}
+                                </div>
+                                <div class="text-purple-200">
+                                    <i class="fas fa-hashtag mr-2"></i>
+                                    <strong>Protocolo:</strong><br>
+                                    ${processo.protocolo || 'Não protocolado'}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2 lg:flex-col">
+                            <button onclick="editProcess('${processo.id}'); event.stopPropagation();" 
+                                    class="btn btn-sm bg-yellow-600 hover:bg-yellow-700 text-white">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteProcess('${processo.id}'); event.stopPropagation();" 
+                                    class="btn btn-sm bg-red-600 hover:bg-red-700 text-white">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = processosHtml;
+        }
+
+        // Filtrar processos por status
+        function filterProcessesByStatus() {
+            const statusFilter = document.getElementById('filtro-status').value;
+            if (!statusFilter) return processosData;
+            
+            return processosData.filter(p => p.status === statusFilter);
+        }
+
+        // Visualizar processo detalhado
+        function viewProcess(processId) {
+            const processo = processosData.find(p => p.id === processId);
+            if (!processo) return;
+
+            currentProcessId = processId;
+            isEditingProcess = false;
+
+            const detalhesHtml = `
+                <div class="space-y-6">
+                    <!-- Header do Processo -->
+                    <div class="bg-gradient-to-r from-blue-900/40 to-purple-900/40 rounded-lg p-6 border border-blue-400/30">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-2xl font-bold text-white">${safeData(processo.assunto)}</h4>
+                            <span class="px-4 py-2 rounded-full ${getStatusBadgeClass(processo.status)}">
+                                ${getStatusText(processo.status)}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="text-blue-200">
+                                <strong>Protocolo:</strong> ${processo.protocolo || 'Não protocolado'}
+                            </div>
+                            <div class="text-blue-200">
+                                <strong>Data de Abertura:</strong> ${new Date(processo.dataAberto).toLocaleDateString('pt-BR')}
+                            </div>
+                            ${processo.dataProtocolo ? `
+                            <div class="text-green-200">
+                                <strong>Data de Protocolo:</strong> ${new Date(processo.dataProtocolo).toLocaleDateString('pt-BR')}
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Dados do Requerente -->
+                    <div class="bg-green-900/20 rounded-lg p-6 border border-green-400/30">
+                        <h5 class="text-green-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-user text-green-400"></i>
+                            Dados do Requerente/Cliente
+                        </h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="text-white">
+                                <strong>Nome:</strong><br>
+                                ${safeData(processo.requerente)}
+                            </div>
+                            <div class="text-white">
+                                <strong>Documento:</strong><br>
+                                ${safeData(processo.requerenteDocumento)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dados do Processo -->
+                    <div class="bg-blue-900/20 rounded-lg p-6 border border-blue-400/30">
+                        <h5 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-balance-scale text-blue-400"></i>
+                            Informações Processuais
+                        </h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="text-white">
+                                <strong>Tipo de Processo:</strong><br>
+                                ${safeData(processo.tipoProcesso)}
+                            </div>
+                            <div class="text-white">
+                                <strong>Vara/Instância:</strong><br>
+                                ${safeData(processo.varaInstancia) || 'Não especificado'}
+                            </div>
+                            <div class="text-white">
+                                <strong>Valor da Causa:</strong><br>
+                                ${processo.valorCausa ? `R$ ${parseFloat(processo.valorCausa).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : 'Não especificado'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Descrição -->
+                    ${processo.descricaoProcesso ? `
+                    <div class="bg-purple-900/20 rounded-lg p-6 border border-purple-400/30">
+                        <h5 class="text-purple-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-align-left text-purple-400"></i>
+                            Descrição Detalhada
+                        </h5>
+                        <div class="text-white whitespace-pre-wrap">${safeData(processo.descricaoProcesso)}</div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Observações -->
+                    ${processo.observacoesProcesso ? `
+                    <div class="bg-yellow-900/20 rounded-lg p-6 border border-yellow-400/30">
+                        <h5 class="text-yellow-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-sticky-note text-yellow-400"></i>
+                            Observações Especiais
+                        </h5>
+                        <div class="text-white whitespace-pre-wrap">${safeData(processo.observacoesProcesso)}</div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Petição Anexada -->
+                    ${processo.peticaoFile ? `
+                    <div class="bg-indigo-900/20 rounded-lg p-6 border border-indigo-400/30">
+                        <h5 class="text-indigo-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-file-image text-indigo-400"></i>
+                            Petição Inicial Anexada
+                        </h5>
+                        <div class="text-white">
+                            <i class="fas fa-image mr-2"></i>
+                            ${processo.peticaoFile.name} (${formatFileSize(processo.peticaoFile.size)})
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+
+            document.getElementById('processo-detalhes').innerHTML = detalhesHtml;
+            document.getElementById('modal-titulo').textContent = `Processo: ${processo.assunto}`;
+            document.getElementById('modal-processo').style.display = 'flex';
+        }
+
+        // Fechar modal de processo
+        function closeProcessModal() {
+            document.getElementById('modal-processo').style.display = 'none';
+            currentProcessId = null;
+            isEditingProcess = false;
+        }
+
+        // Editar processo
+        function editProcess(processId = null) {
+            const id = processId || currentProcessId;
+            if (!id) return;
+
+            const processo = processosData.find(p => p.id === id);
+            if (!processo) return;
+
+            // Fechar modal se estiver aberto
+            closeProcessModal();
+
+            // Preencher formulário com dados do processo
+            document.getElementById('requerente-nome').value = processo.requerente || '';
+            document.getElementById('requerente-documento').value = processo.requerenteDocumento || '';
+            document.getElementById('tipo-processo').value = processo.tipoProcesso || '';
+            document.getElementById('assunto-processo').value = processo.assunto || '';
+            document.getElementById('descricao-processo').value = processo.descricaoProcesso || '';
+            document.getElementById('valor-causa').value = processo.valorCausa || '';
+            document.getElementById('vara-instancia').value = processo.varaInstancia || '';
+            document.getElementById('observacoes-processo').value = processo.observacoesProcesso || '';
+
+            // Configurar modo de edição
+            isEditingProcess = true;
+            currentProcessId = id;
+
+            // Mostrar formulário
+            showNewProcessForm();
+
+            // Atualizar botões
+            updateFormButtons(true);
+        }
+
+        // Atualizar botões do formulário para modo edição
+        function updateFormButtons(isEditing) {
+            const submitBtn = document.querySelector('#processForm button[type="submit"]');
+            const saveBtn = document.querySelector('#processForm button[onclick="saveDraft()"]');
+            
+            if (isEditing) {
+                submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Salvar Alterações';
+                saveBtn.style.display = 'none';
+            } else {
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Protocolar Processo';
+                saveBtn.style.display = 'block';
+            }
+        }
+
+        // Excluir processo
+        function deleteProcess(processId = null) {
+            const id = processId || currentProcessId;
+            if (!id) return;
+
+            const processo = processosData.find(p => p.id === id);
+            if (!processo) return;
+
+            if (confirm(`Tem certeza que deseja excluir o processo "${processo.assunto}"?\n\nEsta ação não pode ser desfeita.`)) {
+                processosData = processosData.filter(p => p.id !== id);
+                saveProcessesToStorage();
+                
+                closeProcessModal();
+                updateProcessList();
+                updateProcessStats();
+                
+                showNotification('Processo excluído com sucesso!', 'success');
+            }
+        }
+
+        // Filtrar processos
+        function filterProcesses() {
+            updateProcessList();
+        }
+
+        // Modificar a função de protocolar processo para lidar com edição
+        function protocolProcess(event) {
+            event.preventDefault();
+            
+            const formData = getProcessFormData();
+            if (!validateProcessForm(formData)) {
+                return;
+            }
+
+            if (isEditingProcess && currentProcessId) {
+                // Atualizar processo existente
+                const index = processosData.findIndex(p => p.id === currentProcessId);
+                if (index !== -1) {
+                    const existingProcess = processosData[index];
+                    processosData[index] = {
+                        ...existingProcess,
+                        ...formData,
+                        dataAtualizacao: new Date().toISOString()
+                    };
+                    
+                    saveProcessesToStorage();
+                    showNotification('Processo atualizado com sucesso!', 'success');
+                    
+                    // Reset do modo de edição
+                    isEditingProcess = false;
+                    currentProcessId = null;
+                }
+            } else {
+                // Criar novo processo
+                formData.status = 'protocolado';
+                formData.id = generateProcessId();
+                formData.protocolo = generateProtocol();
+                formData.dataAberto = new Date().toISOString();
+                formData.dataProtocolo = new Date().toISOString();
+
+                processosData.push(formData);
+                saveProcessesToStorage();
+                
+                syncProcessWithOtherPortals(formData);
+                showNotification(`Processo protocolado com sucesso! Protocolo: ${formData.protocolo}`, 'success');
+            }
+            
+            hideNewProcessForm();
+            updateProcessList();
+            updateProcessStats();
+            updateFormButtons(false);
+        }
+
+        // Salvar alterações no rascunho
+        function saveDraft() {
+            const formData = getProcessFormData();
+            if (!formData.requerente || !formData.tipoProcesso) {
+                showNotification('Preencha pelo menos o nome do requerente e tipo de processo', 'warning');
+                return;
+            }
+
+            if (isEditingProcess && currentProcessId) {
+                // Atualizar rascunho existente
+                const index = processosData.findIndex(p => p.id === currentProcessId);
+                if (index !== -1) {
+                    const existingProcess = processosData[index];
+                    processosData[index] = {
+                        ...existingProcess,
+                        ...formData,
+                        status: 'rascunho',
+                        dataAtualizacao: new Date().toISOString()
+                    };
+                }
+            } else {
+                // Criar novo rascunho
+                formData.status = 'rascunho';
+                formData.id = generateProcessId();
+                formData.dataAberto = new Date().toISOString();
+                formData.protocolo = null;
+                processosData.push(formData);
+            }
+
+            saveProcessesToStorage();
+            showNotification('Rascunho salvo com sucesso!', 'success');
+            
+            isEditingProcess = false;
+            currentProcessId = null;
+            hideNewProcessForm();
+            updateProcessList();
+            updateProcessStats();
+            updateFormButtons(false);
         }
 
         function getStatusText(status) {
