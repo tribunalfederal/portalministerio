@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Sistema de Notificações</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .teste { margin: 10px 0; padding: 10px; border: 1px solid #333; border-radius: 5px; }
+        .ok { border-color: green; background: #003300; }
+        .erro { border-color: red; background: #330000; }
+        .warning { border-color: orange; background: #331100; }
+    </style>
+</head>
+<body>
+    <h1>🔔 Teste do Sistema de Notificações V4.0</h1>
+    
+    <div id="resultados"></div>
+    
+    <script>
+        const resultados = document.getElementById('resultados');
+        
+        function adicionarTeste(nome, status, detalhes) {
+            const div = document.createElement('div');
+            div.className = `teste ${status}`;
+            div.innerHTML = `
+                <strong>${nome}</strong><br>
+                ${detalhes}
+            `;
+            resultados.appendChild(div);
+        }
+        
+        // Testar localStorage
+        try {
+            localStorage.setItem('teste', 'valor');
+            localStorage.removeItem('teste');
+            adicionarTeste('✅ localStorage', 'ok', 'Funcionando corretamente');
+        } catch (error) {
+            adicionarTeste('❌ localStorage', 'erro', `Erro: ${error.message}`);
+        }
+        
+        // Testar JSON parsing
+        try {
+            const teste = JSON.parse('[]');
+            adicionarTeste('✅ JSON Parse', 'ok', 'Funcionando corretamente');
+        } catch (error) {
+            adicionarTeste('❌ JSON Parse', 'erro', `Erro: ${error.message}`);
+        }
+        
+        // Testar funções básicas
+        function testarFuncaoNotificacao() {
+            const notificacoesLidas = [];
+            
+            function foiLida(id) {
+                return notificacoesLidas.some(item => {
+                    if (typeof item === 'string') {
+                        return item === id;
+                    }
+                    return item.id === id;
+                });
+            }
+            
+            function marcarComoLida(id) {
+                if (!foiLida(id)) {
+                    notificacoesLidas.push({
+                        id: id,
+                        timestamp: Date.now()
+                    });
+                    return true;
+                }
+                return false;
+            }
+            
+            // Teste 1: Marcar nova notificação
+            const resultado1 = marcarComoLida('notif-1');
+            if (resultado1 && notificacoesLidas.length === 1) {
+                adicionarTeste('✅ Marcar Notificação', 'ok', 'Nova notificação marcada corretamente');
+            } else {
+                adicionarTeste('❌ Marcar Notificação', 'erro', 'Falha ao marcar nova notificação');
+            }
+            
+            // Teste 2: Evitar duplicação
+            const resultado2 = marcarComoLida('notif-1');
+            if (!resultado2 && notificacoesLidas.length === 1) {
+                adicionarTeste('✅ Prevenção Duplicação', 'ok', 'Duplicação prevenida corretamente');
+            } else {
+                adicionarTeste('❌ Prevenção Duplicação', 'erro', 'Falha na prevenção de duplicação');
+            }
+            
+            // Teste 3: Compatibilidade com formato antigo
+            notificacoesLidas.push('notif-old');
+            if (foiLida('notif-old')) {
+                adicionarTeste('✅ Compatibilidade', 'ok', 'Compatibilidade com formato antigo mantida');
+            } else {
+                adicionarTeste('❌ Compatibilidade', 'erro', 'Falha na compatibilidade');
+            }
+        }
+        
+        testarFuncaoNotificacao();
+        
+        // Teste de limpeza de dados antigos
+        function testarLimpezaAntigas() {
+            const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            const dados = [
+                { id: 'nova', timestamp: Date.now() },
+                { id: 'antiga', timestamp: seteDiasAtras - 1000 },
+                'formato-antigo'
+            ];
+            
+            const filtrados = dados.filter(item => {
+                if (typeof item === 'object' && item.timestamp) {
+                    return item.timestamp > seteDiasAtras;
+                }
+                return true;
+            });
+            
+            if (filtrados.length === 2 && filtrados[0].id === 'nova') {
+                adicionarTeste('✅ Limpeza Antigas', 'ok', 'Limpeza de notificações antigas funcionando');
+            } else {
+                adicionarTeste('❌ Limpeza Antigas', 'erro', 'Falha na limpeza de notificações antigas');
+            }
+        }
+        
+        testarLimpezaAntigas();
+        
+        // Resumo
+        setTimeout(() => {
+            const testes = document.querySelectorAll('.teste');
+            const sucessos = document.querySelectorAll('.ok').length;
+            const erros = document.querySelectorAll('.erro').length;
+            
+            const resumo = document.createElement('div');
+            resumo.className = 'teste ' + (erros === 0 ? 'ok' : 'warning');
+            resumo.innerHTML = `
+                <strong>📊 RESUMO DOS TESTES</strong><br>
+                ✅ Sucessos: ${sucessos}<br>
+                ❌ Erros: ${erros}<br>
+                📋 Total: ${testes.length}<br><br>
+                <strong>Status: ${erros === 0 ? '🎉 TODOS OS TESTES PASSARAM!' : '⚠️ ALGUNS TESTES FALHARAM'}</strong>
+            `;
+            resultados.appendChild(resumo);
+        }, 1000);
+    </script>
+</body>
+</html>
