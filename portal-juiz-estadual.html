@@ -52,11 +52,11 @@
         }
     </style>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK v3.0 Otimizado -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         
         // Configuração Firebase
         const firebaseConfig = {
@@ -74,11 +74,21 @@
         
         window.firebaseAuth = auth;
         window.firebaseDB = db;
-        window.firebaseModules = { signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc };
+        window.firebaseModules = { 
+            signOut, 
+            onAuthStateChanged, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            onSnapshot 
+        };
         
-        console.log('🔥 Firebase inicializado no TJBR - Tribunal de Justiça');
+        console.log('🔥 Firebase inicializado no TJBR v3.0 - Tribunal de Justiça');
 
-        // Sistema de conectividade simplificado para portais
+        // Sistema de conectividade otimizado v3.0
         let firebaseStatus = { isOnline: false };
         
         function verificarConexaoPortal() {
@@ -90,17 +100,17 @@
                     
                     if (!firebaseStatus.isOnline) {
                         firebaseStatus.isOnline = true;
-                        console.log('🔥✅ Portal: Firebase reconectado');
+                        console.log('🔥✅ Portal v3.0: Firebase reconectado');
                         atualizarStatusPortal('conectado');
                     }
                 } catch (error) {
                     if (firebaseStatus.isOnline) {
                         firebaseStatus.isOnline = false;
-                        console.log('🔥❌ Portal: Firebase desconectado');
+                        console.log('🔥❌ Portal v3.0: Firebase desconectado');
                         atualizarStatusPortal('desconectado');
                     }
                 }
-            }, 10000); // Verificar a cada 10 segundos
+            }, 10000);
         }
         
         function atualizarStatusPortal(status) {
@@ -1057,12 +1067,19 @@
             }
         });
 
-        // Atualizar interface com dados do usuário
+        // Atualizar interface com dados do usuário (v3.0 seguro)
         function atualizarInterfaceUsuario() {
             if (usuarioLogado) {
-                document.getElementById('usuario-nome').textContent = usuarioLogado.nome;
-                document.getElementById('usuario-titulo').textContent = usuarioLogado.titulo || 'Juiz de Direito';
-                document.getElementById('usuario-oab').textContent = `TJ: ${usuarioLogado.oab || 'N/A'}`;
+                // Verificar se os elementos existem antes de atualizar
+                const nomeElement = document.getElementById('usuario-nome');
+                const tituloElement = document.getElementById('usuario-titulo');
+                const oabElement = document.getElementById('usuario-oab');
+                
+                if (nomeElement) nomeElement.textContent = usuarioLogado.nome;
+                if (tituloElement) tituloElement.textContent = usuarioLogado.titulo || usuarioLogado.cargo || 'Juiz de Direito';
+                if (oabElement) oabElement.textContent = `TJ: ${usuarioLogado.oab || 'N/A'}`;
+                
+                console.log('✅ Interface do juiz atualizada:', usuarioLogado.nome);
             }
         }
 
@@ -1745,27 +1762,34 @@
             if (statIntimacoes) statIntimacoes.textContent = intimacoesEnviadas;
         }
 
-        // Carregar processos do Firebase
+        // Carregar processos do Firebase (v3.0 otimizado)
         function carregarProcessosJuiz() {
             if (!window.firebaseDB) return;
             
             try {
-                const { collection, onSnapshot, query, orderBy } = window.firebaseModules;
+                const { collection, onSnapshot } = window.firebaseModules;
                 const processosRef = collection(window.firebaseDB, 'processos');
-                const q = query(processosRef, orderBy('timestamp', 'desc'));
                 
-                onSnapshot(q, (snapshot) => {
+                // Consulta simples sem orderBy para evitar índices
+                onSnapshot(processosRef, (snapshot) => {
                     const processosCarregados = [];
                     snapshot.forEach((doc) => {
                         const processo = { ...doc.data(), firebaseId: doc.id };
                         processosCarregados.push(processo);
                     });
                     
+                    // Ordenar no client-side
+                    processosCarregados.sort((a, b) => {
+                        const timestampA = a.timestamp || 0;
+                        const timestampB = b.timestamp || 0;
+                        return timestampB - timestampA;
+                    });
+                    
                     processosJuiz = processosCarregados;
                     atualizarListaProcessosJuiz();
                     atualizarEstatisticasJuiz();
                     
-                    console.log(`🔄 ${processosCarregados.length} processos sincronizados - Portal Juiz`);
+                    console.log(`🔄 ${processosCarregados.length} processos sincronizados - Portal Juiz v3.0`);
                 });
             } catch (error) {
                 console.error('❌ Erro ao carregar processos:', error);
@@ -1804,16 +1828,16 @@
             }
         }
 
-        // Iniciar listener de notificações
+        // Iniciar listener de notificações (v3.0 otimizado)
         function iniciarListenerNotificacoesJuiz() {
             if (!window.firebaseDB) return;
             
             try {
-                const { collection, onSnapshot, query, orderBy, limit } = window.firebaseModules;
+                const { collection, onSnapshot } = window.firebaseModules;
                 const notificacoesRef = collection(window.firebaseDB, 'notificacoes');
-                const q = query(notificacoesRef, orderBy('timestamp', 'desc'), limit(50));
                 
-                onSnapshot(q, (snapshot) => {
+                // Consulta simples sem orderBy para evitar índices
+                onSnapshot(notificacoesRef, (snapshot) => {
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === 'added') {
                             const notificacao = change.doc.data();
@@ -1826,7 +1850,7 @@
                     });
                 });
                 
-                console.log('✅ Listener de notificações iniciado - Portal Juiz');
+                console.log('✅ Listener de notificações iniciado - Portal Juiz v3.0');
             } catch (error) {
                 console.error('❌ Erro ao iniciar listener:', error);
             }
