@@ -1259,6 +1259,31 @@
                                 </div>
                             </div>
 
+                            <!-- Natureza do Processo -->
+                            <div class="bg-purple-900/20 rounded-lg p-6 border border-purple-400/30">
+                                <h4 class="text-purple-300 font-semibold mb-4 flex items-center gap-2">
+                                    <i class="fas fa-scales-balanced text-purple-400"></i>
+                                    Natureza do Processo
+                                </h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-purple-300 font-semibold mb-2">
+                                        <i class="fas fa-gavel mr-2"></i>Área Jurídica *
+                                    </label>
+                                    <select id="tipo-peticao" required onchange="toggleProcessFields()"
+                                            class="w-full px-4 py-3 bg-slate-800/50 border border-purple-300/30 rounded-lg text-white focus:border-purple-400 focus:outline-none">
+                                        <option value="">Selecione a área jurídica</option>
+                                        <option value="civil">Processo Cível (Civil)</option>
+                                        <option value="criminal">Processo Criminal (Penal)</option>
+                                    </select>
+                                    <p class="text-purple-300/70 text-xs mt-2">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        <strong>Cível:</strong> Disputas entre particulares (cobrança, indenização, divórcio, etc.)<br>
+                                        <strong>Criminal:</strong> Crimes processados pelo Estado (defesa de acusados)
+                                    </p>
+                                </div>
+                            </div>
+
                             <!-- Tipo de Processo -->
                             <div>
                                 <label class="block text-blue-300 font-semibold mb-2">
@@ -2860,7 +2885,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
                 // Resetar opções de tipo de processo
                 tipoProcessoSelect.innerHTML = `
-                    <option value="">Primeiro selecione o tipo de petição</option>
+                    <option value="">Primeiro selecione a área jurídica</option>
                 `;
             }
         }
