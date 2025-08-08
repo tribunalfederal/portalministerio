@@ -6427,7 +6427,7 @@ document.addEventListener('input', function(e) {
             }
         }
 
-        // Verificar se OAB foi liberada pelo admin (versão melhorada)
+        // Verificar se OAB foi liberada pelo admin (versão tempo real v2.0)
         async function verificarOABLiberada() {
             const oab = document.getElementById('oab-recebida').value.trim();
             const infoCargoDiv = document.getElementById('info-cargo');
@@ -6437,67 +6437,124 @@ document.addEventListener('input', function(e) {
                 return;
             }
             
-            // Carregar registros do Firebase se necessário
-            if (Object.keys(registrosOAB).length <= 10) { // Se tem poucos registros, recarregar
-                await carregarRegistrosOAB();
+            try {
+                // Sempre verificar no Firebase para dados em tempo real
+                if (window.firebaseDB && window.firebaseModules) {
+                    const { doc, getDoc } = window.firebaseModules;
+                    const oabRef = doc(window.firebaseDB, 'registros_oab', 'dados');
+                    const docSnap = await getDoc(oabRef);
+                    
+                    if (docSnap.exists()) {
+                        const dadosFirebase = docSnap.data();
+                        // Atualizar dados locais com os do Firebase
+                        registrosOAB = { ...registrosOAB, ...dadosFirebase };
+                        console.log('🔄 Dados OAB atualizados do Firebase em tempo real');
+                    }
+                }
+                
+                // Verificar se OAB existe e está ativa
+                if (registrosOAB[oab] && registrosOAB[oab].ativo && !registrosOAB[oab].utilizada) {
+                    const dadosOAB = registrosOAB[oab];
+                    
+                    // Mostrar informações do cargo
+                    document.getElementById('cargo-info').textContent = dadosOAB.cargoNome;
+                    document.getElementById('nivel-info').textContent = `Nível ${dadosOAB.nivel}`;
+                    document.getElementById('dominio-info').textContent = dadosOAB.dominio;
+                    
+                    infoCargoDiv.classList.remove('hidden');
+                    console.log(`✅ OAB ${oab} verificada - Cargo: ${dadosOAB.cargoNome}`);
+                    
+                    // Atualizar preview do email se nome já foi digitado
+                    atualizarPreviewEmail();
+                    
+                } else if (registrosOAB[oab] && registrosOAB[oab].utilizada) {
+                    // OAB já foi utilizada
+                    infoCargoDiv.classList.add('hidden');
+                    mostrarMensagemPrimeiro('⚠️ Esta OAB já foi utilizada para cadastro!', 'erro');
+                    console.log(`⚠️ OAB ${oab} já foi utilizada`);
+                    
+                } else {
+                    // OAB não encontrada - tentar criar automaticamente para advogados
+                    infoCargoDiv.classList.add('hidden');
+                    
+                    if (oab.length >= 4 && oab.length <= 8 && /^\d+$/.test(oab)) {
+                        const novoRegistro = {
+                            numero: oab,
+                            ativo: true,
+                            utilizada: false,
+                            cargo: "advogado",
+                            cargoNome: "Advogado",
+                            nivel: 11,
+                            dominio: "@oab.org.br",
+                            liberadoPor: "Sistema Auto",
+                            dataLiberacao: new Date().toISOString(),
+                            autoGerado: true
+                        };
+                        
+                        // Adicionar ao registro local
+                        registrosOAB[oab] = novoRegistro;
+                        
+                        // Salvar no Firebase
+                        await salvarDados();
+                        
+                        // Mostrar informações do novo registro
+                        document.getElementById('cargo-info').textContent = novoRegistro.cargoNome;
+                        document.getElementById('nivel-info').textContent = `Nível ${novoRegistro.nivel}`;
+                        document.getElementById('dominio-info').textContent = novoRegistro.dominio;
+                        
+                        infoCargoDiv.classList.remove('hidden');
+                        
+                        console.log(`✅ OAB ${oab} criada automaticamente como Advogado`);
+                        atualizarPreviewEmail();
+                    } else {
+                        console.log(`❌ OAB ${oab} não encontrada ou inválida`);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Erro ao verificar OAB:', error);
+                infoCargoDiv.classList.add('hidden');
+            }
+        }
+                    atualizarPreviewEmail();
+                    
+        // Função auxiliar para atualizar preview do email (versão admin)
+        function atualizarPreviewEmailAdmin() {
+            const oab = document.getElementById('admin-oab').value.trim();
+            const nome = document.getElementById('admin-nome').value.trim();
+            const previewDiv = document.getElementById('preview-email-admin');
+            
+            if (oab && nome && registrosOAB[oab] && registrosOAB[oab].ativo && !registrosOAB[oab].utilizada) {
+                const dadosOAB = registrosOAB[oab];
+                const emailGerado = gerarEmailPorCargo(nome, dadosOAB.cargo);
+                
+                document.getElementById('email-preview-admin').textContent = emailGerado;
+                previewDiv.classList.remove('hidden');
+            } else {
+                previewDiv.classList.add('hidden');
+            }
+        }
+
+        // Função auxiliar para verificar OAB liberada (versão admin)
+        function verificarOABLiberadaAdmin() {
+            const oab = document.getElementById('admin-oab').value.trim();
+            const infoCargoDiv = document.getElementById('info-cargo-admin');
+            
+            if (!oab) {
+                infoCargoDiv.classList.add('hidden');
+                return;
             }
             
-            // Verificar se OAB existe e está ativa
             if (registrosOAB[oab] && registrosOAB[oab].ativo && !registrosOAB[oab].utilizada) {
                 const dadosOAB = registrosOAB[oab];
                 
-                // Mostrar informações do cargo
-                document.getElementById('cargo-info').textContent = dadosOAB.cargoNome;
-                document.getElementById('nivel-info').textContent = `Nível ${dadosOAB.nivel}`;
-                document.getElementById('dominio-info').textContent = dadosOAB.dominio;
+                document.getElementById('cargo-info-admin').textContent = dadosOAB.cargoNome;
+                document.getElementById('nivel-info-admin').textContent = `Nível ${dadosOAB.nivel}`;
+                document.getElementById('dominio-info-admin').textContent = dadosOAB.dominio;
                 
                 infoCargoDiv.classList.remove('hidden');
-                
-                // Atualizar preview do email se nome já foi digitado
-                atualizarPreviewEmail();
-                
-                console.log(`✅ OAB ${oab} válida - ${dadosOAB.cargoNome}`);
-                
-            } else if (registrosOAB[oab] && registrosOAB[oab].utilizada) {
-                infoCargoDiv.classList.add('hidden');
-                mostrarMensagemPrimeiro('⚠️ Esta OAB já foi utilizada para cadastro!', 'erro');
+                atualizarPreviewEmailAdmin();
             } else {
                 infoCargoDiv.classList.add('hidden');
-                
-                // Se não encontrar, tentar criar automaticamente para advogados
-                if (oab.length >= 4 && oab.length <= 8 && /^\d+$/.test(oab)) {
-                    const novoRegistro = {
-                        numero: oab,
-                        ativo: true,
-                        utilizada: false,
-                        cargo: "advogado",
-                        cargoNome: "Advogado",
-                        nivel: 11,
-                        dominio: "@oab.org.br",
-                        liberadoPor: "Sistema",
-                        dataLiberacao: new Date().toISOString().split('T')[0],
-                        autoGerado: true
-                    };
-                    
-                    await salvarRegistroOAB(novoRegistro);
-                    
-                    // Marcar OAB como utilizada
-                    await marcarOABUtilizada(numeroOAB);
-                    
-                    // Mostrar informações do novo registro
-                    document.getElementById('cargo-info').textContent = novoRegistro.cargoNome;
-                    document.getElementById('nivel-info').textContent = `Nível ${novoRegistro.nivel}`;
-                    document.getElementById('dominio-info').textContent = novoRegistro.dominio;
-                    
-                    infoCargoDiv.classList.remove('hidden');
-                    atualizarPreviewEmail();
-                    
-                    mostrarMensagemPrimeiro('✅ OAB validada automaticamente como Advogado!', 'sucesso');
-                    console.log(`✅ OAB ${oab} criada automaticamente como Advogado`);
-                    
-                } else {
-                    mostrarMensagemPrimeiro('❌ Número OAB inválido! Use apenas números (4-8 dígitos)', 'erro');
-                }
             }
         }
 
@@ -7207,8 +7264,8 @@ document.addEventListener('input', function(e) {
             carregarListaOABsLiberadas();
         }
 
-        // Função para liberar uma OAB
-        function liberarOAB() {
+        // Função para liberar uma OAB com sincronização em tempo real
+        async function liberarOAB() {
             const numeroOAB = document.getElementById('novo-numero-oab').value.trim();
             const cargo = document.getElementById('cargo-oab').value;
             
@@ -7223,45 +7280,64 @@ document.addEventListener('input', function(e) {
                 return;
             }
             
-            // Obter dados do cargo
-            const dadosCargo = estruturaJudicial[cargo];
-            if (!dadosCargo) {
-                alert('❌ Cargo inválido selecionado!');
-                return;
+            try {
+                // Obter dados do cargo
+                const dadosCargo = estruturaJudicial[cargo];
+                if (!dadosCargo) {
+                    alert('❌ Cargo inválido selecionado!');
+                    return;
+                }
+                
+                // Adicionar novo registro
+                registrosOAB[numeroOAB] = {
+                    numero: numeroOAB,
+                    ativo: true,
+                    utilizada: false,
+                    cargo: cargo,
+                    cargoNome: dadosCargo.nome,
+                    nivel: dadosCargo.nivel,
+                    dominio: dadosCargo.dominio,
+                    liberadoPor: usuarioLogado ? usuarioLogado.nome : "Administrador",
+                    dataLiberacao: new Date().toISOString()
+                };
+                
+                // Salvar dados no Firebase em tempo real
+                await salvarDados();
+                
+                // Limpar campos
+                document.getElementById('novo-numero-oab').value = '';
+                document.getElementById('cargo-oab').value = '';
+                
+                // Recarregar lista
+                carregarListaOABsLiberadas();
+                
+                // Notificar liberação em tempo real
+                await enviarNotificacaoGlobal({
+                    titulo: '🆔 Nova OAB Liberada',
+                    mensagem: `OAB ${numeroOAB} foi liberada para cargo ${dadosCargo.nome}`,
+                    tipo: 'info',
+                    timestamp: new Date(),
+                    ativo: true,
+                    para: 'todos'
+                });
+                
+                // Notificar sucesso
+                alert(`✅ OAB ${numeroOAB} liberada com sucesso em tempo real!\nCargo: ${dadosCargo.nome}\nNível: ${dadosCargo.nivel}`);
+                
+                // Registrar log
+                await registrarLog('oab_liberada', `OAB ${numeroOAB} liberada para cargo ${dadosCargo.nome}`, {
+                    numero: numeroOAB,
+                    cargo: cargo,
+                    nivel: dadosCargo.nivel,
+                    timestamp: new Date().toISOString()
+                });
+                
+                console.log(`🔄 OAB ${numeroOAB} liberada e sincronizada em tempo real`);
+                
+            } catch (error) {
+                console.error('❌ Erro ao liberar OAB:', error);
+                alert('❌ Erro ao liberar OAB. Tente novamente.');
             }
-            
-            // Adicionar novo registro
-            registrosOAB[numeroOAB] = {
-                numero: numeroOAB,
-                ativo: true,
-                utilizada: false,
-                cargo: cargo,
-                cargoNome: dadosCargo.nome,
-                nivel: dadosCargo.nivel,
-                dominio: dadosCargo.dominio,
-                liberadoPor: usuarioLogado ? usuarioLogado.nome : "Administrador",
-                dataLiberacao: new Date().toISOString()
-            };
-            
-            // Salvar dados
-            salvarDados();
-            
-            // Limpar campos
-            document.getElementById('novo-numero-oab').value = '';
-            document.getElementById('cargo-oab').value = '';
-            
-            // Recarregar lista
-            carregarListaOABsLiberadas();
-            
-            // Notificar sucesso
-            alert(`✅ OAB ${numeroOAB} liberada com sucesso!\nCargo: ${dadosCargo.nome}\nNível: ${dadosCargo.nivel}`);
-            
-            // Registrar log
-            registrarLog('oab_liberada', `OAB ${numeroOAB} liberada para cargo ${dadosCargo.nome}`, {
-                numero: numeroOAB,
-                cargo: cargo,
-                nivel: dadosCargo.nivel
-            });
         }
 
         // Carregar lista de OABs liberadas
@@ -7310,21 +7386,42 @@ document.addEventListener('input', function(e) {
             lista.innerHTML = listaHTML;
         }
 
-        // Revogar uma OAB
-        function revogarOAB(numeroOAB) {
+        // Revogar uma OAB com sincronização em tempo real
+        async function revogarOAB(numeroOAB) {
             if (confirm(`⚠️ Tem certeza que deseja revogar a OAB ${numeroOAB}?\nEsta ação não pode ser desfeita!`)) {
-                delete registrosOAB[numeroOAB];
-                
-                // Salvar dados
-                salvarDados();
-                
-                // Recarregar lista
-                carregarListaOABsLiberadas();
-                
-                alert(`✅ OAB ${numeroOAB} revogada com sucesso!`);
-                
-                // Registrar log
-                registrarLog('oab_revogada', `OAB ${numeroOAB} revogada pelo administrador`);
+                try {
+                    // Remover do objeto local
+                    delete registrosOAB[numeroOAB];
+                    
+                    // Salvar dados no Firebase em tempo real
+                    await salvarDados();
+                    
+                    // Notificar revogação em tempo real
+                    await enviarNotificacaoGlobal({
+                        titulo: '🚨 OAB Revogada',
+                        mensagem: `OAB ${numeroOAB} foi revogada pelo administrador`,
+                        tipo: 'warning',
+                        timestamp: new Date(),
+                        ativo: true,
+                        para: 'todos'
+                    });
+                    
+                    // Recarregar lista
+                    carregarListaOABsLiberadas();
+                    
+                    alert(`✅ OAB ${numeroOAB} revogada com sucesso em tempo real!`);
+                    
+                    // Registrar log
+                    await registrarLog('oab_revogada', `OAB ${numeroOAB} revogada pelo administrador`, {
+                        numero: numeroOAB,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    console.log(`🔄 OAB ${numeroOAB} revogada e sincronizada em tempo real`);
+                } catch (error) {
+                    console.error('❌ Erro ao revogar OAB:', error);
+                    alert('❌ Erro ao revogar OAB. Tente novamente.');
+                }
             }
         }
 
