@@ -759,9 +759,6 @@
                 <div class="modal-content" style="max-width: 1200px;">
                     <div class="modal-header">
                         <h3 id="generator-title" class="text-white text-xl font-bold">Gerador de Documento</h3>
-                        <button onclick="closeDocumentGenerator()" class="text-gray-400 hover:text-white">
-                            <i class="fas fa-times text-xl"></i>
-                        </button>
                     </div>
                     
                     <div class="modal-body">
@@ -1177,32 +1174,32 @@
                                 </div>
                             </div>
 
-                            <!-- Dados Básicos do Processo -->
-                            <div class="bg-green-900/20 rounded-lg p-6 border border-green-400/30">
-                                <h4 class="text-green-300 font-semibold mb-4 flex items-center gap-2">
-                                    <i class="fas fa-user text-green-400"></i>
+                            <!-- Dados Básicos do Processo (oculto inicialmente) -->
+                            <div id="dados-cliente-section" class="bg-blue-900/20 rounded-lg p-6 border border-blue-400/30" style="display: none;">
+                                <h4 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
+                                    <i class="fas fa-user text-blue-400"></i>
                                     <span id="cliente-titulo">Dados do Cliente</span>
                                 </h4>
                                 
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-green-300 font-semibold mb-2">
+                                        <label class="block text-blue-300 font-semibold mb-2">
                                             <i class="fas fa-user mr-2"></i><span id="cliente-label">Nome do Cliente *</span>
                                         </label>
                                         <input type="text" id="requerente-nome" required 
-                                               class="w-full px-4 py-3 bg-slate-800/50 border border-green-300/30 rounded-lg text-white focus:border-green-400 focus:outline-none"
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
                                                placeholder="Nome completo do cliente">
                                     </div>
 
                                     <div>
-                                        <label class="block text-green-300 font-semibold mb-2">
+                                        <label class="block text-blue-300 font-semibold mb-2">
                                             <i class="fas fa-id-card mr-2"></i><span id="documento-label">RG ou Passaporte *</span>
                                         </label>
                                         <input type="text" id="requerente-documento" required maxlength="10"
-                                               class="w-full px-4 py-3 bg-slate-800/50 border border-green-300/30 rounded-lg text-white focus:border-green-400 focus:outline-none"
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
                                                placeholder="Ex: 123456 ou 12345678"
                                                oninput="formatDocumentInput(this)">
-                                        <p class="text-green-300/70 text-xs mt-1">
+                                        <p class="text-blue-300/70 text-xs mt-1">
                                             <i class="fas fa-info-circle mr-1"></i>
                                             <span id="documento-hint">RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)</span>
                                         </p>
@@ -1259,31 +1256,6 @@
                                         </div>
                                     </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Tipo de Petição Inicial -->
-                            <div class="bg-purple-900/20 rounded-lg p-6 border border-purple-400/30">
-                                <h4 class="text-purple-300 font-semibold mb-4 flex items-center gap-2">
-                                    <i class="fas fa-gavel text-purple-400"></i>
-                                    Tipo de Petição Inicial
-                                </h4>
-                                
-                                <div class="mb-4">
-                                    <label class="block text-purple-300 font-semibold mb-2">
-                                        <i class="fas fa-scroll mr-2"></i>Natureza da Petição *
-                                    </label>
-                                    <select id="tipo-peticao" required onchange="toggleProcessFields()"
-                                            class="w-full px-4 py-3 bg-slate-800/50 border border-purple-300/30 rounded-lg text-white focus:border-purple-400 focus:outline-none">
-                                        <option value="">Selecione o tipo de petição</option>
-                                        <option value="civil">Petição Inicial Civil (Autor vs Réu)</option>
-                                        <option value="criminal">Petição Inicial Criminal (Defesa do Réu)</option>
-                                    </select>
-                                    <p class="text-purple-300/70 text-xs mt-2">
-                                        <i class="fas fa-info-circle mr-1"></i>
-                                        <strong>Civil:</strong> Quando você representa o autor de uma ação (cobrança, indenização, etc.)<br>
-                                        <strong>Criminal:</strong> Quando você defende um réu em processo criminal movido pelo Ministério Público
-                                    </p>
                                 </div>
                             </div>
 
@@ -2802,12 +2774,16 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const documentoLabel = document.getElementById('documento-label');
             const documentoHint = document.getElementById('documento-hint');
             const tipoProcessoSelect = document.getElementById('tipo-processo');
+            const dadosClienteSection = document.getElementById('dados-cliente-section');
 
             // Reset campos
             infoCivil.style.display = 'none';
             infoCriminal.style.display = 'none';
 
             if (tipoPeticao === 'civil') {
+                // Mostrar seção de dados do cliente
+                dadosClienteSection.style.display = 'block';
+                
                 // Configurar para processo civil
                 clienteTitulo.textContent = 'Dados do Cliente (Autor da Ação)';
                 clienteLabel.textContent = 'Nome do Autor/Cliente *';
@@ -2843,6 +2819,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 `;
 
             } else if (tipoPeticao === 'criminal') {
+                // Mostrar seção de dados do cliente
+                dadosClienteSection.style.display = 'block';
+                
                 // Configurar para processo criminal
                 clienteTitulo.textContent = 'Dados do Cliente (Réu/Acusado)';
                 clienteLabel.textContent = 'Nome do Réu/Acusado *';
@@ -2871,7 +2850,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 `;
 
             } else {
-                // Quando nenhum tipo está selecionado
+                // Quando nenhum tipo está selecionado - OCULTAR seção de dados do cliente
+                dadosClienteSection.style.display = 'none';
+                
                 clienteTitulo.textContent = 'Dados do Cliente';
                 clienteLabel.textContent = 'Nome do Cliente *';
                 documentoLabel.textContent = 'RG ou Passaporte *';
