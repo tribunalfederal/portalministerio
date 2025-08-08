@@ -4302,7 +4302,7 @@ document.addEventListener('input', function(e) {
                     nomeado: true,
                     nomeado_por: 'Sistema',
                     data_nomeacao: new Date().toISOString(),
-                    pode_nomear: (estruturaJudicial['1_juiz_federal'] && estruturaJudicial['1_juiz_federal'].pode_nomear) || [],
+                    pode_nomear: ["2_juiz_federal", "3_juiz_federal", "1_desembargador", "2_desembargador", "3_desembargador", "1_juiz_estadual", "2_juiz_estadual", "3_juiz_estadual", "4_juiz_estadual", "1_procurador_geral_republica", "2_procurador_geral_justica", "3_procurador_geral_justica", "1_promotor", "2_promotor", "3_promotor", "4_promotor", "5_promotor", "6_promotor", "1_oficial_justica_2_instancia", "1_oficial_justica_1_instancia", "advogado", "defensor_publico"],
                     ativo: true,
                     data_criacao: new Date().toISOString()
                 };
@@ -4349,7 +4349,7 @@ document.addEventListener('input', function(e) {
                     permissoes: ['todas', 'suprema_autoridade', 'nomeacao_geral'],
                     isAdmin: true,
                     oab: 'STF-001',
-                    pode_nomear: (estruturaJudicial['1_juiz_federal'] && estruturaJudicial['1_juiz_federal'].pode_nomear) || [],
+                    pode_nomear: ["2_juiz_federal", "3_juiz_federal", "1_desembargador", "2_desembargador", "3_desembargador", "1_juiz_estadual", "2_juiz_estadual", "3_juiz_estadual", "4_juiz_estadual", "1_procurador_geral_republica", "2_procurador_geral_justica", "3_procurador_geral_justica", "1_promotor", "2_promotor", "3_promotor", "4_promotor", "5_promotor", "6_promotor", "1_oficial_justica_2_instancia", "1_oficial_justica_1_instancia", "advogado", "defensor_publico"],
                     loginTime: new Date()
                 };
                 
