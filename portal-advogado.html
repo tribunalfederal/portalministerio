@@ -914,6 +914,7 @@
             showSection('dashboard');
             initializeCalculator();
             loadUserData(); // Carregar dados do perfil do usuário
+            initializeHierarchy(); // Inicializar sistema de hierarquia
         });
 
         // === CALCULADORA DE PENAS - SISTEMA COMPLETO ===
@@ -1678,6 +1679,252 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 });
             }
         });
+
+        // === SISTEMA DE HIERARQUIA JURÍDICA ===
+
+        // Dados da hierarquia (preparado para sincronização em tempo real)
+        let hierarchyData = {
+            // Cargos únicos (1 por cargo)
+            'juiz-federal-1': { name: 'Dr. João Silva', status: 'occupied' },
+            'juiz-federal-2': { name: null, status: 'vacant' },
+            'juiz-federal-3': { name: null, status: 'vacant' },
+            'desembargador-1': { name: null, status: 'vacant' },
+            'desembargador-2': { name: null, status: 'vacant' },
+            'desembargador-3': { name: null, status: 'vacant' },
+            'procurador-geral-republica-1': { name: null, status: 'vacant' },
+            'procurador-geral-2': { name: null, status: 'vacant' },
+            'procurador-geral-3': { name: null, status: 'vacant' },
+            'presidente-oab': { name: null, status: 'vacant' },
+            'juiz-estadual-1': { name: null, status: 'vacant' },
+            'promotor-1': { name: null, status: 'vacant' },
+            'oficial-2instancia': { name: null, status: 'vacant' },
+            'oficial-1instancia': { name: null, status: 'vacant' },
+            
+            // Cargos múltiplos
+            'juizes-estaduais': [], // Até 4 juízes (2º ao 4º)
+            'promotores': [], // Até 6 promotores (2º ao 6º)
+            'advogados': [], // Ilimitado
+            'defensores': [], // Ilimitado
+            'advogados-licenciados': [] // Ilimitado
+        };
+
+        // Inicializar hierarquia
+        function initializeHierarchy() {
+            // Carregar dados salvos (simulação - futuramente será do backend)
+            const savedHierarchy = localStorage.getItem('hierarchyData');
+            if (savedHierarchy) {
+                hierarchyData = { ...hierarchyData, ...JSON.parse(savedHierarchy) };
+            }
+            
+            // Gerar posições múltiplas vazias se necessário
+            initializeMultiplePositions();
+        }
+
+        // Inicializar posições múltiplas
+        function initializeMultiplePositions() {
+            // Juízes Estaduais (2º ao 4º - máximo 3)
+            while (hierarchyData['juizes-estaduais'].length < 3) {
+                hierarchyData['juizes-estaduais'].push({
+                    id: `juiz-estadual-${hierarchyData['juizes-estaduais'].length + 2}`,
+                    name: null,
+                    status: 'vacant',
+                    position: `${hierarchyData['juizes-estaduais'].length + 2}º Juiz(a) Estadual - 1ª Instância`
+                });
+            }
+            
+            // Promotores (2º ao 6º - máximo 5)
+            while (hierarchyData['promotores'].length < 5) {
+                hierarchyData['promotores'].push({
+                    id: `promotor-${hierarchyData['promotores'].length + 2}`,
+                    name: null,
+                    status: 'vacant',
+                    position: `${hierarchyData['promotores'].length + 2}º Promotor - 1ª Instância`
+                });
+            }
+            
+            // Advogados (iniciar com 5 vagas se vazio)
+            if (hierarchyData['advogados'].length === 0) {
+                for (let i = 1; i <= 5; i++) {
+                    hierarchyData['advogados'].push({
+                        id: `advogado-${i}`,
+                        name: null,
+                        status: 'vacant',
+                        position: `Advogado(a) ${i}ª/2ª Instância`
+                    });
+                }
+            }
+            
+            // Defensores (iniciar com 3 vagas se vazio)
+            if (hierarchyData['defensores'].length === 0) {
+                for (let i = 1; i <= 3; i++) {
+                    hierarchyData['defensores'].push({
+                        id: `defensor-${i}`,
+                        name: null,
+                        status: 'vacant',
+                        position: `Defensor(a) Público(a) ${i}`
+                    });
+                }
+            }
+            
+            // Advogados Licenciados (iniciar com 2 vagas se vazio)
+            if (hierarchyData['advogados-licenciados'].length === 0) {
+                for (let i = 1; i <= 2; i++) {
+                    hierarchyData['advogados-licenciados'].push({
+                        id: `advogado-lic-${i}`,
+                        name: null,
+                        status: 'vacant',
+                        position: `Advogado(a) Licenciado(a) ${i}`
+                    });
+                }
+            }
+        }
+
+        // Atualizar display da hierarquia
+        function updateHierarchyDisplay() {
+            // Atualizar status dos cargos únicos
+            document.querySelectorAll('.status-indicator').forEach(indicator => {
+                const position = indicator.getAttribute('data-position');
+                const data = hierarchyData[position];
+                
+                if (data && data.status === 'occupied' && data.name) {
+                    indicator.innerHTML = `<span class="status-badge bg-green-600 text-white px-2 py-1 rounded text-xs">${data.name}</span>`;
+                } else {
+                    indicator.innerHTML = `<span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>`;
+                }
+            });
+            
+            // Atualizar juízes estaduais
+            updateMultiplePositionsDisplay('juizes-estaduais', 'juizes-estaduais-base');
+            
+            // Atualizar promotores
+            updateMultiplePositionsDisplay('promotores', 'promotores-base');
+            
+            // Atualizar advogados
+            updateMultiplePositionsDisplay('advogados', 'advogados-list');
+            
+            // Atualizar defensores
+            updateMultiplePositionsDisplay('defensores', 'defensores-list');
+            
+            // Atualizar advogados licenciados
+            updateMultiplePositionsDisplay('advogados-licenciados', 'advogados-licenciados-list');
+        }
+
+        // Atualizar display de posições múltiplas
+        function updateMultiplePositionsDisplay(dataKey, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const positions = hierarchyData[dataKey];
+            let html = '';
+            
+            positions.forEach(position => {
+                const statusColor = position.status === 'occupied' && position.name ? 'green' : 'red';
+                const statusText = position.status === 'occupied' && position.name ? position.name : 'VAGO';
+                
+                html += `
+                    <div class="position-card bg-gradient-to-r from-slate-600/20 to-slate-500/20 p-2 rounded border border-slate-400/20">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-user text-slate-400 text-xs"></i>
+                                <div>
+                                    <div class="text-white font-medium text-xs">${position.position}</div>
+                                </div>
+                            </div>
+                            <div class="status-indicator">
+                                <span class="status-badge bg-${statusColor}-600 text-white px-2 py-1 rounded text-xs">${statusText}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Salvar dados da hierarquia
+        function saveHierarchyData() {
+            localStorage.setItem('hierarchyData', JSON.stringify(hierarchyData));
+        }
+
+        // Atualizar cargo (preparado para API futura)
+        function updatePosition(positionId, name, status = 'occupied') {
+            if (hierarchyData[positionId]) {
+                hierarchyData[positionId].name = name;
+                hierarchyData[positionId].status = status;
+            } else {
+                // Procurar em arrays de posições múltiplas
+                for (const key in hierarchyData) {
+                    if (Array.isArray(hierarchyData[key])) {
+                        const position = hierarchyData[key].find(p => p.id === positionId);
+                        if (position) {
+                            position.name = name;
+                            position.status = status;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            saveHierarchyData();
+            updateHierarchyDisplay();
+            
+            // TODO: Futuramente fazer sync com API
+            // syncWithAPI(positionId, name, status);
+        }
+
+        // Remover pessoa do cargo
+        function removeFromPosition(positionId) {
+            updatePosition(positionId, null, 'vacant');
+        }
+
+        // Adicionar nova vaga (para cargos múltiplos)
+        function addNewPosition(type) {
+            const limits = {
+                'promotores': 5, // Máximo 5 (2º ao 6º)
+                'juizes-estaduais': 3, // Máximo 3 (2º ao 4º)
+                'advogados': Infinity, // Ilimitado
+                'defensores': Infinity, // Ilimitado
+                'advogados-licenciados': Infinity // Ilimitado
+            };
+            
+            if (hierarchyData[type].length >= limits[type]) {
+                showNotification(`Limite máximo de ${limits[type]} ${type} atingido!`, 'warning');
+                return;
+            }
+            
+            const newId = `${type}-${hierarchyData[type].length + 1}`;
+            const newPosition = {
+                id: newId,
+                name: null,
+                status: 'vacant',
+                position: `${getPositionName(type, hierarchyData[type].length + 1)}`
+            };
+            
+            hierarchyData[type].push(newPosition);
+            saveHierarchyData();
+            updateHierarchyDisplay();
+            
+            showNotification(`Nova vaga de ${type} criada!`, 'success');
+        }
+
+        // Obter nome da posição baseado no tipo e número
+        function getPositionName(type, number) {
+            const names = {
+                'promotores': `${number + 1}º Promotor - 1ª Instância`,
+                'juizes-estaduais': `${number + 1}º Juiz(a) Estadual - 1ª Instância`,
+                'advogados': `Advogado(a) ${number} - 1ª/2ª Instância`,
+                'defensores': `Defensor(a) Público(a) ${number}`,
+                'advogados-licenciados': `Advogado(a) Licenciado(a) ${number}`
+            };
+            return names[type] || `${type} ${number}`;
+        }
+
+        // Mostrar hierarquia jurídica (atualizar função existente)
+        function showJudicialHierarchy() {
+            updateHierarchyDisplay(); // Atualizar dados antes de mostrar
+            document.getElementById('hierarchyModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
     </script>
 
     <!-- Modais -->
@@ -1807,92 +2054,348 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     </button>
                 </div>
                 
-                <div class="space-y-6">
-                    <!-- Hierarquia Federal -->
-                    <div>
-                        <h4 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
-                            <i class="fas fa-flag text-blue-400"></i>
-                            Justiça Federal
-                        </h4>
-                        <div class="bg-slate-800/30 p-4 rounded-lg">
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-yellow-600/20 to-yellow-500/20 rounded">
-                                    <i class="fas fa-crown text-yellow-400"></i>
-                                    <div>
-                                        <div class="text-white font-semibold">Supremo Tribunal Federal (STF)</div>
-                                        <div class="text-blue-200 text-sm">Mais alta instância do Poder Judiciário</div>
+                <div class="space-y-4 max-h-96 overflow-y-auto">
+                    <!-- Nível 1 - Autoridade Máxima -->
+                    <div class="hierarchy-level">
+                        <div class="level-header bg-gradient-to-r from-yellow-600/30 to-yellow-500/30 p-3 rounded-lg border border-yellow-400/30">
+                            <h4 class="text-yellow-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-crown text-yellow-400"></i>
+                                NÍVEL 1 - AUTORIDADE MÁXIMA
+                            </h4>
+                        </div>
+                        <div class="ml-4 mt-2 space-y-2">
+                            <div class="position-card bg-gradient-to-r from-yellow-600/20 to-yellow-500/20 p-3 rounded border border-yellow-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-star text-yellow-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">1º Juiz Federal - Presidente do STF/STJ/STB</div>
+                                            <div class="text-yellow-200 text-xs">Máxima autoridade judicial</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-blue-600/20 to-blue-500/20 rounded">
-                                    <i class="fas fa-university text-blue-400"></i>
-                                    <div>
-                                        <div class="text-white font-semibold">Superior Tribunal de Justiça (STJ)</div>
-                                        <div class="text-blue-200 text-sm">Uniformização da interpretação da lei federal</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-green-600/20 to-green-500/20 rounded">
-                                    <i class="fas fa-gavel text-green-400"></i>
-                                    <div>
-                                        <div class="text-white font-semibold">Tribunais Regionais Federais (TRF)</div>
-                                        <div class="text-blue-200 text-sm">Segunda instância da Justiça Federal</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-purple-600/20 to-purple-500/20 rounded">
-                                    <i class="fas fa-balance-scale text-purple-400"></i>
-                                    <div>
-                                        <div class="text-white font-semibold">Juízes Federais</div>
-                                        <div class="text-blue-200 text-sm">Primeira instância da Justiça Federal</div>
+                                    <div class="status-indicator" data-position="juiz-federal-1">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Hierarquia Estadual -->
-                    <div>
-                        <h4 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
-                            <i class="fas fa-map-marker-alt text-green-400"></i>
-                            Justiça Estadual - BRASILÂNDIA
-                        </h4>
-                        <div class="bg-slate-800/30 p-4 rounded-lg">
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-red-600/20 to-red-500/20 rounded">
-                                    <i class="fas fa-landmark text-red-400"></i>
-                                    <div>
-                                        <div class="text-white font-semibold">Tribunal de Justiça de BRASILÂNDIA (TJBR)</div>
-                                        <div class="text-blue-200 text-sm">Segunda instância estadual</div>
+
+                    <!-- Nível 2 - Cúpula da Justiça Federal -->
+                    <div class="hierarchy-level">
+                        <div class="level-header bg-gradient-to-r from-blue-600/30 to-blue-500/30 p-3 rounded-lg border border-blue-400/30">
+                            <h4 class="text-blue-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-university text-blue-400"></i>
+                                NÍVEL 2 - CÚPULA DA JUSTIÇA FEDERAL
+                            </h4>
+                        </div>
+                        <div class="ml-4 mt-2 space-y-2">
+                            <div class="position-card bg-gradient-to-r from-blue-600/20 to-blue-500/20 p-3 rounded border border-blue-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-gavel text-blue-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">2º Juiz Federal</div>
+                                            <div class="text-blue-200 text-xs">Vice-presidente do tribunal federal</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-orange-600/20 to-orange-500/20 rounded">
-                                    <i class="fas fa-user-tie text-orange-400"></i>
-                                    <div>
-                                        <div class="text-white font-semibold">Juízes de Direito</div>
-                                        <div class="text-blue-200 text-sm">Primeira instância estadual</div>
+                                    <div class="status-indicator" data-position="juiz-federal-2">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Ministério Público -->
-                    <div>
-                        <h4 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
-                            <i class="fas fa-shield-alt text-red-400"></i>
-                            Ministério Público
-                        </h4>
-                        <div class="bg-slate-800/30 p-4 rounded-lg">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="space-y-2">
-                                    <div class="text-blue-300 font-medium">Federal</div>
-                                    <div class="text-blue-200 text-sm">• Procurador-Geral da República</div>
-                                    <div class="text-blue-200 text-sm">• Procuradores da República</div>
-                                    <div class="text-blue-200 text-sm">• Promotores de Justiça Federais</div>
+
+                    <!-- Nível 3 - Alta Cúpula -->
+                    <div class="hierarchy-level">
+                        <div class="level-header bg-gradient-to-r from-purple-600/30 to-purple-500/30 p-3 rounded-lg border border-purple-400/30">
+                            <h4 class="text-purple-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-balance-scale text-purple-400"></i>
+                                NÍVEL 3 - ALTA CÚPULA
+                            </h4>
+                        </div>
+                        <div class="ml-4 mt-2 space-y-2">
+                            <div class="position-card bg-gradient-to-r from-purple-600/20 to-purple-500/20 p-3 rounded border border-purple-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-landmark text-purple-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">3º Juiz Federal</div>
+                                            <div class="text-purple-200 text-xs">Membro da alta cúpula federal</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="juiz-federal-3">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
                                 </div>
-                                <div class="space-y-2">
-                                    <div class="text-blue-300 font-medium">Estadual</div>
-                                    <div class="text-blue-200 text-sm">• Procurador-Geral de Justiça</div>
-                                    <div class="text-blue-200 text-sm">• Promotores de Justiça</div>
-                                    <div class="text-blue-200 text-sm">• Promotores Substitutos</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nível 4 - Liderança de Desembargadores e MP Federal -->
+                    <div class="hierarchy-level">
+                        <div class="level-header bg-gradient-to-r from-red-600/30 to-red-500/30 p-3 rounded-lg border border-red-400/30">
+                            <h4 class="text-red-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-users-cog text-red-400"></i>
+                                NÍVEL 4 - LIDERANÇA DE DESEMBARGADORES E MP FEDERAL
+                            </h4>
+                        </div>
+                        <div class="ml-4 mt-2 space-y-2">
+                            <div class="position-card bg-gradient-to-r from-red-600/20 to-red-500/20 p-3 rounded border border-red-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-user-tie text-red-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">1º Desembargador</div>
+                                            <div class="text-red-200 text-xs">Presidente do Tribunal de Justiça</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="desembargador-1">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="position-card bg-gradient-to-r from-red-600/20 to-red-500/20 p-3 rounded border border-red-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-shield-alt text-red-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">1º Procurador Geral da República</div>
+                                            <div class="text-red-200 text-xs">Chefe do Ministério Público Federal</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="procurador-geral-republica-1">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nível 5 - Desembargadores, Procuradores e OAB -->
+                    <div class="hierarchy-level">
+                        <div class="level-header bg-gradient-to-r from-green-600/30 to-green-500/30 p-3 rounded-lg border border-green-400/30">
+                            <h4 class="text-green-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-layer-group text-green-400"></i>
+                                NÍVEL 5 - DESEMBARGADORES, PROCURADORES E OAB
+                            </h4>
+                        </div>
+                        <div class="ml-4 mt-2 space-y-2">
+                            <div class="position-card bg-gradient-to-r from-green-600/20 to-green-500/20 p-3 rounded border border-green-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-user-tie text-green-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">2º Desembargador</div>
+                                            <div class="text-green-200 text-xs">Vice-presidente do TJ</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="desembargador-2">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="position-card bg-gradient-to-r from-green-600/20 to-green-500/20 p-3 rounded border border-green-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-user-tie text-green-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">3º Desembargador</div>
+                                            <div class="text-green-200 text-xs">Membro do Tribunal de Justiça</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="desembargador-3">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="position-card bg-gradient-to-r from-green-600/20 to-green-500/20 p-3 rounded border border-green-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-shield-alt text-green-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">2º Procurador Geral de Justiça - 2ª Instância</div>
+                                            <div class="text-green-200 text-xs">Ministério Público Estadual</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="procurador-geral-2">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="position-card bg-gradient-to-r from-green-600/20 to-green-500/20 p-3 rounded border border-green-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-briefcase text-green-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">Presidente da OAB</div>
+                                            <div class="text-green-200 text-xs">Ordem dos Advogados do Brasil</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="presidente-oab">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nível 6 - Juízes e Promotores de Primeira Instância -->
+                    <div class="hierarchy-level">
+                        <div class="level-header bg-gradient-to-r from-orange-600/30 to-orange-500/30 p-3 rounded-lg border border-orange-400/30">
+                            <h4 class="text-orange-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-balance-scale-right text-orange-400"></i>
+                                NÍVEL 6 - JUÍZES E PROMOTORES DE PRIMEIRA INSTÂNCIA
+                            </h4>
+                        </div>
+                        <div class="ml-4 mt-2 space-y-2">
+                            <div class="position-card bg-gradient-to-r from-orange-600/20 to-orange-500/20 p-3 rounded border border-orange-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-gavel text-orange-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">1º Juiz(a) Estadual - 1ª Instância</div>
+                                            <div class="text-orange-200 text-xs">Juiz Presidente da Primeira Instância</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="juiz-estadual-1">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="position-card bg-gradient-to-r from-orange-600/20 to-orange-500/20 p-3 rounded border border-orange-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-shield-alt text-orange-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">3º Procurador Geral de Justiça - 1ª Instância</div>
+                                            <div class="text-orange-200 text-xs">Primeira instância do MP</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="procurador-geral-3">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nível 7 - Juízes e Promotores de Base -->
+                    <div class="hierarchy-level">
+                        <div class="level-header bg-gradient-to-r from-teal-600/30 to-teal-500/30 p-3 rounded-lg border border-teal-400/30">
+                            <h4 class="text-teal-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-users text-teal-400"></i>
+                                NÍVEL 7 - JUÍZES E PROMOTORES DE BASE
+                            </h4>
+                        </div>
+                        <div class="ml-4 mt-2 space-y-2">
+                            <div class="position-group">
+                                <div class="text-teal-200 text-xs mb-2 font-medium">Juízes Estaduais (2º ao 4º)</div>
+                                <div class="grid grid-cols-1 gap-2" id="juizes-estaduais-base">
+                                    <!-- Juízes 2-4 serão inseridos dinamicamente -->
+                                </div>
+                            </div>
+                            <div class="position-card bg-gradient-to-r from-teal-600/20 to-teal-500/20 p-3 rounded border border-teal-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-star text-teal-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">1º Promotor - Líder da Promotoria Geral</div>
+                                            <div class="text-teal-200 text-xs">Chefe dos promotores de base</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="promotor-1">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nível 8 - Promotores Auxiliares e Oficiais Sênior -->
+                    <div class="hierarchy-level">
+                        <div class="level-header bg-gradient-to-r from-indigo-600/30 to-indigo-500/30 p-3 rounded-lg border border-indigo-400/30">
+                            <h4 class="text-indigo-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-user-friends text-indigo-400"></i>
+                                NÍVEL 8 - PROMOTORES AUXILIARES E OFICIAIS SÊNIOR
+                            </h4>
+                        </div>
+                        <div class="ml-4 mt-2 space-y-2">
+                            <div class="position-group">
+                                <div class="text-indigo-200 text-xs mb-2 font-medium">Promotores de 1ª Instância (2º ao 6º)</div>
+                                <div class="grid grid-cols-1 gap-2" id="promotores-base">
+                                    <!-- Promotores 2-6 serão inseridos dinamicamente -->
+                                </div>
+                            </div>
+                            <div class="position-card bg-gradient-to-r from-indigo-600/20 to-indigo-500/20 p-3 rounded border border-indigo-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-file-alt text-indigo-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">1º Oficial de Justiça - 2ª Instância</div>
+                                            <div class="text-indigo-200 text-xs">Oficial sênior de segunda instância</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="oficial-2instancia">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nível 9 - Oficiais de Primeira Instância -->
+                    <div class="hierarchy-level">
+                        <div class="level-header bg-gradient-to-r from-gray-600/30 to-gray-500/30 p-3 rounded-lg border border-gray-400/30">
+                            <h4 class="text-gray-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-clipboard-check text-gray-400"></i>
+                                NÍVEL 9 - OFICIAIS DE PRIMEIRA INSTÂNCIA
+                            </h4>
+                        </div>
+                        <div class="ml-4 mt-2 space-y-2">
+                            <div class="position-card bg-gradient-to-r from-gray-600/20 to-gray-500/20 p-3 rounded border border-gray-400/20">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-file-alt text-gray-400"></i>
+                                        <div>
+                                            <div class="text-white font-semibold text-sm">1º Oficial de Justiça - 1ª Instância</div>
+                                            <div class="text-gray-200 text-xs">Oficial de primeira instância</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-indicator" data-position="oficial-1instancia">
+                                        <span class="status-badge bg-red-600 text-white px-2 py-1 rounded text-xs">VAGO</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nível 10 - Funções Essenciais -->
+                    <div class="hierarchy-level">
+                        <div class="level-header bg-gradient-to-r from-cyan-600/30 to-cyan-500/30 p-3 rounded-lg border border-cyan-400/30">
+                            <h4 class="text-cyan-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-briefcase text-cyan-400"></i>
+                                NÍVEL 10 - FUNÇÕES ESSENCIAIS À JUSTIÇA
+                            </h4>
+                        </div>
+                        <div class="ml-4 mt-2 space-y-2">
+                            <div class="position-group">
+                                <div class="text-cyan-200 text-xs mb-2 font-medium">Advogados - 1ª & 2ª Instância</div>
+                                <div class="grid grid-cols-1 gap-2" id="advogados-list">
+                                    <!-- Advogados serão inseridos dinamicamente -->
+                                </div>
+                            </div>
+                            <div class="position-group">
+                                <div class="text-cyan-200 text-xs mb-2 font-medium">Defensores Públicos - 1ª & 2ª Instância</div>
+                                <div class="grid grid-cols-1 gap-2" id="defensores-list">
+                                    <!-- Defensores serão inseridos dinamicamente -->
+                                </div>
+                            </div>
+                            <div class="position-group">
+                                <div class="text-cyan-200 text-xs mb-2 font-medium">Advogados(as) Licenciados</div>
+                                <div class="grid grid-cols-1 gap-2" id="advogados-licenciados-list">
+                                    <!-- Advogados licenciados serão inseridos dinamicamente -->
                                 </div>
                             </div>
                         </div>
