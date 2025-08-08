@@ -1631,6 +1631,28 @@
         let selectedCrimes = []; // Array para múltiplos crimes
         let currentCategory = 'all';
 
+        // === CONFIGURAÇÃO DO TRIBUNAL ===
+        
+        // Logo oficial do tribunal (substitua pela URL real quando disponível)
+        const TRIBUNAL_LOGO = {
+            // URL do logo oficial - SUBSTITUA quando enviar o link
+            url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDAiIGN5PSI0MCIgcj0iNDAiIGZpbGw9IiMxZTQwYWYiLz4KPHN2ZyB4PSIyMCIgeT0iMjAiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Im0xMS45OTkgMGMtNi42MjcgMC0xMiA1LjM3My0xMiAxMiAwIDYuNjI3IDUuMzczIDEyIDEyIDEyczEyLTUuMzczIDEyLTEyYzAtNi42MjctNS4zNzMtMTItMTItMTJ6bTAgMjJjLTUuNTE0IDAtMTAtNC40ODYtMTAtMTBzNC40ODYtMTAgMTAtMTAgMTAgNC40ODYgMTAgMTAtNC40ODYgMTAtMTAgMTB6Ii8+CjxwYXRoIGQ9Im0xNS4wNjMgOC40MzgtMS42MjUtMS42MjUtNS40MzggNS40MzctNS40MzgtNS40MzctMS42MjUgMS42MjUgNS40MzggNS40MzctNS40MzggNS40MzggMS42MjUgMS42MjUgNS40MzgtNS40MzggNS40MzggNS40MzggMS42MjUtMS42MjUtNS40MzgtNS40Mzh6Ii8+Cjwvc3ZnPgo8L3N2Zz4K',
+            // Dimensões
+            width: '80px',
+            height: '80px',
+            alt: 'Brasão do Tribunal de Justiça de Brasilândia'
+        };
+
+        // Função para atualizar o logo do tribunal (quando você enviar o link)
+        function updateTribunalLogo(newLogoUrl, width = '80px', height = '80px') {
+            TRIBUNAL_LOGO.url = newLogoUrl;
+            TRIBUNAL_LOGO.width = width;
+            TRIBUNAL_LOGO.height = height;
+            
+            console.log('Logo do tribunal atualizado:', newLogoUrl);
+            showNotification('Logo do tribunal atualizado com sucesso!', 'success');
+        }
+
         // Inicializar calculadora
         function initializeCalculator() {
             renderCrimesGrid();
@@ -3055,12 +3077,19 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             
             if (!hasData) {
                 document.getElementById('document-preview').innerHTML = `
-                    <div id="document-for-image" class="bg-white text-black p-6 rounded-lg" style="min-height: 600px; font-family: 'Times New Roman', serif; line-height: 1.6;">
-                        <div style="text-align: center; margin-top: 200px;">
+                    <div id="document-for-image" class="bg-white text-black" style="min-height: 800px; font-family: 'Times New Roman', serif; line-height: 1.8; padding: 40px; border: 2px solid #1e40af;">
+                        <div style="text-align: center; margin-bottom: 40px; border-bottom: 2px solid #1e40af; padding-bottom: 20px;">
+                            <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: ${TRIBUNAL_LOGO.width}; height: ${TRIBUNAL_LOGO.height}; margin: 0 auto 15px; display: block;">
+                            <div style="font-size: 16px; font-weight: bold; color: #1e40af; letter-spacing: 1px;">REPÚBLICA FEDERATIVA DO BRASIL</div>
+                            <div style="font-size: 18px; font-weight: bold; color: #1e40af; margin: 5px 0;">TRIBUNAL DE JUSTIÇA</div>
+                            <div style="font-size: 18px; font-weight: bold; color: #1e40af; margin-bottom: 15px;">COMARCA DE BRASILÂNDIA</div>
+                            <div style="font-size: 16px; font-weight: bold; color: #000; text-decoration: underline;">DOCUMENTO</div>
+                        </div>
+                        <div style="text-align: center; margin-top: 100px;">
                             <div style="color: #94a3b8; font-size: 16px;">
                                 <i class="fas fa-file-alt" style="font-size: 60px; margin-bottom: 20px;"></i>
-                                <p>Preencha os dados para ver o preview do documento</p>
-                                <p style="font-size: 14px; margin-top: 10px;">O documento será gerado como imagem PNG</p>
+                                <p><strong>Preencha os dados para ver o preview</strong></p>
+                                <p style="font-size: 14px; margin-top: 10px;">Documento será gerado como <strong>imagem PNG profissional</strong></p>
                             </div>
                         </div>
                     </div>
@@ -3073,17 +3102,52 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             
             // Mostrar preview formatado para conversão em imagem
             document.getElementById('document-preview').innerHTML = `
-                <div id="document-for-image" class="bg-white text-black p-6 rounded-lg" style="min-height: 600px; font-family: 'Times New Roman', serif; line-height: 1.6;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiMxZTQwYWYiLz4KPHN2ZyB4PSIxNSIgeT0iMTUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Im0xMS45OTkgMGMtNi42MjcgMC0xMiA1LjM3My0xMiAxMiAwIDYuNjI3IDUuMzczIDEyIDEyIDEyczEyLTUuMzczIDEyLTEyYzAtNi42MjctNS4zNzMtMTItMTItMTJ6bTAgMjJjLTUuNTE0IDAtMTAtNC40ODYtMTAtMTBzNC40ODYtMTAgMTAtMTAgMTAgNC40ODYgMTAgMTAtNC40ODYgMTAtMTAgMTB6Ii8+CjxwYXRoIGQ9Im0xNS4wNjMgOC40MzgtMS42MjUtMS42MjUtNS40MzggNS40MzctNS40MzgtNS40MzctMS42MjUgMS42MjUgNS40MzggNS40MzctNS40MzggNS40MzggMS42MjUgMS42MjUgNS40MzgtNS40MzggNS40MzggNS40MzggMS42MjUtMS42MjUtNS40MzgtNS40Mzh6Ii8+Cjwvc3ZnPgo8L3N2Zz4K" alt="Brasão" style="width: 60px; height: 60px; margin: 0 auto 10px;">
-                        <h2 style="margin: 0; font-size: 18px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA DE BRASILÂNDIA</h2>
-                        <h3 style="margin: 5px 0 20px; font-size: 16px; font-weight: bold;">${documentTemplates[currentDocumentType].title.toUpperCase()}</h3>
+                <div id="document-for-image" class="bg-white text-black" style="min-height: 800px; font-family: 'Times New Roman', serif; line-height: 1.8; padding: 40px; border: 2px solid #1e40af;">
+                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 2px solid #1e40af; padding-bottom: 20px;">
+                        <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: ${TRIBUNAL_LOGO.width}; height: ${TRIBUNAL_LOGO.height}; margin: 0 auto 15px; display: block;">
+                        <div style="font-size: 16px; font-weight: bold; color: #1e40af; letter-spacing: 1px;">REPÚBLICA FEDERATIVA DO BRASIL</div>
+                        <div style="font-size: 18px; font-weight: bold; color: #1e40af; margin: 5px 0;">TRIBUNAL DE JUSTIÇA</div>
+                        <div style="font-size: 18px; font-weight: bold; color: #1e40af; margin-bottom: 15px;">COMARCA DE BRASILÂNDIA</div>
+                        <div style="font-size: 16px; font-weight: bold; color: #000; text-decoration: underline;">${documentTemplates[currentDocumentType].title.toUpperCase()}</div>
                     </div>
-                    <div style="white-space: pre-line; text-align: justify; font-size: 14px;">
-                        ${content}
+                    <div style="text-align: justify; font-size: 14px; line-height: 1.8;">
+                        ${formatDocumentContent(content)}
                     </div>
                 </div>
             `;
+        }
+
+        // Formatar conteúdo do documento com negritos e formatação profissional
+        function formatDocumentContent(content) {
+            // Aplicar formatação profissional com negritos
+            return content
+                // Excelentíssimo em negrito
+                .replace(/(EXCELENTÍSSIMO\(A\)\s+SENHOR\(A\)\s+DOUTOR\(A\)\s+JUIZ\(A\)\s+DE\s+DIREITO)/g, '<strong>$1</strong>')
+                
+                // Seções principais em negrito
+                .replace(/(DOS FATOS:|DO DIREITO:|DOS PEDIDOS:|DA FUNDAMENTAÇÃO:|DAS PROVAS:|DA SITUAÇÃO ATUAL:|DA ILEGALIDADE\/ABUSO DE PODER:|DOS CRIMES ANTERIORES:|DO COMPORTAMENTO POSTERIOR:|DAS EVIDÊNCIAS DE REABILITAÇÃO:|DA FUNDAMENTAÇÃO LEGAL:|DA MOTIVAÇÃO:|DA EXPERIÊNCIA COM ARMAS:|DOS ANTECEDENTES:|DA DECISÃO RECORRIDA:|TERMOS EM QUE)/g, '<strong>$1</strong>')
+                
+                // Nome do advogado em negrito
+                .replace(/(Dr\(a\)\.\s+[^,]+),/g, '<strong>$1</strong>,')
+                
+                // Dados pessoais em negrito
+                .replace(/(AUTOR:|RÉU:|APELANTE:|PACIENTE:|IMPETRANTE:|REQUERENTE:|PARTE:)/g, '<strong>$1</strong>')
+                .replace(/(PROCESSO Nº:|AUTORIDADE COATORA:|AUTORIDADE IMPETRADA:|PROFISSÃO:|ENDEREÇO:|TEMPO DECORRIDO:|VALOR DA FIANÇA:)/g, '<strong>$1</strong>')
+                
+                // Pede deferimento em negrito
+                .replace(/(Pede deferimento\.)/g, '<strong>$1</strong>')
+                
+                // Assinatura em negrito
+                .replace(/(OAB\s+\d+[.\d]*)/g, '<strong>$1</strong>')
+                
+                // Quebras de linha
+                .replace(/\n/g, '<br>')
+                
+                // Espaçamento entre seções
+                .replace(/(<br><br>)/g, '<br><br>')
+                
+                // Identação para parágrafos
+                .replace(/^(.+)$/gm, '&nbsp;&nbsp;&nbsp;&nbsp;$1');
         }
 
         // Protocolar processo
