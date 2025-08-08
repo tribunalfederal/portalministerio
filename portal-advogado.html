@@ -634,8 +634,8 @@
                     <div class="text-blue-200 text-sm">Documentos</div>
                 </div>
                 <div class="card p-4 text-center">
-                    <div class="text-3xl font-bold text-purple-400 mb-1">89</div>
-                    <div class="text-blue-200 text-sm">Clientes</div>
+                    <div class="text-3xl font-bold text-purple-400 mb-1" id="processos-dashboard">0</div>
+                    <div class="text-blue-200 text-sm">Processos</div>
                 </div>
                 <div class="card p-4 text-center">
                     <div class="text-3xl font-bold text-red-400 mb-1">12</div>
@@ -2188,7 +2188,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             activeCases: 12,
             completedCases: 45,
             documents: 78,
-            clients: 23,
+            processes: 23,
             lastAccess: "Hoje"
         };
 
@@ -3614,10 +3614,18 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const pendentes = processosData.filter(p => p.status === 'protocolado').length;
             const finalizados = processosData.filter(p => p.status === 'finalizado').length;
             
+            // Atualizar estatísticas da seção de processos
             document.getElementById('total-processos').textContent = total;
             document.getElementById('processos-andamento').textContent = andamento;
             document.getElementById('processos-pendentes').textContent = pendentes;
             document.getElementById('processos-finalizados').textContent = finalizados;
+            
+            // Atualizar estatísticas do dashboard principal
+            const processosDiv = document.getElementById('processos-dashboard');
+            if (processosDiv) processosDiv.textContent = total;
+            
+            const profileDiv = document.getElementById('total-processos-profile');
+            if (profileDiv) profileDiv.textContent = total;
         }
 
         // Funções auxiliares
@@ -4245,8 +4253,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                                 <div class="text-blue-200 text-sm">Documentos</div>
                             </div>
                             <div class="bg-slate-800/30 p-3 rounded text-center">
-                                <div class="text-purple-400 text-2xl font-bold">23</div>
-                                <div class="text-blue-200 text-sm">Clientes</div>
+                                <div class="text-purple-400 text-2xl font-bold" id="total-processos-profile">0</div>
+                                <div class="text-blue-200 text-sm">Processos</div>
                             </div>
                         </div>
                     </div>
