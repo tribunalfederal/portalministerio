@@ -56,7 +56,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         
         // Configuração Firebase
         const firebaseConfig = {
@@ -74,9 +74,9 @@
         
         window.firebaseAuth = auth;
         window.firebaseDB = db;
-        window.firebaseModules = { signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc };
+        window.firebaseModules = { signOut, onAuthStateChanged, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot };
         
-        console.log('🔥 Firebase inicializado no Portal do Promotor');
+        console.log('🔥 Firebase inicializado no Portal do Promotor v3.0');
 
         // Sistema de conectividade simplificado para portais
         let firebaseStatus = { isOnline: false };
@@ -788,12 +788,22 @@
             }
         });
 
-        // Atualizar interface com dados do usuário
+        // Atualizar interface com dados do usuário (v3.0 - seguro)
         function atualizarInterfaceUsuario() {
             if (usuarioLogado) {
-                document.getElementById('usuario-nome').textContent = usuarioLogado.nome;
-                document.getElementById('usuario-titulo').textContent = usuarioLogado.titulo || 'Promotor de Justiça';
-                document.getElementById('usuario-oab').textContent = `MP: ${usuarioLogado.oab || 'N/A'}`;
+                // Verificar e atualizar elementos se existirem
+                const nomeEl = document.getElementById('nome-usuario');
+                const cargoEl = document.getElementById('cargo-usuario');
+                
+                if (nomeEl) {
+                    nomeEl.textContent = usuarioLogado.nome || 'Usuário';
+                }
+                
+                if (cargoEl) {
+                    cargoEl.textContent = usuarioLogado.titulo || 'Promotor de Justiça';
+                }
+                
+                console.log('✅ Interface do promotor atualizada:', usuarioLogado.nome);
             }
         }
 
