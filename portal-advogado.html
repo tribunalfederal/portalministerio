@@ -56,7 +56,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         
         // Configuração Firebase
         const firebaseConfig = {
@@ -83,7 +83,8 @@
             collection, 
             addDoc, 
             getDocs, 
-            onSnapshot 
+            onSnapshot,
+            deleteDoc
         };
         
         console.log('🔥 Firebase inicializado no Portal do Advogado v3.0');
@@ -169,6 +170,15 @@
                             <div class="text-xs text-slate-400 truncate" id="cargo-usuario"></div>
                         </div>
                     </div>
+
+                    <!-- Botão Notificações -->
+                    <button onclick="mostrarNotificacoes()" class="bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 hover:text-yellow-300 px-3 py-2.5 rounded-lg border border-yellow-500/20 transition-all text-sm h-12 flex items-center relative" id="btn-notificacoes">
+                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Notificações</span>
+                        <span id="badge-notificacoes" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                    </button>
 
                     <!-- Botão Admin -->
                     <button onclick="mostrarPainelAdmin()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 px-3 py-2.5 rounded-lg border border-red-500/20 transition-all hidden text-sm h-12 flex items-center" id="btn-admin">
@@ -560,6 +570,30 @@
                     <div id="log-processos-advogado" class="bg-gray-900 rounded p-3 max-h-32 overflow-y-auto text-sm font-mono">
                         <div class="text-green-400">[07/08/2025 15:30:25] Portal do Advogado iniciado</div>
                         <div class="text-blue-400">[07/08/2025 15:30:26] Sistema de processos 24/7 conectado</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="secao-notificacoes" class="hidden">
+            <div class="portal-card rounded-2xl p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-white text-2xl font-bold">📬 Minhas Notificações</h2>
+                    <div class="flex gap-2">
+                        <button onclick="marcarTodasComoLidas()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all text-sm">
+                            ✅ Marcar Todas como Lidas
+                        </button>
+                        <button onclick="limparNotificacoes()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-all text-sm">
+                            🗑️ Limpar Todas
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="lista-notificacoes" class="space-y-4 max-h-96 overflow-y-auto">
+                    <div class="text-center text-white/70 py-8">
+                        <span class="text-4xl mb-4 block">📭</span>
+                        <p>Nenhuma notificação encontrada.</p>
+                        <p class="text-sm mt-2">Você receberá notificações sobre processos e atividades jurídicas.</p>
                     </div>
                 </div>
             </div>
@@ -1133,16 +1167,17 @@
             alert(`📄 Gerando contrato de ${tipo}...\n\n(Em desenvolvimento - gerador automático de contratos)`);
         }
 
-        // Função para voltar ao portal principal
-        function voltarParaPortalPrincipal() {
-            // Definir flag para não fazer redirecionamento automático
-            localStorage.setItem('ficarNoPortalPrincipal', 'true');
-            window.location.href = 'index.html';
+        // Função global de logout (compatibilidade)
+        function logout() {
+            fazerLogout();
         }
 
-        // Logout
+        // Logout com limpeza de notificações
         async function fazerLogout() {
             try {
+                // Limpar notificações lidas do Firestore antes de fazer logout
+                await limparNotificacoesLogoff();
+                
                 if (window.firebaseModules && window.firebaseAuth) {
                     await window.firebaseModules.signOut(window.firebaseAuth);
                 }
@@ -1430,7 +1465,13 @@
             }
         }
 
-        // Iniciar listener de notificações específicas do advogado (v3.0 otimizado)
+        // ===== SISTEMA DE NOTIFICAÇÕES INTELIGENTE v3.0 =====
+        
+        let notificacoesAtivas = [];
+        let notificacoesLidas = [];
+        let sessionId = `advogado_${Date.now()}`;
+        
+        // Iniciar listener de notificações otimizado
         function iniciarListenerNotificacoesAdvogado() {
             if (!window.firebaseDB) return;
             
@@ -1438,26 +1479,276 @@
                 const { collection, onSnapshot } = window.firebaseModules;
                 const notificacoesRef = collection(window.firebaseDB, 'notificacoes');
                 
-                // Consulta simples sem orderBy para evitar índices
+                // Escutar apenas notificações não lidas para este usuário/tipo
                 onSnapshot(notificacoesRef, (snapshot) => {
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === 'added') {
-                            const notificacao = change.doc.data();
-                            // Mostrar notificações relevantes para advogados
-                            if (notificacao.destinatario === 'advogados' || 
-                                notificacao.tipo === 'intimacao' || 
-                                notificacao.tipo === 'designacao' ||
-                                notificacao.tipo === 'sentenca') {
-                                mostrarNotificacaoAdvogado(notificacao);
+                            const notificacao = { id: change.doc.id, ...change.doc.data() };
+                            
+                            // Verificar se é para advogados e não foi lida nesta sessão
+                            if (isNotificacaoParaAdvogado(notificacao) && !foiLidaNestaSessao(notificacao.id)) {
+                                adicionarNotificacaoLista(notificacao);
+                                mostrarNotificacaoPopup(notificacao);
+                                atualizarBadgeNotificacoes();
                                 adicionarLogProcessos(`🔔 ${notificacao.titulo}: ${notificacao.mensagem}`);
                             }
                         }
                     });
                 });
                 
-                console.log('✅ Listener de notificações iniciado - Portal Advogado');
+                console.log('✅ Sistema de notificações inteligente iniciado - Portal Advogado');
             } catch (error) {
                 console.error('❌ Erro ao iniciar listener:', error);
+            }
+        }
+        
+        // Verificar se notificação é para advogados
+        function isNotificacaoParaAdvogado(notificacao) {
+            return notificacao.ativo && (
+                notificacao.destinatario === 'advogados' || 
+                notificacao.tipo === 'intimacao' || 
+                notificacao.tipo === 'designacao' ||
+                notificacao.tipo === 'sentenca' ||
+                notificacao.tipo === 'novo-processo'
+            );
+        }
+        
+        // Verificar se foi lida nesta sessão
+        function foiLidaNestaSessao(notifId) {
+            return notificacoesLidas.includes(notifId);
+        }
+        
+        // Adicionar notificação à lista
+        function adicionarNotificacaoLista(notificacao) {
+            // Evitar duplicatas
+            if (!notificacoesAtivas.find(n => n.id === notificacao.id)) {
+                notificacoesAtivas.unshift(notificacao);
+                renderizarListaNotificacoes();
+            }
+        }
+        
+        // Mostrar popup de notificação
+        function mostrarNotificacaoPopup(notificacao) {
+            const container = document.getElementById('container-notificacoes-advogado') || criarContainerNotificacoes();
+            
+            const div = document.createElement('div');
+            div.className = 'notification-toast transform translate-x-full bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-lg shadow-lg border border-blue-500';
+            div.id = `notif-popup-${notificacao.id}`;
+            
+            const tipoIcon = {
+                'novo-processo': '📋',
+                'intimacao': '📨',
+                'designacao': '👨‍⚖️',
+                'sentenca': '⚖️',
+                'info': 'ℹ️',
+                'urgente': '🚨'
+            };
+            
+            div.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl">${tipoIcon[notificacao.tipo] || '📬'}</div>
+                    <div class="flex-1">
+                        <div class="font-semibold text-sm">${notificacao.titulo}</div>
+                        <div class="text-blue-100 text-xs mt-1">${notificacao.mensagem}</div>
+                        <div class="text-blue-200 text-xs mt-1">${formatarDataNotificacao(notificacao.timestamp)}</div>
+                    </div>
+                    <button onclick="fecharPopupNotificacao('${div.id}', '${notificacao.id}')" class="text-blue-200 hover:text-white text-lg">&times;</button>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            
+            // Animar entrada
+            setTimeout(() => {
+                div.classList.remove('translate-x-full');
+                div.classList.add('translate-x-0');
+            }, 100);
+            
+            // Auto-fechar após 5 segundos
+            setTimeout(() => {
+                fecharPopupNotificacao(div.id, notificacao.id);
+            }, 5000);
+        }
+        
+        // Fechar popup e marcar como lida
+        function fecharPopupNotificacao(divId, notifId) {
+            const popup = document.getElementById(divId);
+            if (popup) {
+                popup.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => popup.remove(), 300);
+            }
+            marcarComoLida(notifId);
+        }
+        
+        // Marcar notificação como lida
+        function marcarComoLida(notifId) {
+            if (!notificacoesLidas.includes(notifId)) {
+                notificacoesLidas.push(notifId);
+                
+                // Atualizar status visual na lista
+                const notif = notificacoesAtivas.find(n => n.id === notifId);
+                if (notif) {
+                    notif.lida = true;
+                    renderizarListaNotificacoes();
+                    atualizarBadgeNotificacoes();
+                }
+            }
+        }
+        
+        // Renderizar lista de notificações
+        function renderizarListaNotificacoes() {
+            const lista = document.getElementById('lista-notificacoes');
+            if (!lista) return;
+            
+            if (notificacoesAtivas.length === 0) {
+                lista.innerHTML = `
+                    <div class="text-center text-white/70 py-8">
+                        <span class="text-4xl mb-4 block">📭</span>
+                        <p>Nenhuma notificação encontrada.</p>
+                        <p class="text-sm mt-2">Você receberá notificações sobre processos e atividades jurídicas.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = notificacoesAtivas.map(notif => {
+                const tipoIcon = {
+                    'novo-processo': '📋',
+                    'intimacao': '📨',
+                    'designacao': '👨‍⚖️',
+                    'sentenca': '⚖️',
+                    'info': 'ℹ️',
+                    'urgente': '�'
+                };
+                
+                const statusClass = notif.lida ? 'bg-gray-700/50 border-gray-600' : 'bg-blue-900/30 border-blue-600/40';
+                const statusIcon = notif.lida ? '✅' : '🔴';
+                
+                return `
+                    <div class="notification-item ${statusClass} rounded-lg p-4 border">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl">${tipoIcon[notif.tipo] || '📬'}</span>
+                                <h4 class="text-white font-bold text-sm">${notif.titulo}</h4>
+                                <span class="text-xs">${statusIcon}</span>
+                            </div>
+                            <div class="text-xs text-white/60">${formatarDataNotificacao(notif.timestamp)}</div>
+                        </div>
+                        
+                        <p class="text-white/80 text-sm mb-3">${notif.mensagem}</p>
+                        
+                        <div class="flex gap-2">
+                            ${!notif.lida ? `
+                                <button onclick="marcarComoLida('${notif.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs transition-all">
+                                    ✅ Marcar como Lida
+                                </button>
+                            ` : ''}
+                            <button onclick="removerNotificacao('${notif.id}')" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-xs transition-all">
+                                🗑️ Remover
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            lista.innerHTML = html;
+        }
+        
+        // Atualizar badge de notificações
+        function atualizarBadgeNotificacoes() {
+            const badge = document.getElementById('badge-notificacoes');
+            const naoLidas = notificacoesAtivas.filter(n => !n.lida).length;
+            
+            if (naoLidas > 0) {
+                badge.textContent = naoLidas > 99 ? '99+' : naoLidas;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+        
+        // Marcar todas como lidas
+        function marcarTodasComoLidas() {
+            notificacoesAtivas.forEach(notif => {
+                if (!notif.lida) {
+                    marcarComoLida(notif.id);
+                }
+            });
+            alert('✅ Todas as notificações foram marcadas como lidas!');
+        }
+        
+        // Remover notificação específica
+        function removerNotificacao(notifId) {
+            notificacoesAtivas = notificacoesAtivas.filter(n => n.id !== notifId);
+            notificacoesLidas = notificacoesLidas.filter(id => id !== notifId);
+            renderizarListaNotificacoes();
+            atualizarBadgeNotificacoes();
+        }
+        
+        // Limpar todas as notificações
+        function limparNotificacoes() {
+            if (confirm('🗑️ Tem certeza que deseja limpar todas as notificações?')) {
+                notificacoesAtivas = [];
+                notificacoesLidas = [];
+                renderizarListaNotificacoes();
+                atualizarBadgeNotificacoes();
+                alert('🗑️ Todas as notificações foram removidas!');
+            }
+        }
+        
+        // Mostrar/ocultar aba de notificações
+        function mostrarNotificacoes() {
+            // Esconder todas as seções
+            document.querySelectorAll('[id^="secao-"]').forEach(s => s.classList.add('hidden'));
+            // Esconder dashboard
+            const cards = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
+            if (cards) cards.style.display = 'none';
+            // Mostrar seção de notificações
+            document.getElementById('secao-notificacoes').classList.remove('hidden');
+            renderizarListaNotificacoes();
+        }
+        
+        // Criar container de popups
+        function criarContainerNotificacoes() {
+            const container = document.createElement('div');
+            container.id = 'container-notificacoes-advogado';
+            container.className = 'fixed top-20 right-4 z-50 space-y-2 max-w-sm';
+            document.body.appendChild(container);
+            return container;
+        }
+        
+        // Formatar data da notificação
+        function formatarDataNotificacao(timestamp) {
+            try {
+                const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+                return date.toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return 'Agora';
+            }
+        }
+        
+        // Cleanup ao fazer logoff - remover notificações lidas do Firestore
+        async function limparNotificacoesLogoff() {
+            if (!window.firebaseDB || notificacoesLidas.length === 0) return;
+            
+            try {
+                const { doc, deleteDoc } = window.firebaseModules;
+                
+                // Remover do Firestore apenas as notificações que foram lidas nesta sessão
+                for (const notifId of notificacoesLidas) {
+                    const notifRef = doc(window.firebaseDB, 'notificacoes', notifId);
+                    await deleteDoc(notifRef);
+                    console.log(`🗑️ Notificação ${notifId} removida do Firestore`);
+                }
+                
+                console.log(`✅ ${notificacoesLidas.length} notificações lidas removidas do Firestore`);
+            } catch (error) {
+                console.error('❌ Erro ao limpar notificações do Firestore:', error);
             }
         }
 
