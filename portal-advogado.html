@@ -2681,11 +2681,23 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             input.value = value;
         }
 
-        // === GERADOR DE DOCUMENTOS ===
+        // === GERADOR DE DOCUMENTOS v2.0 ===
+        // Sistema de geração profissional de documentos jurídicos
+        // Compatível com expansões futuras e novos templates
         
         let currentDocumentType = '';
         
-        // Modelos de documentos
+        // Sistema de configuração para expansões futuras
+        const documentConfig = {
+            version: '2.0',
+            tribunal: 'TRIBUNAL DE JUSTIÇA DE BRASILÂNDIA',
+            comarca: 'COMARCA DE SÃO PAULO',
+            maxFieldLength: 5000,
+            allowedFileTypes: ['png', 'jpg', 'pdf'],
+            enableValidation: true
+        };
+        
+        // Modelos de documentos - Sistema extensível
         const documentTemplates = {
             'peticao-inicial': {
                 title: 'Petição Inicial',
@@ -2746,7 +2758,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 icon: 'fas fa-key',
                 fields: [
                     { name: 'requerente', label: 'Nome do Requerente', type: 'text', required: true },
-                    { name: 'requenteRG', label: 'RG do Requerente', type: 'text', required: true },
+                    { name: 'requerenteRG', label: 'RG do Requerente', type: 'text', required: true },
                     { name: 'numeroProcesso', label: 'Número do Processo', type: 'text', required: true },
                     { name: 'fundamentacao', label: 'Fundamentação Legal', type: 'textarea', required: true },
                     { name: 'medidas', label: 'Medidas Cautelares Propostas', type: 'textarea', required: false },
@@ -2959,6 +2971,12 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Gerar conteúdo do documento
         function generateDocumentContent(type, data) {
+            // Verificar se o template existe
+            if (!documentTemplates[type]) {
+                console.error('Template não encontrado:', type);
+                return 'Erro: Template de documento não encontrado.';
+            }
+            
             const userProfile = JSON.parse(localStorage.getItem('advogado-profile')) || {};
             const currentDate = new Date().toLocaleDateString('pt-BR');
             
@@ -2973,15 +2991,20 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             content += `com escritório localizado em Brasilândia, `;
             content += `vem respeitosamente perante Vossa Excelência para:\n\n`;
 
+            // Função helper para proteger dados faltando
+            const safeData = (field, fallback = '[CAMPO NÃO PREENCHIDO]') => {
+                return data[field] && data[field].trim() ? data[field] : fallback;
+            };
+
             // Conteúdo específico por tipo de documento
             switch(type) {
                 case 'peticao-inicial':
-                    content += `AUTOR: ${data.autor} - RG: ${data.autorRG}\n`;
-                    content += `RÉU: ${data.reu} - RG: ${data.reuRG}\n\n`;
-                    content += `DOS FATOS:\n${data.fatos}\n\n`;
-                    content += `DO CRIME: ${data.crime}\n\n`;
-                    if (data.provas) content += `DAS PROVAS:\n${data.provas}\n\n`;
-                    content += `DOS PEDIDOS:\n${data.pedidos}\n\n`;
+                    content += `AUTOR: ${safeData('autor')} - RG: ${safeData('autorRG')}\n`;
+                    content += `RÉU: ${safeData('reu')} - RG: ${safeData('reuRG')}\n\n`;
+                    content += `DOS FATOS:\n${safeData('fatos')}\n\n`;
+                    content += `DO CRIME: ${safeData('crime')}\n\n`;
+                    if (data.provas && data.provas.trim()) content += `DAS PROVAS:\n${data.provas}\n\n`;
+                    content += `DOS PEDIDOS:\n${safeData('pedidos')}\n\n`;
                     break;
                     
                 case 'recurso-apelacao':
