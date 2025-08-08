@@ -9046,11 +9046,24 @@ document.addEventListener('input', function(e) {
 
         function atualizarProcessoFirebase(processo) {
             if (!window.firebaseDB) return;
-            
             try {
-                const { doc, updateDoc } = window.firebaseModules;
-                // Em uma implementação real, você salvaria o ID do documento
-                console.log('✅ Processo atualizado no Firebase:', processo.numero);
+                const { doc, updateDoc, setDoc } = window.firebaseModules;
+                // O processo precisa ter um id único (campo id ou firebaseId)
+                const processoId = processo.firebaseId || processo.id;
+                if (!processoId) {
+                    console.error('❌ Processo sem id para atualizar no Firestore!');
+                    return;
+                }
+                // Atualiza (ou cria) o documento do processo no Firestore
+                const processoRef = doc(window.firebaseDB, 'processos', processoId);
+                // Salva todos os campos relevantes, incluindo juiz e status
+                setDoc(processoRef, processo, { merge: true })
+                    .then(() => {
+                        console.log('✅ Processo atualizado no Firebase:', processo.numero);
+                    })
+                    .catch((error) => {
+                        console.error('❌ Erro ao atualizar processo:', error);
+                    });
             } catch (error) {
                 console.error('❌ Erro ao atualizar processo:', error);
             }
