@@ -1184,21 +1184,22 @@
                             <div class="bg-green-900/20 rounded-lg p-6 border border-green-400/30">
                                 <h4 class="text-green-300 font-semibold mb-4 flex items-center gap-2">
                                     <i class="fas fa-user text-green-400"></i>
-                                    Dados do Cliente/Requerente
+                                    <span id="cliente-titulo">Dados do Cliente</span>
                                 </h4>
                                 
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <div>
                                         <label class="block text-green-300 font-semibold mb-2">
-                                            <i class="fas fa-user mr-2"></i>Nome do Requerente/Cliente *
+                                            <i class="fas fa-user mr-2"></i><span id="cliente-label">Nome do Cliente *</span>
                                         </label>
                                         <input type="text" id="requerente-nome" required 
-                                               class="w-full px-4 py-3 bg-slate-800/50 border border-green-300/30 rounded-lg text-white focus:border-green-400 focus:outline-none">
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-green-300/30 rounded-lg text-white focus:border-green-400 focus:outline-none"
+                                               placeholder="Nome completo do cliente">
                                     </div>
 
                                     <div>
                                         <label class="block text-green-300 font-semibold mb-2">
-                                            <i class="fas fa-id-card mr-2"></i>RG ou Passaporte do Requerente *
+                                            <i class="fas fa-id-card mr-2"></i><span id="documento-label">RG ou Passaporte *</span>
                                         </label>
                                         <input type="text" id="requerente-documento" required maxlength="10"
                                                class="w-full px-4 py-3 bg-slate-800/50 border border-green-300/30 rounded-lg text-white focus:border-green-400 focus:outline-none"
@@ -1206,9 +1207,93 @@
                                                oninput="formatDocumentInput(this)">
                                         <p class="text-green-300/70 text-xs mt-1">
                                             <i class="fas fa-info-circle mr-1"></i>
-                                            RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)
+                                            <span id="documento-hint">RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)</span>
                                         </p>
                                     </div>
+                                </div>
+
+                                <!-- Informações Específicas por Tipo -->
+                                <div id="info-civil" class="mt-4 p-4 bg-blue-900/20 rounded-lg border border-blue-400/20" style="display: none;">
+                                    <h5 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                                        <i class="fas fa-scales text-blue-400"></i>
+                                        Informações do Processo Civil
+                                    </h5>
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-blue-300 font-semibold mb-2">
+                                                <i class="fas fa-user-times mr-2"></i>Nome do Réu (opcional)
+                                            </label>
+                                            <input type="text" id="reu-nome" 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                                   placeholder="Nome da pessoa/empresa processada">
+                                        </div>
+                                        <div>
+                                            <label class="block text-blue-300 font-semibold mb-2">
+                                                <i class="fas fa-id-card mr-2"></i>CPF/CNPJ do Réu (opcional)
+                                            </label>
+                                            <input type="text" id="reu-documento" 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                                   placeholder="CPF ou CNPJ do réu">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="info-criminal" class="mt-4 p-4 bg-red-900/20 rounded-lg border border-red-400/20" style="display: none;">
+                                    <h5 class="text-red-300 font-semibold mb-3 flex items-center gap-2">
+                                        <i class="fas fa-shield-alt text-red-400"></i>
+                                        Informações do Processo Criminal
+                                    </h5>
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-red-300 font-semibold mb-2">
+                                                <i class="fas fa-building-columns mr-2"></i>Promotor/Ministério Público
+                                            </label>
+                                            <input type="text" id="promotor-nome" 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-red-300/30 rounded-lg text-white focus:border-red-400 focus:outline-none"
+                                                   placeholder="Nome do promotor ou 'Ministério Público'">
+                                        </div>
+                                        <div>
+                                            <label class="block text-red-300 font-semibold mb-2">
+                                                <i class="fas fa-hashtag mr-2"></i>Número do Inquérito/Processo (opcional)
+                                            </label>
+                                            <input type="text" id="inquerito-numero" 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-red-300/30 rounded-lg text-white focus:border-red-400 focus:outline-none"
+                                                   placeholder="Ex: 001.2024.123456-7">
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <label class="block text-red-300 font-semibold mb-2">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>Acusação/Crime Imputado
+                                        </label>
+                                        <textarea id="crime-imputado" rows="2" 
+                                                  class="w-full px-4 py-3 bg-slate-800/50 border border-red-300/30 rounded-lg text-white focus:border-red-400 focus:outline-none"
+                                                  placeholder="Descreva brevemente o crime ou acusação..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tipo de Petição Inicial -->
+                            <div class="bg-purple-900/20 rounded-lg p-6 border border-purple-400/30">
+                                <h4 class="text-purple-300 font-semibold mb-4 flex items-center gap-2">
+                                    <i class="fas fa-gavel text-purple-400"></i>
+                                    Tipo de Petição Inicial
+                                </h4>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-purple-300 font-semibold mb-2">
+                                        <i class="fas fa-scroll mr-2"></i>Natureza da Petição *
+                                    </label>
+                                    <select id="tipo-peticao" required onchange="toggleProcessFields()"
+                                            class="w-full px-4 py-3 bg-slate-800/50 border border-purple-300/30 rounded-lg text-white focus:border-purple-400 focus:outline-none">
+                                        <option value="">Selecione o tipo de petição</option>
+                                        <option value="civil">Petição Inicial Civil (Autor vs Réu)</option>
+                                        <option value="criminal">Petição Inicial Criminal (Defesa do Réu)</option>
+                                    </select>
+                                    <p class="text-purple-300/70 text-xs mt-2">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        <strong>Civil:</strong> Quando você representa o autor de uma ação (cobrança, indenização, etc.)<br>
+                                        <strong>Criminal:</strong> Quando você defende um réu em processo criminal movido pelo Ministério Público
+                                    </p>
                                 </div>
                             </div>
 
@@ -2697,6 +2782,98 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             input.value = value;
         }
 
+        // Alternar campos conforme tipo de petição
+        function toggleProcessFields() {
+            const tipoPeticao = document.getElementById('tipo-peticao').value;
+            const infoCivil = document.getElementById('info-civil');
+            const infoCriminal = document.getElementById('info-criminal');
+            const clienteTitulo = document.getElementById('cliente-titulo');
+            const clienteLabel = document.getElementById('cliente-label');
+            const documentoLabel = document.getElementById('documento-label');
+            const documentoHint = document.getElementById('documento-hint');
+            const tipoProcessoSelect = document.getElementById('tipo-processo');
+
+            // Reset campos
+            infoCivil.style.display = 'none';
+            infoCriminal.style.display = 'none';
+
+            if (tipoPeticao === 'civil') {
+                // Configurar para processo civil
+                clienteTitulo.textContent = 'Dados do Cliente (Autor da Ação)';
+                clienteLabel.textContent = 'Nome do Autor/Cliente *';
+                documentoLabel.textContent = 'RG ou Passaporte do Autor *';
+                documentoHint.textContent = 'RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)';
+                infoCivil.style.display = 'block';
+
+                // Atualizar opções de tipo de processo para civil
+                tipoProcessoSelect.innerHTML = `
+                    <option value="">Selecione o tipo de processo</option>
+                    <optgroup label="🏆 Mais Utilizados em BRASILÂNDIA">
+                        <option value="limpeza-ficha">Limpeza de Ficha Criminal</option>
+                        <option value="porte-armas">Porte de Armas</option>
+                    </optgroup>
+                    <optgroup label="📋 Processos Cíveis">
+                        <option value="acao-cobranca">Ação de Cobrança</option>
+                        <option value="acao-indenizacao">Ação de Indenização</option>
+                        <option value="acao-despejo">Ação de Despejo</option>
+                        <option value="divorcio">Divórcio</option>
+                        <option value="inventario">Inventário</option>
+                        <option value="usucapiao">Usucapião</option>
+                        <option value="consignacao-pagamento">Consignação em Pagamento</option>
+                        <option value="rescisao-contrato">Rescisão de Contrato</option>
+                    </optgroup>
+                    <optgroup label="👨‍💼 Trabalhista">
+                        <option value="reclamacao-trabalhista">Reclamação Trabalhista</option>
+                        <option value="acao-acidente-trabalho">Ação de Acidente de Trabalho</option>
+                    </optgroup>
+                    <optgroup label="🏛️ Administrativo">
+                        <option value="acao-popular">Ação Popular</option>
+                        <option value="mandado-seguranca">Mandado de Segurança</option>
+                    </optgroup>
+                `;
+
+            } else if (tipoPeticao === 'criminal') {
+                // Configurar para processo criminal
+                clienteTitulo.textContent = 'Dados do Cliente (Réu/Acusado)';
+                clienteLabel.textContent = 'Nome do Réu/Acusado *';
+                documentoLabel.textContent = 'RG ou Passaporte do Réu *';
+                documentoHint.textContent = 'RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)';
+                infoCriminal.style.display = 'block';
+
+                // Atualizar opções de tipo de processo para criminal
+                tipoProcessoSelect.innerHTML = `
+                    <option value="">Selecione o tipo de processo</option>
+                    <optgroup label="⚖️ Processos Criminais - Defesa">
+                        <option value="habeas-corpus">Habeas Corpus</option>
+                        <option value="liberdade-provisoria">Pedido de Liberdade Provisória</option>
+                        <option value="revisao-criminal">Revisão Criminal</option>
+                        <option value="contestacao-criminal">Contestação/Defesa Prévia</option>
+                        <option value="alegacoes-finais-criminal">Alegações Finais</option>
+                        <option value="recurso-apelacao-criminal">Recurso de Apelação Criminal</option>
+                        <option value="embargos-declaracao">Embargos de Declaração</option>
+                        <option value="peticao-fianca">Pedido de Fiança</option>
+                    </optgroup>
+                    <optgroup label="📋 Outros Procedimentos">
+                        <option value="relaxamento-prisao">Relaxamento de Prisão</option>
+                        <option value="substituicao-pena">Substituição de Pena</option>
+                        <option value="sursis">Pedido de Sursis</option>
+                    </optgroup>
+                `;
+
+            } else {
+                // Quando nenhum tipo está selecionado
+                clienteTitulo.textContent = 'Dados do Cliente';
+                clienteLabel.textContent = 'Nome do Cliente *';
+                documentoLabel.textContent = 'RG ou Passaporte *';
+                documentoHint.textContent = 'RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)';
+
+                // Resetar opções de tipo de processo
+                tipoProcessoSelect.innerHTML = `
+                    <option value="">Primeiro selecione o tipo de petição</option>
+                `;
+            }
+        }
+
         // === GERADOR DE DOCUMENTOS v2.0 ===
         // Sistema de geração profissional de documentos jurídicos
         // Compatível com expansões futuras e novos templates
@@ -3210,10 +3387,15 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Coletar dados do formulário
         function getProcessFormData() {
-            return {
+            const tipoPeticao = document.getElementById('tipo-peticao').value;
+            
+            const baseData = {
+                // Tipo de Petição
+                tipoPeticao: tipoPeticao,
+                
                 // Dados do Cliente/Requerente
                 requerente: document.getElementById('requerente-nome').value,
-                documentoRequerente: document.getElementById('requerente-documento').value,
+                requerenteDocumento: document.getElementById('requerente-documento').value,
                 
                 // Dados do Advogado Responsável
                 advogadoResponsavel: document.getElementById('advogado-nome').value,
@@ -3222,31 +3404,49 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 // Dados do Processo
                 tipoProcesso: document.getElementById('tipo-processo').value,
                 assunto: document.getElementById('assunto-processo').value,
-                descricao: document.getElementById('descricao-processo').value,
+                descricaoProcesso: document.getElementById('descricao-processo').value,
                 valorCausa: parseFloat(document.getElementById('valor-causa').value) || 0,
                 varaInstancia: document.getElementById('vara-instancia').value,
-                observacoes: document.getElementById('observacoes-processo').value,
-                peticaoAnexada: selectedPetitionFile ? {
-                    nome: selectedPetitionFile.name,
-                    tamanho: selectedPetitionFile.size,
-                    tipo: selectedPetitionFile.type
+                observacoesProcesso: document.getElementById('observacoes-processo').value,
+                peticaoFile: selectedPetitionFile ? {
+                    name: selectedPetitionFile.name,
+                    size: selectedPetitionFile.size,
+                    type: selectedPetitionFile.type
                 } : null
             };
+
+            // Adicionar dados específicos por tipo de petição
+            if (tipoPeticao === 'civil') {
+                baseData.reuNome = document.getElementById('reu-nome').value;
+                baseData.reuDocumento = document.getElementById('reu-documento').value;
+            } else if (tipoPeticao === 'criminal') {
+                baseData.promotorNome = document.getElementById('promotor-nome').value;
+                baseData.inqueritoNumero = document.getElementById('inquerito-numero').value;
+                baseData.crimeImputado = document.getElementById('crime-imputado').value;
+            }
+
+            return baseData;
         }
 
         // Validar formulário
         function validateProcessForm(data) {
-            if (!data.requerente) {
-                showNotification('Nome do requerente é obrigatório', 'error');
+            // Validar tipo de petição
+            if (!data.tipoPeticao) {
+                showNotification('Tipo de petição é obrigatório', 'error');
                 return false;
             }
-            if (!data.documentoRequerente) {
-                showNotification('RG ou Passaporte do requerente é obrigatório', 'error');
+
+            if (!data.requerente) {
+                showNotification('Nome do cliente é obrigatório', 'error');
+                return false;
+            }
+            if (!data.requerenteDocumento) {
+                showNotification('RG ou Passaporte do cliente é obrigatório', 'error');
                 return false;
             }
             
             // Validar RG/Passaporte (apenas números, 5-10 dígitos)
-            const documento = data.documentoRequerente.replace(/\D/g, ''); // Remove não-números
+            const documento = data.requerenteDocumento.replace(/\D/g, ''); // Remove não-números
             if (documento.length < 5 || documento.length > 10) {
                 showNotification('RG ou Passaporte deve ter entre 5 e 10 dígitos', 'error');
                 return false;
@@ -3260,6 +3460,17 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 showNotification('Assunto do processo é obrigatório', 'error');
                 return false;
             }
+
+            // Validações específicas por tipo de petição
+            if (data.tipoPeticao === 'criminal') {
+                if (!data.crimeImputado) {
+                    showNotification('Para processos criminais, é necessário informar a acusação/crime imputado', 'warning');
+                }
+                if (!data.promotorNome) {
+                    data.promotorNome = 'Ministério Público'; // Valor padrão
+                }
+            }
+
             return true;
         }
 
@@ -3501,11 +3712,63 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         </div>
                     </div>
 
-                    <!-- Dados do Requerente -->
+                    <!-- Tipo de Petição -->
+                    <div class="bg-purple-900/20 rounded-lg p-6 border border-purple-400/30">
+                        <h5 class="text-purple-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-gavel text-purple-400"></i>
+                            Tipo de Petição: ${processo.tipoPeticao === 'civil' ? 'Civil (Autor vs Réu)' : 'Criminal (Defesa do Réu)'}
+                        </h5>
+                        
+                        ${processo.tipoPeticao === 'civil' ? `
+                            <!-- Informações Específicas - Civil -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${processo.reuNome ? `
+                                <div class="text-white">
+                                    <strong>Nome do Réu:</strong><br>
+                                    ${safeData(processo.reuNome)}
+                                </div>
+                                ` : ''}
+                                ${processo.reuDocumento ? `
+                                <div class="text-white">
+                                    <strong>CPF/CNPJ do Réu:</strong><br>
+                                    ${safeData(processo.reuDocumento)}
+                                </div>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+
+                        ${processo.tipoPeticao === 'criminal' ? `
+                            <!-- Informações Específicas - Criminal -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="text-white">
+                                    <strong>Promotor/Ministério Público:</strong><br>
+                                    ${safeData(processo.promotorNome) || 'Ministério Público'}
+                                </div>
+                                ${processo.inqueritoNumero ? `
+                                <div class="text-white">
+                                    <strong>Número do Inquérito:</strong><br>
+                                    ${safeData(processo.inqueritoNumero)}
+                                </div>
+                                ` : ''}
+                            </div>
+                            ${processo.crimeImputado ? `
+                            <div class="mt-4">
+                                <div class="text-white">
+                                    <strong>Acusação/Crime Imputado:</strong><br>
+                                    <div class="mt-2 p-3 bg-red-900/30 rounded-lg border border-red-400/20">
+                                        ${safeData(processo.crimeImputado)}
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+                        ` : ''}
+                    </div>
+
+                    <!-- Dados do Cliente/Requerente -->
                     <div class="bg-green-900/20 rounded-lg p-6 border border-green-400/30">
                         <h5 class="text-green-300 font-semibold mb-4 flex items-center gap-2">
                             <i class="fas fa-user text-green-400"></i>
-                            Dados do Requerente/Cliente
+                            ${processo.tipoPeticao === 'civil' ? 'Dados do Cliente (Autor)' : 'Dados do Cliente (Réu/Acusado)'}
                         </h5>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="text-white">
@@ -3603,6 +3866,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             closeProcessModal();
 
             // Preencher formulário com dados do processo
+            document.getElementById('tipo-peticao').value = processo.tipoPeticao || '';
+            toggleProcessFields(); // Atualizar campos conforme tipo de petição
+            
             document.getElementById('requerente-nome').value = processo.requerente || '';
             document.getElementById('requerente-documento').value = processo.requerenteDocumento || '';
             document.getElementById('tipo-processo').value = processo.tipoProcesso || '';
@@ -3611,6 +3877,16 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.getElementById('valor-causa').value = processo.valorCausa || '';
             document.getElementById('vara-instancia').value = processo.varaInstancia || '';
             document.getElementById('observacoes-processo').value = processo.observacoesProcesso || '';
+
+            // Preencher campos específicos por tipo
+            if (processo.tipoPeticao === 'civil') {
+                document.getElementById('reu-nome').value = processo.reuNome || '';
+                document.getElementById('reu-documento').value = processo.reuDocumento || '';
+            } else if (processo.tipoPeticao === 'criminal') {
+                document.getElementById('promotor-nome').value = processo.promotorNome || '';
+                document.getElementById('inquerito-numero').value = processo.inqueritoNumero || '';
+                document.getElementById('crime-imputado').value = processo.crimeImputado || '';
+            }
 
             // Configurar modo de edição
             isEditingProcess = true;
