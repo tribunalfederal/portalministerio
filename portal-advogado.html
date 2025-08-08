@@ -2368,26 +2368,33 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 const modals = ['profileModal', 'hierarchyModal', 'settingsModal'];
                 modals.forEach(modalId => {
                     const modal = document.getElementById(modalId);
-                    if (!modal.classList.contains('hidden')) {
+                    if (modal && !modal.classList.contains('hidden')) {
                         closeModal(modalId);
                     }
                 });
                 
                 // Modal de processo
                 const modalProcesso = document.getElementById('modal-processo');
-                if (modalProcesso && modalProcesso.style.display === 'flex') {
+                if (modalProcesso && !modalProcesso.classList.contains('hidden')) {
                     closeProcessModal();
                 }
                 
-                // Modal de documentos (se visível)
-                const modalDocumento = document.querySelector('.modal[style*="flex"]');
-                if (modalDocumento && modalDocumento.id !== 'modal-processo') {
-                    // Fechar modal de documento
-                    const cancelButton = modalDocumento.querySelector('button[onclick*="cancelDocument"], button[onclick*="hideDocumentModal"], button[onclick*="closeModal"]');
-                    if (cancelButton) {
-                        cancelButton.click();
-                    }
+                // Modal do gerador de documentos
+                const documentModal = document.getElementById('document-generator-modal');
+                if (documentModal && !documentModal.classList.contains('hidden')) {
+                    closeDocumentGenerator();
                 }
+                
+                // Qualquer modal com a classe 'modal' que esteja visível
+                const allModals = document.querySelectorAll('.modal');
+                allModals.forEach(modal => {
+                    if (!modal.classList.contains('hidden') && modal.style.display !== 'none') {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                        document.body.classList.remove('modal-open');
+                        document.documentElement.classList.remove('modal-open');
+                    }
+                });
                 
                 // Formulário de novo processo
                 const novoProcessoForm = document.getElementById('novo-processo-form');
@@ -3037,9 +3044,18 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 title: 'Pedido de Limpeza de Ficha',
                 icon: 'fas fa-eraser',
                 fields: [
+                    { name: 'tipoPeticao', label: 'Tipo de Processo', type: 'select', required: true, 
+                      options: [
+                          { value: '', text: 'Selecione o tipo de processo' },
+                          { value: 'civil', text: 'Processo Civil' },
+                          { value: 'criminal', text: 'Processo Criminal' }
+                      ] 
+                    },
                     { name: 'requerente', label: 'Nome do Requerente', type: 'text', required: true },
                     { name: 'requerenteRG', label: 'RG do Requerente', type: 'text', required: true },
-                    { name: 'crimesAnteriores', label: 'Crimes Anteriores', type: 'textarea', required: true },
+                    { name: 'outraParte', label: 'Nome da Outra Parte', type: 'text', required: false, 
+                      hint: 'Civil: Nome do Réu/Interessado | Criminal: Ministério Público' },
+                    { name: 'crimesAnteriores', label: 'Crimes/Processos Anteriores', type: 'textarea', required: true },
                     { name: 'tempoDecorrido', label: 'Tempo Decorrido', type: 'text', required: true },
                     { name: 'comportamento', label: 'Comportamento Posterior', type: 'textarea', required: true },
                     { name: 'reabilitacao', label: 'Evidências de Reabilitação', type: 'textarea', required: true },
@@ -3081,6 +3097,16 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                                     ${field.required ? 'required' : ''}
                                     oninput="updateDocumentPreview()"
                                 ></textarea>
+                            ` : field.type === 'select' ? `
+                                <select 
+                                    id="field-${field.name}" 
+                                    class="w-full p-3 bg-slate-800/50 border border-blue-300/20 rounded text-white" 
+                                    ${field.required ? 'required' : ''}
+                                    onchange="updateDocumentPreview(); handleDocumentTypeChange('${field.name}')"
+                                >
+                                    ${field.options.map(option => `<option value="${option.value}">${option.text}</option>`).join('')}
+                                </select>
+                                ${field.hint ? `<p class="text-blue-300/70 text-xs mt-2">${field.hint}</p>` : ''}
                             ` : `
                                 <input 
                                     type="${field.type}" 
@@ -3097,7 +3123,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             `;
 
             document.getElementById('generator-content').innerHTML = formHTML;
-            document.getElementById('document-generator-modal').style.display = 'flex';
+            const modal = document.getElementById('document-generator-modal');
+            modal.style.display = 'flex';
+            modal.classList.remove('hidden');
             
             // Inicializar preview vazio
             updateDocumentPreview();
@@ -3106,7 +3134,32 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Fechar gerador
         function closeDocumentGenerator() {
             document.getElementById('document-generator-modal').style.display = 'none';
+            document.getElementById('document-generator-modal').classList.add('hidden');
             currentDocumentType = '';
+        }
+
+        // Lidar com mudanças no tipo de documento (civil/criminal)
+        function handleDocumentTypeChange(fieldName) {
+            if (fieldName === 'tipoPeticao') {
+                const tipoPeticao = document.getElementById('field-tipoPeticao').value;
+                const clienteLabel = document.querySelector('label[for="field-cliente"]');
+                const outraParteField = document.getElementById('field-outraParte');
+                const outraParteLabel = document.querySelector('label[for="field-outraParte"]');
+                
+                if (tipoPeticao === 'civil') {
+                    if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente (Autor) <span class="text-red-400">*</span>';
+                    if (outraParteField) outraParteField.placeholder = 'Nome do Réu';
+                    if (outraParteLabel) outraParteLabel.textContent = 'Nome do Réu';
+                } else if (tipoPeticao === 'criminal') {
+                    if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente (Réu/Acusado) <span class="text-red-400">*</span>';
+                    if (outraParteField) outraParteField.placeholder = 'Ministério Público';
+                    if (outraParteLabel) outraParteLabel.textContent = 'Autor da Ação';
+                } else {
+                    if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente <span class="text-red-400">*</span>';
+                    if (outraParteField) outraParteField.placeholder = 'Nome da outra parte';
+                    if (outraParteLabel) outraParteLabel.textContent = 'Nome da Outra Parte';
+                }
+            }
         }
 
         // Gerar documento
