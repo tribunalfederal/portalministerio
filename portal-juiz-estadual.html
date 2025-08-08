@@ -1058,6 +1058,13 @@
                         usuarioLogado = JSON.parse(dadosUsuario);
                         console.log('✅ Dados do usuário encontrados:', usuarioLogado.nome);
                         atualizarInterfaceUsuario();
+                        
+                        // Inicializar sistema de membros online
+                        setTimeout(() => {
+                            inicializarSistemaMembrosOnlineJuizEstadual();
+                            console.log('👥 Sistema de membros online iniciado - Juiz Estadual');
+                        }, 2000);
+                        
                         return;
                     } catch (parseError) {
                         console.error('❌ Erro ao fazer parse dos dados do usuário:', parseError);
@@ -1086,6 +1093,12 @@
                                 };
                                 localStorage.setItem('usuarioLogadoAtual', JSON.stringify(usuarioLogado));
                                 atualizarInterfaceUsuario();
+                                
+                                // Inicializar sistema de membros online para admin
+                                setTimeout(() => {
+                                    inicializarSistemaMembrosOnlineJuizEstadual();
+                                    console.log('👥 Sistema de membros online iniciado - Juiz Estadual Admin');
+                                }, 2000);
                             } else {
                                 // Para outros usuários, redirecionar para configuração
                                 console.log('⚠️ Usuário sem dados completos, redirecionando...');
@@ -2903,6 +2916,109 @@
             const modal = document.getElementById('modal-hierarquia');
             if (modal) {
                 modal.remove();
+            }
+        }
+
+        // ===== SISTEMA DE MEMBROS ONLINE JUIZ ESTADUAL =====
+        
+        // Inicializar sistema de membros online
+        function inicializarSistemaMembrosOnlineJuizEstadual() {
+            try {
+                console.log('👥 [JUIZ ESTADUAL] Inicializando sistema de membros online...');
+                
+                if (!window.firebaseDB || !window.firebaseModules) {
+                    console.warn('⚠️ [JUIZ ESTADUAL] Firebase não disponível para membros online');
+                    return;
+                }
+                
+                // Registrar presença online
+                registrarPresencaOnlineJuizEstadual();
+                
+                // Configurar listener para usuários online
+                configurarListenerUsuariosOnlineJuizEstadual();
+                
+                // Atualizar a cada 30 segundos
+                setInterval(() => {
+                    registrarPresencaOnlineJuizEstadual();
+                    atualizarContadorMembrosOnlineJuizEstadual();
+                }, 30000);
+                
+                console.log('✅ [JUIZ ESTADUAL] Sistema de membros online iniciado');
+            } catch (error) {
+                console.error('❌ [JUIZ ESTADUAL] Erro ao inicializar membros online:', error);
+            }
+        }
+        
+        // Registrar presença online
+        function registrarPresencaOnlineJuizEstadual() {
+            if (!usuarioLogado || !window.firebaseDB) return;
+            
+            try {
+                const { doc, setDoc } = window.firebaseModules;
+                const presencaRef = doc(window.firebaseDB, 'usuariosOnline', usuarioLogado.email || 'anonimo');
+                
+                setDoc(presencaRef, {
+                    nome: usuarioLogado.nome || 'Usuário',
+                    cargo: usuarioLogado.cargo || 'Juiz Estadual',
+                    portal: 'Portal do Juiz Estadual',
+                    nivel: usuarioLogado.nivel || 7,
+                    timestamp: new Date(),
+                    ativo: true
+                }, { merge: true });
+                
+            } catch (error) {
+                console.warn('⚠️ [JUIZ ESTADUAL] Erro ao registrar presença:', error);
+            }
+        }
+        
+        // Configurar listener para usuários online
+        function configurarListenerUsuariosOnlineJuizEstadual() {
+            try {
+                const { collection, onSnapshot } = window.firebaseModules;
+                const usuariosRef = collection(window.firebaseDB, 'usuariosOnline');
+                
+                onSnapshot(usuariosRef, (snapshot) => {
+                    usuariosOnline = {};
+                    snapshot.docs.forEach(doc => {
+                        usuariosOnline[doc.id] = doc.data();
+                    });
+                    atualizarContadorMembrosOnlineJuizEstadual();
+                });
+                
+            } catch (error) {
+                console.warn('⚠️ [JUIZ ESTADUAL] Erro no listener de usuários:', error);
+            }
+        }
+        
+        // Atualizar contador de membros online
+        function atualizarContadorMembrosOnlineJuizEstadual() {
+            if (!usuariosOnline) return;
+            
+            const agora = new Date();
+            const usuariosAtivos = Object.values(usuariosOnline).filter(usuario => {
+                if (!usuario.timestamp) return false;
+                const timestamp = usuario.timestamp?.toDate ? usuario.timestamp.toDate() : new Date(usuario.timestamp);
+                const diffMinutos = (agora - timestamp) / (1000 * 60);
+                return diffMinutos <= 2;
+            });
+            
+            const totalOnline = usuariosAtivos.length;
+            
+            // Atualizar contadores
+            const contadorBtn = document.getElementById('contador-btn-estadual');
+            const contadorMembros = document.getElementById('contador-membros-estadual');
+            const btnMembrosOnline = document.getElementById('btn-membros-online-estadual');
+            
+            if (contadorBtn) contadorBtn.textContent = totalOnline;
+            if (contadorMembros) contadorMembros.textContent = totalOnline;
+            
+            // Mostrar/ocultar botão
+            if (btnMembrosOnline) {
+                if (totalOnline >= 1) {
+                    btnMembrosOnline.classList.remove('hidden');
+                } else {
+                    btnMembrosOnline.classList.add('hidden');
+                }
             }
         }
 
