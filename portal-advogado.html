@@ -189,6 +189,82 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary-blue);
         }
+
+        /* Crime Category Tabs */
+        .crime-category-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .crime-category-tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .crime-category-tab.active {
+            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+            color: white;
+            border-color: var(--secondary-blue);
+        }
+
+        /* Crime Cards */
+        .crime-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .crime-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--secondary-blue);
+            transform: translateY(-2px);
+        }
+
+        .crime-card.selected {
+            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+            border-color: var(--secondary-blue);
+            color: white;
+        }
+
+        .crime-card.selected:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .crime-card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
+        }
+
+        .crime-card-article {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+        }
+
+        .crime-card.selected .crime-card-article {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .crime-card-penalty {
+            font-size: 0.75rem;
+            color: #fbbf24;
+            font-weight: 500;
+        }
     </style>
 </head>
 
@@ -381,9 +457,9 @@
                 </button>
                 <h2 class="text-white text-3xl font-bold mb-2">
                     <i class="fas fa-calculator mr-3 text-red-400"></i>
-                    Calculadora de Sentenças v4.0 - Brasilândia
+                    Calculadora de Sentenças v5.0 - Brasilândia
                 </h2>
-                <p class="text-blue-200">Sistema oficial de cálculo de sentenças conforme Código Penal de Brasilândia</p>
+                <p class="text-blue-200">Sistema oficial com interface intuitiva e todos os crimes do Código Penal de Brasilândia</p>
             </div>
 
             <div class="grid-responsive grid-main gap-8">
@@ -396,56 +472,82 @@
                             Seleção do Crime
                         </h3>
                         
-                        <div class="mb-4">
+                        <!-- Busca Global -->
+                        <div class="mb-6">
                             <label class="block text-blue-200 text-sm font-medium mb-2">Buscar Crime:</label>
                             <div class="relative">
                                 <input 
                                     type="text" 
                                     id="searchCrime" 
-                                    placeholder="Digite o nome do crime..."
+                                    placeholder="Digite o nome do crime ou artigo..."
                                     class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white placeholder-blue-300/50 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
                                     onkeyup="filterCrimes()"
                                 >
                                 <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
                             </div>
                         </div>
-                        
+
+                        <!-- Abas de Categorias -->
                         <div class="mb-4">
-                            <label class="block text-blue-200 text-sm font-medium mb-2">Crime Selecionado:</label>
-                            <select 
-                                id="crimeSelect" 
-                                class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
-                                onchange="updateCrimeInfo()"
-                            >
-                                <option value="">Selecione um crime...</option>
-                            </select>
+                            <nav class="flex flex-wrap gap-2">
+                                <button onclick="showCrimeCategory('all')" class="crime-category-tab active" data-category="all">
+                                    <i class="fas fa-th-large mr-2"></i>Todos
+                                </button>
+                                <button onclick="showCrimeCategory('Trânsito')" class="crime-category-tab" data-category="Trânsito">
+                                    <i class="fas fa-car mr-2"></i>Trânsito
+                                </button>
+                                <button onclick="showCrimeCategory('Contra a Pessoa')" class="crime-category-tab" data-category="Contra a Pessoa">
+                                    <i class="fas fa-user-injured mr-2"></i>Pessoa
+                                </button>
+                                <button onclick="showCrimeCategory('Contra o Patrimônio')" class="crime-category-tab" data-category="Contra o Patrimônio">
+                                    <i class="fas fa-coins mr-2"></i>Patrimônio
+                                </button>
+                                <button onclick="showCrimeCategory('Contra a Ordem Pública')" class="crime-category-tab" data-category="Contra a Ordem Pública">
+                                    <i class="fas fa-university mr-2"></i>Ordem Pública
+                                </button>
+                                <button onclick="showCrimeCategory('Armas e Drogas')" class="crime-category-tab" data-category="Armas e Drogas">
+                                    <i class="fas fa-ban mr-2"></i>Armas/Drogas
+                                </button>
+                            </nav>
+                        </div>
+
+                        <!-- Grid de Crimes -->
+                        <div id="crimesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
+                            <!-- Crimes serão inseridos aqui dinamicamente -->
                         </div>
                         
-                        <!-- Informações do Crime -->
-                        <div id="crimeInfo" class="hidden bg-slate-800/30 rounded-lg p-4 border border-blue-300/20">
-                            <h4 class="text-white font-semibold mb-2">Informações do Crime:</h4>
+                        <!-- Crime Selecionado -->
+                        <div id="selectedCrimeInfo" class="hidden mt-6 bg-slate-800/30 rounded-lg p-4 border border-blue-300/20">
+                            <h4 class="text-white font-semibold mb-2">Crime Selecionado:</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                 <div>
+                                    <span class="text-blue-300">Nome:</span>
+                                    <span id="selectedCrimeName" class="text-white font-medium"></span>
+                                </div>
+                                <div>
+                                    <span class="text-blue-300">Artigo:</span>
+                                    <span id="selectedCrimeArticle" class="text-white font-medium"></span>
+                                </div>
+                                <div>
                                     <span class="text-blue-300">Serviços Comunitários:</span>
-                                    <span id="crimeServices" class="text-white font-medium"></span>
+                                    <span id="selectedCrimeServices" class="text-white font-medium"></span>
                                 </div>
                                 <div>
                                     <span class="text-blue-300">Multa:</span>
-                                    <span id="crimeFine" class="text-white font-medium"></span>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <span class="text-blue-300">Artigo:</span>
-                                    <span id="crimeArtigo" class="text-white font-medium"></span>
+                                    <span id="selectedCrimeFine" class="text-white font-medium"></span>
                                 </div>
                                 <div class="md:col-span-2">
                                     <span class="text-blue-300">Categoria:</span>
-                                    <span id="crimeCategory" class="text-white font-medium"></span>
+                                    <span id="selectedCrimeCategory" class="text-white font-medium"></span>
                                 </div>
                                 <div class="md:col-span-2">
                                     <span class="text-blue-300">Descrição:</span>
-                                    <span id="crimeDescription" class="text-white font-medium"></span>
+                                    <span id="selectedCrimeDescription" class="text-white font-medium"></span>
                                 </div>
                             </div>
+                            <button onclick="clearCrimeSelection()" class="mt-3 text-red-400 hover:text-red-300 text-sm">
+                                <i class="fas fa-times mr-1"></i>Limpar seleção
+                            </button>
                         </div>
                     </div>
 
@@ -742,7 +844,7 @@
 
         // === CALCULADORA DE PENAS - SISTEMA COMPLETO ===
         
-        // Base de dados de crimes - CÓDIGO PENAL DE BRASILÂNDIA
+        // Base de dados de crimes - CÓDIGO PENAL DE BRASILÂNDIA COMPLETO
         const crimesDatabase = [
             // === CRIMES DE TRÂNSITO ===
             { name: "Alta Velocidade", services: 0, fine: 600, article: "Art. 218", category: "Trânsito", 
@@ -787,6 +889,8 @@
               description: "Matar alguém em razão de imprudência, negligência ou imperícia" },
             { name: "Lesão corporal", services: 3, fine: 550, article: "Art. 129", category: "Contra a Pessoa", 
               description: "Ofender a integridade física ou saúde de outrem" },
+            { name: "Lesão corporal seguida de morte", services: 30, fine: 1500, article: "Art. 129 III", category: "Contra a Pessoa", 
+              description: "Ofender a integridade física ou saúde de outrem" },
             { name: "Calúnia", services: 10, fine: 450, article: "Art. 130", category: "Contra a Pessoa", 
               description: "Imputar falsamente a alguém fato definido como crime" },
             { name: "Difamação", services: 10, fine: 450, article: "Art. 139", category: "Contra a Pessoa", 
@@ -797,22 +901,20 @@
               description: "Privar alguém de sua liberdade, mediante sequestro ou cárcere privado" },
             { name: "Genocídio", services: 60, fine: 3000, article: "Art. 3", category: "Contra a Pessoa", 
               description: "Praticar homicídio doloso, direcionado por motivos de etnia ou condição do sexo feminino" },
-            { name: "Lesão corporal seguida de morte", services: 30, fine: 1500, article: "Art. 129 III", category: "Contra a Pessoa", 
-              description: "Ofender a integridade física ou saúde de outrem" },
             { name: "Incitação e/ou apologia ao crime", services: 25, fine: 850, article: "Art. 287", category: "Contra a Pessoa", 
               description: "Fazer apologia de fato criminoso ou de autor de crime, elogiar a prática de crimes" },
 
             // === CRIMES CONTRA O PATRIMÔNIO ===
-            { name: "Furto qualificado", services: 30, fine: 550, article: "Art. 155 I", category: "Contra o Patrimônio", 
-              description: "Subtrair, para si ou para outrem, coisa alheia móvel" },
             { name: "Furto", services: 25, fine: 350, article: "Art. 155", category: "Contra o Patrimônio", 
+              description: "Subtrair, para si ou para outrem, coisa alheia móvel" },
+            { name: "Furto qualificado", services: 30, fine: 550, article: "Art. 155 I", category: "Contra o Patrimônio", 
               description: "Subtrair, para si ou para outrem, coisa alheia móvel" },
             { name: "Roubo", services: 40, fine: 750, article: "Art. 157", category: "Contra o Patrimônio", 
               description: "Subtrair coisa alheia móvel, para si ou para outrem, mediante violência ou grave ameaça" },
-            { name: "Roubo seguido de morte (latrocínio)", services: 50, fine: 1000, article: "Art. 157-B", category: "Contra o Patrimônio", 
-              description: "Subtrair coisa alheia móvel, para si ou outrem, mediante violência ou grave ameaça, com resultado morte" },
             { name: "Roubo qualificado", services: 50, fine: 900, article: "Art. 157 II", category: "Contra o Patrimônio", 
               description: "Apropriar-se de bens, valores ou dinheiro sob sua responsabilidade" },
+            { name: "Roubo seguido de morte (latrocínio)", services: 50, fine: 1000, article: "Art. 157-B", category: "Contra o Patrimônio", 
+              description: "Subtrair coisa alheia móvel, para si ou outrem, mediante violência ou grave ameaça, com resultado morte" },
             { name: "Estelionato", services: 12, fine: 2500, article: "Art. 171", category: "Contra o Patrimônio", 
               description: "Obter, para si ou outrem, vantagem ilícita, em prejuízo alheio, por meio de fraude, erro, artifício ou ardil" },
             { name: "Desmonte de veículos", services: 10, fine: 2500, article: "Art. 126", category: "Contra o Patrimônio", 
@@ -868,87 +970,144 @@
         ];
 
         let calculationHistory = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
+        let selectedCrime = null;
+        let currentCategory = 'all';
 
         // Inicializar calculadora
         function initializeCalculator() {
-            populateCrimeSelect();
+            renderCrimesGrid();
             updateTotalCrimes();
             updateHistoryDisplay();
         }
 
-        // Popular select de crimes
-        function populateCrimeSelect() {
-            const select = document.getElementById('crimeSelect');
-            const sortedCrimes = crimesDatabase.sort((a, b) => a.name.localeCompare(b.name));
+        // Renderizar grid de crimes
+        function renderCrimesGrid(crimes = null) {
+            const grid = document.getElementById('crimesGrid');
+            const searchTerm = document.getElementById('searchCrime').value.toLowerCase();
             
-            select.innerHTML = '<option value="">Selecione um crime...</option>';
+            let filteredCrimes = crimes || crimesDatabase;
             
-            sortedCrimes.forEach((crime, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = crime.name;
-                select.appendChild(option);
+            // Filtrar por categoria
+            if (currentCategory !== 'all') {
+                filteredCrimes = filteredCrimes.filter(crime => crime.category === currentCategory);
+            }
+            
+            // Filtrar por busca
+            if (searchTerm) {
+                filteredCrimes = filteredCrimes.filter(crime => 
+                    crime.name.toLowerCase().includes(searchTerm) ||
+                    crime.article.toLowerCase().includes(searchTerm) ||
+                    crime.category.toLowerCase().includes(searchTerm) ||
+                    crime.description.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Ordenar alfabeticamente
+            filteredCrimes.sort((a, b) => a.name.localeCompare(b.name));
+            
+            grid.innerHTML = '';
+            
+            if (filteredCrimes.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <i class="fas fa-search text-blue-400 text-3xl mb-3"></i>
+                        <p class="text-blue-200">Nenhum crime encontrado</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredCrimes.forEach((crime, index) => {
+                const originalIndex = crimesDatabase.findIndex(c => c.name === crime.name);
+                const isSelected = selectedCrime && selectedCrime.name === crime.name;
+                
+                const crimeCard = document.createElement('div');
+                crimeCard.className = `crime-card ${isSelected ? 'selected' : ''}`;
+                crimeCard.onclick = () => selectCrime(originalIndex);
+                
+                crimeCard.innerHTML = `
+                    <div class="crime-card-title">${crime.name}</div>
+                    <div class="crime-card-article">${crime.article}</div>
+                    <div class="crime-card-penalty">
+                        ${crime.services > 0 ? crime.services + ' serviços' : 'Sem serviços'} • ${formatCurrency(crime.fine)}
+                    </div>
+                `;
+                
+                grid.appendChild(crimeCard);
             });
+        }
+
+        // Mostrar categoria de crimes
+        function showCrimeCategory(category) {
+            currentCategory = category;
+            
+            // Atualizar abas ativas
+            document.querySelectorAll('.crime-category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            
+            // Re-renderizar grid
+            renderCrimesGrid();
+        }
+
+        // Selecionar crime
+        function selectCrime(crimeIndex) {
+            selectedCrime = crimesDatabase[crimeIndex];
+            
+            // Atualizar informações do crime selecionado
+            document.getElementById('selectedCrimeName').textContent = selectedCrime.name;
+            document.getElementById('selectedCrimeArticle').textContent = selectedCrime.article;
+            document.getElementById('selectedCrimeServices').textContent = selectedCrime.services + ' serviços comunitários';
+            document.getElementById('selectedCrimeFine').textContent = formatCurrency(selectedCrime.fine);
+            document.getElementById('selectedCrimeCategory').textContent = selectedCrime.category;
+            document.getElementById('selectedCrimeDescription').textContent = selectedCrime.description;
+            
+            // Mostrar informações
+            document.getElementById('selectedCrimeInfo').classList.remove('hidden');
+            document.getElementById('selectCrimeMessage').classList.add('hidden');
+            
+            // Re-renderizar grid para mostrar seleção
+            renderCrimesGrid();
+            
+            // Calcular sentença
+            calculateSentence();
+        }
+
+        // Limpar seleção de crime
+        function clearCrimeSelection() {
+            selectedCrime = null;
+            document.getElementById('selectedCrimeInfo').classList.add('hidden');
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('selectCrimeMessage').classList.remove('hidden');
+            
+            // Limpar modificadores
+            document.querySelectorAll('.atenuante:checked, .agravante:checked').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Re-renderizar grid
+            renderCrimesGrid();
+            
+            // Atualizar contadores
+            document.getElementById('activeAtenuantes').textContent = '0';
+            document.getElementById('activeAgravantes').textContent = '0';
         }
 
         // Filtrar crimes por busca
         function filterCrimes() {
-            const searchTerm = document.getElementById('searchCrime').value.toLowerCase();
-            const select = document.getElementById('crimeSelect');
-            
-            select.innerHTML = '<option value="">Selecione um crime...</option>';
-            
-            const filteredCrimes = crimesDatabase.filter(crime => 
-                crime.name.toLowerCase().includes(searchTerm) ||
-                crime.category.toLowerCase().includes(searchTerm)
-            );
-            
-            filteredCrimes.forEach((crime, index) => {
-                const originalIndex = crimesDatabase.findIndex(c => c.name === crime.name);
-                const option = document.createElement('option');
-                option.value = originalIndex;
-                option.textContent = crime.name;
-                select.appendChild(option);
-            });
+            renderCrimesGrid();
         }
 
-        // Atualizar informações do crime
-        function updateCrimeInfo() {
-            const crimeIndex = document.getElementById('crimeSelect').value;
-            const crimeInfo = document.getElementById('crimeInfo');
-            
-            if (crimeIndex === '') {
-                crimeInfo.classList.add('hidden');
-                document.getElementById('resultContainer').classList.add('hidden');
-                document.getElementById('selectCrimeMessage').classList.remove('hidden');
-                return;
-            }
-            
-            const crime = crimesDatabase[crimeIndex];
-            
-            document.getElementById('crimeServices').textContent = crime.services + ' serviços comunitários';
-            document.getElementById('crimeFine').textContent = formatCurrency(crime.fine);
-            document.getElementById('crimeArtigo').textContent = crime.article;
-            document.getElementById('crimeCategory').textContent = crime.category;
-            document.getElementById('crimeDescription').textContent = crime.description;
-            
-            crimeInfo.classList.remove('hidden');
-            document.getElementById('selectCrimeMessage').classList.add('hidden');
-            
-            calculateSentence();
-        }
-
-        // Calcular sentença (Sistema Brasilândia)
+        // Calcular sentença (adaptado para nova interface)
         function calculateSentence() {
-            const crimeIndex = document.getElementById('crimeSelect').value;
-            if (crimeIndex === '') return;
+            if (!selectedCrime) return;
             
-            const crime = crimesDatabase[crimeIndex];
             const atenuantes = document.querySelectorAll('.atenuante:checked');
             const agravantes = document.querySelectorAll('.agravante:checked');
             
-            let baseServices = crime.services;
-            let baseFine = crime.fine;
+            let baseServices = selectedCrime.services;
+            let baseFine = selectedCrime.fine;
             let totalReduction = 0;
             let totalIncrease = 0;
             
@@ -988,12 +1147,12 @@
             document.getElementById('activeAgravantes').textContent = agravantes.length;
             
             // Mostrar detalhes do cálculo
-            updateCalculationDetails(crime, baseServices, baseFine, finalServices, finalFine, totalReduction, totalIncrease);
+            updateCalculationDetails(selectedCrime, baseServices, baseFine, finalServices, finalFine, totalReduction, totalIncrease);
             
             document.getElementById('resultContainer').classList.remove('hidden');
             
             // Adicionar ao histórico
-            addToHistory(crime, finalServices, finalFine, totalReduction, totalIncrease);
+            addToHistory(selectedCrime, finalServices, finalFine, totalReduction, totalIncrease);
         }
 
         // Atualizar detalhes do cálculo
@@ -1085,13 +1244,11 @@
 
         // Exportar cálculo
         function exportCalculation(format) {
-            const crimeIndex = document.getElementById('crimeSelect').value;
-            if (crimeIndex === '') {
+            if (!selectedCrime) {
                 alert('Selecione um crime primeiro!');
                 return;
             }
             
-            const crime = crimesDatabase[crimeIndex];
             const finalServices = document.getElementById('finalServices').textContent;
             const finalFine = document.getElementById('finalFine').textContent;
             const timestamp = new Date().toLocaleString('pt-BR');
@@ -1100,9 +1257,9 @@
 RELATÓRIO DE CÁLCULO DE SENTENÇA - BRASILÂNDIA
 ============================================
 
-Crime: ${crime.name}
-Artigo: ${crime.article}
-Categoria: ${crime.category}
+Crime: ${selectedCrime.name}
+Artigo: ${selectedCrime.article}
+Categoria: ${selectedCrime.category}
 
 SENTENÇA FINAL:
 - Serviços Comunitários: ${finalServices}
@@ -1111,7 +1268,7 @@ SENTENÇA FINAL:
 Data/Hora: ${timestamp}
 
 Calculado pelo Sistema Jurídico BRASILÂNDIA
-Portal do Advogado - Calculadora de Penas v4.0 (Brasilândia)
+Portal do Advogado - Calculadora de Sentenças v5.0 (Brasilândia)
 
 OBSERVAÇÃO: Este documento foi gerado automaticamente
 pelo sistema e deve ser validado pelas autoridades competentes.
