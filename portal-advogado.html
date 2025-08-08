@@ -1459,12 +1459,32 @@
         // ===== SISTEMA DE NOTIFICAÇÕES INTELIGENTE v3.0 =====
         
         let notificacoesAtivas = [];
-        let notificacoesLidas = [];
+        let notificacoesLidas = JSON.parse(localStorage.getItem('notificacoesLidas_advogado') || '[]');
         let sessionId = `advogado_${Date.now()}`;
+
+        // Salvar notificações lidas no localStorage
+        function salvarNotificacoesLidas() {
+            localStorage.setItem('notificacoesLidas_advogado', JSON.stringify(notificacoesLidas));
+        }
+
+        // Limpar notificações antigas do localStorage (mais de 7 dias)
+        function limparNotificacoesAntigas() {
+            const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            notificacoesLidas = notificacoesLidas.filter(item => {
+                if (typeof item === 'object' && item.timestamp) {
+                    return item.timestamp > seteDiasAtras;
+                }
+                return true; // Manter strings antigas por compatibilidade
+            });
+            salvarNotificacoesLidas();
+        }
         
         // Iniciar listener de notificações otimizado
         function iniciarListenerNotificacoesAdvogado() {
             if (!window.firebaseDB) return;
+            
+            // Limpar notificações antigas na inicialização
+            limparNotificacoesAntigas();
             
             try {
                 const { collection, onSnapshot } = window.firebaseModules;
@@ -1504,9 +1524,14 @@
             );
         }
         
-        // Verificar se foi lida nesta sessão
+        // Verificar se foi lida nesta sessão ou anteriormente
         function foiLidaNestaSessao(notifId) {
-            return notificacoesLidas.includes(notifId);
+            return notificacoesLidas.some(item => {
+                if (typeof item === 'string') {
+                    return item === notifId; // Compatibilidade com formato antigo
+                }
+                return item.id === notifId; // Novo formato com timestamp
+            });
         }
         
         // Adicionar notificação à lista
@@ -1574,7 +1599,14 @@
         // Marcar notificação como lida
         function marcarComoLida(notifId) {
             if (!notificacoesLidas.includes(notifId)) {
-                notificacoesLidas.push(notifId);
+                // Salvar com timestamp para permitir limpeza automática
+                notificacoesLidas.push({
+                    id: notifId,
+                    timestamp: Date.now()
+                });
+                
+                // Salvar no localStorage
+                salvarNotificacoesLidas();
                 
                 // Atualizar status visual na lista
                 const notif = notificacoesAtivas.find(n => n.id === notifId);
@@ -1671,7 +1703,13 @@
         // Remover notificação específica
         function removerNotificacao(notifId) {
             notificacoesAtivas = notificacoesAtivas.filter(n => n.id !== notifId);
-            notificacoesLidas = notificacoesLidas.filter(id => id !== notifId);
+            notificacoesLidas = notificacoesLidas.filter(item => {
+                if (typeof item === 'string') {
+                    return item !== notifId;
+                }
+                return item.id !== notifId;
+            });
+            salvarNotificacoesLidas();
             renderizarListaNotificacoes();
             atualizarBadgeNotificacoes();
         }
@@ -1681,6 +1719,7 @@
             if (confirm('🗑️ Tem certeza que deseja limpar todas as notificações?')) {
                 notificacoesAtivas = [];
                 notificacoesLidas = [];
+                salvarNotificacoesLidas();
                 renderizarListaNotificacoes();
                 atualizarBadgeNotificacoes();
                 alert('🗑️ Todas as notificações foram removidas!');
