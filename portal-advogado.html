@@ -190,6 +190,53 @@
             background: var(--primary-blue);
         }
 
+        /* Mobile Modal Improvements */
+        @media (max-width: 768px) {
+            /* Fix iOS scroll issues */
+            .fixed.inset-0 {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Ensure modals can scroll on mobile */
+            .overflow-y-auto {
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+            }
+            
+            /* Modal container adjustments for mobile */
+            .min-h-screen {
+                min-height: 100vh;
+                min-height: -webkit-fill-available;
+            }
+            
+            /* Reduce padding on very small screens */
+            .p-4.py-8 {
+                padding: 1rem;
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+            
+            /* Improve touch targets */
+            button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+
+        /* Prevent body scroll when modal is open */
+        body.modal-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
         /* Crime Category Tabs */
         .crime-category-tab {
             padding: 0.5rem 1rem;
@@ -1528,24 +1575,28 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             // Mostrar modal
             document.getElementById('profileModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
         }
 
         // Mostrar hierarquia jurídica
         function showJudicialHierarchy() {
             document.getElementById('hierarchyModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
         }
 
         // Mostrar configurações
         function showSettings() {
             document.getElementById('settingsModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
         }
 
         // Fechar modal
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
             document.body.style.overflow = 'auto';
+            document.body.classList.remove('modal-open');
         }
 
         // Salvar perfil
@@ -1684,18 +1735,18 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Dados da hierarquia (preparado para sincronização em tempo real)
         let hierarchyData = {
-            // Cargos únicos (1 por cargo) - DEMONSTRAÇÃO COM ALGUNS OCUPADOS
-            'juiz-federal-1': { name: 'Dr. João Silva', status: 'occupied' },
-            'juiz-federal-2': { name: 'Dra. Maria Santos', status: 'occupied' },
+            // Cargos únicos (1 por cargo)
+            'juiz-federal-1': { name: null, status: 'vacant' },
+            'juiz-federal-2': { name: null, status: 'vacant' },
             'juiz-federal-3': { name: null, status: 'vacant' },
-            'desembargador-1': { name: 'Dr. Carlos Oliveira', status: 'occupied' },
+            'desembargador-1': { name: null, status: 'vacant' },
             'desembargador-2': { name: null, status: 'vacant' },
             'desembargador-3': { name: null, status: 'vacant' },
-            'procurador-geral-republica-1': { name: 'Dr. Roberto Lima', status: 'occupied' },
+            'procurador-geral-republica-1': { name: null, status: 'vacant' },
             'procurador-geral-2': { name: null, status: 'vacant' },
             'procurador-geral-3': { name: null, status: 'vacant' },
-            'presidente-oab': { name: 'Dra. Ana Costa', status: 'occupied' },
-            'juiz-estadual-1': { name: 'Dr. Pedro Alves', status: 'occupied' },
+            'presidente-oab': { name: null, status: 'vacant' },
+            'juiz-estadual-1': { name: null, status: 'vacant' },
             'promotor-1': { name: null, status: 'vacant' },
             'oficial-2instancia': { name: null, status: 'vacant' },
             'oficial-1instancia': { name: null, status: 'vacant' },
@@ -1954,50 +2005,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             updateHierarchyDisplay(); // Atualizar dados antes de mostrar
             document.getElementById('hierarchyModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-        }
-
-        // === FUNÇÕES DE DEMONSTRAÇÃO TEMPO REAL ===
-
-        // Simular nomeação em tempo real (para demonstração)
-        function demonstrateRealTimeUpdate() {
-            setTimeout(() => {
-                // Nomear alguém para um cargo vago
-                updatePosition('juiz-federal-3', 'Dr. Alexandre Novo', 'occupied');
-                showNotification('🎉 Dr. Alexandre Novo foi nomeado para 3º Juiz Federal!', 'success');
-                
-                setTimeout(() => {
-                    // Remover alguém de um cargo
-                    removeFromPosition('desembargador-1');
-                    showNotification('📋 Dr. Carlos Oliveira foi exonerado do cargo de 1º Desembargador', 'info');
-                    
-                    setTimeout(() => {
-                        // Nomear para outro cargo
-                        updatePosition('promotor-1', 'Dra. Beatriz Silva', 'occupied');
-                        showNotification('⚖️ Dra. Beatriz Silva assumiu como 1º Promotor - Líder da Promotoria!', 'success');
-                    }, 3000);
-                }, 3000);
-            }, 2000);
-        }
-
-        // Função para testar atualizações manuais
-        function testHierarchyUpdate() {
-            const updates = [
-                { position: 'oficial-1instancia', name: 'Sr. José Santos', action: 'nomear' },
-                { position: 'presidente-oab', name: null, action: 'exonerar' },
-                { position: 'oficial-2instancia', name: 'Sra. Marina Alves', action: 'nomear' }
-            ];
-            
-            updates.forEach((update, index) => {
-                setTimeout(() => {
-                    if (update.action === 'nomear') {
-                        updatePosition(update.position, update.name, 'occupied');
-                        showNotification(`✅ ${update.name} foi nomeado(a)!`, 'success');
-                    } else {
-                        removeFromPosition(update.position);
-                        showNotification(`📤 Cargo deixado vago`, 'info');
-                    }
-                }, (index + 1) * 2000);
-            });
+            document.body.classList.add('modal-open');
         }
     </script>
 
@@ -2005,8 +2013,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     
     <!-- Modal Perfil Completo -->
     <div id="profileModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="card bg-slate-900/95 border border-blue-300/20 max-w-2xl w-full p-6">
+        <div class="flex items-start justify-center min-h-screen p-4 py-8 overflow-y-auto">
+            <div class="card bg-slate-900/95 border border-blue-300/20 max-w-2xl w-full p-6 my-auto">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-white text-xl font-bold flex items-center gap-2">
                         <i class="fas fa-user text-blue-400"></i>
@@ -2116,8 +2124,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
     <!-- Modal Hierarquia Jurídica -->
     <div id="hierarchyModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="card bg-slate-900/95 border border-blue-300/20 max-w-4xl w-full p-6">
+        <div class="flex items-start justify-center min-h-screen p-4 py-8 overflow-y-auto">
+            <div class="card bg-slate-900/95 border border-blue-300/20 max-w-4xl w-full p-6 my-auto">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-white text-xl font-bold flex items-center gap-2">
                         <i class="fas fa-sitemap text-purple-400"></i>
@@ -2476,13 +2484,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     </div>
                 </div>
                 
-                <div class="flex justify-center mt-6 space-x-4">
-                    <button onclick="demonstrateRealTimeUpdate()" class="btn btn-secondary">
-                        <i class="fas fa-sync mr-2"></i>Demonstrar Tempo Real
-                    </button>
-                    <button onclick="testHierarchyUpdate()" class="btn btn-info">
-                        <i class="fas fa-test-tube mr-2"></i>Teste Atualização
-                    </button>
+                <div class="flex justify-center mt-6">
                     <button onclick="closeModal('hierarchyModal')" class="btn btn-primary">
                         <i class="fas fa-check mr-2"></i>Entendido
                     </button>
@@ -2493,8 +2495,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
     <!-- Modal Configurações -->
     <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="card bg-slate-900/95 border border-blue-300/20 max-w-2xl w-full p-6">
+        <div class="flex items-start justify-center min-h-screen p-4 py-8 overflow-y-auto">
+            <div class="card bg-slate-900/95 border border-blue-300/20 max-w-2xl w-full p-6 my-auto">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-white text-xl font-bold flex items-center gap-2">
                         <i class="fas fa-cog text-gray-400"></i>
