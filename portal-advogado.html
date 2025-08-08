@@ -1492,42 +1492,85 @@
             }
         }
 
-        // ===== SISTEMA DE NOTIFICAÇÕES INTELIGENTE v3.0 =====
-        
+        // ===== SISTEMA DE NOTIFICAÇÕES ADVOGADO V4.0 =====
         let notificacoesAtivas = [];
-        let notificacoesLidas = JSON.parse(localStorage.getItem('notificacoesLidas_advogado') || '[]');
+        let notificacoesLidas = [];
+        let notificacoesListener = null;
+        let isNotificacoesOnline = false;
         let sessionId = `advogado_${Date.now()}`;
+        
+        // Carregar notificações lidas do localStorage
+        function carregarNotificacoesLidas() {
+            try {
+                const dados = localStorage.getItem('notificacoesLidas_advogado');
+                if (dados) {
+                    const parsed = JSON.parse(dados);
+                    notificacoesLidas = Array.isArray(parsed) ? parsed : [];
+                    console.log(`📱 [ADVOGADO] Carregadas ${notificacoesLidas.length} notificações lidas`);
+                }
+            } catch (error) {
+                console.warn('⚠️ [ADVOGADO] Erro ao carregar notificações lidas:', error);
+                notificacoesLidas = [];
+            }
+        }
 
         // Salvar notificações lidas no localStorage
         function salvarNotificacoesLidas() {
-            localStorage.setItem('notificacoesLidas_advogado', JSON.stringify(notificacoesLidas));
+            try {
+                localStorage.setItem('notificacoesLidas_advogado', JSON.stringify(notificacoesLidas));
+            } catch (error) {
+                console.warn('⚠️ [ADVOGADO] Erro ao salvar notificações lidas:', error);
+            }
         }
 
         // Limpar notificações antigas do localStorage (mais de 7 dias)
         function limparNotificacoesAntigas() {
             const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            const tamanhoOriginal = notificacoesLidas.length;
+            
             notificacoesLidas = notificacoesLidas.filter(item => {
                 if (typeof item === 'object' && item.timestamp) {
                     return item.timestamp > seteDiasAtras;
                 }
                 return true; // Manter strings antigas por compatibilidade
             });
-            salvarNotificacoesLidas();
+            
+            if (notificacoesLidas.length !== tamanhoOriginal) {
+                console.log(`🧹 [ADVOGADO] Limpas ${tamanhoOriginal - notificacoesLidas.length} notificações antigas`);
+                salvarNotificacoesLidas();
+            }
         }
         
         // Iniciar listener de notificações otimizado
         function iniciarListenerNotificacoesAdvogado() {
-            if (!window.firebaseDB) return;
-            
-            // Limpar notificações antigas na inicialização
-            limparNotificacoesAntigas();
-            
             try {
+                console.log('🔔 [ADVOGADO] Iniciando sistema de notificações v4.0...');
+                
+                // Carregar dados locais primeiro
+                carregarNotificacoesLidas();
+                limparNotificacoesAntigas();
+                
+                if (!window.firebaseDB || !window.firebaseModules) {
+                    console.warn('⚠️ [ADVOGADO] Firebase não disponível, usando modo offline');
+                    return;
+                }
+                
+                // Limpar listener anterior se existir
+                if (notificacoesListener) {
+                    notificacoesListener();
+                    notificacoesListener = null;
+                }
+                
                 const { collection, onSnapshot } = window.firebaseModules;
                 const notificacoesRef = collection(window.firebaseDB, 'notificacoes');
                 
                 // Escutar apenas notificações não lidas para este usuário/tipo
-                onSnapshot(notificacoesRef, (snapshot) => {
+                notificacoesListener = onSnapshot(notificacoesRef, (snapshot) => {
+                    if (!isNotificacoesOnline) {
+                        isNotificacoesOnline = true;
+                        console.log('✅ [ADVOGADO] Sistema de notificações online');
+                    }
+                    
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === 'added') {
                             const notificacao = { id: change.doc.id, ...change.doc.data() };
@@ -1538,14 +1581,72 @@
                                 mostrarNotificacaoPopup(notificacao);
                                 atualizarBadgeNotificacoes();
                                 adicionarLogProcessos(`🔔 ${notificacao.titulo}: ${notificacao.mensagem}`);
+                                marcarNotificacaoComoLida(notificacao.id);
                             }
                         }
                     });
+                }, (error) => {
+                    console.warn('⚠️ [ADVOGADO] Erro no listener de notificações:', error);
+                    isNotificacoesOnline = false;
+                    iniciarNotificacoesPollingAdvogado();
                 });
                 
-                console.log('✅ Sistema de notificações inteligente iniciado - Portal Advogado');
+                console.log('✅ [ADVOGADO] Sistema de notificações inteligente iniciado');
             } catch (error) {
-                console.error('❌ Erro ao iniciar listener:', error);
+                console.error('❌ [ADVOGADO] Erro ao iniciar listener:', error);
+                iniciarNotificacoesPollingAdvogado();
+            }
+        }
+        
+        // Sistema de polling como fallback
+        function iniciarNotificacoesPollingAdvogado() {
+            try {
+                console.log('🔔 [ADVOGADO] Iniciando polling de notificações...');
+                
+                if (!window.firebaseDB || !window.firebaseModules) {
+                    console.warn('⚠️ [ADVOGADO] Firebase indisponível para polling');
+                    return;
+                }
+                
+                const { collection, getDocs } = window.firebaseModules;
+                
+                const intervalId = setInterval(async () => {
+                    try {
+                        const notificacoesRef = collection(window.firebaseDB, 'notificacoes');
+                        const snapshot = await getDocs(notificacoesRef);
+                        
+                        snapshot.docs.forEach(doc => {
+                            const notificacao = { id: doc.id, ...doc.data() };
+                            
+                            if (isNotificacaoParaAdvogado(notificacao) && !foiLidaNestaSessao(notificacao.id)) {
+                                adicionarNotificacaoLista(notificacao);
+                                mostrarNotificacaoPopup(notificacao);
+                                atualizarBadgeNotificacoes();
+                                marcarNotificacaoComoLida(notificacao.id);
+                            }
+                        });
+                        
+                        if (!isNotificacoesOnline) {
+                            isNotificacoesOnline = true;
+                            console.log('✅ [ADVOGADO] Polling de notificações funcionando');
+                        }
+                        
+                    } catch (error) {
+                        if (isNotificacoesOnline) {
+                            isNotificacoesOnline = false;
+                            console.warn('⚠️ [ADVOGADO] Erro no polling:', error);
+                        }
+                    }
+                }, 60000);
+                
+                // Salvar para limpeza posterior
+                if (typeof window.notificacoesIntervals === 'undefined') {
+                    window.notificacoesIntervals = [];
+                }
+                window.notificacoesIntervals.push(intervalId);
+                
+            } catch (error) {
+                console.error('❌ [ADVOGADO] Erro ao iniciar polling:', error);
             }
         }
         
@@ -1568,6 +1669,17 @@
                 }
                 return item.id === notifId; // Novo formato com timestamp
             });
+        }
+        
+        // Marcar notificação como lida
+        function marcarNotificacaoComoLida(notifId) {
+            if (!foiLidaNestaSessao(notifId)) {
+                notificacoesLidas.push({
+                    id: notifId,
+                    timestamp: Date.now()
+                });
+                salvarNotificacoesLidas();
+            }
         }
         
         // Adicionar notificação à lista

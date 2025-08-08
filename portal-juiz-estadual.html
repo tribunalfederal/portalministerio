@@ -1124,9 +1124,9 @@
             }
         }
 
-        // Sistema de Notificações v3.0 - Inteligente
-        let notificacoesLidas = new Set();
-        let notificacoesListener = null;
+        // Sistema de Notificações v4.0 - já declarado acima
+        // let notificacoesLidas = new Set();
+        // let notificacoesListener = null;
 
         function mostrarPopupNotificacao(titulo, mensagem, tipo = 'info') {
             // Criar popup
@@ -2234,31 +2234,189 @@
             }
         }
 
-        // Iniciar listener de notificações (v3.0 otimizado)
-        function iniciarListenerNotificacoesJuiz() {
-            if (!window.firebaseDB) return;
-            
+        // ===== SISTEMA DE NOTIFICAÇÕES JUIZ ESTADUAL V4.0 =====
+        let notificacoesAtivas = [];
+        let notificacoesLidas = [];
+        let notificacoesListener = null;
+        let isNotificacoesOnline = false;
+        
+        // Carregar notificações lidas do localStorage
+        function carregarNotificacoesLidasJuiz() {
             try {
+                const dados = localStorage.getItem('notificacoesLidas_juizEstadual');
+                if (dados) {
+                    const parsed = JSON.parse(dados);
+                    notificacoesLidas = Array.isArray(parsed) ? parsed : [];
+                    console.log(`📱 [JUIZ ESTADUAL] Carregadas ${notificacoesLidas.length} notificações lidas`);
+                }
+            } catch (error) {
+                console.warn('⚠️ [JUIZ ESTADUAL] Erro ao carregar notificações lidas:', error);
+                notificacoesLidas = [];
+            }
+        }
+
+        // Salvar notificações lidas no localStorage
+        function salvarNotificacoesLidasJuiz() {
+            try {
+                localStorage.setItem('notificacoesLidas_juizEstadual', JSON.stringify(notificacoesLidas));
+            } catch (error) {
+                console.warn('⚠️ [JUIZ ESTADUAL] Erro ao salvar notificações lidas:', error);
+            }
+        }
+
+        // Limpar notificações antigas (mais de 7 dias)
+        function limparNotificacoesAntigasJuiz() {
+            const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            const tamanhoOriginal = notificacoesLidas.length;
+            
+            notificacoesLidas = notificacoesLidas.filter(item => {
+                if (typeof item === 'object' && item.timestamp) {
+                    return item.timestamp > seteDiasAtras;
+                }
+                return true;
+            });
+            
+            if (notificacoesLidas.length !== tamanhoOriginal) {
+                console.log(`🧹 [JUIZ ESTADUAL] Limpas ${tamanhoOriginal - notificacoesLidas.length} notificações antigas`);
+                salvarNotificacoesLidasJuiz();
+            }
+        }
+
+        // Iniciar listener de notificações (v4.0 otimizado)
+        function iniciarListenerNotificacoesJuiz() {
+            try {
+                console.log('🔔 [JUIZ ESTADUAL] Iniciando sistema de notificações v4.0...');
+                
+                // Carregar dados locais primeiro
+                carregarNotificacoesLidasJuiz();
+                limparNotificacoesAntigasJuiz();
+                
+                if (!window.firebaseDB || !window.firebaseModules) {
+                    console.warn('⚠️ [JUIZ ESTADUAL] Firebase não disponível, usando modo offline');
+                    return;
+                }
+                
+                // Limpar listener anterior se existir
+                if (notificacoesListener) {
+                    notificacoesListener();
+                    notificacoesListener = null;
+                }
+                
                 const { collection, onSnapshot } = window.firebaseModules;
                 const notificacoesRef = collection(window.firebaseDB, 'notificacoes');
                 
                 // Consulta simples sem orderBy para evitar índices
-                onSnapshot(notificacoesRef, (snapshot) => {
+                notificacoesListener = onSnapshot(notificacoesRef, (snapshot) => {
+                    if (!isNotificacoesOnline) {
+                        isNotificacoesOnline = true;
+                        console.log('✅ [JUIZ ESTADUAL] Sistema de notificações online');
+                    }
+                    
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === 'added') {
-                            const notificacao = change.doc.data();
-                            // Mostrar notificações relevantes para juízes
-                            if (notificacao.destinatario === 'juizes' || notificacao.tipo === 'novo-processo') {
+                            const notificacao = { id: change.doc.id, ...change.doc.data() };
+                            
+                            // Mostrar notificações relevantes para juízes e não lidas
+                            if (isNotificacaoParaJuiz(notificacao) && !foiLidaAnteriormenteJuiz(notificacao.id)) {
                                 mostrarNotificacaoJuiz(notificacao);
                                 adicionarLogProcessosJuiz(`🔔 ${notificacao.titulo}: ${notificacao.mensagem}`);
+                                marcarNotificacaoComoLidaJuiz(notificacao.id);
                             }
                         }
                     });
+                }, (error) => {
+                    console.warn('⚠️ [JUIZ ESTADUAL] Erro no listener de notificações:', error);
+                    isNotificacoesOnline = false;
+                    iniciarNotificacoesPollingJuiz();
                 });
                 
-                console.log('✅ Listener de notificações iniciado - Portal Juiz v3.0');
+                console.log('✅ [JUIZ ESTADUAL] Listener de notificações iniciado v4.0');
             } catch (error) {
-                console.error('❌ Erro ao iniciar listener:', error);
+                console.error('❌ [JUIZ ESTADUAL] Erro ao iniciar listener:', error);
+                iniciarNotificacoesPollingJuiz();
+            }
+        }
+        
+        // Sistema de polling como fallback
+        function iniciarNotificacoesPollingJuiz() {
+            try {
+                console.log('🔔 [JUIZ ESTADUAL] Iniciando polling de notificações...');
+                
+                if (!window.firebaseDB || !window.firebaseModules) {
+                    console.warn('⚠️ [JUIZ ESTADUAL] Firebase indisponível para polling');
+                    return;
+                }
+                
+                const { collection, getDocs } = window.firebaseModules;
+                
+                const intervalId = setInterval(async () => {
+                    try {
+                        const notificacoesRef = collection(window.firebaseDB, 'notificacoes');
+                        const snapshot = await getDocs(notificacoesRef);
+                        
+                        snapshot.docs.forEach(doc => {
+                            const notificacao = { id: doc.id, ...doc.data() };
+                            
+                            if (isNotificacaoParaJuiz(notificacao) && !foiLidaAnteriormenteJuiz(notificacao.id)) {
+                                mostrarNotificacaoJuiz(notificacao);
+                                adicionarLogProcessosJuiz(`🔔 ${notificacao.titulo}: ${notificacao.mensagem}`);
+                                marcarNotificacaoComoLidaJuiz(notificacao.id);
+                            }
+                        });
+                        
+                        if (!isNotificacoesOnline) {
+                            isNotificacoesOnline = true;
+                            console.log('✅ [JUIZ ESTADUAL] Polling de notificações funcionando');
+                        }
+                        
+                    } catch (error) {
+                        if (isNotificacoesOnline) {
+                            isNotificacoesOnline = false;
+                            console.warn('⚠️ [JUIZ ESTADUAL] Erro no polling:', error);
+                        }
+                    }
+                }, 60000);
+                
+                // Salvar para limpeza posterior
+                if (typeof window.notificacoesIntervals === 'undefined') {
+                    window.notificacoesIntervals = [];
+                }
+                window.notificacoesIntervals.push(intervalId);
+                
+            } catch (error) {
+                console.error('❌ [JUIZ ESTADUAL] Erro ao iniciar polling:', error);
+            }
+        }
+        
+        // Verificar se notificação é para juízes
+        function isNotificacaoParaJuiz(notificacao) {
+            return notificacao.ativo && (
+                notificacao.destinatario === 'juizes' || 
+                notificacao.destinatario === 'juiz-estadual' ||
+                notificacao.tipo === 'novo-processo' ||
+                notificacao.tipo === 'audiencia' ||
+                notificacao.tipo === 'recurso'
+            );
+        }
+        
+        // Verificar se foi lida anteriormente
+        function foiLidaAnteriormenteJuiz(notifId) {
+            return notificacoesLidas.some(item => {
+                if (typeof item === 'string') {
+                    return item === notifId;
+                }
+                return item.id === notifId;
+            });
+        }
+        
+        // Marcar notificação como lida
+        function marcarNotificacaoComoLidaJuiz(notifId) {
+            if (!foiLidaAnteriormenteJuiz(notifId)) {
+                notificacoesLidas.push({
+                    id: notifId,
+                    timestamp: Date.now()
+                });
+                salvarNotificacoesLidasJuiz();
             }
         }
 

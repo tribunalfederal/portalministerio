@@ -823,34 +823,6 @@
                 console.error('❌ Erro ao iniciar polling:', error);
             }
         }
-                        
-                        snapshot.forEach((doc) => {
-                            const notificacao = doc.data();
-                            // Verificar se está ativo
-                            if (notificacao.ativo) {
-                                notificacao.id = doc.id;
-                                // Verificar se é nova (criada nos últimos 65 segundos)
-                                const agora = Date.now();
-                                const notifTime = notificacao.timestamp || 0;
-                                if (agora - notifTime < 65000) {
-                                    mostrarNotificacaoTempo(notificacao);
-                                }
-                            }
-                        });
-                    } catch (pollingError) {
-                        console.warn('⚠️ Erro no polling de notificações:', pollingError);
-                    }
-                }, 60000); // 60 segundos
-                
-                console.log('✅ Notificações por polling ativas (60s)');
-                
-                // Salvar o intervalo para poder cancelar depois
-                window.notifInterval = intervalId;
-                
-            } catch (error) {
-                console.error('❌ Erro nas notificações alternativas:', error);
-            }
-        }
         
         // Mostrar notificação em tempo real
         function mostrarNotificacaoTempo(notificacao) {
@@ -4231,7 +4203,7 @@ document.addEventListener('input', function(e) {
         
         // Sistema Firebase - Dados em tempo real
         let usuariosOnline = {};
-        let listeners = []; // Para gerenciar listeners do Firebase
+        // listeners já declarado no sistema de notificações
         
         // Função para salvar dados no Firebase
         async function salvarDados() {

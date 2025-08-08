@@ -1012,31 +1012,98 @@
             }, 5000);
         }
 
-        function iniciarListenerNotificacoes() {
-            if (!usuarioLogado || notificacoesListener) return;
-            
+        // ===== SISTEMA DE NOTIFICAÇÕES JUIZ FEDERAL V4.0 =====
+        let notificacoesAtivas = [];
+        let notificacoesLidas = [];
+        let notificacoesListener = null;
+        let isNotificacoesOnline = false;
+        
+        // Carregar notificações lidas do localStorage
+        function carregarNotificacoesLidasFederal() {
             try {
+                const dados = localStorage.getItem('notificacoesLidas_juizFederal');
+                if (dados) {
+                    const parsed = JSON.parse(dados);
+                    if (Array.isArray(parsed)) {
+                        notificacoesLidas = parsed;
+                    } else {
+                        // Converter Set antigo para Array
+                        notificacoesLidas = Array.from(parsed);
+                    }
+                    console.log(`📱 [JUIZ FEDERAL] Carregadas ${notificacoesLidas.length} notificações lidas`);
+                }
+            } catch (error) {
+                console.warn('⚠️ [JUIZ FEDERAL] Erro ao carregar notificações lidas:', error);
+                notificacoesLidas = [];
+            }
+        }
+
+        // Salvar notificações lidas no localStorage
+        function salvarNotificacoesLidasFederal() {
+            try {
+                localStorage.setItem('notificacoesLidas_juizFederal', JSON.stringify(notificacoesLidas));
+            } catch (error) {
+                console.warn('⚠️ [JUIZ FEDERAL] Erro ao salvar notificações lidas:', error);
+            }
+        }
+
+        // Limpar notificações antigas (mais de 7 dias)
+        function limparNotificacoesAntigasFederal() {
+            const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            const tamanhoOriginal = notificacoesLidas.length;
+            
+            notificacoesLidas = notificacoesLidas.filter(item => {
+                if (typeof item === 'object' && item.timestamp) {
+                    return item.timestamp > seteDiasAtras;
+                }
+                return true;
+            });
+            
+            if (notificacoesLidas.length !== tamanhoOriginal) {
+                console.log(`🧹 [JUIZ FEDERAL] Limpas ${tamanhoOriginal - notificacoesLidas.length} notificações antigas`);
+                salvarNotificacoesLidasFederal();
+            }
+        }
+
+        function iniciarListenerNotificacoes() {
+            try {
+                console.log('🔔 [JUIZ FEDERAL] Iniciando sistema de notificações v4.0...');
+                
+                // Carregar dados locais primeiro
+                carregarNotificacoesLidasFederal();
+                limparNotificacoesAntigasFederal();
+                
+                if (!usuarioLogado || notificacoesListener) return;
+                
+                if (!db) {
+                    console.warn('⚠️ [JUIZ FEDERAL] Firebase não disponível, usando modo offline');
+                    return;
+                }
+                
                 const notificacoesRef = collection(db, 'notificacoes');
                 
                 notificacoesListener = onSnapshot(notificacoesRef, (snapshot) => {
+                    if (!isNotificacoesOnline) {
+                        isNotificacoesOnline = true;
+                        console.log('✅ [JUIZ FEDERAL] Sistema de notificações online');
+                    }
+                    
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === 'added') {
                             const notificacao = change.doc.data();
                             const id = change.doc.id;
                             
                             // Verificar se a notificação é para este usuário
-                            if (notificacao.para === usuarioLogado.email || notificacao.para === 'todos') {
+                            if (isNotificacaoParaJuizFederal(notificacao) && !foiLidaAnteriormenteFederal(id)) {
                                 // Mostrar popup apenas se não foi lida
-                                if (!notificacoesLidas.has(id)) {
-                                    mostrarPopupNotificacao(
-                                        notificacao.titulo,
-                                        notificacao.mensagem,
-                                        notificacao.tipo || 'info'
-                                    );
-                                    
-                                    // Marcar como vista (mas não lida)
-                                    notificacoesLidas.add(id);
-                                }
+                                mostrarPopupNotificacao(
+                                    notificacao.titulo,
+                                    notificacao.mensagem,
+                                    notificacao.tipo || 'info'
+                                );
+                                
+                                // Marcar como lida
+                                marcarNotificacaoComoLidaFederal(id);
                             }
                         }
                     });
@@ -1048,11 +1115,100 @@
                     if (!document.getElementById('secao-notificacoes').classList.contains('hidden')) {
                         carregarListaNotificacoes();
                     }
+                }, (error) => {
+                    console.warn('⚠️ [JUIZ FEDERAL] Erro no listener de notificações:', error);
+                    isNotificacoesOnline = false;
+                    iniciarNotificacoesPollingFederal();
                 });
                 
-                console.log('✅ Listener de notificações iniciado');
+                console.log('✅ [JUIZ FEDERAL] Listener de notificações iniciado');
             } catch (error) {
-                console.error('❌ Erro ao iniciar listener de notificações:', error);
+                console.error('❌ [JUIZ FEDERAL] Erro ao iniciar listener de notificações:', error);
+                iniciarNotificacoesPollingFederal();
+            }
+        }
+        
+        // Sistema de polling como fallback
+        function iniciarNotificacoesPollingFederal() {
+            try {
+                console.log('🔔 [JUIZ FEDERAL] Iniciando polling de notificações...');
+                
+                if (!db) {
+                    console.warn('⚠️ [JUIZ FEDERAL] Firebase indisponível para polling');
+                    return;
+                }
+                
+                const intervalId = setInterval(async () => {
+                    try {
+                        const notificacoesRef = collection(db, 'notificacoes');
+                        const snapshot = await getDocs(notificacoesRef);
+                        
+                        snapshot.docs.forEach(doc => {
+                            const notificacao = doc.data();
+                            const id = doc.id;
+                            
+                            if (isNotificacaoParaJuizFederal(notificacao) && !foiLidaAnteriormenteFederal(id)) {
+                                mostrarPopupNotificacao(
+                                    notificacao.titulo,
+                                    notificacao.mensagem,
+                                    notificacao.tipo || 'info'
+                                );
+                                marcarNotificacaoComoLidaFederal(id);
+                            }
+                        });
+                        
+                        if (!isNotificacoesOnline) {
+                            isNotificacoesOnline = true;
+                            console.log('✅ [JUIZ FEDERAL] Polling de notificações funcionando');
+                        }
+                        
+                    } catch (error) {
+                        if (isNotificacoesOnline) {
+                            isNotificacoesOnline = false;
+                            console.warn('⚠️ [JUIZ FEDERAL] Erro no polling:', error);
+                        }
+                    }
+                }, 60000);
+                
+                // Salvar para limpeza posterior
+                if (typeof window.notificacoesIntervals === 'undefined') {
+                    window.notificacoesIntervals = [];
+                }
+                window.notificacoesIntervals.push(intervalId);
+                
+            } catch (error) {
+                console.error('❌ [JUIZ FEDERAL] Erro ao iniciar polling:', error);
+            }
+        }
+        
+        // Verificar se notificação é para juiz federal
+        function isNotificacaoParaJuizFederal(notificacao) {
+            return notificacao.ativo && (
+                notificacao.para === usuarioLogado.email || 
+                notificacao.para === 'todos' ||
+                notificacao.destinatario === 'juizes' ||
+                notificacao.destinatario === 'juiz-federal'
+            );
+        }
+        
+        // Verificar se foi lida anteriormente
+        function foiLidaAnteriormenteFederal(notifId) {
+            return notificacoesLidas.some(item => {
+                if (typeof item === 'string') {
+                    return item === notifId;
+                }
+                return item.id === notifId;
+            });
+        }
+        
+        // Marcar notificação como lida
+        function marcarNotificacaoComoLidaFederal(notifId) {
+            if (!foiLidaAnteriormenteFederal(notifId)) {
+                notificacoesLidas.push({
+                    id: notifId,
+                    timestamp: Date.now()
+                });
+                salvarNotificacoesLidasFederal();
             }
         }
 
