@@ -948,11 +948,16 @@
 
                                 <div>
                                     <label class="block text-blue-300 font-semibold mb-2">
-                                        <i class="fas fa-id-card mr-2"></i>CPF/CNPJ do Requerente *
+                                        <i class="fas fa-id-card mr-2"></i>RG ou Passaporte do Requerente *
                                     </label>
-                                    <input type="text" id="requerente-documento" required 
+                                    <input type="text" id="requerente-documento" required maxlength="10"
                                            class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                           placeholder="000.000.000-00">
+                                           placeholder="Ex: 123456 ou 12345678"
+                                           oninput="formatDocumentInput(this)">
+                                    <p class="text-blue-300/70 text-xs mt-1">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)
+                                    </p>
                                 </div>
                             </div>
 
@@ -2360,6 +2365,19 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             updateProcessStats();
         }
 
+        // Formatar input de documento (apenas números)
+        function formatDocumentInput(input) {
+            // Remove tudo que não for número
+            let value = input.value.replace(/\D/g, '');
+            
+            // Limita a 10 dígitos
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            
+            input.value = value;
+        }
+
         // Protocolar processo
         function protocolProcess(event) {
             event.preventDefault();
@@ -2415,9 +2433,17 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 return false;
             }
             if (!data.documentoRequerente) {
-                showNotification('CPF/CNPJ do requerente é obrigatório', 'error');
+                showNotification('RG ou Passaporte do requerente é obrigatório', 'error');
                 return false;
             }
+            
+            // Validar RG/Passaporte (apenas números, 5-10 dígitos)
+            const documento = data.documentoRequerente.replace(/\D/g, ''); // Remove não-números
+            if (documento.length < 5 || documento.length > 10) {
+                showNotification('RG ou Passaporte deve ter entre 5 e 10 dígitos', 'error');
+                return false;
+            }
+            
             if (!data.tipoProcesso) {
                 showNotification('Tipo de processo é obrigatório', 'error');
                 return false;
@@ -2483,6 +2509,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                             
                             <div class="text-blue-200 text-sm space-y-1">
                                 <div><strong>Requerente:</strong> ${processo.requerente}</div>
+                                <div><strong>RG/Passaporte:</strong> ${processo.documentoRequerente}</div>
                                 <div><strong>Tipo:</strong> ${getTipoProcessoText(processo.tipoProcesso)}</div>
                                 ${processo.valorCausa > 0 ? `<div><strong>Valor:</strong> R$ ${processo.valorCausa.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>` : ''}
                                 <div><strong>Data:</strong> ${formatDate(processo.dataAberto)}</div>
@@ -2564,7 +2591,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const processo = processosData.find(p => p.id === id);
             if (!processo) return;
             
-            alert(`Detalhes do Processo:\n\nProtocolo: ${processo.protocolo || 'N/A'}\nRequerente: ${processo.requerente}\nTipo: ${getTipoProcessoText(processo.tipoProcesso)}\nStatus: ${getStatusText(processo.status)}\nData: ${formatDate(processo.dataAberto)}`);
+            alert(`Detalhes do Processo:\n\nProtocolo: ${processo.protocolo || 'N/A'}\nRequerente: ${processo.requerente}\nRG/Passaporte: ${processo.documentoRequerente}\nTipo: ${getTipoProcessoText(processo.tipoProcesso)}\nStatus: ${getStatusText(processo.status)}\nData: ${formatDate(processo.dataAberto)}`);
         }
 
         // Editar processo
