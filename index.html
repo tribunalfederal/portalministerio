@@ -648,34 +648,105 @@
         let notificacoesAtivas = [];
         let contadorNotificacoes = 0;
         
+        // ===== SISTEMA DE NOTIFICAÇÕES UNIVERSAL V4.0 =====
+        let notificacoesAtivas = [];
+        let notificacoesLidas = [];
+        let listeners = [];
+        let notificacoesListener = null;
+        let isNotificacoesOnline = false;
+        
+        // Carregar notificações lidas do localStorage
+        function carregarNotificacoesLidas() {
+            try {
+                const dados = localStorage.getItem('notificacoesLidas_principal');
+                if (dados) {
+                    const parsed = JSON.parse(dados);
+                    notificacoesLidas = Array.isArray(parsed) ? parsed : [];
+                    console.log(`📱 Carregadas ${notificacoesLidas.length} notificações lidas do localStorage`);
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao carregar notificações lidas:', error);
+                notificacoesLidas = [];
+            }
+        }
+        
+        // Salvar notificações lidas no localStorage
+        function salvarNotificacoesLidas() {
+            try {
+                localStorage.setItem('notificacoesLidas_principal', JSON.stringify(notificacoesLidas));
+            } catch (error) {
+                console.warn('⚠️ Erro ao salvar notificações lidas:', error);
+            }
+        }
+
+        // Limpar notificações antigas (mais de 7 dias)
+        function limparNotificacoesAntigas() {
+            const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            const tamanhoOriginal = notificacoesLidas.length;
+            
+            notificacoesLidas = notificacoesLidas.filter(item => {
+                if (typeof item === 'object' && item.timestamp) {
+                    return item.timestamp > seteDiasAtras;
+                }
+                return true; // Manter strings antigas por compatibilidade
+            });
+            
+            if (notificacoesLidas.length !== tamanhoOriginal) {
+                console.log(`🧹 Limpas ${tamanhoOriginal - notificacoesLidas.length} notificações antigas`);
+                salvarNotificacoesLidas();
+            }
+        }
+        
         // Configurar listener para notificações em tempo real (otimizado)
         function iniciarListenerNotificacoes() {
             try {
-                console.log('🔔 Iniciando sistema de notificações...');
+                console.log('🔔 Iniciando sistema de notificações v4.0...');
+                
+                // Carregar dados locais primeiro
+                carregarNotificacoesLidas();
+                limparNotificacoesAntigas();
+                
+                if (!window.firebaseDB || !window.firebaseModules) {
+                    console.warn('⚠️ Firebase não disponível, usando modo offline');
+                    return;
+                }
+                
                 const { collection, onSnapshot } = window.firebaseModules;
                 const db = window.firebaseDB;
+                
+                // Limpar listener anterior se existir
+                if (notificacoesListener) {
+                    notificacoesListener();
+                    notificacoesListener = null;
+                }
                 
                 // Consulta simples sem índices
                 const notificacoesRef = collection(db, 'notificacoes');
                 
-                const unsubscribe = onSnapshot(notificacoesRef, (snapshot) => {
+                notificacoesListener = onSnapshot(notificacoesRef, (snapshot) => {
+                    if (!isNotificacoesOnline) {
+                        isNotificacoesOnline = true;
+                        console.log('✅ Sistema de notificações online');
+                    }
+                    
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === 'added') {
                             const notificacao = change.doc.data();
-                            // Filtrar no client-side
-                            if (notificacao.ativo === true) {
+                            // Filtrar no client-side e verificar se já foi lida
+                            if (notificacao.ativo === true && !foiNotificacaoLida(change.doc.id)) {
                                 notificacao.id = change.doc.id;
                                 mostrarNotificacaoTempo(notificacao);
+                                marcarNotificacaoComoLida(change.doc.id);
                             }
                         }
                     });
                 }, (error) => {
-                    console.warn('⚠️ Erro no listener de notificações, usando polling:', error);
+                    console.warn('⚠️ Erro no listener de notificações:', error);
+                    isNotificacoesOnline = false;
                     iniciarNotificacoesAlternativas();
                 });
                 
                 console.log('✅ Listener de notificações ativo');
-                listeners.push(unsubscribe);
                 
             } catch (error) {
                 console.error('❌ Erro ao iniciar listener:', error);
@@ -683,20 +754,75 @@
             }
         }
         
+        // Verificar se notificação já foi lida
+        function foiNotificacaoLida(notifId) {
+            return notificacoesLidas.some(item => {
+                if (typeof item === 'string') {
+                    return item === notifId;
+                }
+                return item.id === notifId;
+            });
+        }
+        
+        // Marcar notificação como lida
+        function marcarNotificacaoComoLida(notifId) {
+            if (!foiNotificacaoLida(notifId)) {
+                notificacoesLidas.push({
+                    id: notifId,
+                    timestamp: Date.now()
+                });
+                salvarNotificacoesLidas();
+            }
+        }
+        
         // Função alternativa para notificações (sem índices complexos)
         function iniciarNotificacoesAlternativas() {
             try {
                 console.log('🔔 Iniciando notificações alternativas (polling)...');
+                
+                if (!window.firebaseDB || !window.firebaseModules) {
+                    console.warn('⚠️ Firebase indisponível para polling');
+                    return;
+                }
+                
                 const { collection, getDocs } = window.firebaseModules;
                 const db = window.firebaseDB;
-                
-                if (!db) return;
                 
                 // Usar polling a cada 60 segundos para verificar novas notificações
                 const intervalId = setInterval(async () => {
                     try {
                         const notificacoesRef = collection(db, 'notificacoes');
                         const snapshot = await getDocs(notificacoesRef);
+                        
+                        snapshot.docs.forEach(doc => {
+                            const notificacao = doc.data();
+                            if (notificacao.ativo === true && !foiNotificacaoLida(doc.id)) {
+                                notificacao.id = doc.id;
+                                mostrarNotificacaoTempo(notificacao);
+                                marcarNotificacaoComoLida(doc.id);
+                            }
+                        });
+                        
+                        if (!isNotificacoesOnline) {
+                            isNotificacoesOnline = true;
+                            console.log('✅ Polling de notificações funcionando');
+                        }
+                        
+                    } catch (error) {
+                        if (isNotificacoesOnline) {
+                            isNotificacoesOnline = false;
+                            console.warn('⚠️ Erro no polling de notificações:', error);
+                        }
+                    }
+                }, 60000);
+                
+                // Salvar ID do interval para limpeza posterior
+                listeners.push(() => clearInterval(intervalId));
+                
+            } catch (error) {
+                console.error('❌ Erro ao iniciar polling:', error);
+            }
+        }
                         
                         snapshot.forEach((doc) => {
                             const notificacao = doc.data();
