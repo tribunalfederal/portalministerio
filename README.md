@@ -1,190 +1,126 @@
-# 🏛️ Sistema Jurídico Brasileiro
+# 🏛️ Portal Jurídico de BRASILÂNDIA
 
-[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://javascript.info/)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+## 📋 Sistema Integrado para GTA RP
 
-Sistema completo de gestão jurídica com portais específicos para diferentes níveis hierárquicos do sistema judiciário brasileiro.
+Portal virtual do sistema jurídico da cidade de BRASILÂNDIA, desenvolvido para servidores de GTA RP com hierarquia completa de 17 níveis do poder judiciário brasileiro.
 
-## 🎯 **Visão Geral**
+## 🌐 **Acesso Online**
+**Portal Principal**: https://tribunalfederal.github.io/portalministerio/
 
-O Sistema Jurídico Brasileiro é uma plataforma web que oferece ferramentas especializadas para:
+## 🏛️ **Portais Especializados**
 
-- **👨‍💼 Advogados** - Geração de petições, recursos e documentos básicos
-- **⚖️ Promotores** - Denúncias, pareceres e documentos do Ministério Público  
-- **🏛️ Juízes Estaduais** - Sentenças e decisões da justiça estadual
-- **👑 Juízes Federais** - Acesso completo incluindo documentos federais exclusivos
+### 🎯 **Portais Disponíveis:**
+- **Portal Principal** (`index.html`) - Hub central do sistema
+- **Portal do Advogado** (`portal-advogado.html`) - Interface para advogados
+- **Portal Juiz Estadual** (`portal-juiz-estadual.html`) - Primeira instância estadual
+- **Portal Juiz Federal** (`portal-juiz-federal.html`) - Primeira instância federal  
+- **Portal Promotor** (`portal-promotor.html`) - Ministério Público
 
-## 🔐 **Hierarquia de Permissões**
+### 🔧 **Ferramentas do Sistema:**
+- **Configurador Firebase** (`configurador.html`) - Setup automático do banco de dados
+
+## 👨‍⚖️ **Hierarquia Judicial (17 Níveis)**
+
+**SUPREMO TRIBUNAL FEDERAL:**
+1. 🏛️ Presidente do STF (R$ 9.500)
+2. 🏛️ Ministro do STF (R$ 9.000)
+
+**SUPERIOR TRIBUNAL DE JUSTIÇA:**
+3. ⚖️ Presidente do STJ (R$ 8.500)
+4. ⚖️ Ministro do STJ (R$ 8.000)
+
+**TRIBUNAIS SUPERIORES:**
+5. 🏛️ Presidente TSE/TST/STM (R$ 7.500)
+6. ⚖️ Ministro TSE/TST/STM (R$ 7.000)
+
+**TRIBUNAIS DE JUSTIÇA:**
+7. 👨‍⚖️ Desembargador TJ (R$ 6.500)
+8. 👨‍⚖️ Juiz de Direito (R$ 6.000)
+
+**MINISTÉRIO PÚBLICO:**
+9. 🛡️ 1º Procurador Geral da República (R$ 5.000)
+10. 🛡️ 2º Procurador Geral de Justiça (R$ 4.500)
+11. 🛡️ Procurador de Justiça (R$ 4.000)
+12. 🛡️ Promotor de Justiça (R$ 3.500)
+
+**ADVOCACIA:**
+13. 👔 Presidente da OAB (R$ 3.800)
+14. 👔 Conselheiro Federal OAB (R$ 3.600)
+15. 👔 Advogado Sênior (R$ 3.400)
+16. 👔 Advogado Pleno (R$ 3.200)
+17. 🛡️ Defensor Público (R$ 2.800)
+
+## 🔥 **Recursos do Sistema**
+
+### ✨ **Funcionalidades Principais:**
+- **Sincronização em tempo real** entre todos os portais
+- **Sistema de notificações** automáticas
+- **Calculadora de penas** inteligente
+- **Gestão de processos** completa
+- **Autenticação segura** por cargo
+- **Interface responsiva** para dispositivos móveis
+
+### 🛡️ **Segurança:**
+- Autenticação via Firebase Auth
+- Controle de acesso por hierarquia
+- Dados criptografados em tempo real
+
+## 🚀 **Instalação e Uso**
+
+### **Pré-requisitos:**
+- Conta Firebase configurada
+- Acesso ao repositório GitHub
+
+### **Setup Rápido:**
+1. Acesse o **Configurador**: https://tribunalfederal.github.io/portalministerio/configurador.html
+2. Execute a configuração automática
+3. Acesse qualquer portal com as credenciais fornecidas
+
+### **Credenciais de Teste:**
+- **Email**: alexandre.moraes@stf.brasilandia.gov.br
+- **Senha**: STF2025@Seguro
+- **Cargo**: Presidente do STF
+
+## 🔧 **Estrutura de Arquivos**
 
 ```
-👑 Juiz Federal (ACESSO TOTAL)
-├── Habeas Corpus Federal
-├── Sentenças Federais
-├── Documentos Estaduais
-├── Documentos do MP
-└── Documentos de Advogado
-
-🟢 Juiz Estadual (ACESSO AVANÇADO)
-├── Sentenças Estaduais
-├── Documentos do MP Estadual
-└── Documentos de Advogado
-
-🔴 Promotor (ACESSO INTERMEDIÁRIO)
-├── Denúncias e Pareceres
-└── Documentos de Advogado
-
-🔵 Advogado (ACESSO BÁSICO)
-└── Petições e Recursos
+📁 Portal BRASILÂNDIA/
+├── 🏛️ index.html                    # Portal principal
+├── 👔 portal-advogado.html          # Portal dos advogados  
+├── ⚖️ portal-juiz-estadual.html     # Portal juízes estaduais
+├── 🏛️ portal-juiz-federal.html      # Portal juízes federais
+├── 🛡️ portal-promotor.html          # Portal promotores
+├── 🔧 configurador.html             # Ferramenta de setup
+├── 🔥 firebase.json                 # Configuração Firebase
+├── 🔒 firestore.rules              # Regras de segurança
+├── 📊 firestore.indexes.json       # Índices do banco
+└── 📋 README.md                     # Este arquivo
 ```
 
-## 🚀 **Tecnologias Utilizadas**
+## 💻 **Tecnologias Utilizadas**
 
-- **Frontend:** HTML5, CSS3, JavaScript ES6+
-- **Styling:** TailwindCSS
-- **Backend:** Firebase (Auth + Firestore)
-- **Icons:** Font Awesome 6
-- **Hosting:** Firebase Hosting
+- **Frontend**: HTML5, CSS3, JavaScript ES6+
+- **UI Framework**: Tailwind CSS
+- **Backend**: Firebase (Auth + Firestore)
+- **Hosting**: GitHub Pages
+- **Versionamento**: Git
 
-## 📦 **Instalação Rápida**
+## 🎮 **Para Servidores GTA RP**
 
-### **1. Clone o repositório:**
-```bash
-git clone https://github.com/SEU-USUARIO/sistema-juridico-brasileiro.git
-cd sistema-juridico-brasileiro
-```
+Este sistema foi desenvolvido especificamente para roleplay jurídico em servidores de GTA, oferecendo:
 
-### **2. Configure o Firebase:**
-```bash
-npm install -g firebase-tools
-firebase login
-firebase init
-```
-
-### **3. Configure as credenciais:**
-Edite o arquivo `firebase-config.js` com suas credenciais:
-```javascript
-const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJETO_ID",
-  // ... outras configurações
-};
-```
-
-### **4. Deploy:**
-```bash
-firebase deploy
-```
-
-## 🏗️ **Estrutura do Projeto**
-
-```
-sistema-juridico-brasileiro/
-├── 📁 public/
-│   ├── index.html (login principal)
-│   ├── portal-advogado.html
-│   ├── portal-promotor.html
-│   ├── portal-juiz-estadual.html
-│   ├── portal-juiz-federal.html
-│   └── portal-admin.html
-├── 📁 src/
-│   ├── 📁 css/
-│   ├── 📁 js/
-│   └── 📁 assets/
-├── 📁 docs/
-└── firebase.json
-```
-
-## 🔧 **Configuração de Usuários**
-
-### **Usuário Admin Padrão:**
-- **Email:** alexandre.moraes@stf.jus.br
-- **Senha:** STF2025@Seguro
-- **Cargo:** 1º Juiz Federal (Acesso Total)
-
-### **Estrutura de Cargos:**
-```javascript
-const estruturaJudicial = {
-  // Juízes Federais
-  '1_juiz_federal': { nome: '1º Juiz Federal', nivel: 1 },
-  '2_juiz_federal': { nome: '2º Juiz Federal', nivel: 2 },
-  '3_juiz_federal': { nome: '3º Juiz Federal', nivel: 3 },
-  
-  // Juízes Estaduais  
-  'juiz_direito': { nome: 'Juiz de Direito', nivel: 4 },
-  'desembargador': { nome: 'Desembargador', nivel: 3 },
-  
-  // Ministério Público
-  'promotor_justica': { nome: 'Promotor de Justiça', nivel: 5 },
-  'procurador_republica': { nome: 'Procurador da República', nivel: 4 },
-  
-  // Advogados
-  'advogado_criminal': { nome: 'Advogado Criminal', nivel: 6 },
-  'advogado_civil': { nome: 'Advogado Civil', nivel: 6 }
-};
-```
-
-## 📋 **Funcionalidades Principais**
-
-### **✅ Sistema de Autenticação**
-- Login seguro com Firebase Auth
-- Redirecionamento automático por cargo
-- Controle de sessão
-- Logout seguro
-
-### **✅ Portais Especializados**
-- Interface personalizada por tipo de usuário
-- Acesso diferenciado a documentos
-- Dashboard específico para cada cargo
-- Design responsivo
-
-### **✅ Geração de Documentos**
-- Templates jurídicos predefinidos
-- Validação por nível de permissão
-- Preenchimento automático de dados
-- Export em PDF (em desenvolvimento)
-
-### **🚧 Em Desenvolvimento**
-- [ ] Sistema de comunicação entre portais
-- [ ] Gestão de processos/casos
-- [ ] Notificações em tempo real
-- [ ] Assinatura digital
-- [ ] Integração com sistemas tribunais
-
-## 🔒 **Segurança**
-
-- **Autenticação:** Firebase Authentication
-- **Autorização:** Controle por cargo/nível
-- **Dados:** Firestore com regras de segurança
-- **Frontend:** Validação dupla de permissões
-- **Session:** Controle de sessão ativa
-
-## 🤝 **Contribuição**
-
-1. Faça um Fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/NovaFuncionalidade`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/NovaFuncionalidade`)
-5. Abra um Pull Request
+- **Realismo jurídico** com hierarquia brasileira
+- **Integração multiplayer** em tempo real
+- **Facilidade de uso** para jogadores
+- **Personalização** por servidor
 
 ## 📞 **Suporte**
 
-Para dúvidas ou suporte:
-- 📧 Email: suporte@sistemajuridico.com.br
-- 🐛 Issues: [GitHub Issues](https://github.com/SEU-USUARIO/sistema-juridico-brasileiro/issues)
-- 📖 Docs: [Documentação Completa](./docs/)
-
-## 📄 **Licença**
-
-Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
-
-## 👏 **Agradecimentos**
-
-- Tribunal de Justiça do Brasil
-- Comunidade open source
-- Contribuidores do projeto
+Para suporte técnico ou dúvidas sobre implementação:
+- **Repositório**: https://github.com/tribunalfederal/portalministerio
+- **Portal Online**: https://tribunalfederal.github.io/portalministerio/
 
 ---
 
-**⚖️ Desenvolvido para modernizar o sistema judiciário brasileiro**
+**🏛️ Sistema Jurídico BRASILÂNDIA v3.0**  
+*Desenvolvido para GTA RP com tecnologia Firebase*
