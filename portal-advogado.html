@@ -880,15 +880,251 @@
         
         <!-- Casos Section -->
         <section id="casos" class="section">
-            <div class="card p-8">
-                <h2 class="text-white text-2xl font-bold mb-6">
-                    <i class="fas fa-folder mr-3 text-purple-400"></i>
-                    Gestão de Casos
-                </h2>
-                <p class="text-blue-200 mb-6">Em desenvolvimento...</p>
-                <button onclick="showSection('dashboard')" class="btn btn-primary">
-                    <i class="fas fa-arrow-left mr-2"></i>Voltar ao Dashboard
-                </button>
+            <div class="space-y-6">
+                <!-- Header da Seção -->
+                <div class="card p-6 bg-gradient-to-r from-purple-900/40 to-blue-900/40">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-white text-3xl font-bold mb-2 flex items-center gap-3">
+                                <i class="fas fa-folder-open text-purple-400"></i>
+                                Sistema de Abertura de Processos
+                            </h2>
+                            <p class="text-blue-200">Gerencie e abra novos processos jurídicos</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="showNewProcessForm()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                <i class="fas fa-plus mr-2"></i>Novo Processo
+                            </button>
+                            <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                                <i class="fas fa-arrow-left mr-2"></i>Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estatísticas Rápidas -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="card p-4 text-center">
+                        <div class="text-2xl font-bold text-green-400 mb-1" id="total-processos">0</div>
+                        <div class="text-blue-200 text-sm">Total de Processos</div>
+                    </div>
+                    <div class="card p-4 text-center">
+                        <div class="text-2xl font-bold text-yellow-400 mb-1" id="processos-andamento">0</div>
+                        <div class="text-blue-200 text-sm">Em Andamento</div>
+                    </div>
+                    <div class="card p-4 text-center">
+                        <div class="text-2xl font-bold text-blue-400 mb-1" id="processos-pendentes">0</div>
+                        <div class="text-blue-200 text-sm">Aguardando Análise</div>
+                    </div>
+                    <div class="card p-4 text-center">
+                        <div class="text-2xl font-bold text-purple-400 mb-1" id="processos-finalizados">0</div>
+                        <div class="text-blue-200 text-sm">Finalizados</div>
+                    </div>
+                </div>
+
+                <!-- Formulário de Novo Processo (Inicialmente Oculto) -->
+                <div id="novo-processo-form" class="hidden">
+                    <div class="card p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-white text-2xl font-bold flex items-center gap-2">
+                                <i class="fas fa-file-plus text-green-400"></i>
+                                Abertura de Novo Processo
+                            </h3>
+                            <button onclick="hideNewProcessForm()" class="text-gray-400 hover:text-white text-xl">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <form id="processForm" class="space-y-6">
+                            <!-- Dados Básicos do Processo -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-blue-300 font-semibold mb-2">
+                                        <i class="fas fa-user mr-2"></i>Nome do Requerente *
+                                    </label>
+                                    <input type="text" id="requerente-nome" required 
+                                           class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
+                                </div>
+
+                                <div>
+                                    <label class="block text-blue-300 font-semibold mb-2">
+                                        <i class="fas fa-id-card mr-2"></i>CPF/CNPJ do Requerente *
+                                    </label>
+                                    <input type="text" id="requerente-documento" required 
+                                           class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                           placeholder="000.000.000-00">
+                                </div>
+                            </div>
+
+                            <!-- Tipo de Processo -->
+                            <div>
+                                <label class="block text-blue-300 font-semibold mb-2">
+                                    <i class="fas fa-balance-scale mr-2"></i>Tipo de Processo *
+                                </label>
+                                <select id="tipo-processo" required 
+                                        class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
+                                    <option value="">Selecione o tipo de processo</option>
+                                    <optgroup label="📋 Cível">
+                                        <option value="acao-cobranca">Ação de Cobrança</option>
+                                        <option value="acao-indenizacao">Ação de Indenização</option>
+                                        <option value="acao-despejo">Ação de Despejo</option>
+                                        <option value="divorcio">Divórcio</option>
+                                        <option value="inventario">Inventário</option>
+                                        <option value="usucapiao">Usucapião</option>
+                                    </optgroup>
+                                    <optgroup label="⚖️ Criminal">
+                                        <option value="queixa-crime">Queixa-Crime</option>
+                                        <option value="habeas-corpus">Habeas Corpus</option>
+                                        <option value="revisao-criminal">Revisão Criminal</option>
+                                    </optgroup>
+                                    <optgroup label="👨‍💼 Trabalhista">
+                                        <option value="reclamacao-trabalhista">Reclamação Trabalhista</option>
+                                        <option value="acao-acidente-trabalho">Ação de Acidente de Trabalho</option>
+                                    </optgroup>
+                                    <optgroup label="🏛️ Administrativo">
+                                        <option value="mandado-seguranca">Mandado de Segurança</option>
+                                        <option value="acao-popular">Ação Popular</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <!-- Assunto do Processo -->
+                            <div>
+                                <label class="block text-blue-300 font-semibold mb-2">
+                                    <i class="fas fa-heading mr-2"></i>Assunto/Resumo do Processo *
+                                </label>
+                                <input type="text" id="assunto-processo" required 
+                                       class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                       placeholder="Ex: Cobrança de honorários advocatícios">
+                            </div>
+
+                            <!-- Descrição Detalhada -->
+                            <div>
+                                <label class="block text-blue-300 font-semibold mb-2">
+                                    <i class="fas fa-align-left mr-2"></i>Descrição Detalhada do Caso
+                                </label>
+                                <textarea id="descricao-processo" rows="4" 
+                                          class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                          placeholder="Descreva os detalhes do caso, fatos relevantes, pedidos principais..."></textarea>
+                            </div>
+
+                            <!-- Valor da Causa -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-blue-300 font-semibold mb-2">
+                                        <i class="fas fa-dollar-sign mr-2"></i>Valor da Causa (R$)
+                                    </label>
+                                    <input type="number" id="valor-causa" step="0.01" 
+                                           class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                           placeholder="0,00">
+                                </div>
+
+                                <div>
+                                    <label class="block text-blue-300 font-semibold mb-2">
+                                        <i class="fas fa-gavel mr-2"></i>Vara/Instância
+                                    </label>
+                                    <select id="vara-instancia" 
+                                            class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
+                                        <option value="">Selecione a vara</option>
+                                        <option value="1-vara-civel">1ª Vara Cível</option>
+                                        <option value="2-vara-civel">2ª Vara Cível</option>
+                                        <option value="vara-criminal">Vara Criminal</option>
+                                        <option value="vara-trabalhista">Vara Trabalhista</option>
+                                        <option value="vara-federal">Vara Federal</option>
+                                        <option value="tribunal-justica">Tribunal de Justiça</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Upload de Petição -->
+                            <div class="border-2 border-dashed border-blue-300/30 rounded-lg p-6 bg-slate-800/30">
+                                <div class="text-center">
+                                    <i class="fas fa-file-upload text-4xl text-blue-400 mb-4"></i>
+                                    <h4 class="text-white font-semibold mb-2">Anexar Petição Inicial</h4>
+                                    <p class="text-blue-200 text-sm mb-4">Faça upload da petição inicial (PDF, DOC, DOCX) - Máximo 10MB</p>
+                                    
+                                    <input type="file" id="peticao-upload" accept=".pdf,.doc,.docx" 
+                                           class="hidden" onchange="handlePetitionUpload(event)">
+                                    
+                                    <button type="button" onclick="document.getElementById('peticao-upload').click()" 
+                                            class="btn bg-blue-600 hover:bg-blue-700 text-white">
+                                        <i class="fas fa-upload mr-2"></i>Selecionar Arquivo
+                                    </button>
+                                    
+                                    <div id="arquivo-selecionado" class="hidden mt-4 p-3 bg-green-600/20 rounded-lg border border-green-500/30">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-file-pdf text-red-400"></i>
+                                                <span class="text-white" id="nome-arquivo"></span>
+                                                <span class="text-green-400 text-sm" id="tamanho-arquivo"></span>
+                                            </div>
+                                            <button type="button" onclick="removePetitionFile()" class="text-red-400 hover:text-red-300">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Observações Especiais -->
+                            <div>
+                                <label class="block text-blue-300 font-semibold mb-2">
+                                    <i class="fas fa-sticky-note mr-2"></i>Observações Especiais
+                                </label>
+                                <textarea id="observacoes-processo" rows="3" 
+                                          class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                          placeholder="Alguma observação especial, urgência, peculiaridade do caso..."></textarea>
+                            </div>
+
+                            <!-- Botões de Ação -->
+                            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-blue-300/20">
+                                <button type="button" onclick="saveDraft()" class="btn bg-yellow-600 hover:bg-yellow-700 text-white flex-1">
+                                    <i class="fas fa-save mr-2"></i>Salvar Rascunho
+                                </button>
+                                <button type="submit" class="btn bg-green-600 hover:bg-green-700 text-white flex-1">
+                                    <i class="fas fa-paper-plane mr-2"></i>Protocolar Processo
+                                </button>
+                                <button type="button" onclick="hideNewProcessForm()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                                    <i class="fas fa-times mr-2"></i>Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Lista de Processos -->
+                <div id="lista-processos">
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                                <i class="fas fa-list text-blue-400"></i>
+                                Meus Processos
+                            </h3>
+                            <div class="flex gap-2">
+                                <select id="filtro-status" onchange="filterProcesses()" 
+                                        class="px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white text-sm">
+                                    <option value="">Todos os Status</option>
+                                    <option value="rascunho">Rascunho</option>
+                                    <option value="protocolado">Protocolado</option>
+                                    <option value="em-andamento">Em Andamento</option>
+                                    <option value="finalizado">Finalizado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="processos-container">
+                            <!-- Mensagem quando não há processos -->
+                            <div id="sem-processos" class="text-center py-12">
+                                <i class="fas fa-folder-open text-6xl text-gray-500 mb-4"></i>
+                                <h4 class="text-gray-400 text-xl mb-2">Nenhum processo encontrado</h4>
+                                <p class="text-gray-500 mb-6">Clique em "Novo Processo" para começar</p>
+                                <button onclick="showNewProcessForm()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                    <i class="fas fa-plus mr-2"></i>Criar Primeiro Processo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
         
@@ -2031,6 +2267,353 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.body.style.overflow = 'hidden';
             document.body.classList.add('modal-open');
         }
+
+        // === SISTEMA DE ABERTURA DE PROCESSOS ===
+
+        // Base de dados dos processos (em produção será Firebase/Backend)
+        let processosData = JSON.parse(localStorage.getItem('processosAdvogado')) || [];
+        let selectedPetitionFile = null;
+
+        // Mostrar formulário de novo processo
+        function showNewProcessForm() {
+            document.getElementById('novo-processo-form').classList.remove('hidden');
+            document.getElementById('lista-processos').classList.add('hidden');
+            clearProcessForm();
+        }
+
+        // Esconder formulário de novo processo
+        function hideNewProcessForm() {
+            document.getElementById('novo-processo-form').classList.add('hidden');
+            document.getElementById('lista-processos').classList.remove('hidden');
+            clearProcessForm();
+        }
+
+        // Limpar formulário
+        function clearProcessForm() {
+            document.getElementById('processForm').reset();
+            removePetitionFile();
+        }
+
+        // Lidar com upload de petição
+        function handlePetitionUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Verificar tamanho (10MB max)
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                showNotification('Arquivo muito grande! Máximo 10MB', 'error');
+                return;
+            }
+
+            // Verificar tipo
+            const allowedTypes = ['.pdf', '.doc', '.docx'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            if (!allowedTypes.includes(fileExtension)) {
+                showNotification('Tipo de arquivo não permitido! Use PDF, DOC ou DOCX', 'error');
+                return;
+            }
+
+            selectedPetitionFile = file;
+            
+            // Mostrar arquivo selecionado
+            document.getElementById('nome-arquivo').textContent = file.name;
+            document.getElementById('tamanho-arquivo').textContent = formatFileSize(file.size);
+            document.getElementById('arquivo-selecionado').classList.remove('hidden');
+        }
+
+        // Remover arquivo de petição
+        function removePetitionFile() {
+            selectedPetitionFile = null;
+            document.getElementById('peticao-upload').value = '';
+            document.getElementById('arquivo-selecionado').classList.add('hidden');
+        }
+
+        // Formatar tamanho do arquivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        // Salvar rascunho
+        function saveDraft() {
+            const formData = getProcessFormData();
+            if (!formData.requerente || !formData.tipoProcesso) {
+                showNotification('Preencha pelo menos o nome do requerente e tipo de processo', 'warning');
+                return;
+            }
+
+            formData.status = 'rascunho';
+            formData.id = generateProcessId();
+            formData.dataAberto = new Date().toISOString();
+            formData.protocolo = null; // Rascunho não tem protocolo
+
+            processosData.push(formData);
+            saveProcessesToStorage();
+            
+            showNotification('Rascunho salvo com sucesso!', 'success');
+            hideNewProcessForm();
+            updateProcessList();
+            updateProcessStats();
+        }
+
+        // Protocolar processo
+        function protocolProcess(event) {
+            event.preventDefault();
+            
+            const formData = getProcessFormData();
+            if (!validateProcessForm(formData)) {
+                return;
+            }
+
+            formData.status = 'protocolado';
+            formData.id = generateProcessId();
+            formData.protocolo = generateProtocol();
+            formData.dataAberto = new Date().toISOString();
+            formData.dataProtocolo = new Date().toISOString();
+
+            processosData.push(formData);
+            saveProcessesToStorage();
+            
+            // Simular sincronização com outros portais
+            syncProcessWithOtherPortals(formData);
+            
+            showNotification(`Processo protocolado com sucesso! Protocolo: ${formData.protocolo}`, 'success');
+            hideNewProcessForm();
+            updateProcessList();
+            updateProcessStats();
+        }
+
+        // Coletar dados do formulário
+        function getProcessFormData() {
+            return {
+                requerente: document.getElementById('requerente-nome').value,
+                documentoRequerente: document.getElementById('requerente-documento').value,
+                tipoProcesso: document.getElementById('tipo-processo').value,
+                assunto: document.getElementById('assunto-processo').value,
+                descricao: document.getElementById('descricao-processo').value,
+                valorCausa: parseFloat(document.getElementById('valor-causa').value) || 0,
+                varaInstancia: document.getElementById('vara-instancia').value,
+                observacoes: document.getElementById('observacoes-processo').value,
+                peticaoAnexada: selectedPetitionFile ? {
+                    nome: selectedPetitionFile.name,
+                    tamanho: selectedPetitionFile.size,
+                    tipo: selectedPetitionFile.type
+                } : null,
+                advogado: userData.name,
+                oabAdvogado: userData.oab
+            };
+        }
+
+        // Validar formulário
+        function validateProcessForm(data) {
+            if (!data.requerente) {
+                showNotification('Nome do requerente é obrigatório', 'error');
+                return false;
+            }
+            if (!data.documentoRequerente) {
+                showNotification('CPF/CNPJ do requerente é obrigatório', 'error');
+                return false;
+            }
+            if (!data.tipoProcesso) {
+                showNotification('Tipo de processo é obrigatório', 'error');
+                return false;
+            }
+            if (!data.assunto) {
+                showNotification('Assunto do processo é obrigatório', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        // Gerar ID único do processo
+        function generateProcessId() {
+            return 'PROC_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Gerar protocolo
+        function generateProtocol() {
+            const year = new Date().getFullYear();
+            const sequence = String(processosData.filter(p => p.protocolo).length + 1).padStart(6, '0');
+            return `${sequence}/2025-BR-ADV`;
+        }
+
+        // Salvar processos no localStorage
+        function saveProcessesToStorage() {
+            localStorage.setItem('processosAdvogado', JSON.stringify(processosData));
+        }
+
+        // Sincronizar com outros portais (simulação)
+        function syncProcessWithOtherPortals(processData) {
+            // Aqui seria feita a sincronização real com Firebase/Backend
+            console.log('🔄 Sincronizando processo com outros portais:', processData.protocolo);
+            
+            // Simular delay de sincronização
+            setTimeout(() => {
+                console.log('✅ Processo sincronizado com sucesso nos portais: Juiz, Promotor, STF');
+            }, 2000);
+        }
+
+        // Atualizar lista de processos
+        function updateProcessList() {
+            const container = document.getElementById('processos-container');
+            const semProcessos = document.getElementById('sem-processos');
+            
+            if (processosData.length === 0) {
+                semProcessos.classList.remove('hidden');
+                return;
+            }
+            
+            semProcessos.classList.add('hidden');
+            
+            const processosHtml = processosData.map(processo => `
+                <div class="border border-blue-300/20 rounded-lg p-4 mb-4 bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h4 class="text-white font-semibold">${processo.assunto}</h4>
+                                <span class="px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(processo.status)}">
+                                    ${getStatusText(processo.status)}
+                                </span>
+                                ${processo.protocolo ? `<span class="text-blue-300 text-sm font-mono">${processo.protocolo}</span>` : ''}
+                            </div>
+                            
+                            <div class="text-blue-200 text-sm space-y-1">
+                                <div><strong>Requerente:</strong> ${processo.requerente}</div>
+                                <div><strong>Tipo:</strong> ${getTipoProcessoText(processo.tipoProcesso)}</div>
+                                ${processo.valorCausa > 0 ? `<div><strong>Valor:</strong> R$ ${processo.valorCausa.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>` : ''}
+                                <div><strong>Data:</strong> ${formatDate(processo.dataAberto)}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button onclick="viewProcess('${processo.id}')" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm">
+                                <i class="fas fa-eye mr-1"></i>Ver
+                            </button>
+                            ${processo.status === 'rascunho' ? `
+                                <button onclick="editProcess('${processo.id}')" class="btn bg-yellow-600 hover:bg-yellow-700 text-white text-sm">
+                                    <i class="fas fa-edit mr-1"></i>Editar
+                                </button>
+                            ` : ''}
+                            <button onclick="deleteProcess('${processo.id}')" class="btn bg-red-600 hover:bg-red-700 text-white text-sm">
+                                <i class="fas fa-trash mr-1"></i>Excluir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = processosHtml;
+        }
+
+        // Atualizar estatísticas
+        function updateProcessStats() {
+            const total = processosData.length;
+            const andamento = processosData.filter(p => p.status === 'em-andamento').length;
+            const pendentes = processosData.filter(p => p.status === 'protocolado').length;
+            const finalizados = processosData.filter(p => p.status === 'finalizado').length;
+            
+            document.getElementById('total-processos').textContent = total;
+            document.getElementById('processos-andamento').textContent = andamento;
+            document.getElementById('processos-pendentes').textContent = pendentes;
+            document.getElementById('processos-finalizados').textContent = finalizados;
+        }
+
+        // Funções auxiliares
+        function getStatusBadgeClass(status) {
+            const classes = {
+                'rascunho': 'bg-gray-600 text-white',
+                'protocolado': 'bg-blue-600 text-white',
+                'em-andamento': 'bg-yellow-600 text-white',
+                'finalizado': 'bg-green-600 text-white'
+            };
+            return classes[status] || 'bg-gray-600 text-white';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'rascunho': 'Rascunho',
+                'protocolado': 'Protocolado',
+                'em-andamento': 'Em Andamento',
+                'finalizado': 'Finalizado'
+            };
+            return texts[status] || status;
+        }
+
+        function getTipoProcessoText(tipo) {
+            const element = document.querySelector(`option[value="${tipo}"]`);
+            return element ? element.textContent : tipo;
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('pt-BR');
+        }
+
+        // Filtrar processos
+        function filterProcesses() {
+            const filtro = document.getElementById('filtro-status').value;
+            // Implementar filtro aqui se necessário
+            updateProcessList();
+        }
+
+        // Ver processo
+        function viewProcess(id) {
+            const processo = processosData.find(p => p.id === id);
+            if (!processo) return;
+            
+            alert(`Detalhes do Processo:\n\nProtocolo: ${processo.protocolo || 'N/A'}\nRequerente: ${processo.requerente}\nTipo: ${getTipoProcessoText(processo.tipoProcesso)}\nStatus: ${getStatusText(processo.status)}\nData: ${formatDate(processo.dataAberto)}`);
+        }
+
+        // Editar processo
+        function editProcess(id) {
+            const processo = processosData.find(p => p.id === id);
+            if (!processo || processo.status !== 'rascunho') return;
+            
+            // Preencher formulário com dados do processo
+            document.getElementById('requerente-nome').value = processo.requerente;
+            document.getElementById('requerente-documento').value = processo.documentoRequerente;
+            document.getElementById('tipo-processo').value = processo.tipoProcesso;
+            document.getElementById('assunto-processo').value = processo.assunto;
+            document.getElementById('descricao-processo').value = processo.descricao || '';
+            document.getElementById('valor-causa').value = processo.valorCausa || '';
+            document.getElementById('vara-instancia').value = processo.varaInstancia || '';
+            document.getElementById('observacoes-processo').value = processo.observacoes || '';
+            
+            // Remover processo da lista para ser salvo novamente
+            processosData = processosData.filter(p => p.id !== id);
+            saveProcessesToStorage();
+            
+            showNewProcessForm();
+        }
+
+        // Excluir processo
+        function deleteProcess(id) {
+            if (!confirm('Tem certeza que deseja excluir este processo?')) return;
+            
+            processosData = processosData.filter(p => p.id !== id);
+            saveProcessesToStorage();
+            updateProcessList();
+            updateProcessStats();
+            showNotification('Processo excluído com sucesso!', 'success');
+        }
+
+        // Inicializar sistema de processos
+        function initProcessSystem() {
+            updateProcessList();
+            updateProcessStats();
+            
+            // Adicionar event listener ao formulário
+            document.getElementById('processForm').addEventListener('submit', protocolProcess);
+        }
+
+        // Inicializar aplicação quando página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeUserProfile();
+            initProcessSystem();
+        });
     </script>
 
     <!-- Modais -->
