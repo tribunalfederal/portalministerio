@@ -595,25 +595,23 @@
         window.addEventListener('load', async () => {
             try {
                 console.log('🔍 Verificando autenticação do usuário...');
-                
                 // Verificar se há dados do usuário no localStorage
                 const dadosUsuario = localStorage.getItem('usuarioLogadoAtual');
-                
                 if (dadosUsuario) {
                     try {
                         usuarioLogado = JSON.parse(dadosUsuario);
+                        nomeAdvogadoAtual = usuarioLogado.nome; // Corrigir nome do advogado para filtro
                         console.log('✅ Dados do usuário encontrados:', usuarioLogado.nome);
                         atualizarInterfaceUsuario();
+                        inicializarSistemaProcessosAdvogado(); // Inicializar sistema de processos após login
                         return;
                     } catch (parseError) {
                         console.error('❌ Erro ao fazer parse dos dados do usuário:', parseError);
                     }
                 }
-
                 // Se não há dados no localStorage, verificar Firebase Auth
                 if (window.firebaseAuth && window.firebaseModules) {
                     console.log('🔍 Verificando autenticação no Firebase...');
-                    
                     window.firebaseModules.onAuthStateChanged(window.firebaseAuth, (user) => {
                         if (user) {
                             console.log('✅ Usuário autenticado no Firebase:', user.email);
@@ -630,8 +628,10 @@
                                     acessoUniversal: true,
                                     permissoes: ['todas', 'admin', 'acesso_universal']
                                 };
+                                nomeAdvogadoAtual = usuarioLogado.nome;
                                 localStorage.setItem('usuarioLogadoAtual', JSON.stringify(usuarioLogado));
                                 atualizarInterfaceUsuario();
+                                inicializarSistemaProcessosAdvogado();
                             } else {
                                 // Para outros usuários, redirecionar para configuração
                                 console.log('⚠️ Usuário sem dados completos, redirecionando...');
@@ -647,7 +647,6 @@
                     console.log('❌ Firebase não inicializado, redirecionando...');
                     window.location.href = 'index.html';
                 }
-                
             } catch (error) {
                 console.error('❌ Erro ao carregar dados do usuário:', error);
                 window.location.href = 'index.html';
