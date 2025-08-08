@@ -344,6 +344,70 @@
     <main class="container py-8">
         <!-- Dashboard Section -->
         <section id="dashboard" class="section active fade-in">
+            <!-- Perfil do Usuário Logado -->
+            <div class="card p-6 mb-8 bg-gradient-to-r from-blue-900/40 to-indigo-900/40">
+                <div class="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+                    <!-- Avatar e Informações Básicas -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                            <span id="user-initials">DR</span>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-xl mb-1" id="user-name">Dr. Roberto Silva</h3>
+                            <p class="text-blue-200 text-sm mb-1" id="user-position">Advogado Criminalista</p>
+                            <p class="text-blue-300 text-xs flex items-center gap-2">
+                                <i class="fas fa-id-card"></i>
+                                <span>OAB/SP <span id="user-oab">123.456</span></span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações Adicionais -->
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Status Online -->
+                        <div class="flex items-center gap-2 text-green-400">
+                            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                            <span class="text-sm">Online</span>
+                        </div>
+                        
+                        <!-- Casos Ativos -->
+                        <div class="flex items-center gap-2 text-blue-200">
+                            <i class="fas fa-folder-open text-purple-400"></i>
+                            <span class="text-sm"><span id="active-cases">12</span> casos ativos</span>
+                        </div>
+                        
+                        <!-- Último Acesso -->
+                        <div class="flex items-center gap-2 text-blue-200">
+                            <i class="fas fa-clock text-yellow-400"></i>
+                            <span class="text-sm">Último acesso: <span id="last-access">Hoje</span></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Botões de Ação -->
+                    <div class="flex flex-wrap gap-3">
+                        <!-- Perfil Completo -->
+                        <button onclick="showUserProfile()" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2">
+                            <i class="fas fa-user mr-2"></i>Perfil
+                        </button>
+                        
+                        <!-- Hierarquia Jurídica -->
+                        <button onclick="showJudicialHierarchy()" class="btn bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2">
+                            <i class="fas fa-sitemap mr-2"></i>Hierarquia
+                        </button>
+                        
+                        <!-- Configurações -->
+                        <button onclick="showSettings()" class="btn bg-gray-600 hover:bg-gray-700 text-white text-sm px-4 py-2">
+                            <i class="fas fa-cog mr-2"></i>Config
+                        </button>
+                        
+                        <!-- Logout -->
+                        <button onclick="logout()" class="btn bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <div class="mb-8">
                 <h2 class="text-white text-3xl font-bold mb-2">Bem-vindo ao Portal</h2>
                 <p class="text-blue-200">Gerencie seus casos, clientes e documentos jurídicos</p>
@@ -840,6 +904,7 @@
             console.log('Portal do Advogado carregado com sucesso!');
             showSection('dashboard');
             initializeCalculator();
+            loadUserData(); // Carregar dados do perfil do usuário
         });
 
         // === CALCULADORA DE PENAS - SISTEMA COMPLETO ===
@@ -1294,6 +1359,531 @@ pelo sistema e deve ser validado pelas autoridades competentes.
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         }
+
+        // === FUNÇÕES DO PERFIL DO USUÁRIO ===
+
+        // Dados do usuário (simulados - normalmente viriam do backend)
+        let userData = {
+            name: "Dr. Roberto Silva",
+            initials: "DR",
+            position: "Advogado Criminalista",
+            oab: "123.456",
+            email: "roberto.silva@oab.org.br",
+            phone: "(11) 99999-9999",
+            specialization: "criminal",
+            office: "Silva & Associados",
+            experience: 15,
+            activeCases: 12,
+            completedCases: 45,
+            documents: 78,
+            clients: 23,
+            lastAccess: "Hoje"
+        };
+
+        // Inicializar dados do usuário na página
+        function initializeUserProfile() {
+            document.getElementById('user-name').textContent = userData.name;
+            document.getElementById('user-initials').textContent = userData.initials;
+            document.getElementById('user-position').textContent = userData.position;
+            document.getElementById('user-oab').textContent = userData.oab;
+            document.getElementById('active-cases').textContent = userData.activeCases;
+            document.getElementById('last-access').textContent = userData.lastAccess;
+        }
+
+        // Mostrar perfil completo
+        function showUserProfile() {
+            // Preencher campos do modal com dados atuais
+            document.getElementById('profile-name').value = userData.name;
+            document.getElementById('profile-oab').value = userData.oab;
+            document.getElementById('profile-email').value = userData.email;
+            document.getElementById('profile-phone').value = userData.phone;
+            document.getElementById('profile-specialization').value = userData.specialization;
+            document.getElementById('profile-position').value = userData.position;
+            document.getElementById('profile-office').value = userData.office;
+            document.getElementById('profile-experience').value = userData.experience;
+            
+            // Mostrar modal
+            document.getElementById('profileModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Mostrar hierarquia jurídica
+        function showJudicialHierarchy() {
+            document.getElementById('hierarchyModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Mostrar configurações
+        function showSettings() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Fechar modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Salvar perfil
+        function saveProfile() {
+            // Atualizar dados do usuário
+            userData.name = document.getElementById('profile-name').value;
+            userData.oab = document.getElementById('profile-oab').value;
+            userData.email = document.getElementById('profile-email').value;
+            userData.phone = document.getElementById('profile-phone').value;
+            userData.specialization = document.getElementById('profile-specialization').value;
+            userData.position = document.getElementById('profile-position').value;
+            userData.office = document.getElementById('profile-office').value;
+            userData.experience = parseInt(document.getElementById('profile-experience').value);
+            
+            // Atualizar iniciais
+            const nameParts = userData.name.split(' ');
+            userData.initials = nameParts.length >= 2 ? 
+                nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0) : 
+                nameParts[0].charAt(0) + nameParts[0].charAt(1);
+            
+            // Salvar no localStorage (simulação)
+            localStorage.setItem('userData', JSON.stringify(userData));
+            
+            // Atualizar interface
+            initializeUserProfile();
+            
+            // Fechar modal
+            closeModal('profileModal');
+            
+            // Mostrar confirmação
+            showNotification('Perfil atualizado com sucesso!', 'success');
+        }
+
+        // Salvar configurações
+        function saveSettings() {
+            // Aqui normalmente salvaríamos as configurações no backend
+            closeModal('settingsModal');
+            showNotification('Configurações salvas com sucesso!', 'success');
+        }
+
+        // Função de logout
+        function logout() {
+            if (confirm('Deseja realmente sair do sistema?')) {
+                // Limpar dados da sessão
+                localStorage.removeItem('userSession');
+                
+                // Mostrar mensagem de logout
+                showNotification('Logout realizado com sucesso. Redirecionando...', 'info');
+                
+                // Redirecionar para página de login após 2 segundos
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        }
+
+        // Mostrar notificação
+        function showNotification(message, type = 'info') {
+            // Criar elemento de notificação
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg border transform transition-all duration-300 translate-x-full`;
+            
+            // Definir cores baseadas no tipo
+            switch(type) {
+                case 'success':
+                    notification.className += ' bg-green-600 border-green-500 text-white';
+                    break;
+                case 'error':
+                    notification.className += ' bg-red-600 border-red-500 text-white';
+                    break;
+                case 'warning':
+                    notification.className += ' bg-yellow-600 border-yellow-500 text-white';
+                    break;
+                default:
+                    notification.className += ' bg-blue-600 border-blue-500 text-white';
+            }
+            
+            notification.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info'}-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            // Adicionar ao body
+            document.body.appendChild(notification);
+            
+            // Animar entrada
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Remover após 4 segundos
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 4000);
+        }
+
+        // Carregar dados do usuário do localStorage na inicialização
+        function loadUserData() {
+            const savedData = localStorage.getItem('userData');
+            if (savedData) {
+                userData = { ...userData, ...JSON.parse(savedData) };
+            }
+            initializeUserProfile();
+        }
+
+        // Fechar modais ao clicar fora
+        window.addEventListener('click', function(e) {
+            const modals = ['profileModal', 'hierarchyModal', 'settingsModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (e.target === modal) {
+                    closeModal(modalId);
+                }
+            });
+        });
+
+        // Fechar modais com ESC
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modals = ['profileModal', 'hierarchyModal', 'settingsModal'];
+                modals.forEach(modalId => {
+                    const modal = document.getElementById(modalId);
+                    if (!modal.classList.contains('hidden')) {
+                        closeModal(modalId);
+                    }
+                });
+            }
+        });
     </script>
+
+    <!-- Modais -->
+    
+    <!-- Modal Perfil Completo -->
+    <div id="profileModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="card bg-slate-900/95 border border-blue-300/20 max-w-2xl w-full p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                        <i class="fas fa-user text-blue-400"></i>
+                        Perfil Completo
+                    </h3>
+                    <button onclick="closeModal('profileModal')" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Informações Pessoais -->
+                    <div>
+                        <h4 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                            <i class="fas fa-id-card"></i>
+                            Informações Pessoais
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-blue-200 text-sm">Nome Completo</label>
+                                <input type="text" id="profile-name" value="Dr. Roberto Silva" class="w-full mt-1 p-2 bg-slate-800/50 border border-blue-300/20 rounded text-white">
+                            </div>
+                            <div>
+                                <label class="text-blue-200 text-sm">OAB</label>
+                                <input type="text" id="profile-oab" value="123.456" class="w-full mt-1 p-2 bg-slate-800/50 border border-blue-300/20 rounded text-white">
+                            </div>
+                            <div>
+                                <label class="text-blue-200 text-sm">Email</label>
+                                <input type="email" id="profile-email" value="roberto.silva@oab.org.br" class="w-full mt-1 p-2 bg-slate-800/50 border border-blue-300/20 rounded text-white">
+                            </div>
+                            <div>
+                                <label class="text-blue-200 text-sm">Telefone</label>
+                                <input type="tel" id="profile-phone" value="(11) 99999-9999" class="w-full mt-1 p-2 bg-slate-800/50 border border-blue-300/20 rounded text-white">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações Profissionais -->
+                    <div>
+                        <h4 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                            <i class="fas fa-briefcase"></i>
+                            Informações Profissionais
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-blue-200 text-sm">Especialização</label>
+                                <select id="profile-specialization" class="w-full mt-1 p-2 bg-slate-800/50 border border-blue-300/20 rounded text-white">
+                                    <option value="criminal">Direito Criminal</option>
+                                    <option value="civil">Direito Civil</option>
+                                    <option value="trabalhista">Direito Trabalhista</option>
+                                    <option value="empresarial">Direito Empresarial</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-blue-200 text-sm">Cargo/Posição</label>
+                                <input type="text" id="profile-position" value="Advogado Criminalista" class="w-full mt-1 p-2 bg-slate-800/50 border border-blue-300/20 rounded text-white">
+                            </div>
+                            <div>
+                                <label class="text-blue-200 text-sm">Escritório</label>
+                                <input type="text" id="profile-office" value="Silva & Associados" class="w-full mt-1 p-2 bg-slate-800/50 border border-blue-300/20 rounded text-white">
+                            </div>
+                            <div>
+                                <label class="text-blue-200 text-sm">Anos de Experiência</label>
+                                <input type="number" id="profile-experience" value="15" class="w-full mt-1 p-2 bg-slate-800/50 border border-blue-300/20 rounded text-white">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estatísticas -->
+                    <div>
+                        <h4 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                            <i class="fas fa-chart-bar"></i>
+                            Estatísticas do Portal
+                        </h4>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-slate-800/30 p-3 rounded text-center">
+                                <div class="text-blue-400 text-2xl font-bold">12</div>
+                                <div class="text-blue-200 text-sm">Casos Ativos</div>
+                            </div>
+                            <div class="bg-slate-800/30 p-3 rounded text-center">
+                                <div class="text-green-400 text-2xl font-bold">45</div>
+                                <div class="text-blue-200 text-sm">Casos Concluídos</div>
+                            </div>
+                            <div class="bg-slate-800/30 p-3 rounded text-center">
+                                <div class="text-yellow-400 text-2xl font-bold">78</div>
+                                <div class="text-blue-200 text-sm">Documentos</div>
+                            </div>
+                            <div class="bg-slate-800/30 p-3 rounded text-center">
+                                <div class="text-purple-400 text-2xl font-bold">23</div>
+                                <div class="text-blue-200 text-sm">Clientes</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 mt-6">
+                    <button onclick="closeModal('profileModal')" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                        Cancelar
+                    </button>
+                    <button onclick="saveProfile()" class="btn btn-primary">
+                        <i class="fas fa-save mr-2"></i>Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Hierarquia Jurídica -->
+    <div id="hierarchyModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="card bg-slate-900/95 border border-blue-300/20 max-w-4xl w-full p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                        <i class="fas fa-sitemap text-purple-400"></i>
+                        Hierarquia do Sistema Jurídico - BRASILÂNDIA
+                    </h3>
+                    <button onclick="closeModal('hierarchyModal')" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Hierarquia Federal -->
+                    <div>
+                        <h4 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-flag text-blue-400"></i>
+                            Justiça Federal
+                        </h4>
+                        <div class="bg-slate-800/30 p-4 rounded-lg">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-yellow-600/20 to-yellow-500/20 rounded">
+                                    <i class="fas fa-crown text-yellow-400"></i>
+                                    <div>
+                                        <div class="text-white font-semibold">Supremo Tribunal Federal (STF)</div>
+                                        <div class="text-blue-200 text-sm">Mais alta instância do Poder Judiciário</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-blue-600/20 to-blue-500/20 rounded">
+                                    <i class="fas fa-university text-blue-400"></i>
+                                    <div>
+                                        <div class="text-white font-semibold">Superior Tribunal de Justiça (STJ)</div>
+                                        <div class="text-blue-200 text-sm">Uniformização da interpretação da lei federal</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-green-600/20 to-green-500/20 rounded">
+                                    <i class="fas fa-gavel text-green-400"></i>
+                                    <div>
+                                        <div class="text-white font-semibold">Tribunais Regionais Federais (TRF)</div>
+                                        <div class="text-blue-200 text-sm">Segunda instância da Justiça Federal</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-purple-600/20 to-purple-500/20 rounded">
+                                    <i class="fas fa-balance-scale text-purple-400"></i>
+                                    <div>
+                                        <div class="text-white font-semibold">Juízes Federais</div>
+                                        <div class="text-blue-200 text-sm">Primeira instância da Justiça Federal</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hierarquia Estadual -->
+                    <div>
+                        <h4 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-green-400"></i>
+                            Justiça Estadual - BRASILÂNDIA
+                        </h4>
+                        <div class="bg-slate-800/30 p-4 rounded-lg">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-red-600/20 to-red-500/20 rounded">
+                                    <i class="fas fa-landmark text-red-400"></i>
+                                    <div>
+                                        <div class="text-white font-semibold">Tribunal de Justiça de BRASILÂNDIA (TJBR)</div>
+                                        <div class="text-blue-200 text-sm">Segunda instância estadual</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-orange-600/20 to-orange-500/20 rounded">
+                                    <i class="fas fa-user-tie text-orange-400"></i>
+                                    <div>
+                                        <div class="text-white font-semibold">Juízes de Direito</div>
+                                        <div class="text-blue-200 text-sm">Primeira instância estadual</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ministério Público -->
+                    <div>
+                        <h4 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-shield-alt text-red-400"></i>
+                            Ministério Público
+                        </h4>
+                        <div class="bg-slate-800/30 p-4 rounded-lg">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <div class="text-blue-300 font-medium">Federal</div>
+                                    <div class="text-blue-200 text-sm">• Procurador-Geral da República</div>
+                                    <div class="text-blue-200 text-sm">• Procuradores da República</div>
+                                    <div class="text-blue-200 text-sm">• Promotores de Justiça Federais</div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="text-blue-300 font-medium">Estadual</div>
+                                    <div class="text-blue-200 text-sm">• Procurador-Geral de Justiça</div>
+                                    <div class="text-blue-200 text-sm">• Promotores de Justiça</div>
+                                    <div class="text-blue-200 text-sm">• Promotores Substitutos</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center mt-6">
+                    <button onclick="closeModal('hierarchyModal')" class="btn btn-primary">
+                        <i class="fas fa-check mr-2"></i>Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Configurações -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="card bg-slate-900/95 border border-blue-300/20 max-w-2xl w-full p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                        <i class="fas fa-cog text-gray-400"></i>
+                        Configurações do Sistema
+                    </h3>
+                    <button onclick="closeModal('settingsModal')" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- Preferências da Interface -->
+                    <div>
+                        <h4 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                            <i class="fas fa-desktop"></i>
+                            Interface
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <label class="text-blue-200">Tema Escuro</label>
+                                <input type="checkbox" checked class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <label class="text-blue-200">Notificações</label>
+                                <input type="checkbox" checked class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <label class="text-blue-200">Sons do Sistema</label>
+                                <input type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Segurança -->
+                    <div>
+                        <h4 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                            <i class="fas fa-lock"></i>
+                            Segurança
+                        </h4>
+                        <div class="space-y-3">
+                            <button class="w-full text-left p-3 bg-slate-800/30 rounded border border-blue-300/10 hover:border-blue-300/30 transition-colors">
+                                <div class="text-white font-medium">Alterar Senha</div>
+                                <div class="text-blue-200 text-sm">Última alteração: 30 dias atrás</div>
+                            </button>
+                            <button class="w-full text-left p-3 bg-slate-800/30 rounded border border-blue-300/10 hover:border-blue-300/30 transition-colors">
+                                <div class="text-white font-medium">Autenticação em Duas Etapas</div>
+                                <div class="text-green-400 text-sm">Ativado</div>
+                            </button>
+                            <button class="w-full text-left p-3 bg-slate-800/30 rounded border border-blue-300/10 hover:border-blue-300/30 transition-colors">
+                                <div class="text-white font-medium">Sessões Ativas</div>
+                                <div class="text-blue-200 text-sm">Gerenciar dispositivos conectados</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Sistema -->
+                    <div>
+                        <h4 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                            <i class="fas fa-info-circle"></i>
+                            Sistema
+                        </h4>
+                        <div class="bg-slate-800/30 p-4 rounded">
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <div class="text-blue-200">Versão do Portal</div>
+                                    <div class="text-white font-medium">v2.0.1</div>
+                                </div>
+                                <div>
+                                    <div class="text-blue-200">Última Atualização</div>
+                                    <div class="text-white font-medium">Hoje</div>
+                                </div>
+                                <div>
+                                    <div class="text-blue-200">Servidor</div>
+                                    <div class="text-green-400 font-medium">Online</div>
+                                </div>
+                                <div>
+                                    <div class="text-blue-200">Licença</div>
+                                    <div class="text-white font-medium">Profissional</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 mt-6">
+                    <button onclick="closeModal('settingsModal')" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                        Fechar
+                    </button>
+                    <button onclick="saveSettings()" class="btn btn-primary">
+                        <i class="fas fa-save mr-2"></i>Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
