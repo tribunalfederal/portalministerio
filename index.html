@@ -2004,6 +2004,11 @@
                         <span class="hidden sm:inline">Portais</span>
                     </button>
 
+                    <!-- Botão de Teste Temporário -->
+                    <button onclick="testarPortais()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 px-3 py-2.5 rounded-lg border border-red-500/20 transition-all text-sm h-12 flex items-center" id="btn-teste">
+                        <span class="text-xs">TESTE</span>
+                    </button>
+
                     <!-- Botão Logout -->
                     <button onclick="logout()" class="bg-slate-600/50 hover:bg-slate-600 text-slate-300 hover:text-white px-3 py-2.5 rounded-lg border border-slate-600/50 transition-all hidden text-sm h-12 flex items-center" id="btn-logout">
                         <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
@@ -4293,8 +4298,8 @@ document.addEventListener('input', function(e) {
                 const dadosAdmin = {
                     nome: 'Alexandre de Moraes',
                     email: user.email,
-                    cargo: 'ministro_stf',
-                    titulo: 'Ministro do Supremo Tribunal Federal',
+                    cargo: '1_juiz_federal',
+                    titulo: '1º Juiz Federal - BRASILÂNDIA',
                     permissoes: ['todas', 'suprema_autoridade', 'nomeacao_geral'],
                     isAdmin: true,
                     nivel_hierarquico: 1,
@@ -4302,7 +4307,7 @@ document.addEventListener('input', function(e) {
                     nomeado: true,
                     nomeado_por: 'Sistema',
                     data_nomeacao: new Date().toISOString(),
-                    pode_nomear: ['2_juiz_federal', '3_juiz_federal', '1_desembargador', '2_desembargador', '3_desembargador'],
+                    pode_nomear: estruturaJudicial['1_juiz_federal'].pode_nomear,
                     ativo: true,
                     data_criacao: new Date().toISOString()
                 };
@@ -4344,12 +4349,12 @@ document.addEventListener('input', function(e) {
                     uid: user.uid,
                     email: user.email,
                     nome: 'Alexandre de Moraes',
-                    titulo: 'Ministro do Supremo Tribunal Federal',
-                    cargo: 'ministro_stf',
+                    titulo: '1º Juiz Federal - BRASILÂNDIA',
+                    cargo: '1_juiz_federal',
                     permissoes: ['todas', 'suprema_autoridade', 'nomeacao_geral'],
                     isAdmin: true,
                     oab: 'STF-001',
-                    pode_nomear: estruturaJudicial['ministro_stf'].pode_nomear,
+                    pode_nomear: estruturaJudicial['1_juiz_federal'].pode_nomear,
                     loginTime: new Date()
                 };
                 
@@ -4410,6 +4415,10 @@ document.addEventListener('input', function(e) {
                         if (btnPortaisEl) {
                             btnPortaisEl.classList.remove('hidden');
                             console.log('✅ Botão portais mostrado');
+                            console.log('🔍 Classes do botão portais:', btnPortaisEl.className);
+                            console.log('🔍 Visibilidade do botão:', btnPortaisEl.style.display);
+                        } else {
+                            console.log('❌ Elemento btn-portais não encontrado!');
                         }
                         
                         console.log('🎉 Interface atualizada com sucesso!');
@@ -5009,6 +5018,31 @@ document.addEventListener('input', function(e) {
         }
 
         // Função para mostrar boas-vindas
+        // Função de teste para verificar se o modal funciona
+        function testarPortais() {
+            console.log('🧪 Teste: Função testarPortais() chamada');
+            
+            // Simular usuário logado se não existir
+            if (!usuarioLogado) {
+                console.log('🧪 Teste: Simulando usuário logado');
+                usuarioLogado = {
+                    nome: 'Alexandre de Moraes',
+                    cargo: '1_juiz_federal',
+                    isAdmin: true
+                };
+            }
+            
+            // Forçar exibição do botão de portais
+            const btnPortais = document.getElementById('btn-portais');
+            if (btnPortais) {
+                btnPortais.classList.remove('hidden');
+                console.log('🧪 Teste: Botão portais forçado a aparecer');
+            }
+            
+            // Chamar função do modal
+            mostrarEscolhaPortalUniversal();
+        }
+
         function mostrarBoasVindas() {
             const agora = new Date();
             const horas = agora.getHours();
@@ -6519,11 +6553,16 @@ document.addEventListener('input', function(e) {
         // ===== SISTEMA DE ESCOLHA DE PORTAIS =====
         
         function mostrarEscolhaPortalUniversal() {
+            console.log('🎯 Função mostrarEscolhaPortalUniversal() chamada');
+            console.log('👤 UsuarioLogado:', usuarioLogado);
+            
             if (!usuarioLogado) {
+                console.log('❌ Usuário não logado - mostrando alerta');
                 alert('⚠️ Faça login primeiro para acessar os portais!');
                 return;
             }
 
+            console.log('✅ Criando modal de seleção de portais...');
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center overflow-y-auto';
             
