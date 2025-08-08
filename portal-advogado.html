@@ -1145,6 +1145,11 @@
                                 <i class="fas fa-file-plus text-green-400"></i>
                                 Abertura de Novo Processo
                             </h3>
+                            <div class="flex gap-3">
+                                <button type="button" onclick="hideNewProcessForm()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                                    <i class="fas fa-arrow-left mr-2"></i>Voltar para Lista
+                                </button>
+                            </div>
                         </div>
 
                         <form id="processForm" class="space-y-6">
@@ -1337,16 +1342,6 @@
                                            class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
                                            placeholder="Ex: Cobrança de honorários advocatícios">
                                 </div>
-
-                                <!-- Descrição Detalhada -->
-                                <div>
-                                    <label class="block text-blue-300 font-semibold mb-2">
-                                        <i class="fas fa-align-left mr-2"></i>Descrição Detalhada do Caso
-                                    </label>
-                                    <textarea id="descricao-processo" rows="4" 
-                                              class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                              placeholder="Descreva os detalhes do caso, fatos relevantes, pedidos principais..."></textarea>
-                                </div>
                             </div>
 
                             <!-- Informações Adicionais -->
@@ -1442,7 +1437,7 @@
                 </div>
 
                 <!-- Lista de Processos -->
-                <div id="lista-processos">
+                <div id="lista-processos" class="mt-12">
                     <div class="card p-6">
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="text-white text-xl font-bold flex items-center gap-2">
@@ -3536,7 +3531,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 // Dados do Processo
                 tipoProcesso: document.getElementById('tipo-processo').value,
                 assunto: document.getElementById('assunto-processo').value,
-                descricaoProcesso: document.getElementById('descricao-processo').value,
                 valorCausa: parseFloat(document.getElementById('valor-causa').value) || 0,
                 varaInstancia: document.getElementById('vara-instancia').value,
                 observacoesProcesso: document.getElementById('observacoes-processo').value,
@@ -3733,6 +3727,11 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Carregar processos ao iniciar a seção
         function loadProcessesSection() {
+            // Só carrega se não estiver mostrando o formulário de novo processo
+            if (!document.getElementById('novo-processo-form').classList.contains('hidden')) {
+                return; // Mantém o formulário aberto
+            }
+            
             updateProcessList();
             updateProcessStats();
         }
@@ -3930,17 +3929,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         </div>
                     </div>
 
-                    <!-- Descrição -->
-                    ${processo.descricaoProcesso ? `
-                    <div class="bg-purple-900/20 rounded-lg p-6 border border-purple-400/30">
-                        <h5 class="text-purple-300 font-semibold mb-4 flex items-center gap-2">
-                            <i class="fas fa-align-left text-purple-400"></i>
-                            Descrição Detalhada
-                        </h5>
-                        <div class="text-white whitespace-pre-wrap">${safeData(processo.descricaoProcesso)}</div>
-                    </div>
-                    ` : ''}
-
                     <!-- Observações -->
                     ${processo.observacoesProcesso ? `
                     <div class="bg-yellow-900/20 rounded-lg p-6 border border-yellow-400/30">
@@ -3999,7 +3987,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.getElementById('requerente-documento').value = processo.requerenteDocumento || '';
             document.getElementById('tipo-processo').value = processo.tipoProcesso || '';
             document.getElementById('assunto-processo').value = processo.assunto || '';
-            document.getElementById('descricao-processo').value = processo.descricaoProcesso || '';
             document.getElementById('valor-causa').value = processo.valorCausa || '';
             document.getElementById('vara-instancia').value = processo.varaInstancia || '';
             document.getElementById('observacoes-processo').value = processo.observacoesProcesso || '';
@@ -4197,7 +4184,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.getElementById('advogado-oab').value = processo.oabAdvogado || userData.oab;
             document.getElementById('tipo-processo').value = processo.tipoProcesso;
             document.getElementById('assunto-processo').value = processo.assunto;
-            document.getElementById('descricao-processo').value = processo.descricao || '';
             document.getElementById('valor-causa').value = processo.valorCausa || '';
             document.getElementById('vara-instancia').value = processo.varaInstancia || '';
             document.getElementById('observacoes-processo').value = processo.observacoes || '';
