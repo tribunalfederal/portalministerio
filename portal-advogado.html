@@ -6,6 +6,7 @@
     <title>👨‍💼 Portal do Advogado - Sistema Jurídico BRASILÂNDIA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -810,7 +811,7 @@
                             <i class="fas fa-times mr-2"></i>Cancelar
                         </button>
                         <button onclick="generateDocument()" class="btn btn-primary">
-                            <i class="fas fa-file-download mr-2"></i>Gerar Documento
+                            <i class="fas fa-image mr-2"></i>Gerar Imagem (PNG)
                         </button>
                     </div>
                 </div>
@@ -2893,14 +2894,51 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 return;
             }
 
-            // Gerar documento
-            const documentContent = generateDocumentContent(currentDocumentType, formData);
+            // Gerar imagem do documento
+            generateDocumentImage(template.title);
+        }
+
+        // Gerar imagem do documento
+        function generateDocumentImage(documentTitle) {
+            const documentElement = document.getElementById('document-for-image');
             
-            // Criar e baixar arquivo
-            downloadDocument(documentContent, `${template.title.replace(/\s+/g, '_')}_${Date.now()}.txt`);
-            
-            showNotification('Documento gerado com sucesso!', 'success');
-            closeDocumentGenerator();
+            if (!documentElement) {
+                showNotification('Erro: preview não encontrado. Preencha os dados primeiro.', 'error');
+                return;
+            }
+
+            // Configurações para melhor qualidade da imagem
+            const options = {
+                backgroundColor: '#ffffff',
+                scale: 2, // Aumenta a resolução
+                useCORS: true,
+                allowTaint: true,
+                width: 800,
+                height: Math.max(1000, documentElement.scrollHeight + 100),
+                scrollX: 0,
+                scrollY: 0
+            };
+
+            html2canvas(documentElement, options).then(canvas => {
+                // Converter canvas para blob
+                canvas.toBlob(function(blob) {
+                    // Criar URL para download
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${documentTitle.replace(/\s+/g, '_')}_${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    showNotification('Documento gerado como imagem com sucesso!', 'success');
+                    closeDocumentGenerator();
+                }, 'image/png', 1.0); // Qualidade máxima
+            }).catch(error => {
+                console.error('Erro ao gerar imagem:', error);
+                showNotification('Erro ao gerar imagem do documento', 'error');
+            });
         }
 
         // Gerar conteúdo do documento
@@ -3017,9 +3055,14 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             
             if (!hasData) {
                 document.getElementById('document-preview').innerHTML = `
-                    <div class="text-blue-200 text-sm text-center py-8">
-                        <i class="fas fa-file-alt text-4xl mb-3"></i>
-                        <p>Preencha os dados para ver o preview</p>
+                    <div id="document-for-image" class="bg-white text-black p-6 rounded-lg" style="min-height: 600px; font-family: 'Times New Roman', serif; line-height: 1.6;">
+                        <div style="text-align: center; margin-top: 200px;">
+                            <div style="color: #94a3b8; font-size: 16px;">
+                                <i class="fas fa-file-alt" style="font-size: 60px; margin-bottom: 20px;"></i>
+                                <p>Preencha os dados para ver o preview do documento</p>
+                                <p style="font-size: 14px; margin-top: 10px;">O documento será gerado como imagem PNG</p>
+                            </div>
+                        </div>
                     </div>
                 `;
                 return;
@@ -3028,10 +3071,17 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             // Gerar preview
             const content = generateDocumentContent(currentDocumentType, formData);
             
-            // Mostrar preview formatado
+            // Mostrar preview formatado para conversão em imagem
             document.getElementById('document-preview').innerHTML = `
-                <div class="text-white text-sm font-mono leading-relaxed whitespace-pre-wrap">
-                    ${content.replace(/\n/g, '<br>')}
+                <div id="document-for-image" class="bg-white text-black p-6 rounded-lg" style="min-height: 600px; font-family: 'Times New Roman', serif; line-height: 1.6;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiMxZTQwYWYiLz4KPHN2ZyB4PSIxNSIgeT0iMTUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Im0xMS45OTkgMGMtNi42MjcgMC0xMiA1LjM3My0xMiAxMiAwIDYuNjI3IDUuMzczIDEyIDEyIDEyczEyLTUuMzczIDEyLTEyYzAtNi42MjctNS4zNzMtMTItMTItMTJ6bTAgMjJjLTUuNTE0IDAtMTAtNC40ODYtMTAtMTBzNC40ODYtMTAgMTAtMTAgMTAgNC40ODYgMTAgMTAtNC40ODYgMTAtMTAgMTB6Ii8+CjxwYXRoIGQ9Im0xNS4wNjMgOC40MzgtMS42MjUtMS42MjUtNS40MzggNS40MzctNS40MzgtNS40MzctMS42MjUgMS42MjUgNS40MzggNS40MzctNS40MzggNS40MzggMS42MjUgMS42MjUgNS40MzgtNS40MzggNS40MzggNS40MzggMS42MjUtMS42MjUtNS40MzgtNS40Mzh6Ii8+Cjwvc3ZnPgo8L3N2Zz4K" alt="Brasão" style="width: 60px; height: 60px; margin: 0 auto 10px;">
+                        <h2 style="margin: 0; font-size: 18px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA DE BRASILÂNDIA</h2>
+                        <h3 style="margin: 5px 0 20px; font-size: 16px; font-weight: bold;">${documentTemplates[currentDocumentType].title.toUpperCase()}</h3>
+                    </div>
+                    <div style="white-space: pre-line; text-align: justify; font-size: 14px;">
+                        ${content}
+                    </div>
                 </div>
             `;
         }
