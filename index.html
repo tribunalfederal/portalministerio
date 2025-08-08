@@ -4000,6 +4000,17 @@ document.addEventListener('input', function(e) {
         // Função para salvar dados no Firebase
         async function salvarDados() {
             try {
+                // Garantir que as variáveis estejam inicializadas
+                if (typeof usuariosCadastrados === 'undefined') {
+                    usuariosCadastrados = {};
+                }
+                if (typeof registrosOAB === 'undefined') {
+                    registrosOAB = {};
+                }
+                if (typeof usuariosOnline === 'undefined') {
+                    usuariosOnline = {};
+                }
+                
                 // Salvar no Firebase em tempo real
                 await Promise.all([
                     salvarDadosFirebase('usuarios_cadastrados', 'dados', usuariosCadastrados),
@@ -4010,9 +4021,9 @@ document.addEventListener('input', function(e) {
             } catch (error) {
                 console.error('❌ Erro ao salvar dados:', error);
                 // Fallback para localStorage em caso de erro
-                localStorage.setItem('usuariosCadastrados', JSON.stringify(usuariosCadastrados));
-                localStorage.setItem('registrosOAB', JSON.stringify(registrosOAB));
-                localStorage.setItem('usuariosOnline', JSON.stringify(usuariosOnline));
+                localStorage.setItem('usuariosCadastrados', JSON.stringify(usuariosCadastrados || {}));
+                localStorage.setItem('registrosOAB', JSON.stringify(registrosOAB || {}));
+                localStorage.setItem('usuariosOnline', JSON.stringify(usuariosOnline || {}));
             }
         }
         
@@ -6637,9 +6648,34 @@ document.addEventListener('input', function(e) {
         }
 
         function obterNivelHierarquico(cargo) {
-            // Usar a estrutura principal para obter nível
-            const cargoInfo = estruturaJudicial[cargo];
-            return cargoInfo ? cargoInfo.nivel : 99;
+            // Mapeamento direto dos níveis hierárquicos BRASILÂNDIA
+            const niveisHierarquicos = {
+                '1_juiz_federal': 1,
+                '2_juiz_federal': 2,
+                '3_juiz_federal': 3,
+                '1_desembargador': 4,
+                '2_desembargador': 5,
+                '3_desembargador': 6,
+                '1_juiz_estadual': 7,
+                '2_juiz_estadual': 8,
+                '3_juiz_estadual': 9,
+                '4_juiz_estadual': 10,
+                '1_procurador_geral_republica': 11,
+                '2_procurador_geral_justica': 12,
+                '3_procurador_geral_justica': 13,
+                '1_promotor': 14,
+                '2_promotor': 15,
+                '3_promotor': 16,
+                '4_promotor': 17,
+                '5_promotor': 18,
+                '6_promotor': 19,
+                '1_oficial_justica_2_instancia': 20,
+                '1_oficial_justica_1_instancia': 21,
+                'advogado': 22,
+                'defensor_publico': 23
+            };
+            
+            return niveisHierarquicos[cargo] || 99;
         }
 
         function redirecionarParaPortal(portal) {
