@@ -1684,18 +1684,18 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Dados da hierarquia (preparado para sincronização em tempo real)
         let hierarchyData = {
-            // Cargos únicos (1 por cargo)
+            // Cargos únicos (1 por cargo) - DEMONSTRAÇÃO COM ALGUNS OCUPADOS
             'juiz-federal-1': { name: 'Dr. João Silva', status: 'occupied' },
-            'juiz-federal-2': { name: null, status: 'vacant' },
+            'juiz-federal-2': { name: 'Dra. Maria Santos', status: 'occupied' },
             'juiz-federal-3': { name: null, status: 'vacant' },
-            'desembargador-1': { name: null, status: 'vacant' },
+            'desembargador-1': { name: 'Dr. Carlos Oliveira', status: 'occupied' },
             'desembargador-2': { name: null, status: 'vacant' },
             'desembargador-3': { name: null, status: 'vacant' },
-            'procurador-geral-republica-1': { name: null, status: 'vacant' },
+            'procurador-geral-republica-1': { name: 'Dr. Roberto Lima', status: 'occupied' },
             'procurador-geral-2': { name: null, status: 'vacant' },
             'procurador-geral-3': { name: null, status: 'vacant' },
-            'presidente-oab': { name: null, status: 'vacant' },
-            'juiz-estadual-1': { name: null, status: 'vacant' },
+            'presidente-oab': { name: 'Dra. Ana Costa', status: 'occupied' },
+            'juiz-estadual-1': { name: 'Dr. Pedro Alves', status: 'occupied' },
             'promotor-1': { name: null, status: 'vacant' },
             'oficial-2instancia': { name: null, status: 'vacant' },
             'oficial-1instancia': { name: null, status: 'vacant' },
@@ -1722,35 +1722,65 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Inicializar posições múltiplas
         function initializeMultiplePositions() {
-            // Juízes Estaduais (2º ao 4º - máximo 3)
+            // Juízes Estaduais (2º ao 4º - máximo 3) - COM DEMONSTRAÇÃO
             while (hierarchyData['juizes-estaduais'].length < 3) {
-                hierarchyData['juizes-estaduais'].push({
+                const position = {
                     id: `juiz-estadual-${hierarchyData['juizes-estaduais'].length + 2}`,
                     name: null,
                     status: 'vacant',
                     position: `${hierarchyData['juizes-estaduais'].length + 2}º Juiz(a) Estadual - 1ª Instância`
-                });
+                };
+                
+                // Demonstração: preencher alguns cargos
+                if (hierarchyData['juizes-estaduais'].length === 0) {
+                    position.name = 'Dra. Fernanda Souza';
+                    position.status = 'occupied';
+                }
+                
+                hierarchyData['juizes-estaduais'].push(position);
             }
             
-            // Promotores (2º ao 6º - máximo 5)
+            // Promotores (2º ao 6º - máximo 5) - COM DEMONSTRAÇÃO  
             while (hierarchyData['promotores'].length < 5) {
-                hierarchyData['promotores'].push({
+                const position = {
                     id: `promotor-${hierarchyData['promotores'].length + 2}`,
                     name: null,
                     status: 'vacant',
                     position: `${hierarchyData['promotores'].length + 2}º Promotor - 1ª Instância`
-                });
+                };
+                
+                // Demonstração: preencher alguns cargos
+                if (hierarchyData['promotores'].length === 0) {
+                    position.name = 'Dr. Marcos Pereira';
+                    position.status = 'occupied';
+                } else if (hierarchyData['promotores'].length === 1) {
+                    position.name = 'Dra. Juliana Rocha';
+                    position.status = 'occupied';
+                }
+                
+                hierarchyData['promotores'].push(position);
             }
             
-            // Advogados (iniciar com 5 vagas se vazio)
+            // Advogados (iniciar com 5 vagas se vazio) - COM DEMONSTRAÇÃO
             if (hierarchyData['advogados'].length === 0) {
                 for (let i = 1; i <= 5; i++) {
-                    hierarchyData['advogados'].push({
+                    const position = {
                         id: `advogado-${i}`,
                         name: null,
                         status: 'vacant',
                         position: `Advogado(a) ${i}ª/2ª Instância`
-                    });
+                    };
+                    
+                    // Demonstração: preencher alguns advogados
+                    if (i === 1) {
+                        position.name = 'Dr. Roberto Silva';
+                        position.status = 'occupied';
+                    } else if (i === 2) {
+                        position.name = 'Dra. Carla Mendes';
+                        position.status = 'occupied';
+                    }
+                    
+                    hierarchyData['advogados'].push(position);
                 }
             }
             
@@ -1924,6 +1954,50 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             updateHierarchyDisplay(); // Atualizar dados antes de mostrar
             document.getElementById('hierarchyModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+        }
+
+        // === FUNÇÕES DE DEMONSTRAÇÃO TEMPO REAL ===
+
+        // Simular nomeação em tempo real (para demonstração)
+        function demonstrateRealTimeUpdate() {
+            setTimeout(() => {
+                // Nomear alguém para um cargo vago
+                updatePosition('juiz-federal-3', 'Dr. Alexandre Novo', 'occupied');
+                showNotification('🎉 Dr. Alexandre Novo foi nomeado para 3º Juiz Federal!', 'success');
+                
+                setTimeout(() => {
+                    // Remover alguém de um cargo
+                    removeFromPosition('desembargador-1');
+                    showNotification('📋 Dr. Carlos Oliveira foi exonerado do cargo de 1º Desembargador', 'info');
+                    
+                    setTimeout(() => {
+                        // Nomear para outro cargo
+                        updatePosition('promotor-1', 'Dra. Beatriz Silva', 'occupied');
+                        showNotification('⚖️ Dra. Beatriz Silva assumiu como 1º Promotor - Líder da Promotoria!', 'success');
+                    }, 3000);
+                }, 3000);
+            }, 2000);
+        }
+
+        // Função para testar atualizações manuais
+        function testHierarchyUpdate() {
+            const updates = [
+                { position: 'oficial-1instancia', name: 'Sr. José Santos', action: 'nomear' },
+                { position: 'presidente-oab', name: null, action: 'exonerar' },
+                { position: 'oficial-2instancia', name: 'Sra. Marina Alves', action: 'nomear' }
+            ];
+            
+            updates.forEach((update, index) => {
+                setTimeout(() => {
+                    if (update.action === 'nomear') {
+                        updatePosition(update.position, update.name, 'occupied');
+                        showNotification(`✅ ${update.name} foi nomeado(a)!`, 'success');
+                    } else {
+                        removeFromPosition(update.position);
+                        showNotification(`📤 Cargo deixado vago`, 'info');
+                    }
+                }, (index + 1) * 2000);
+            });
         }
     </script>
 
@@ -2402,7 +2476,13 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     </div>
                 </div>
                 
-                <div class="flex justify-center mt-6">
+                <div class="flex justify-center mt-6 space-x-4">
+                    <button onclick="demonstrateRealTimeUpdate()" class="btn btn-secondary">
+                        <i class="fas fa-sync mr-2"></i>Demonstrar Tempo Real
+                    </button>
+                    <button onclick="testHierarchyUpdate()" class="btn btn-info">
+                        <i class="fas fa-test-tube mr-2"></i>Teste Atualização
+                    </button>
                     <button onclick="closeModal('hierarchyModal')" class="btn btn-primary">
                         <i class="fas fa-check mr-2"></i>Entendido
                     </button>
