@@ -707,15 +707,6 @@
                     </div>
                 </div>
 
-                <!-- Mandado de Segurança -->
-                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('mandado-seguranca')">
-                    <div class="text-center">
-                        <i class="fas fa-shield-alt text-4xl text-yellow-400 mb-4"></i>
-                        <h3 class="text-white font-bold text-lg mb-2">Mandado de Segurança</h3>
-                        <p class="text-blue-200 text-sm">Proteção de direitos líquidos e certos</p>
-                    </div>
-                </div>
-
                 <!-- Contestação -->
                 <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('contestacao')">
                     <div class="text-center">
@@ -1269,7 +1260,6 @@
                                         <option value="acao-acidente-trabalho">Ação de Acidente de Trabalho</option>
                                     </optgroup>
                                     <optgroup label="🏛️ Administrativo">
-                                        <option value="mandado-seguranca">Mandado de Segurança</option>
                                         <option value="acao-popular">Ação Popular</option>
                                     </optgroup>
                                 </select>
@@ -2737,24 +2727,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     { name: 'ilegalidade', label: 'Ilegalidade ou Abuso de Poder', type: 'textarea', required: true },
                     { name: 'fundamentacaoJuridica', label: 'Fundamentação Jurídica', type: 'textarea', required: true },
                     { name: 'pedidos', label: 'Pedidos (Libertação Imediata, etc.)', type: 'textarea', required: true }
-                ]
-            },
-            'mandado-seguranca': {
-                title: 'Mandado de Segurança',
-                icon: 'fas fa-shield-alt',
-                fields: [
-                    { name: 'impetrante', label: 'Nome do Impetrante', type: 'text', required: true },
-                    { name: 'impetranteRG', label: 'RG/CPF do Impetrante', type: 'text', required: true },
-                    { name: 'impetranteQualificacao', label: 'Qualificação do Impetrante', type: 'text', required: true },
-                    { name: 'autoridade', label: 'Autoridade Impetrada', type: 'text', required: true },
-                    { name: 'cargoAutoridade', label: 'Cargo da Autoridade', type: 'text', required: true },
-                    { name: 'atoImpugnado', label: 'Ato Administrativo Impugnado', type: 'textarea', required: true },
-                    { name: 'dataAto', label: 'Data do Ato Impugnado', type: 'date', required: true },
-                    { name: 'direitoLiquido', label: 'Direito Líquido e Certo Violado', type: 'textarea', required: true },
-                    { name: 'fundamentacaoJuridica', label: 'Fundamentação Jurídica', type: 'textarea', required: true },
-                    { name: 'urgencia', label: 'Urgência e Necessidade da Medida', type: 'textarea', required: true },
-                    { name: 'pedidoLiminar', label: 'Pedido de Liminar', type: 'textarea', required: false },
-                    { name: 'pedidos', label: 'Pedidos Finais', type: 'textarea', required: true }
                 ]
             },
             'contestacao': {
