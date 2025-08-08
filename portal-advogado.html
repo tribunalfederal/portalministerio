@@ -407,6 +407,15 @@
                 padding-left: 1rem;
                 padding-right: 1rem;
             }
+
+            /* Stack em mobile */
+            .modal-body .grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            #document-preview {
+                height: 300px !important;
+            }
         }
     </style>
 </head>
@@ -739,11 +748,29 @@
                     </div>
                 </div>
 
+                <!-- Porte de Armas -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('porte-armas')">
+                    <div class="text-center">
+                        <i class="fas fa-crosshairs text-4xl text-rose-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Porte de Armas</h3>
+                        <p class="text-blue-200 text-sm">Solicitação de autorização para porte</p>
+                    </div>
+                </div>
+
+                <!-- Limpeza de Ficha -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('limpeza-ficha')">
+                    <div class="text-center">
+                        <i class="fas fa-eraser text-4xl text-teal-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Limpeza de Ficha</h3>
+                        <p class="text-blue-200 text-sm">Reabilitação criminal</p>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Modal do Gerador -->
             <div id="document-generator-modal" class="modal">
-                <div class="modal-content">
+                <div class="modal-content" style="max-width: 1200px;">
                     <div class="modal-header">
                         <h3 id="generator-title" class="text-white text-xl font-bold">Gerador de Documento</h3>
                         <button onclick="closeDocumentGenerator()" class="text-gray-400 hover:text-white">
@@ -752,8 +779,29 @@
                     </div>
                     
                     <div class="modal-body">
-                        <div id="generator-content">
-                            <!-- Conteúdo será carregado dinamicamente -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Formulário -->
+                            <div>
+                                <h4 class="text-white font-semibold mb-4">
+                                    <i class="fas fa-edit mr-2"></i>Preencher Dados
+                                </h4>
+                                <div id="generator-content">
+                                    <!-- Conteúdo será carregado dinamicamente -->
+                                </div>
+                            </div>
+                            
+                            <!-- Preview -->
+                            <div>
+                                <h4 class="text-white font-semibold mb-4">
+                                    <i class="fas fa-eye mr-2"></i>Preview do Documento
+                                </h4>
+                                <div id="document-preview" class="bg-white/10 rounded-lg p-4 h-96 overflow-y-auto border border-blue-300/20">
+                                    <div class="text-blue-200 text-sm text-center py-8">
+                                        <i class="fas fa-file-alt text-4xl mb-3"></i>
+                                        <p>Preencha os dados para ver o preview</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -2723,6 +2771,34 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     { name: 'justificativa', label: 'Justificativa', type: 'textarea', required: true },
                     { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
                 ]
+            },
+            'porte-armas': {
+                title: 'Pedido de Porte de Armas',
+                icon: 'fas fa-crosshairs',
+                fields: [
+                    { name: 'requerente', label: 'Nome do Requerente', type: 'text', required: true },
+                    { name: 'requerenteRG', label: 'RG do Requerente', type: 'text', required: true },
+                    { name: 'profissao', label: 'Profissão', type: 'text', required: true },
+                    { name: 'endereco', label: 'Endereço Completo', type: 'text', required: true },
+                    { name: 'motivacao', label: 'Motivação para o Porte', type: 'textarea', required: true },
+                    { name: 'experiencia', label: 'Experiência com Armas', type: 'textarea', required: true },
+                    { name: 'antecedentes', label: 'Antecedentes Criminais', type: 'textarea', required: true },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                ]
+            },
+            'limpeza-ficha': {
+                title: 'Pedido de Limpeza de Ficha',
+                icon: 'fas fa-eraser',
+                fields: [
+                    { name: 'requerente', label: 'Nome do Requerente', type: 'text', required: true },
+                    { name: 'requerenteRG', label: 'RG do Requerente', type: 'text', required: true },
+                    { name: 'crimesAnteriores', label: 'Crimes Anteriores', type: 'textarea', required: true },
+                    { name: 'tempoDecorrido', label: 'Tempo Decorrido', type: 'text', required: true },
+                    { name: 'comportamento', label: 'Comportamento Posterior', type: 'textarea', required: true },
+                    { name: 'reabilitacao', label: 'Evidências de Reabilitação', type: 'textarea', required: true },
+                    { name: 'fundamentacao', label: 'Fundamentação Legal', type: 'textarea', required: true },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                ]
             }
         };
 
@@ -2756,6 +2832,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                                     class="w-full p-3 bg-slate-800/50 border border-blue-300/20 rounded text-white" 
                                     placeholder="Digite aqui..."
                                     ${field.required ? 'required' : ''}
+                                    oninput="updateDocumentPreview()"
                                 ></textarea>
                             ` : `
                                 <input 
@@ -2764,7 +2841,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                                     class="w-full p-3 bg-slate-800/50 border border-blue-300/20 rounded text-white" 
                                     placeholder="Digite aqui..."
                                     ${field.required ? 'required' : ''}
-                                    ${field.name.includes('RG') ? 'oninput="formatDocumentInput(this)"' : ''}
+                                    ${field.name.includes('RG') ? 'oninput="formatDocumentInput(this); updateDocumentPreview()"' : 'oninput="updateDocumentPreview()"'}
                                 >
                             `}
                         </div>
@@ -2774,6 +2851,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
             document.getElementById('generator-content').innerHTML = formHTML;
             document.getElementById('document-generator-modal').style.display = 'flex';
+            
+            // Inicializar preview vazio
+            updateDocumentPreview();
         }
 
         // Fechar gerador
@@ -2866,6 +2946,26 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     content += `DOS PEDIDOS:\n${data.pedidos}\n\n`;
                     break;
                     
+                case 'porte-armas':
+                    content += `REQUERENTE: ${data.requerente} - RG: ${data.requerenteRG}\n`;
+                    content += `PROFISSÃO: ${data.profissao}\n`;
+                    content += `ENDEREÇO: ${data.endereco}\n\n`;
+                    content += `DA MOTIVAÇÃO:\n${data.motivacao}\n\n`;
+                    content += `DA EXPERIÊNCIA COM ARMAS:\n${data.experiencia}\n\n`;
+                    content += `DOS ANTECEDENTES:\n${data.antecedentes}\n\n`;
+                    content += `DOS PEDIDOS:\n${data.pedidos}\n\n`;
+                    break;
+                    
+                case 'limpeza-ficha':
+                    content += `REQUERENTE: ${data.requerente} - RG: ${data.requerenteRG}\n\n`;
+                    content += `DOS CRIMES ANTERIORES:\n${data.crimesAnteriores}\n\n`;
+                    content += `DO TEMPO DECORRIDO:\n${data.tempoDecorrido}\n\n`;
+                    content += `DO COMPORTAMENTO POSTERIOR:\n${data.comportamento}\n\n`;
+                    content += `DAS EVIDÊNCIAS DE REABILITAÇÃO:\n${data.reabilitacao}\n\n`;
+                    content += `DA FUNDAMENTAÇÃO LEGAL:\n${data.fundamentacao}\n\n`;
+                    content += `DOS PEDIDOS:\n${data.pedidos}\n\n`;
+                    break;
+                    
                 default:
                     // Gerar conteúdo genérico para outros tipos
                     Object.keys(data).forEach(key => {
@@ -2895,6 +2995,45 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             a.click();
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
+        }
+
+        // Atualizar preview do documento em tempo real
+        function updateDocumentPreview() {
+            const template = documentTemplates[currentDocumentType];
+            
+            if (!template) return;
+
+            // Coletar dados do formulário
+            const formData = {};
+            template.fields.forEach(field => {
+                const element = document.getElementById(`field-${field.name}`);
+                if (element) {
+                    formData[field.name] = element.value.trim();
+                }
+            });
+
+            // Verificar se há dados para mostrar
+            const hasData = Object.values(formData).some(value => value.length > 0);
+            
+            if (!hasData) {
+                document.getElementById('document-preview').innerHTML = `
+                    <div class="text-blue-200 text-sm text-center py-8">
+                        <i class="fas fa-file-alt text-4xl mb-3"></i>
+                        <p>Preencha os dados para ver o preview</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Gerar preview
+            const content = generateDocumentContent(currentDocumentType, formData);
+            
+            // Mostrar preview formatado
+            document.getElementById('document-preview').innerHTML = `
+                <div class="text-white text-sm font-mono leading-relaxed whitespace-pre-wrap">
+                    ${content.replace(/\n/g, '<br>')}
+                </div>
+            `;
         }
 
         // Protocolar processo
