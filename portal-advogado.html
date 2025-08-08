@@ -27,7 +27,7 @@
         
         body { 
             font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e3a8a 50%, #1e1b4b 100%);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e3a8a 50%, #1e1b4b 100%) fixed;
             min-height: 100vh;
             line-height: 1.6;
         }
@@ -255,12 +255,21 @@
 
         /* Prevent body scroll when modal is open */
         body.modal-open {
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            /* Manter o fundo azul original quando modal aberto */
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e3a8a 50%, #1e1b4b 100%) !important;
+            overflow: hidden !important;
+            /* Não usar position: fixed que causa problemas de background */
+        }
+
+        /* Garantir que o background azul sempre seja visível */
+        html, body {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e3a8a 50%, #1e1b4b 100%) fixed !important;
+            background-attachment: fixed !important;
+            background-repeat: no-repeat !important;
+            background-size: cover !important;
+        }
+
+        /* Background específico para quando modal está aberto */
+        html.modal-open, body.modal-open {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e3a8a 50%, #1e1b4b 100%) fixed !important;
         }
 
         /* Crime Category Tabs */
@@ -1843,6 +1852,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.getElementById('profileModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             document.body.classList.add('modal-open');
+            document.documentElement.classList.add('modal-open'); // Adicionar no HTML também
         }
 
         // Mostrar hierarquia jurídica
@@ -1850,6 +1860,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.getElementById('hierarchyModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             document.body.classList.add('modal-open');
+            document.documentElement.classList.add('modal-open'); // Adicionar no HTML também
         }
 
         // Mostrar configurações
@@ -1857,6 +1868,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.getElementById('settingsModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             document.body.classList.add('modal-open');
+            document.documentElement.classList.add('modal-open'); // Adicionar no HTML também
         }
 
         // Fechar modal
@@ -1864,6 +1876,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.getElementById(modalId).classList.add('hidden');
             document.body.style.overflow = 'auto';
             document.body.classList.remove('modal-open');
+            document.documentElement.classList.remove('modal-open'); // Remover do HTML também
         }
 
         // Salvar perfil
@@ -2273,6 +2286,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.getElementById('hierarchyModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             document.body.classList.add('modal-open');
+            document.documentElement.classList.add('modal-open'); // Adicionar no HTML também
         }
 
         // === SISTEMA DE ABERTURA DE PROCESSOS ===
