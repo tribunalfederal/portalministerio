@@ -348,6 +348,66 @@
             color: #fbbf24;
             font-weight: 500;
         }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem 1rem 2rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem 2rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 2rem 1.5rem 2rem;
+            border-top: 1px solid rgba(59, 130, 246, 0.2);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 1rem;
+                max-height: calc(100vh - 2rem);
+            }
+            
+            .modal-header,
+            .modal-body,
+            .modal-footer {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
     </style>
 </head>
 
@@ -584,15 +644,128 @@
         
         <!-- Documentos Section -->
         <section id="documentos" class="section">
-            <div class="card p-8">
-                <h2 class="text-white text-2xl font-bold mb-6">
-                    <i class="fas fa-file-alt mr-3 text-green-400"></i>
-                    Gestão de Documentos
-                </h2>
-                <p class="text-blue-200 mb-6">Em desenvolvimento...</p>
-                <button onclick="showSection('dashboard')" class="btn btn-primary">
+            <div class="mb-6">
+                <button onclick="showSection('dashboard')" class="btn btn-primary mb-4">
                     <i class="fas fa-arrow-left mr-2"></i>Voltar ao Dashboard
                 </button>
+                <h2 class="text-white text-3xl font-bold mb-2">
+                    <i class="fas fa-file-alt mr-3 text-green-400"></i>
+                    Gerador de Documentos Jurídicos
+                </h2>
+                <p class="text-blue-200">Crie petições, recursos e documentos profissionais para o Tribunal de Brasilândia</p>
+            </div>
+
+            <!-- Grid de Geradores -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                
+                <!-- Petição Inicial -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('peticao-inicial')">
+                    <div class="text-center">
+                        <i class="fas fa-file-invoice text-4xl text-blue-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Petição Inicial</h3>
+                        <p class="text-blue-200 text-sm">Gerar petição inicial para novos processos</p>
+                    </div>
+                </div>
+
+                <!-- Recurso de Apelação -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('recurso-apelacao')">
+                    <div class="text-center">
+                        <i class="fas fa-balance-scale text-4xl text-purple-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Recurso de Apelação</h3>
+                        <p class="text-blue-200 text-sm">Recurso contra sentenças em 1ª instância</p>
+                    </div>
+                </div>
+
+                <!-- Habeas Corpus -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('habeas-corpus')">
+                    <div class="text-center">
+                        <i class="fas fa-unlock text-4xl text-green-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Habeas Corpus</h3>
+                        <p class="text-blue-200 text-sm">Proteção da liberdade de locomoção</p>
+                    </div>
+                </div>
+
+                <!-- Mandado de Segurança -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('mandado-seguranca')">
+                    <div class="text-center">
+                        <i class="fas fa-shield-alt text-4xl text-yellow-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Mandado de Segurança</h3>
+                        <p class="text-blue-200 text-sm">Proteção de direitos líquidos e certos</p>
+                    </div>
+                </div>
+
+                <!-- Contestação -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('contestacao')">
+                    <div class="text-center">
+                        <i class="fas fa-file-signature text-4xl text-red-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Contestação</h3>
+                        <p class="text-blue-200 text-sm">Resposta à petição inicial</p>
+                    </div>
+                </div>
+
+                <!-- Petição de Liberdade Provisória -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('liberdade-provisoria')">
+                    <div class="text-center">
+                        <i class="fas fa-key text-4xl text-cyan-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Liberdade Provisória</h3>
+                        <p class="text-blue-200 text-sm">Solicitação de liberdade provisória</p>
+                    </div>
+                </div>
+
+                <!-- Petição de Fiança -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('peticao-fianca')">
+                    <div class="text-center">
+                        <i class="fas fa-money-bill text-4xl text-emerald-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Petição de Fiança</h3>
+                        <p class="text-blue-200 text-sm">Pagamento de fiança para liberdade</p>
+                    </div>
+                </div>
+
+                <!-- Alegações Finais -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('alegacoes-finais')">
+                    <div class="text-center">
+                        <i class="fas fa-gavel text-4xl text-indigo-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Alegações Finais</h3>
+                        <p class="text-blue-200 text-sm">Argumentação final do processo</p>
+                    </div>
+                </div>
+
+                <!-- Requerimento de Provas -->
+                <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="showDocumentGenerator('requerimento-provas')">
+                    <div class="text-center">
+                        <i class="fas fa-search text-4xl text-orange-400 mb-4"></i>
+                        <h3 class="text-white font-bold text-lg mb-2">Requerimento de Provas</h3>
+                        <p class="text-blue-200 text-sm">Solicitação de produção de provas</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal do Gerador -->
+            <div id="document-generator-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="generator-title" class="text-white text-xl font-bold">Gerador de Documento</h3>
+                        <button onclick="closeDocumentGenerator()" class="text-gray-400 hover:text-white">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div id="generator-content">
+                            <!-- Conteúdo será carregado dinamicamente -->
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button onclick="closeDocumentGenerator()" class="btn btn-secondary mr-3">
+                            <i class="fas fa-times mr-2"></i>Cancelar
+                        </button>
+                        <button onclick="generateDocument()" class="btn btn-primary">
+                            <i class="fas fa-file-download mr-2"></i>Gerar Documento
+                        </button>
+                    </div>
+                </div>
             </div>
         </section>
         
@@ -1092,22 +1265,22 @@
                             <!-- Upload de Petição -->
                             <div class="border-2 border-dashed border-blue-300/30 rounded-lg p-6 bg-slate-800/30">
                                 <div class="text-center">
-                                    <i class="fas fa-file-upload text-4xl text-blue-400 mb-4"></i>
+                                    <i class="fas fa-image text-4xl text-blue-400 mb-4"></i>
                                     <h4 class="text-white font-semibold mb-2">Anexar Petição Inicial</h4>
-                                    <p class="text-blue-200 text-sm mb-4">Faça upload da petição inicial (PDF, DOC, DOCX) - Máximo 10MB</p>
+                                    <p class="text-blue-200 text-sm mb-4">Faça upload da imagem da petição inicial (PNG, JPG, JPEG) - Máximo 10MB</p>
                                     
-                                    <input type="file" id="peticao-upload" accept=".pdf,.doc,.docx" 
+                                    <input type="file" id="peticao-upload" accept=".png,.jpg,.jpeg" 
                                            class="hidden" onchange="handlePetitionUpload(event)">
                                     
                                     <button type="button" onclick="document.getElementById('peticao-upload').click()" 
                                             class="btn bg-blue-600 hover:bg-blue-700 text-white">
-                                        <i class="fas fa-upload mr-2"></i>Selecionar Arquivo
+                                        <i class="fas fa-upload mr-2"></i>Selecionar Imagem
                                     </button>
                                     
                                     <div id="arquivo-selecionado" class="hidden mt-4 p-3 bg-green-600/20 rounded-lg border border-green-500/30">
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center gap-2">
-                                                <i class="fas fa-file-pdf text-red-400"></i>
+                                                <i class="fas fa-image text-blue-400"></i>
                                                 <span class="text-white" id="nome-arquivo"></span>
                                                 <span class="text-green-400 text-sm" id="tamanho-arquivo"></span>
                                             </div>
@@ -2368,11 +2541,11 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 return;
             }
 
-            // Verificar tipo
-            const allowedTypes = ['.pdf', '.doc', '.docx'];
+            // Verificar tipo (agora aceita imagens)
+            const allowedTypes = ['.png', '.jpg', '.jpeg'];
             const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
             if (!allowedTypes.includes(fileExtension)) {
-                showNotification('Tipo de arquivo não permitido! Use PDF, DOC ou DOCX', 'error');
+                showNotification('Tipo de arquivo não permitido! Use PNG, JPG ou JPEG', 'error');
                 return;
             }
 
@@ -2433,6 +2606,295 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             }
             
             input.value = value;
+        }
+
+        // === GERADOR DE DOCUMENTOS ===
+        
+        let currentDocumentType = '';
+        
+        // Modelos de documentos
+        const documentTemplates = {
+            'peticao-inicial': {
+                title: 'Petição Inicial',
+                icon: 'fas fa-file-invoice',
+                fields: [
+                    { name: 'autor', label: 'Nome do Autor', type: 'text', required: true },
+                    { name: 'autorRG', label: 'RG do Autor', type: 'text', required: true },
+                    { name: 'reu', label: 'Nome do Réu', type: 'text', required: true },
+                    { name: 'reuRG', label: 'RG do Réu', type: 'text', required: true },
+                    { name: 'crime', label: 'Crime Cometido', type: 'text', required: true },
+                    { name: 'fatos', label: 'Narrativa dos Fatos', type: 'textarea', required: true },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true },
+                    { name: 'provas', label: 'Provas (opcional)', type: 'textarea', required: false }
+                ]
+            },
+            'recurso-apelacao': {
+                title: 'Recurso de Apelação',
+                icon: 'fas fa-balance-scale',
+                fields: [
+                    { name: 'apelante', label: 'Nome do Apelante', type: 'text', required: true },
+                    { name: 'apelanteRG', label: 'RG do Apelante', type: 'text', required: true },
+                    { name: 'numeroProcesso', label: 'Número do Processo', type: 'text', required: true },
+                    { name: 'sentenca', label: 'Decisão Recorrida', type: 'textarea', required: true },
+                    { name: 'fundamentacao', label: 'Fundamentação do Recurso', type: 'textarea', required: true },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                ]
+            },
+            'habeas-corpus': {
+                title: 'Habeas Corpus',
+                icon: 'fas fa-unlock',
+                fields: [
+                    { name: 'paciente', label: 'Nome do Paciente', type: 'text', required: true },
+                    { name: 'pacienteRG', label: 'RG do Paciente', type: 'text', required: true },
+                    { name: 'autoridade', label: 'Autoridade Coatora', type: 'text', required: true },
+                    { name: 'situacao', label: 'Situação Atual', type: 'textarea', required: true },
+                    { name: 'ilegalidade', label: 'Ilegalidade ou Abuso', type: 'textarea', required: true },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                ]
+            },
+            'mandado-seguranca': {
+                title: 'Mandado de Segurança',
+                icon: 'fas fa-shield-alt',
+                fields: [
+                    { name: 'impetrante', label: 'Nome do Impetrante', type: 'text', required: true },
+                    { name: 'impetranteRG', label: 'RG do Impetrante', type: 'text', required: true },
+                    { name: 'autoridade', label: 'Autoridade Impetrada', type: 'text', required: true },
+                    { name: 'direito', label: 'Direito Violado', type: 'textarea', required: true },
+                    { name: 'ato', label: 'Ato Impugnado', type: 'textarea', required: true },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                ]
+            },
+            'contestacao': {
+                title: 'Contestação',
+                icon: 'fas fa-file-signature',
+                fields: [
+                    { name: 'reu', label: 'Nome do Réu', type: 'text', required: true },
+                    { name: 'reuRG', label: 'RG do Réu', type: 'text', required: true },
+                    { name: 'numeroProcesso', label: 'Número do Processo', type: 'text', required: true },
+                    { name: 'defesa', label: 'Argumentos de Defesa', type: 'textarea', required: true },
+                    { name: 'contraprovas', label: 'Contraprovas', type: 'textarea', required: false },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                ]
+            },
+            'liberdade-provisoria': {
+                title: 'Liberdade Provisória',
+                icon: 'fas fa-key',
+                fields: [
+                    { name: 'requerente', label: 'Nome do Requerente', type: 'text', required: true },
+                    { name: 'requenteRG', label: 'RG do Requerente', type: 'text', required: true },
+                    { name: 'numeroProcesso', label: 'Número do Processo', type: 'text', required: true },
+                    { name: 'fundamentacao', label: 'Fundamentação Legal', type: 'textarea', required: true },
+                    { name: 'medidas', label: 'Medidas Cautelares Propostas', type: 'textarea', required: false },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                ]
+            },
+            'peticao-fianca': {
+                title: 'Petição de Fiança',
+                icon: 'fas fa-money-bill',
+                fields: [
+                    { name: 'requerente', label: 'Nome do Requerente', type: 'text', required: true },
+                    { name: 'requerenteRG', label: 'RG do Requerente', type: 'text', required: true },
+                    { name: 'numeroProcesso', label: 'Número do Processo', type: 'text', required: true },
+                    { name: 'valorFianca', label: 'Valor da Fiança', type: 'text', required: true },
+                    { name: 'fundamentacao', label: 'Fundamentação', type: 'textarea', required: true },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                ]
+            },
+            'alegacoes-finais': {
+                title: 'Alegações Finais',
+                icon: 'fas fa-gavel',
+                fields: [
+                    { name: 'parte', label: 'Nome da Parte', type: 'text', required: true },
+                    { name: 'parteRG', label: 'RG da Parte', type: 'text', required: true },
+                    { name: 'numeroProcesso', label: 'Número do Processo', type: 'text', required: true },
+                    { name: 'resumoFatos', label: 'Resumo dos Fatos', type: 'textarea', required: true },
+                    { name: 'argumentacao', label: 'Argumentação Jurídica', type: 'textarea', required: true },
+                    { name: 'pedidos', label: 'Pedidos Finais', type: 'textarea', required: true }
+                ]
+            },
+            'requerimento-provas': {
+                title: 'Requerimento de Provas',
+                icon: 'fas fa-search',
+                fields: [
+                    { name: 'requerente', label: 'Nome do Requerente', type: 'text', required: true },
+                    { name: 'requerenteRG', label: 'RG do Requerente', type: 'text', required: true },
+                    { name: 'numeroProcesso', label: 'Número do Processo', type: 'text', required: true },
+                    { name: 'provasSolicitadas', label: 'Provas Solicitadas', type: 'textarea', required: true },
+                    { name: 'justificativa', label: 'Justificativa', type: 'textarea', required: true },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                ]
+            }
+        };
+
+        // Mostrar gerador de documento
+        function showDocumentGenerator(documentType) {
+            currentDocumentType = documentType;
+            const template = documentTemplates[documentType];
+            
+            if (!template) {
+                showNotification('Tipo de documento não encontrado', 'error');
+                return;
+            }
+
+            // Atualizar título
+            document.getElementById('generator-title').innerHTML = `
+                <i class="${template.icon} mr-2"></i>${template.title}
+            `;
+
+            // Gerar formulário
+            const formHTML = `
+                <div class="space-y-4">
+                    ${template.fields.map(field => `
+                        <div>
+                            <label class="block text-white font-semibold mb-2">
+                                ${field.label}${field.required ? ' *' : ''}
+                            </label>
+                            ${field.type === 'textarea' ? `
+                                <textarea 
+                                    id="field-${field.name}" 
+                                    rows="4" 
+                                    class="w-full p-3 bg-slate-800/50 border border-blue-300/20 rounded text-white" 
+                                    placeholder="Digite aqui..."
+                                    ${field.required ? 'required' : ''}
+                                ></textarea>
+                            ` : `
+                                <input 
+                                    type="${field.type}" 
+                                    id="field-${field.name}" 
+                                    class="w-full p-3 bg-slate-800/50 border border-blue-300/20 rounded text-white" 
+                                    placeholder="Digite aqui..."
+                                    ${field.required ? 'required' : ''}
+                                    ${field.name.includes('RG') ? 'oninput="formatDocumentInput(this)"' : ''}
+                                >
+                            `}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('generator-content').innerHTML = formHTML;
+            document.getElementById('document-generator-modal').style.display = 'flex';
+        }
+
+        // Fechar gerador
+        function closeDocumentGenerator() {
+            document.getElementById('document-generator-modal').style.display = 'none';
+            currentDocumentType = '';
+        }
+
+        // Gerar documento
+        function generateDocument() {
+            const template = documentTemplates[currentDocumentType];
+            
+            if (!template) {
+                showNotification('Erro: tipo de documento inválido', 'error');
+                return;
+            }
+
+            // Validar campos obrigatórios
+            let isValid = true;
+            const formData = {};
+
+            template.fields.forEach(field => {
+                const element = document.getElementById(`field-${field.name}`);
+                const value = element.value.trim();
+                
+                if (field.required && !value) {
+                    isValid = false;
+                    element.style.borderColor = '#ef4444';
+                } else {
+                    element.style.borderColor = '';
+                    formData[field.name] = value;
+                }
+            });
+
+            if (!isValid) {
+                showNotification('Preencha todos os campos obrigatórios', 'error');
+                return;
+            }
+
+            // Gerar documento
+            const documentContent = generateDocumentContent(currentDocumentType, formData);
+            
+            // Criar e baixar arquivo
+            downloadDocument(documentContent, `${template.title.replace(/\s+/g, '_')}_${Date.now()}.txt`);
+            
+            showNotification('Documento gerado com sucesso!', 'success');
+            closeDocumentGenerator();
+        }
+
+        // Gerar conteúdo do documento
+        function generateDocumentContent(type, data) {
+            const userProfile = JSON.parse(localStorage.getItem('advogado-profile')) || {};
+            const currentDate = new Date().toLocaleDateString('pt-BR');
+            
+            let content = `TRIBUNAL DE JUSTIÇA DE BRASILÂNDIA\n\n`;
+            content += `${documentTemplates[type].title.toUpperCase()}\n\n`;
+            content += `Data: ${currentDate}\n\n`;
+            
+            content += `EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO\n\n`;
+            
+            content += `${userProfile.name || 'Dr(a). Roberto Silva'}, brasileiro, advogado, `;
+            content += `inscrito na OAB sob nº ${userProfile.oab || '123.456'}, `;
+            content += `com escritório localizado em Brasilândia, `;
+            content += `vem respeitosamente perante Vossa Excelência para:\n\n`;
+
+            // Conteúdo específico por tipo de documento
+            switch(type) {
+                case 'peticao-inicial':
+                    content += `AUTOR: ${data.autor} - RG: ${data.autorRG}\n`;
+                    content += `RÉU: ${data.reu} - RG: ${data.reuRG}\n\n`;
+                    content += `DOS FATOS:\n${data.fatos}\n\n`;
+                    content += `DO CRIME: ${data.crime}\n\n`;
+                    if (data.provas) content += `DAS PROVAS:\n${data.provas}\n\n`;
+                    content += `DOS PEDIDOS:\n${data.pedidos}\n\n`;
+                    break;
+                    
+                case 'recurso-apelacao':
+                    content += `APELANTE: ${data.apelante} - RG: ${data.apelanteRG}\n`;
+                    content += `PROCESSO Nº: ${data.numeroProcesso}\n\n`;
+                    content += `DA DECISÃO RECORRIDA:\n${data.sentenca}\n\n`;
+                    content += `DA FUNDAMENTAÇÃO:\n${data.fundamentacao}\n\n`;
+                    content += `DOS PEDIDOS:\n${data.pedidos}\n\n`;
+                    break;
+                    
+                case 'habeas-corpus':
+                    content += `PACIENTE: ${data.paciente} - RG: ${data.pacienteRG}\n`;
+                    content += `AUTORIDADE COATORA: ${data.autoridade}\n\n`;
+                    content += `DA SITUAÇÃO ATUAL:\n${data.situacao}\n\n`;
+                    content += `DA ILEGALIDADE/ABUSO DE PODER:\n${data.ilegalidade}\n\n`;
+                    content += `DOS PEDIDOS:\n${data.pedidos}\n\n`;
+                    break;
+                    
+                default:
+                    // Gerar conteúdo genérico para outros tipos
+                    Object.keys(data).forEach(key => {
+                        if (data[key]) {
+                            content += `${key.toUpperCase()}: ${data[key]}\n\n`;
+                        }
+                    });
+            }
+            
+            content += `Termos em que,\nPede deferimento.\n\n`;
+            content += `Brasilândia, ${currentDate}\n\n`;
+            content += `________________________________\n`;
+            content += `${userProfile.name || 'Dr(a). Roberto Silva'}\n`;
+            content += `OAB ${userProfile.oab || '123.456'}\n`;
+            
+            return content;
+        }
+
+        // Download do documento
+        function downloadDocument(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
         }
 
         // Protocolar processo
