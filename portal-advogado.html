@@ -223,6 +223,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: left;
+            position: relative; /* Para posicionar o ícone de check */
         }
 
         .crime-card:hover {
@@ -521,7 +522,7 @@
                 </button>
                 <h2 class="text-white text-3xl font-bold mb-2">
                     <i class="fas fa-calculator mr-3 text-red-400"></i>
-                    Calculadora de Sentenças v5.0 - Brasilândia
+                    Calculadora de Sentenças v6.0 - Múltiplos Crimes
                 </h2>
                 <p class="text-blue-200">Sistema oficial com interface intuitiva e todos os crimes do Código Penal de Brasilândia</p>
             </div>
@@ -583,6 +584,10 @@
                         <!-- Crime Selecionado -->
                         <div id="selectedCrimeInfo" class="hidden mt-6 bg-slate-800/30 rounded-lg p-4 border border-blue-300/20">
                             <h4 class="text-white font-semibold mb-2">Crime Selecionado:</h4>
+                            
+                            <!-- Lista de Crimes Selecionados (múltiplos) -->
+                            <div id="selectedCrimesList" class="mb-4"></div>
+                            
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                 <div>
                                     <span class="text-blue-300">Nome:</span>
@@ -609,6 +614,10 @@
                                     <span id="selectedCrimeDescription" class="text-white font-medium"></span>
                                 </div>
                             </div>
+                            
+                            <!-- Aviso de Limite de Redução -->
+                            <div id="reductionWarning" class="hidden mt-3 p-2 bg-yellow-600/20 border border-yellow-400/30 rounded text-yellow-300 text-sm"></div>
+                            
                             <button onclick="clearCrimeSelection()" class="mt-3 text-red-400 hover:text-red-300 text-sm">
                                 <i class="fas fa-times mr-1"></i>Limpar seleção
                             </button>
@@ -630,32 +639,32 @@
                                 </h4>
                                 <div class="space-y-2 max-h-60 overflow-y-auto">
                                     <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.20" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Confissão espontânea (-20%)</span>
-                                    </label>
-                                    <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.25" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Colaboração com autoridades (-25%)</span>
-                                    </label>
-                                    <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.15" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Menor de 21 anos (-15%)</span>
-                                    </label>
-                                    <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.15" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Maior de 65 anos (-15%)</span>
-                                    </label>
-                                    <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.10" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Reparação do dano (-10%)</span>
-                                    </label>
-                                    <label class="flex items-start space-x-3 cursor-pointer">
                                         <input type="checkbox" class="atenuante mt-1" value="0.12" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Bons antecedentes (-12%)</span>
+                                        <span class="text-blue-200 text-sm">Confissão espontânea (-12%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.30" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Primeira vez cometendo crime (-30%)</span>
+                                        <input type="checkbox" class="atenuante mt-1" value="0.08" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Colaboração com autoridades (-8%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="atenuante mt-1" value="0.07" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Menor de 21 anos (-7%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="atenuante mt-1" value="0.07" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Maior de 65 anos (-7%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="atenuante mt-1" value="0.05" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Reparação do dano (-5%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="atenuante mt-1" value="0.06" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Bons antecedentes (-6%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="atenuante mt-1" value="0.15" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Primeira vez cometendo crime (-15%)</span>
                                     </label>
                                 </div>
                             </div>
@@ -667,32 +676,32 @@
                                 </h4>
                                 <div class="space-y-2 max-h-60 overflow-y-auto">
                                     <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="agravante mt-1" value="0.50" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Reincidência (+50%)</span>
-                                    </label>
-                                    <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="agravante mt-1" value="0.35" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Crime contra funcionário público (+35%)</span>
-                                    </label>
-                                    <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="agravante mt-1" value="0.25" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Uso de violência (+25%)</span>
-                                    </label>
-                                    <label class="flex items-start space-x-3 cursor-pointer">
                                         <input type="checkbox" class="agravante mt-1" value="0.20" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Crime em local público (+20%)</span>
-                                    </label>
-                                    <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="agravante mt-1" value="0.30" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Crime organizado/quadrilha (+30%)</span>
+                                        <span class="text-blue-200 text-sm">Reincidência (+20%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
                                         <input type="checkbox" class="agravante mt-1" value="0.15" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Uso de arma (+15%)</span>
+                                        <span class="text-blue-200 text-sm">Crime contra funcionário público (+15%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="agravante mt-1" value="0.40" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Resistência à prisão (+40%)</span>
+                                        <input type="checkbox" class="agravante mt-1" value="0.12" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Uso de violência (+12%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="agravante mt-1" value="0.08" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Crime em local público (+8%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="agravante mt-1" value="0.18" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Crime organizado/quadrilha (+18%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="agravante mt-1" value="0.10" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Uso de arma (+10%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="agravante mt-1" value="0.16" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Resistência à prisão (+16%)</span>
                                     </label>
                                 </div>
                             </div>
@@ -1036,6 +1045,7 @@
 
         let calculationHistory = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
         let selectedCrime = null;
+        let selectedCrimes = []; // Array para múltiplos crimes
         let currentCategory = 'all';
 
         // Inicializar calculadora
@@ -1084,7 +1094,7 @@
             
             filteredCrimes.forEach((crime, index) => {
                 const originalIndex = crimesDatabase.findIndex(c => c.name === crime.name);
-                const isSelected = selectedCrime && selectedCrime.name === crime.name;
+                const isSelected = selectedCrimes.some(c => c.name === crime.name);
                 
                 const crimeCard = document.createElement('div');
                 crimeCard.className = `crime-card ${isSelected ? 'selected' : ''}`;
@@ -1096,6 +1106,7 @@
                     <div class="crime-card-penalty">
                         ${crime.services > 0 ? crime.services + ' serviços' : 'Sem serviços'} • ${formatCurrency(crime.fine)}
                     </div>
+                    ${isSelected ? '<div class="absolute top-2 right-2"><i class="fas fa-check text-green-400"></i></div>' : ''}
                 `;
                 
                 grid.appendChild(crimeCard);
@@ -1116,35 +1127,95 @@
             renderCrimesGrid();
         }
 
-        // Selecionar crime
+        // Selecionar crime (agora com suporte a múltiplos)
         function selectCrime(crimeIndex) {
-            selectedCrime = crimesDatabase[crimeIndex];
+            const crime = crimesDatabase[crimeIndex];
             
-            // Atualizar informações do crime selecionado
-            document.getElementById('selectedCrimeName').textContent = selectedCrime.name;
-            document.getElementById('selectedCrimeArticle').textContent = selectedCrime.article;
-            document.getElementById('selectedCrimeServices').textContent = selectedCrime.services + ' serviços comunitários';
-            document.getElementById('selectedCrimeFine').textContent = formatCurrency(selectedCrime.fine);
-            document.getElementById('selectedCrimeCategory').textContent = selectedCrime.category;
-            document.getElementById('selectedCrimeDescription').textContent = selectedCrime.description;
+            // Verificar se o crime já está selecionado
+            const existingIndex = selectedCrimes.findIndex(c => c.name === crime.name);
             
-            // Mostrar informações
-            document.getElementById('selectedCrimeInfo').classList.remove('hidden');
-            document.getElementById('selectCrimeMessage').classList.add('hidden');
+            if (existingIndex > -1) {
+                // Se já está selecionado, remover
+                selectedCrimes.splice(existingIndex, 1);
+            } else {
+                // Se não está selecionado, adicionar
+                selectedCrimes.push(crime);
+            }
             
-            // Re-renderizar grid para mostrar seleção
+            // Atualizar crime principal (último selecionado)
+            selectedCrime = selectedCrimes.length > 0 ? selectedCrimes[selectedCrimes.length - 1] : null;
+            
+            // Atualizar interface
+            updateSelectedCrimesDisplay();
+            
+            // Re-renderizar grid para mostrar seleções
             renderCrimesGrid();
             
             // Calcular sentença
             calculateSentence();
         }
 
+        // Atualizar exibição dos crimes selecionados
+        function updateSelectedCrimesDisplay() {
+            if (selectedCrimes.length === 0) {
+                document.getElementById('selectedCrimeInfo').classList.add('hidden');
+                document.getElementById('selectCrimeMessage').classList.remove('hidden');
+                return;
+            }
+            
+            // Mostrar informações do último crime selecionado
+            const mainCrime = selectedCrimes[selectedCrimes.length - 1];
+            document.getElementById('selectedCrimeName').textContent = mainCrime.name;
+            document.getElementById('selectedCrimeArticle').textContent = mainCrime.article;
+            document.getElementById('selectedCrimeServices').textContent = mainCrime.services + ' serviços comunitários';
+            document.getElementById('selectedCrimeFine').textContent = formatCurrency(mainCrime.fine);
+            document.getElementById('selectedCrimeCategory').textContent = mainCrime.category;
+            document.getElementById('selectedCrimeDescription').textContent = mainCrime.description;
+            
+            // Atualizar lista de crimes selecionados
+            const selectedList = document.getElementById('selectedCrimesList');
+            if (selectedList) {
+                let html = '<div class="mb-3"><strong class="text-blue-300">Crimes Selecionados:</strong></div>';
+                selectedCrimes.forEach((crime, index) => {
+                    html += `
+                        <div class="flex items-center justify-between bg-slate-800/30 rounded p-2 mb-2">
+                            <span class="text-blue-200 text-sm">${index + 1}. ${crime.name}</span>
+                            <button onclick="removeCrime(${index})" class="text-red-400 hover:text-red-300">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                selectedList.innerHTML = html;
+            }
+            
+            // Mostrar informações
+            document.getElementById('selectedCrimeInfo').classList.remove('hidden');
+            document.getElementById('selectCrimeMessage').classList.add('hidden');
+        }
+
+        // Remover crime específico da lista
+        function removeCrime(index) {
+            selectedCrimes.splice(index, 1);
+            selectedCrime = selectedCrimes.length > 0 ? selectedCrimes[selectedCrimes.length - 1] : null;
+            updateSelectedCrimesDisplay();
+            renderCrimesGrid();
+            calculateSentence();
+        }
+
         // Limpar seleção de crime
         function clearCrimeSelection() {
             selectedCrime = null;
+            selectedCrimes = []; // Limpar lista de múltiplos crimes
             document.getElementById('selectedCrimeInfo').classList.add('hidden');
             document.getElementById('resultContainer').classList.add('hidden');
             document.getElementById('selectCrimeMessage').classList.remove('hidden');
+            
+            // Limpar lista de crimes selecionados
+            const selectedList = document.getElementById('selectedCrimesList');
+            if (selectedList) {
+                selectedList.innerHTML = '';
+            }
             
             // Limpar modificadores
             document.querySelectorAll('.atenuante:checked, .agravante:checked').forEach(checkbox => {
@@ -1164,15 +1235,22 @@
             renderCrimesGrid();
         }
 
-        // Calcular sentença (adaptado para nova interface)
+        // Calcular sentença (adaptado para múltiplos crimes e limite de 50%)
         function calculateSentence() {
-            if (!selectedCrime) return;
+            if (selectedCrimes.length === 0) return;
             
             const atenuantes = document.querySelectorAll('.atenuante:checked');
             const agravantes = document.querySelectorAll('.agravante:checked');
             
-            let baseServices = selectedCrime.services;
-            let baseFine = selectedCrime.fine;
+            // Somar todos os crimes selecionados
+            let totalBaseServices = 0;
+            let totalBaseFine = 0;
+            
+            selectedCrimes.forEach(crime => {
+                totalBaseServices += crime.services;
+                totalBaseFine += crime.fine;
+            });
+            
             let totalReduction = 0;
             let totalIncrease = 0;
             
@@ -1181,21 +1259,24 @@
                 totalReduction += parseFloat(atenuante.value);
             });
             
+            // Aplicar limite máximo de 50% de redução
+            totalReduction = Math.min(totalReduction, 0.50);
+            
             // Calcular agravamentos
             agravantes.forEach(agravante => {
                 totalIncrease += parseFloat(agravante.value);
             });
             
-            // Aplicar cálculos nos serviços comunitários
-            let finalServices = baseServices;
-            let finalFine = baseFine;
+            // Aplicar cálculos nos serviços comunitários e multas
+            let finalServices = totalBaseServices;
+            let finalFine = totalBaseFine;
             
             // Aplicar modificações
             let netModification = totalIncrease - totalReduction;
             
             if (netModification !== 0) {
-                finalServices = Math.round(baseServices * (1 + netModification));
-                finalFine = Math.round(baseFine * (1 + netModification));
+                finalServices = Math.round(totalBaseServices * (1 + netModification));
+                finalFine = Math.round(totalBaseFine * (1 + netModification));
             }
             
             // Não pode ser menor que 0
@@ -1207,30 +1288,58 @@
             document.getElementById('finalFine').textContent = formatCurrency(finalFine);
             document.getElementById('modificationTotal').textContent = (netModification * 100).toFixed(1) + '%';
             
+            // Mostrar aviso se reduções foram limitadas a 50%
+            const reductionWarning = document.getElementById('reductionWarning');
+            if (totalReduction >= 0.50 && atenuantes.length > 0) {
+                if (reductionWarning) {
+                    reductionWarning.classList.remove('hidden');
+                    reductionWarning.innerHTML = '<i class="fas fa-exclamation-triangle text-yellow-400 mr-2"></i>Reduções limitadas a 50% máximo conforme regulamento';
+                }
+            } else {
+                if (reductionWarning) reductionWarning.classList.add('hidden');
+            }
+            
             // Atualizar contadores
             document.getElementById('activeAtenuantes').textContent = atenuantes.length;
             document.getElementById('activeAgravantes').textContent = agravantes.length;
             
             // Mostrar detalhes do cálculo
-            updateCalculationDetails(selectedCrime, baseServices, baseFine, finalServices, finalFine, totalReduction, totalIncrease);
+            updateCalculationDetails(selectedCrimes, totalBaseServices, totalBaseFine, finalServices, finalFine, totalReduction, totalIncrease);
             
             document.getElementById('resultContainer').classList.remove('hidden');
             
-            // Adicionar ao histórico
-            addToHistory(selectedCrime, finalServices, finalFine, totalReduction, totalIncrease);
+            // Adicionar ao histórico (usar o último crime como referência)
+            if (selectedCrime) {
+                addToHistory(selectedCrime, finalServices, finalFine, totalReduction, totalIncrease);
+            }
         }
 
-        // Atualizar detalhes do cálculo
-        function updateCalculationDetails(crime, baseServices, baseFine, finalServices, finalFine, totalReduction, totalIncrease) {
+        // Atualizar detalhes do cálculo (adaptado para múltiplos crimes)
+        function updateCalculationDetails(crimes, baseServices, baseFine, finalServices, finalFine, totalReduction, totalIncrease) {
             const details = document.getElementById('calculationDetails');
             let html = '';
             
-            html += `<div>📋 <strong>Crime:</strong> ${crime.name}</div>`;
-            html += `<div>⚖️ <strong>Serviços base:</strong> ${baseServices} serviços comunitários</div>`;
-            html += `<div>💰 <strong>Multa base:</strong> ${formatCurrency(baseFine)}</div>`;
+            if (crimes.length === 1) {
+                html += `<div>📋 <strong>Crime:</strong> ${crimes[0].name}</div>`;
+            } else {
+                html += `<div>📋 <strong>Crimes selecionados:</strong> ${crimes.length} crimes</div>`;
+                html += `<div class="text-sm text-blue-300 ml-4">`;
+                crimes.forEach((crime, index) => {
+                    html += `${index + 1}. ${crime.name}<br>`;
+                });
+                html += `</div>`;
+            }
+            
+            html += `<div>⚖️ <strong>Total de serviços base:</strong> ${baseServices} serviços comunitários</div>`;
+            html += `<div>💰 <strong>Total de multa base:</strong> ${formatCurrency(baseFine)}</div>`;
             
             if (totalReduction > 0) {
-                html += `<div>📉 <strong>Reduções aplicadas:</strong> -${(totalReduction * 100).toFixed(1)}%</div>`;
+                const actualReduction = Math.min(totalReduction, 0.50);
+                html += `<div>📉 <strong>Reduções aplicadas:</strong> -${(actualReduction * 100).toFixed(1)}%`;
+                if (totalReduction > 0.50) {
+                    html += ` <span class="text-yellow-400">(limitado a 50%)</span>`;
+                }
+                html += `</div>`;
             }
             
             if (totalIncrease > 0) {
@@ -1309,8 +1418,8 @@
 
         // Exportar cálculo
         function exportCalculation(format) {
-            if (!selectedCrime) {
-                alert('Selecione um crime primeiro!');
+            if (selectedCrimes.length === 0) {
+                alert('Selecione pelo menos um crime primeiro!');
                 return;
             }
             
@@ -1318,13 +1427,25 @@
             const finalFine = document.getElementById('finalFine').textContent;
             const timestamp = new Date().toLocaleString('pt-BR');
             
+            let crimesText = '';
+            if (selectedCrimes.length === 1) {
+                crimesText = `
+Crime: ${selectedCrimes[0].name}
+Artigo: ${selectedCrimes[0].article}
+Categoria: ${selectedCrimes[0].category}`;
+            } else {
+                crimesText = `
+Crimes Selecionados (${selectedCrimes.length} crimes):`;
+                selectedCrimes.forEach((crime, index) => {
+                    crimesText += `
+${index + 1}. ${crime.name} - ${crime.article} (${crime.category})`;
+                });
+            }
+            
             const content = `
 RELATÓRIO DE CÁLCULO DE SENTENÇA - BRASILÂNDIA
 ============================================
-
-Crime: ${selectedCrime.name}
-Artigo: ${selectedCrime.article}
-Categoria: ${selectedCrime.category}
+${crimesText}
 
 SENTENÇA FINAL:
 - Serviços Comunitários: ${finalServices}
@@ -1333,10 +1454,11 @@ SENTENÇA FINAL:
 Data/Hora: ${timestamp}
 
 Calculado pelo Sistema Jurídico BRASILÂNDIA
-Portal do Advogado - Calculadora de Sentenças v5.0 (Brasilândia)
+Portal do Advogado - Calculadora de Sentenças v6.0 (Múltiplos Crimes)
 
 OBSERVAÇÃO: Este documento foi gerado automaticamente
 pelo sistema e deve ser validado pelas autoridades competentes.
+Reduções limitadas a 50% máximo conforme regulamento GTARP.
             `.trim();
             
             if (format === 'txt') {
