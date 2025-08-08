@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Jurídico Completo - Brasilândia RP - v2.1</title>
+    <title>Sistema Jurídico Completo - Brasilândia RP - v2.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
@@ -946,11 +946,10 @@
                 
                 if (!db) return;
                 
-                // Escutar novos processos para este portal
+                // Escutar novos processos para este portal (sem orderBy para evitar índices)
                 const processosQuery = query(
                     collection(db, 'processos_sincronizados'),
-                    where('destinatario', '==', usuarioLogado?.cargo || 'todos'),
-                    orderBy('dataEnvio', 'desc')
+                    where('destinatario', '==', usuarioLogado?.cargo || 'todos')
                 );
                 
                 const unsubscribe = onSnapshot(processosQuery, (snapshot) => {
@@ -5996,10 +5995,9 @@ document.addEventListener('input', function(e) {
             modal.className = 'fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center overflow-y-auto';
             
             try {
-                // Buscar logs reais do Firebase
+                // Buscar logs reais do Firebase (sem orderBy para evitar índices)
                 const logsQuery = firebaseModules.query(
-                    firebaseModules.collection(dbInstance, 'logs'),
-                    firebaseModules.orderBy ? firebaseModules.orderBy('timestamp', 'desc') : null
+                    firebaseModules.collection(dbInstance, 'logs')
                 );
                 
                 const logsSnapshot = await firebaseModules.getDocs(logsQuery);
