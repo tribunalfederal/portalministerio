@@ -776,7 +776,7 @@
             return container;
         }
         
-        // Fechar notificação
+        // Fechar notificação (global)
         function fecharNotificacao(id) {
             const notif = document.getElementById(id);
             if (notif) {
@@ -784,6 +784,9 @@
                 setTimeout(() => notif.remove(), 300);
             }
         }
+        
+        // Expor função globalmente para uso em onclick
+        window.fecharNotificacao = fecharNotificacao;
         
         // Tocar som de notificação
         function tocarSomNotificacao() {
