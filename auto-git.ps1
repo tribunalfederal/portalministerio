@@ -6,12 +6,12 @@ while ($true) {
     git add -A
     if (git diff --cached --quiet) {
         # Nenhuma alteração para commitar
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 30
         continue
     }
     $msg = "Auto: commit e push automático em $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     git commit -m $msg
     git push
     Write-Host "[AutoGit] Commit e push realizados em $(Get-Date)"
-    Start-Sleep -Seconds 10
+    Start-Sleep -Seconds 30
 }
