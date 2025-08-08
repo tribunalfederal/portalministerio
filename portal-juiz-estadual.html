@@ -56,7 +56,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         
         // Configuração Firebase
         const firebaseConfig = {
@@ -701,6 +701,46 @@
             </div>
         </div>
 
+        <!-- Seção Notificações -->
+        <div id="secao-notificacoes" class="hidden">
+            <div class="bg-gray-800/50 rounded-lg border border-gray-700">
+                <div class="p-6 border-b border-gray-700">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-bold text-white mb-2">Central de Notificações</h2>
+                            <p class="text-gray-400">Gerencie suas notificações do sistema</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="marcarTodasComoLidas()" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-2 rounded-lg border border-blue-500/20 transition-all text-sm">
+                                <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                                </svg>
+                                Marcar Todas Como Lidas
+                            </button>
+                            <button onclick="limparNotificacoesLidas()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-2 rounded-lg border border-red-500/20 transition-all text-sm">
+                                <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+                                </svg>
+                                Limpar Lidas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div id="lista-notificacoes" class="space-y-3">
+                        <!-- Notificações serão carregadas aqui -->
+                    </div>
+                    <div id="sem-notificacoes" class="text-center py-12 hidden">
+                        <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                        </svg>
+                        <p class="text-gray-400 text-lg">Nenhuma notificação encontrada</p>
+                        <p class="text-gray-500 text-sm">Quando houver novas notificações, elas aparecerão aqui</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Seção de Documentos para Juízes Estaduais -->
         <div id="secao-documentos" class="hidden">
             <div class="portal-card rounded-2xl p-8 mb-8">
@@ -1092,6 +1132,316 @@
             }
         }
 
+        // Sistema de Notificações v3.0 - Inteligente
+        let notificacoesLidas = new Set();
+        let notificacoesListener = null;
+
+        function mostrarPopupNotificacao(titulo, mensagem, tipo = 'info') {
+            // Criar popup
+            const popup = document.createElement('div');
+            popup.className = `fixed top-4 right-4 z-50 max-w-md p-4 rounded-lg shadow-lg border transform transition-all duration-300 translate-x-full`;
+            
+            // Definir cores baseadas no tipo
+            const tipoClasses = {
+                'info': 'bg-blue-900/90 border-blue-500/50 text-blue-100',
+                'success': 'bg-green-900/90 border-green-500/50 text-green-100',
+                'warning': 'bg-yellow-900/90 border-yellow-500/50 text-yellow-100',
+                'error': 'bg-red-900/90 border-red-500/50 text-red-100'
+            };
+            
+            popup.className += ' ' + (tipoClasses[tipo] || tipoClasses.info);
+            
+            popup.innerHTML = `
+                <div class="flex items-start">
+                    <div class="flex-1 mr-3">
+                        <h4 class="font-semibold text-sm mb-1">${titulo}</h4>
+                        <p class="text-xs opacity-90">${mensagem}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-current opacity-60 hover:opacity-100">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            // Animar entrada
+            setTimeout(() => {
+                popup.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remover após 5 segundos
+            setTimeout(() => {
+                if (popup.parentElement) {
+                    popup.classList.add('translate-x-full');
+                    setTimeout(() => popup.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        function iniciarListenerNotificacoes() {
+            if (!usuarioLogado || notificacoesListener) return;
+            
+            try {
+                const notificacoesRef = collection(db, 'notificacoes');
+                
+                notificacoesListener = onSnapshot(notificacoesRef, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const notificacao = change.doc.data();
+                            const id = change.doc.id;
+                            
+                            // Verificar se a notificação é para este usuário
+                            if (notificacao.para === usuarioLogado.email || notificacao.para === 'todos') {
+                                // Mostrar popup apenas se não foi lida
+                                if (!notificacoesLidas.has(id)) {
+                                    mostrarPopupNotificacao(
+                                        notificacao.titulo,
+                                        notificacao.mensagem,
+                                        notificacao.tipo || 'info'
+                                    );
+                                    
+                                    // Marcar como vista (mas não lida)
+                                    notificacoesLidas.add(id);
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Atualizar contador
+                    atualizarContadorNotificacoes();
+                    
+                    // Carregar lista se a seção estiver aberta
+                    if (!document.getElementById('secao-notificacoes').classList.contains('hidden')) {
+                        carregarListaNotificacoes();
+                    }
+                });
+                
+                console.log('✅ Listener de notificações iniciado');
+            } catch (error) {
+                console.error('❌ Erro ao iniciar listener de notificações:', error);
+            }
+        }
+
+        async function atualizarContadorNotificacoes() {
+            if (!usuarioLogado) return;
+            
+            try {
+                const notificacoesRef = collection(db, 'notificacoes');
+                const snapshot = await getDocs(notificacoesRef);
+                
+                let naoLidas = 0;
+                snapshot.docs.forEach(doc => {
+                    const notificacao = doc.data();
+                    if ((notificacao.para === usuarioLogado.email || notificacao.para === 'todos') && 
+                        !notificacao.lida) {
+                        naoLidas++;
+                    }
+                });
+                
+                const badge = document.getElementById('badge-notificacoes');
+                if (badge) {
+                    if (naoLidas > 0) {
+                        badge.textContent = naoLidas;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Erro ao atualizar contador:', error);
+            }
+        }
+
+        function mostrarNotificacoes() {
+            mostrarSecao('notificacoes');
+            carregarListaNotificacoes();
+        }
+
+        async function carregarListaNotificacoes() {
+            if (!usuarioLogado) return;
+            
+            try {
+                const lista = document.getElementById('lista-notificacoes');
+                const semNotificacoes = document.getElementById('sem-notificacoes');
+                
+                if (!lista) return;
+                
+                lista.innerHTML = '<div class="text-center py-4 text-gray-400">Carregando...</div>';
+                
+                const notificacoesRef = collection(db, 'notificacoes');
+                const snapshot = await getDocs(notificacoesRef);
+                
+                const notificacoes = [];
+                snapshot.docs.forEach(doc => {
+                    const notificacao = doc.data();
+                    if (notificacao.para === usuarioLogado.email || notificacao.para === 'todos') {
+                        notificacoes.push({ id: doc.id, ...notificacao });
+                    }
+                });
+                
+                // Ordenar por data (mais recentes primeiro)
+                notificacoes.sort((a, b) => {
+                    const dataA = a.timestamp?.toDate() || new Date(0);
+                    const dataB = b.timestamp?.toDate() || new Date(0);
+                    return dataB - dataA;
+                });
+                
+                if (notificacoes.length === 0) {
+                    lista.innerHTML = '';
+                    semNotificacoes.classList.remove('hidden');
+                    return;
+                }
+                
+                semNotificacoes.classList.add('hidden');
+                
+                lista.innerHTML = notificacoes.map(notificacao => {
+                    const data = notificacao.timestamp?.toDate();
+                    const dataFormatada = data ? data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'Data não disponível';
+                    
+                    const tipoIcons = {
+                        'info': 'fa-info-circle text-blue-400',
+                        'success': 'fa-check-circle text-green-400',
+                        'warning': 'fa-exclamation-triangle text-yellow-400',
+                        'error': 'fa-times-circle text-red-400'
+                    };
+                    
+                    const icon = tipoIcons[notificacao.tipo] || tipoIcons.info;
+                    const lida = notificacao.lida ? 'opacity-60' : '';
+                    
+                    return `
+                        <div class="bg-gray-700/30 rounded-lg p-4 border border-gray-600/30 ${lida}" id="notificacao-${notificacao.id}">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start space-x-3 flex-1">
+                                    <i class="fas ${icon} text-lg mt-1"></i>
+                                    <div class="flex-1">
+                                        <h4 class="text-white font-medium mb-1">${notificacao.titulo}</h4>
+                                        <p class="text-gray-300 text-sm mb-2">${notificacao.mensagem}</p>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-gray-500 text-xs">${dataFormatada}</span>
+                                            <div class="flex space-x-2">
+                                                ${!notificacao.lida ? `
+                                                    <button onclick="marcarComoLida('${notificacao.id}')" 
+                                                            class="text-blue-400 hover:text-blue-300 text-xs">
+                                                        <i class="fas fa-eye mr-1"></i>Marcar como lida
+                                                    </button>
+                                                ` : `
+                                                    <span class="text-green-400 text-xs">
+                                                        <i class="fas fa-check mr-1"></i>Lida
+                                                    </span>
+                                                `}
+                                                <button onclick="excluirNotificacao('${notificacao.id}')" 
+                                                        class="text-red-400 hover:text-red-300 text-xs">
+                                                    <i class="fas fa-trash mr-1"></i>Excluir
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar notificações:', error);
+                lista.innerHTML = '<div class="text-center py-4 text-red-400">Erro ao carregar notificações</div>';
+            }
+        }
+
+        async function marcarComoLida(id) {
+            try {
+                const notificacaoRef = doc(db, 'notificacoes', id);
+                await setDoc(notificacaoRef, { lida: true }, { merge: true });
+                
+                // Atualizar visualmente
+                const elemento = document.getElementById(`notificacao-${id}`);
+                if (elemento) {
+                    elemento.classList.add('opacity-60');
+                    elemento.querySelector('.flex.space-x-2').innerHTML = `
+                        <span class="text-green-400 text-xs">
+                            <i class="fas fa-check mr-1"></i>Lida
+                        </span>
+                        <button onclick="excluirNotificacao('${id}')" 
+                                class="text-red-400 hover:text-red-300 text-xs">
+                            <i class="fas fa-trash mr-1"></i>Excluir
+                        </button>
+                    `;
+                }
+                
+                atualizarContadorNotificacoes();
+            } catch (error) {
+                console.error('❌ Erro ao marcar como lida:', error);
+            }
+        }
+
+        async function marcarTodasComoLidas() {
+            if (!usuarioLogado) return;
+            
+            try {
+                const notificacoesRef = collection(db, 'notificacoes');
+                const snapshot = await getDocs(notificacoesRef);
+                
+                const promises = [];
+                snapshot.docs.forEach(doc => {
+                    const notificacao = doc.data();
+                    if ((notificacao.para === usuarioLogado.email || notificacao.para === 'todos') && !notificacao.lida) {
+                        promises.push(setDoc(doc.ref, { lida: true }, { merge: true }));
+                    }
+                });
+                
+                await Promise.all(promises);
+                carregarListaNotificacoes();
+                atualizarContadorNotificacoes();
+                
+                mostrarPopupNotificacao('Sucesso', 'Todas as notificações foram marcadas como lidas', 'success');
+            } catch (error) {
+                console.error('❌ Erro ao marcar todas como lidas:', error);
+                mostrarPopupNotificacao('Erro', 'Erro ao marcar notificações como lidas', 'error');
+            }
+        }
+
+        async function limparNotificacoesLidas() {
+            if (!usuarioLogado) return;
+            
+            try {
+                const notificacoesRef = collection(db, 'notificacoes');
+                const snapshot = await getDocs(notificacoesRef);
+                
+                const promises = [];
+                snapshot.docs.forEach(doc => {
+                    const notificacao = doc.data();
+                    if ((notificacao.para === usuarioLogado.email || notificacao.para === 'todos') && notificacao.lida) {
+                        promises.push(deleteDoc(doc.ref));
+                    }
+                });
+                
+                await Promise.all(promises);
+                carregarListaNotificacoes();
+                atualizarContadorNotificacoes();
+                
+                mostrarPopupNotificacao('Sucesso', 'Notificações lidas removidas do sistema', 'success');
+            } catch (error) {
+                console.error('❌ Erro ao limpar notificações lidas:', error);
+                mostrarPopupNotificacao('Erro', 'Erro ao limpar notificações', 'error');
+            }
+        }
+
+        async function excluirNotificacao(id) {
+            try {
+                await deleteDoc(doc(db, 'notificacoes', id));
+                carregarListaNotificacoes();
+                atualizarContadorNotificacoes();
+                
+                mostrarPopupNotificacao('Sucesso', 'Notificação excluída', 'success');
+            } catch (error) {
+                console.error('❌ Erro ao excluir notificação:', error);
+                mostrarPopupNotificacao('Erro', 'Erro ao excluir notificação', 'error');
+            }
+        }
+
         // Navegação entre seções
         function mostrarSecao(secao) {
             const cards = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4');
@@ -1151,6 +1501,37 @@
         // Logout
         async function fazerLogout() {
             try {
+                // Limpar notificações lidas automaticamente antes do logout
+                if (usuarioLogado) {
+                    console.log('🧹 Limpando notificações lidas antes do logout...');
+                    
+                    try {
+                        const notificacoesRef = collection(db, 'notificacoes');
+                        const snapshot = await getDocs(notificacoesRef);
+                        
+                        const promises = [];
+                        snapshot.docs.forEach(doc => {
+                            const notificacao = doc.data();
+                            if ((notificacao.para === usuarioLogado.email || notificacao.para === 'todos') && notificacao.lida) {
+                                promises.push(deleteDoc(doc.ref));
+                            }
+                        });
+                        
+                        if (promises.length > 0) {
+                            await Promise.all(promises);
+                            console.log(`✅ ${promises.length} notificações lidas removidas do sistema`);
+                        }
+                    } catch (cleanupError) {
+                        console.warn('⚠️ Erro na limpeza de notificações:', cleanupError);
+                    }
+                }
+                
+                // Parar listener de notificações
+                if (notificacoesListener) {
+                    notificacoesListener();
+                    notificacoesListener = null;
+                }
+                
                 if (window.firebaseModules && window.firebaseAuth) {
                     await window.firebaseModules.signOut(window.firebaseAuth);
                 }
@@ -2081,6 +2462,13 @@
             setTimeout(() => {
                 if (window.firebaseDB) {
                     inicializarSistemaProcessosJuiz();
+                    
+                    // Inicializar sistema de notificações
+                    if (usuarioLogado) {
+                        console.log('🔔 Inicializando sistema de notificações...');
+                        iniciarListenerNotificacoes();
+                        atualizarContadorNotificacoes();
+                    }
                 }
             }, 2000);
         });
