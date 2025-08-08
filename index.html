@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Jurídico Completo - Brasilândia RP - v2.3</title>
+    <title>Sistema Jurídico Completo - Brasilândia RP - v3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
@@ -648,30 +648,81 @@
         let notificacoesAtivas = [];
         let contadorNotificacoes = 0;
         
-        // Configurar listener para notificações em tempo real
+        // Configurar listener para notificações em tempo real (otimizado)
         function iniciarListenerNotificacoes() {
             try {
-                const { collection, query, where, onSnapshot } = window.firebaseModules;
+                console.log('🔔 Iniciando sistema de notificações...');
+                const { collection, onSnapshot } = window.firebaseModules;
                 const db = window.firebaseDB;
                 
+                // Consulta simples sem índices
                 const notificacoesRef = collection(db, 'notificacoes');
-                const q = query(notificacoesRef, where('ativo', '==', true));
                 
-                onSnapshot(q, (snapshot) => {
+                const unsubscribe = onSnapshot(notificacoesRef, (snapshot) => {
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === 'added') {
                             const notificacao = change.doc.data();
-                            notificacao.id = change.doc.id;
-                            mostrarNotificacaoTempo(notificacao);
+                            // Filtrar no client-side
+                            if (notificacao.ativo === true) {
+                                notificacao.id = change.doc.id;
+                                mostrarNotificacaoTempo(notificacao);
+                            }
                         }
                     });
                 }, (error) => {
-                    console.warn('Erro no listener de notificações:', error);
+                    console.warn('⚠️ Erro no listener de notificações, usando polling:', error);
+                    iniciarNotificacoesAlternativas();
                 });
                 
-                console.log('✅ Listener de notificações iniciado');
+                console.log('✅ Listener de notificações ativo');
+                listeners.push(unsubscribe);
+                
             } catch (error) {
                 console.error('❌ Erro ao iniciar listener:', error);
+                iniciarNotificacoesAlternativas();
+            }
+        }
+        
+        // Função alternativa para notificações (sem índices complexos)
+        function iniciarNotificacoesAlternativas() {
+            try {
+                console.log('🔔 Iniciando notificações alternativas (polling)...');
+                const { collection, getDocs } = window.firebaseModules;
+                const db = window.firebaseDB;
+                
+                if (!db) return;
+                
+                // Usar polling a cada 60 segundos para verificar novas notificações
+                const intervalId = setInterval(async () => {
+                    try {
+                        const notificacoesRef = collection(db, 'notificacoes');
+                        const snapshot = await getDocs(notificacoesRef);
+                        
+                        snapshot.forEach((doc) => {
+                            const notificacao = doc.data();
+                            // Verificar se está ativo
+                            if (notificacao.ativo) {
+                                notificacao.id = doc.id;
+                                // Verificar se é nova (criada nos últimos 65 segundos)
+                                const agora = Date.now();
+                                const notifTime = notificacao.timestamp || 0;
+                                if (agora - notifTime < 65000) {
+                                    mostrarNotificacaoTempo(notificacao);
+                                }
+                            }
+                        });
+                    } catch (pollingError) {
+                        console.warn('⚠️ Erro no polling de notificações:', pollingError);
+                    }
+                }, 60000); // 60 segundos
+                
+                console.log('✅ Notificações por polling ativas (60s)');
+                
+                // Salvar o intervalo para poder cancelar depois
+                window.notifInterval = intervalId;
+                
+            } catch (error) {
+                console.error('❌ Erro nas notificações alternativas:', error);
             }
         }
         
@@ -938,36 +989,86 @@
             return titulos[tipo] || 'Documento Jurídico';
         }
         
-        // Receber processos sincronizados
+        // Receber processos sincronizados (otimizado sem índices)
         async function receberProcessosSincronizados() {
             try {
-                const { collection, onSnapshot, query, where, orderBy } = window.firebaseModules;
+                console.log('🔄 Iniciando sistema de sincronização de processos...');
+                const { collection, onSnapshot, getDocs } = window.firebaseModules;
                 const db = window.firebaseDB;
                 
                 if (!db) return;
                 
-                // Escutar novos processos para este portal (sem orderBy para evitar índices)
-                const processosQuery = query(
-                    collection(db, 'processos_sincronizados'),
-                    where('destinatario', '==', usuarioLogado?.cargo || 'todos')
-                );
+                // Consulta simples sem índices
+                const processosRef = collection(db, 'processos_sincronizados');
                 
-                const unsubscribe = onSnapshot(processosQuery, (snapshot) => {
+                // Listener em tempo real simples
+                const unsubscribe = onSnapshot(processosRef, (snapshot) => {
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === 'added') {
                             const processo = change.doc.data();
-                            mostrarProcessoRecebido(processo);
+                            // Filtrar no client-side
+                            if (processo.destinatario === (usuarioLogado?.cargo || '') || processo.destinatario === 'todos') {
+                                mostrarProcessoRecebido(processo);
+                            }
                         }
                     });
+                }, (error) => {
+                    console.warn('⚠️ Erro no listener, usando polling:', error);
+                    iniciarSincronizacaoAlternativa();
                 });
                 
+                console.log('✅ Sincronização em tempo real ativa');
                 listeners.push(unsubscribe);
                 
             } catch (error) {
                 console.error('❌ Erro ao configurar listener de processos:', error);
+                iniciarSincronizacaoAlternativa();
             }
         }
         
+        // Função alternativa de sincronização (sem índices complexos)
+        function iniciarSincronizacaoAlternativa() {
+            try {
+                console.log('🔄 Iniciando sincronização alternativa (polling)...');
+                const { collection, getDocs } = window.firebaseModules;
+                const db = window.firebaseDB;
+                
+                if (!db) return;
+                
+                // Usar polling a cada 30 segundos para verificar novos processos
+                const intervalId = setInterval(async () => {
+                    try {
+                        const processosRef = collection(db, 'processos_sincronizados');
+                        const snapshot = await getDocs(processosRef);
+                        
+                        snapshot.forEach((doc) => {
+                            const processo = doc.data();
+                            // Verificar se é para este usuário
+                            if (processo.destinatario === usuarioLogado?.cargo || processo.destinatario === 'todos') {
+                                // Verificar se já foi processado (usar timestamp)
+                                const agora = Date.now();
+                                const processoTime = processo.dataEnvio || 0;
+                                // Se foi criado nos últimos 35 segundos, é novo
+                                if (agora - processoTime < 35000) {
+                                    mostrarProcessoRecebido(processo);
+                                }
+                            }
+                        });
+                    } catch (pollingError) {
+                        console.warn('⚠️ Erro no polling de processos:', pollingError);
+                    }
+                }, 30000); // 30 segundos
+                
+                console.log('✅ Sincronização por polling ativa (30s)');
+                
+                // Salvar o intervalo para poder cancelar depois
+                window.syncInterval = intervalId;
+                
+            } catch (error) {
+                console.error('❌ Erro na sincronização alternativa:', error);
+            }
+        }
+
         // Mostrar processo recebido na interface
         function mostrarProcessoRecebido(processo) {
             const notificacao = {
@@ -8956,6 +9057,7 @@ document.addEventListener('input', function(e) {
             if (!window.firebaseDB) return;
             
             try {
+                console.log('📂 Carregando processos do Firebase...');
                 const { collection, onSnapshot } = window.firebaseModules;
                 const processosRef = collection(window.firebaseDB, 'processos');
                 
