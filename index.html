@@ -4888,6 +4888,14 @@ document.addEventListener('input', function(e) {
                 return;
             }
 
+            // Alexandre como admin pode ficar no portal principal para navegar entre portais
+            if (usuarioLogado.isAdmin) {
+                console.log('👑 Alexandre (Admin) permanece no portal principal');
+                esconderTelaLogin();
+                mostrarLoading(false);
+                return;
+            }
+
             const cargo = usuarioLogado.cargo;
             console.log('🎯 Redirecionando usuário:', usuarioLogado.nome, 'Cargo:', cargo);
 
