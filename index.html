@@ -85,7 +85,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, updateDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, updateDoc, deleteDoc, onSnapshot, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         
         // 🔥 CONFIGURAÇÕES DO FIREBASE - CONFIGURADO!
         const firebaseConfig = {
@@ -121,7 +121,8 @@
             getDocs,
             updateDoc,
             deleteDoc,
-            onSnapshot
+            onSnapshot,
+            orderBy
         };
 
         console.log('🔥 Firebase inicializado com sucesso!');
@@ -4576,7 +4577,7 @@ document.addEventListener('input', function(e) {
                 // Organizar por cargo/hierarquia
                 const usuariosOrganizados = usuariosAtivos.map(userKey => {
                     const dados = usuariosOnline[userKey];
-                    const cargoInfo = estruturaJudicial[dados.cargo] || { nome: 'Profissional', icon: '👤', nivel: 99 };
+                    const cargoInfo = obterInfoCargo(dados.cargo);
                     return { userKey, dados, cargoInfo };
                 }).sort((a, b) => a.cargoInfo.nivel - b.cargoInfo.nivel);
 
@@ -4976,8 +4977,8 @@ document.addEventListener('input', function(e) {
 
         // Função auxiliar para obter nome do cargo
         function getCargoNome(cargo) {
-            const estrutura = estruturaJudicial[cargo];
-            return estrutura ? estrutura.nome : cargo;
+            const info = obterInfoCargo(cargo);
+            return info.nome;
         }
 
         // Função para mostrar mensagens
@@ -5304,7 +5305,7 @@ document.addEventListener('input', function(e) {
             // Listar usuários cadastrados
             for (const [usuario, dados] of Object.entries(usuariosCadastrados)) {
                 const statusNomeacao = dados.nomeado ? '✅ Nomeado' : '⏳ Não Nomeado';
-                const cargoInfo = estruturaJudicial[dados.cargo] || { nome: 'Cargo Desconhecido', icon: '❓' };
+                const cargoInfo = obterInfoCargo(dados.cargo);
                 const isOnline = usuariosOnline[usuario] && (Date.now() - usuariosOnline[usuario].lastSeen < 300000); // 5 minutos
                 
                 listaUsuarios += `
@@ -6679,6 +6680,37 @@ document.addEventListener('input', function(e) {
             const nivel = niveisHierarquicos[cargo] || 99;
             console.log('📊 Nível obtido:', nivel);
             return nivel;
+        }
+
+        function obterInfoCargo(cargo) {
+            // Mapeamento completo das informações dos cargos BRASILÂNDIA
+            const infosCargos = {
+                '1_juiz_federal': { nome: '1º Juiz Federal', icon: '👑', nivel: 1 },
+                '2_juiz_federal': { nome: '2º Juiz Federal', icon: '🏛️', nivel: 2 },
+                '3_juiz_federal': { nome: '3º Juiz Federal', icon: '🏛️', nivel: 3 },
+                '1_desembargador': { nome: '1º Desembargador', icon: '⚖️', nivel: 4 },
+                '2_desembargador': { nome: '2º Desembargador', icon: '⚖️', nivel: 5 },
+                '3_desembargador': { nome: '3º Desembargador', icon: '⚖️', nivel: 6 },
+                '1_juiz_estadual': { nome: '1º Juiz Estadual', icon: '🏛️', nivel: 7 },
+                '2_juiz_estadual': { nome: '2º Juiz Estadual', icon: '🏛️', nivel: 8 },
+                '3_juiz_estadual': { nome: '3º Juiz Estadual', icon: '🏛️', nivel: 9 },
+                '4_juiz_estadual': { nome: '4º Juiz Estadual', icon: '🏛️', nivel: 10 },
+                '1_procurador_geral_republica': { nome: '1º Procurador Geral da República', icon: '📋', nivel: 11 },
+                '2_procurador_geral_justica': { nome: '2º Procurador Geral de Justiça', icon: '📋', nivel: 12 },
+                '3_procurador_geral_justica': { nome: '3º Procurador Geral de Justiça', icon: '📋', nivel: 13 },
+                '1_promotor': { nome: '1º Promotor', icon: '🔍', nivel: 14 },
+                '2_promotor': { nome: '2º Promotor', icon: '🔍', nivel: 15 },
+                '3_promotor': { nome: '3º Promotor', icon: '🔍', nivel: 16 },
+                '4_promotor': { nome: '4º Promotor', icon: '🔍', nivel: 17 },
+                '5_promotor': { nome: '5º Promotor', icon: '🔍', nivel: 18 },
+                '6_promotor': { nome: '6º Promotor', icon: '🔍', nivel: 19 },
+                '1_oficial_justica_2_instancia': { nome: '1º Oficial de Justiça 2ª Instância', icon: '📊', nivel: 20 },
+                '1_oficial_justica_1_instancia': { nome: '1º Oficial de Justiça 1ª Instância', icon: '📊', nivel: 21 },
+                'advogado': { nome: 'Advogado', icon: '💼', nivel: 22 },
+                'defensor_publico': { nome: 'Defensor Público', icon: '🛡️', nivel: 23 }
+            };
+            
+            return infosCargos[cargo] || { nome: 'Profissional', icon: '👤', nivel: 99 };
         }
 
         function redirecionarParaPortal(portal) {
