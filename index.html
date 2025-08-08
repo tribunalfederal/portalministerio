@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Jurídico Completo - Brasilândia RP</title>
+    <title>Sistema Jurídico Completo - Brasilândia RP - v2.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
@@ -6648,7 +6648,8 @@ document.addEventListener('input', function(e) {
         }
 
         function obterNivelHierarquico(cargo) {
-            // Mapeamento direto dos níveis hierárquicos BRASILÂNDIA
+            // Mapeamento direto dos níveis hierárquicos BRASILÂNDIA - VERSÃO 2.0
+            console.log('🔍 Obtendo nível hierárquico para cargo:', cargo);
             const niveisHierarquicos = {
                 '1_juiz_federal': 1,
                 '2_juiz_federal': 2,
@@ -6675,7 +6676,9 @@ document.addEventListener('input', function(e) {
                 'defensor_publico': 23
             };
             
-            return niveisHierarquicos[cargo] || 99;
+            const nivel = niveisHierarquicos[cargo] || 99;
+            console.log('📊 Nível obtido:', nivel);
+            return nivel;
         }
 
         function redirecionarParaPortal(portal) {
