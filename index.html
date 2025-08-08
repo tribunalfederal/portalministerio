@@ -2004,11 +2004,6 @@
                         <span class="hidden sm:inline">Portais</span>
                     </button>
 
-                    <!-- Botão de Teste Temporário -->
-                    <button onclick="testarPortais()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 px-3 py-2.5 rounded-lg border border-red-500/20 transition-all text-sm h-12 flex items-center" id="btn-teste">
-                        <span class="text-xs">TESTE</span>
-                    </button>
-
                     <!-- Botão Logout -->
                     <button onclick="logout()" class="bg-slate-600/50 hover:bg-slate-600 text-slate-300 hover:text-white px-3 py-2.5 rounded-lg border border-slate-600/50 transition-all hidden text-sm h-12 flex items-center" id="btn-logout">
                         <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
@@ -4307,7 +4302,7 @@ document.addEventListener('input', function(e) {
                     nomeado: true,
                     nomeado_por: 'Sistema',
                     data_nomeacao: new Date().toISOString(),
-                    pode_nomear: estruturaJudicial['1_juiz_federal'].pode_nomear,
+                    pode_nomear: (estruturaJudicial['1_juiz_federal'] && estruturaJudicial['1_juiz_federal'].pode_nomear) || [],
                     ativo: true,
                     data_criacao: new Date().toISOString()
                 };
@@ -4354,7 +4349,7 @@ document.addEventListener('input', function(e) {
                     permissoes: ['todas', 'suprema_autoridade', 'nomeacao_geral'],
                     isAdmin: true,
                     oab: 'STF-001',
-                    pode_nomear: estruturaJudicial['1_juiz_federal'].pode_nomear,
+                    pode_nomear: (estruturaJudicial['1_juiz_federal'] && estruturaJudicial['1_juiz_federal'].pode_nomear) || [],
                     loginTime: new Date()
                 };
                 
@@ -4800,6 +4795,12 @@ document.addEventListener('input', function(e) {
                 return;
             }
 
+            // Verificar se Firebase está carregado
+            if (!authInstance || !firebaseModules) {
+                mostrarMensagem('⚠️ Sistema inicializando... Tente novamente em alguns segundos.', 'erro');
+                return;
+            }
+
             // Mostrar loading
             mostrarLoading(true);
 
@@ -5018,31 +5019,6 @@ document.addEventListener('input', function(e) {
         }
 
         // Função para mostrar boas-vindas
-        // Função de teste para verificar se o modal funciona
-        function testarPortais() {
-            console.log('🧪 Teste: Função testarPortais() chamada');
-            
-            // Simular usuário logado se não existir
-            if (!usuarioLogado) {
-                console.log('🧪 Teste: Simulando usuário logado');
-                usuarioLogado = {
-                    nome: 'Alexandre de Moraes',
-                    cargo: '1_juiz_federal',
-                    isAdmin: true
-                };
-            }
-            
-            // Forçar exibição do botão de portais
-            const btnPortais = document.getElementById('btn-portais');
-            if (btnPortais) {
-                btnPortais.classList.remove('hidden');
-                console.log('🧪 Teste: Botão portais forçado a aparecer');
-            }
-            
-            // Chamar função do modal
-            mostrarEscolhaPortalUniversal();
-        }
-
         function mostrarBoasVindas() {
             const agora = new Date();
             const horas = agora.getHours();
