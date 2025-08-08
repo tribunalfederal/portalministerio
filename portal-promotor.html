@@ -118,6 +118,239 @@
         
         // Iniciar verificação após 3 segundos
         setTimeout(verificarConexaoPortal, 3000);
+        
+        // ===== SISTEMA DE NOTIFICAÇÕES PROMOTOR V4.0 =====
+        let notificacoesAtivas = [];
+        let notificacoesLidas = [];
+        let notificacoesListener = null;
+        let isNotificacoesOnline = false;
+        
+        // Carregar notificações lidas do localStorage
+        function carregarNotificacoesLidasPromotor() {
+            try {
+                const dados = localStorage.getItem('notificacoesLidas_promotor');
+                if (dados) {
+                    const parsed = JSON.parse(dados);
+                    notificacoesLidas = Array.isArray(parsed) ? parsed : [];
+                    console.log(`📱 [PROMOTOR] Carregadas ${notificacoesLidas.length} notificações lidas`);
+                }
+            } catch (error) {
+                console.warn('⚠️ [PROMOTOR] Erro ao carregar notificações lidas:', error);
+                notificacoesLidas = [];
+            }
+        }
+
+        // Salvar notificações lidas no localStorage
+        function salvarNotificacoesLidasPromotor() {
+            try {
+                localStorage.setItem('notificacoesLidas_promotor', JSON.stringify(notificacoesLidas));
+            } catch (error) {
+                console.warn('⚠️ [PROMOTOR] Erro ao salvar notificações lidas:', error);
+            }
+        }
+
+        // Limpar notificações antigas (mais de 7 dias)
+        function limparNotificacoesAntigasPromotor() {
+            const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            const tamanhoOriginal = notificacoesLidas.length;
+            
+            notificacoesLidas = notificacoesLidas.filter(item => {
+                if (typeof item === 'object' && item.timestamp) {
+                    return item.timestamp > seteDiasAtras;
+                }
+                return true;
+            });
+            
+            if (notificacoesLidas.length !== tamanhoOriginal) {
+                console.log(`🧹 [PROMOTOR] Limpas ${tamanhoOriginal - notificacoesLidas.length} notificações antigas`);
+                salvarNotificacoesLidasPromotor();
+            }
+        }
+
+        // Iniciar listener de notificações
+        function iniciarListenerNotificacoesPromotor() {
+            try {
+                console.log('🔔 [PROMOTOR] Iniciando sistema de notificações v4.0...');
+                
+                // Carregar dados locais primeiro
+                carregarNotificacoesLidasPromotor();
+                limparNotificacoesAntigasPromotor();
+                
+                if (!window.firebaseDB || !window.firebaseModules) {
+                    console.warn('⚠️ [PROMOTOR] Firebase não disponível, usando modo offline');
+                    return;
+                }
+                
+                // Limpar listener anterior se existir
+                if (notificacoesListener) {
+                    notificacoesListener();
+                    notificacoesListener = null;
+                }
+                
+                const { collection, onSnapshot } = window.firebaseModules;
+                const notificacoesRef = collection(window.firebaseDB, 'notificacoes');
+                
+                notificacoesListener = onSnapshot(notificacoesRef, (snapshot) => {
+                    if (!isNotificacoesOnline) {
+                        isNotificacoesOnline = true;
+                        console.log('✅ [PROMOTOR] Sistema de notificações online');
+                    }
+                    
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const notificacao = { id: change.doc.id, ...change.doc.data() };
+                            
+                            if (isNotificacaoParaPromotor(notificacao) && !foiLidaAnteriormentePromotor(notificacao.id)) {
+                                mostrarNotificacaoPromotor(notificacao);
+                                marcarNotificacaoComoLidaPromotor(notificacao.id);
+                            }
+                        }
+                    });
+                }, (error) => {
+                    console.warn('⚠️ [PROMOTOR] Erro no listener de notificações:', error);
+                    isNotificacoesOnline = false;
+                    iniciarNotificacoesPollingPromotor();
+                });
+                
+                console.log('✅ [PROMOTOR] Listener de notificações iniciado');
+            } catch (error) {
+                console.error('❌ [PROMOTOR] Erro ao iniciar listener:', error);
+                iniciarNotificacoesPollingPromotor();
+            }
+        }
+        
+        // Sistema de polling como fallback
+        function iniciarNotificacoesPollingPromotor() {
+            try {
+                console.log('🔔 [PROMOTOR] Iniciando polling de notificações...');
+                
+                if (!window.firebaseDB || !window.firebaseModules) {
+                    console.warn('⚠️ [PROMOTOR] Firebase indisponível para polling');
+                    return;
+                }
+                
+                const { collection, getDocs } = window.firebaseModules;
+                
+                const intervalId = setInterval(async () => {
+                    try {
+                        const notificacoesRef = collection(window.firebaseDB, 'notificacoes');
+                        const snapshot = await getDocs(notificacoesRef);
+                        
+                        snapshot.docs.forEach(doc => {
+                            const notificacao = { id: doc.id, ...doc.data() };
+                            
+                            if (isNotificacaoParaPromotor(notificacao) && !foiLidaAnteriormentePromotor(notificacao.id)) {
+                                mostrarNotificacaoPromotor(notificacao);
+                                marcarNotificacaoComoLidaPromotor(notificacao.id);
+                            }
+                        });
+                        
+                        if (!isNotificacoesOnline) {
+                            isNotificacoesOnline = true;
+                            console.log('✅ [PROMOTOR] Polling de notificações funcionando');
+                        }
+                        
+                    } catch (error) {
+                        if (isNotificacoesOnline) {
+                            isNotificacoesOnline = false;
+                            console.warn('⚠️ [PROMOTOR] Erro no polling:', error);
+                        }
+                    }
+                }, 60000);
+                
+                // Salvar para limpeza posterior
+                if (typeof window.notificacoesIntervals === 'undefined') {
+                    window.notificacoesIntervals = [];
+                }
+                window.notificacoesIntervals.push(intervalId);
+                
+            } catch (error) {
+                console.error('❌ [PROMOTOR] Erro ao iniciar polling:', error);
+            }
+        }
+        
+        // Verificar se notificação é para promotores
+        function isNotificacaoParaPromotor(notificacao) {
+            return notificacao.ativo && (
+                notificacao.destinatario === 'promotores' || 
+                notificacao.destinatario === 'ministerio-publico' ||
+                notificacao.tipo === 'denuncia' ||
+                notificacao.tipo === 'novo-inquerito' ||
+                notificacao.tipo === 'audiencia'
+            );
+        }
+        
+        // Verificar se foi lida anteriormente
+        function foiLidaAnteriormentePromotor(notifId) {
+            return notificacoesLidas.some(item => {
+                if (typeof item === 'string') {
+                    return item === notifId;
+                }
+                return item.id === notifId;
+            });
+        }
+        
+        // Marcar notificação como lida
+        function marcarNotificacaoComoLidaPromotor(notifId) {
+            if (!foiLidaAnteriormentePromotor(notifId)) {
+                notificacoesLidas.push({
+                    id: notifId,
+                    timestamp: Date.now()
+                });
+                salvarNotificacoesLidasPromotor();
+            }
+        }
+        
+        // Mostrar notificação para promotor
+        function mostrarNotificacaoPromotor(notificacao) {
+            let container = document.getElementById('container-notificacoes-promotor');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'container-notificacoes-promotor';
+                container.className = 'fixed top-4 right-4 z-50 space-y-2';
+                document.body.appendChild(container);
+            }
+            
+            const div = document.createElement('div');
+            div.className = 'bg-gradient-to-r from-red-600 to-red-700 border border-red-400 rounded-lg p-4 shadow-lg max-w-sm transform transition-all duration-300 ease-in-out';
+            
+            const tipoIcon = {
+                'denuncia': '⚖️',
+                'novo-inquerito': '🔍',
+                'audiencia': '👥',
+                'urgente': '🚨',
+                'info': 'ℹ️'
+            };
+            
+            div.innerHTML = `
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <span class="text-xl">${tipoIcon[notificacao.tipo] || 'ℹ️'}</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-white">${notificacao.titulo}</p>
+                        <p class="text-sm text-red-100 mt-1">${notificacao.mensagem}</p>
+                        <p class="text-xs text-red-200 mt-2">${new Date().toLocaleTimeString('pt-BR')}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-red-200 hover:text-white">✕</button>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            
+            // Auto-remover após 10 segundos
+            setTimeout(() => {
+                if (div.parentElement) div.remove();
+            }, 10000);
+        }
+        
+        // Inicializar sistema de notificações quando a página carregar
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                iniciarListenerNotificacoesPromotor();
+                console.log('✅ [PROMOTOR] Sistema de notificações iniciado');
+            }, 3000);
+        });
     </script>
 </head>
 <body class="overflow-x-hidden">

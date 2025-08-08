@@ -1382,6 +1382,30 @@
             }, 4000);
         });
         
+        // Limpeza de recursos ao sair da página
+        window.addEventListener('beforeunload', () => {
+            // Limpar listeners
+            if (notificacoesListener) {
+                notificacoesListener();
+                notificacoesListener = null;
+            }
+            
+            // Limpar intervals
+            if (window.notificacoesIntervals) {
+                window.notificacoesIntervals.forEach(id => clearInterval(id));
+                window.notificacoesIntervals = [];
+            }
+            
+            listeners.forEach(unsubscribe => {
+                if (typeof unsubscribe === 'function') {
+                    unsubscribe();
+                }
+            });
+            listeners = [];
+            
+            console.log('🧹 Recursos de notificações limpos');
+        });
+        
         // Tornar funções disponíveis globalmente
         window.enviarNotificacaoTeste = enviarNotificacaoTeste;
         window.mostrarNotificacaoLocal = mostrarNotificacaoLocal;
