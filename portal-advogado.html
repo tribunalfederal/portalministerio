@@ -1148,9 +1148,6 @@
                                 <i class="fas fa-file-plus text-green-400"></i>
                                 Abertura de Novo Processo
                             </h3>
-                            <button onclick="hideNewProcessForm()" class="text-gray-400 hover:text-white text-xl">
-                                <i class="fas fa-times"></i>
-                            </button>
                         </div>
 
                         <form id="processForm" class="space-y-6">
@@ -1261,13 +1258,6 @@
                                                    placeholder="Ex: 001.2024.123456-7">
                                         </div>
                                     </div>
-                                    <div class="mt-4">
-                                        <label class="block text-red-300 font-semibold mb-2">
-                                            <i class="fas fa-exclamation-triangle mr-2"></i>Acusação/Crime Imputado
-                                        </label>
-                                        <textarea id="crime-imputado" rows="2" 
-                                                  class="w-full px-4 py-3 bg-slate-800/50 border border-red-300/30 rounded-lg text-white focus:border-red-400 focus:outline-none"
-                                                  placeholder="Descreva brevemente o crime ou acusação..."></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -1485,9 +1475,6 @@
                         <i class="fas fa-eye text-blue-400"></i>
                         <span id="modal-titulo">Detalhes do Processo</span>
                     </h3>
-                    <button onclick="closeProcessModal()" class="text-gray-400 hover:text-white text-2xl">
-                        <i class="fas fa-times"></i>
-                    </button>
                 </div>
                 <div class="modal-body">
                     <div id="processo-detalhes">
@@ -2380,6 +2367,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Fechar modais com ESC
         window.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
+                // Modais do sistema de perfil
                 const modals = ['profileModal', 'hierarchyModal', 'settingsModal'];
                 modals.forEach(modalId => {
                     const modal = document.getElementById(modalId);
@@ -2387,6 +2375,28 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         closeModal(modalId);
                     }
                 });
+                
+                // Modal de processo
+                const modalProcesso = document.getElementById('modal-processo');
+                if (modalProcesso && modalProcesso.style.display === 'flex') {
+                    closeProcessModal();
+                }
+                
+                // Modal de documentos (se visível)
+                const modalDocumento = document.querySelector('.modal[style*="flex"]');
+                if (modalDocumento && modalDocumento.id !== 'modal-processo') {
+                    // Fechar modal de documento
+                    const cancelButton = modalDocumento.querySelector('button[onclick*="cancelDocument"], button[onclick*="hideDocumentModal"], button[onclick*="closeModal"]');
+                    if (cancelButton) {
+                        cancelButton.click();
+                    }
+                }
+                
+                // Formulário de novo processo
+                const novoProcessoForm = document.getElementById('novo-processo-form');
+                if (novoProcessoForm && !novoProcessoForm.classList.contains('hidden')) {
+                    hideNewProcessForm();
+                }
             }
         });
 
@@ -2896,14 +2906,23 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 title: 'Petição Inicial',
                 icon: 'fas fa-file-invoice',
                 fields: [
-                    { name: 'autor', label: 'Nome do Autor', type: 'text', required: true },
-                    { name: 'autorRG', label: 'RG do Autor', type: 'text', required: true },
-                    { name: 'reu', label: 'Nome do Réu', type: 'text', required: true },
-                    { name: 'reuRG', label: 'RG do Réu', type: 'text', required: true },
-                    { name: 'crime', label: 'Crime Cometido', type: 'text', required: true },
+                    { name: 'tipoPeticao', label: 'Tipo de Petição', type: 'select', required: true, 
+                      options: [
+                          { value: '', text: 'Selecione o tipo de petição' },
+                          { value: 'civil', text: 'Petição Inicial Civil (Autor vs Réu)' },
+                          { value: 'criminal', text: 'Petição Inicial Criminal (Defesa do Réu)' }
+                      ] 
+                    },
+                    { name: 'cliente', label: 'Nome do Cliente', type: 'text', required: true },
+                    { name: 'clienteRG', label: 'RG do Cliente', type: 'text', required: true },
+                    { name: 'outraParte', label: 'Nome da Outra Parte', type: 'text', required: false, 
+                      hint: 'Civil: Nome do Réu | Criminal: Ministério Público' },
                     { name: 'fatos', label: 'Narrativa dos Fatos', type: 'textarea', required: true },
+                    { name: 'fundamentacaoJuridica', label: 'Fundamentação Jurídica', type: 'textarea', required: true },
                     { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true },
-                    { name: 'provas', label: 'Provas (opcional)', type: 'textarea', required: false }
+                    { name: 'provas', label: 'Provas e Documentos', type: 'textarea', required: false },
+                    { name: 'valorCausa', label: 'Valor da Causa (R$)', type: 'number', required: false, 
+                      hint: 'Obrigatório para ações cíveis com valor econômico' }
                 ]
             },
             'recurso-apelacao': {
@@ -3192,12 +3211,48 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             // Conteúdo específico por tipo de documento
             switch(type) {
                 case 'peticao-inicial':
-                    content += `AUTOR: ${safeData('autor')} - RG: ${safeData('autorRG')}\n`;
-                    content += `RÉU: ${safeData('reu')} - RG: ${safeData('reuRG')}\n\n`;
-                    content += `DOS FATOS:\n${safeData('fatos')}\n\n`;
-                    content += `DO CRIME: ${safeData('crime')}\n\n`;
-                    if (data.provas && data.provas.trim()) content += `DAS PROVAS:\n${data.provas}\n\n`;
-                    content += `DOS PEDIDOS:\n${safeData('pedidos')}\n\n`;
+                    const tipoPeticao = data.tipoPeticao;
+                    
+                    if (tipoPeticao === 'civil') {
+                        // Petição Inicial Civil
+                        content += `AUTOR: ${safeData('cliente')} - RG: ${safeData('clienteRG')}\n`;
+                        if (data.outraParte && data.outraParte.trim()) {
+                            content += `RÉU: ${safeData('outraParte')}\n`;
+                        }
+                        content += `\n`;
+                        content += `DOS FATOS:\n${safeData('fatos')}\n\n`;
+                        content += `DA FUNDAMENTAÇÃO JURÍDICA:\n${safeData('fundamentacaoJuridica')}\n\n`;
+                        if (data.provas && data.provas.trim()) {
+                            content += `DAS PROVAS:\n${data.provas}\n\n`;
+                        }
+                        if (data.valorCausa && parseFloat(data.valorCausa) > 0) {
+                            content += `DO VALOR DA CAUSA:\nDá-se à presente causa o valor de R$ ${parseFloat(data.valorCausa).toLocaleString('pt-BR', {minimumFractionDigits: 2})}.\n\n`;
+                        }
+                        content += `DOS PEDIDOS:\n${safeData('pedidos')}\n\n`;
+                        
+                    } else if (tipoPeticao === 'criminal') {
+                        // Petição Inicial Criminal (Defesa)
+                        content += `PACIENTE/RÉU: ${safeData('cliente')} - RG: ${safeData('clienteRG')}\n`;
+                        if (data.outraParte && data.outraParte.trim()) {
+                            content += `AUTOR DA AÇÃO PENAL: ${safeData('outraParte')}\n`;
+                        } else {
+                            content += `AUTOR DA AÇÃO PENAL: Ministério Público\n`;
+                        }
+                        content += `\n`;
+                        content += `DOS FATOS E DA ACUSAÇÃO:\n${safeData('fatos')}\n\n`;
+                        content += `DA DEFESA E FUNDAMENTAÇÃO JURÍDICA:\n${safeData('fundamentacaoJuridica')}\n\n`;
+                        if (data.provas && data.provas.trim()) {
+                            content += `DAS PROVAS DE DEFESA:\n${data.provas}\n\n`;
+                        }
+                        content += `DOS PEDIDOS:\n${safeData('pedidos')}\n\n`;
+                        
+                    } else {
+                        // Tipo não selecionado
+                        content += `CLIENTE: ${safeData('cliente')} - RG: ${safeData('clienteRG')}\n`;
+                        content += `DOS FATOS:\n${safeData('fatos')}\n\n`;
+                        content += `DA FUNDAMENTAÇÃO:\n${safeData('fundamentacaoJuridica')}\n\n`;
+                        content += `DOS PEDIDOS:\n${safeData('pedidos')}\n\n`;
+                    }
                     break;
                     
                 case 'recurso-apelacao':
@@ -3422,7 +3477,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             } else if (tipoPeticao === 'criminal') {
                 baseData.promotorNome = document.getElementById('promotor-nome').value;
                 baseData.inqueritoNumero = document.getElementById('inquerito-numero').value;
-                baseData.crimeImputado = document.getElementById('crime-imputado').value;
             }
 
             return baseData;
@@ -3463,9 +3517,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
             // Validações específicas por tipo de petição
             if (data.tipoPeticao === 'criminal') {
-                if (!data.crimeImputado) {
-                    showNotification('Para processos criminais, é necessário informar a acusação/crime imputado', 'warning');
-                }
                 if (!data.promotorNome) {
                     data.promotorNome = 'Ministério Público'; // Valor padrão
                 }
@@ -3751,16 +3802,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                                 </div>
                                 ` : ''}
                             </div>
-                            ${processo.crimeImputado ? `
-                            <div class="mt-4">
-                                <div class="text-white">
-                                    <strong>Acusação/Crime Imputado:</strong><br>
-                                    <div class="mt-2 p-3 bg-red-900/30 rounded-lg border border-red-400/20">
-                                        ${safeData(processo.crimeImputado)}
-                                    </div>
-                                </div>
-                            </div>
-                            ` : ''}
                         ` : ''}
                     </div>
 
@@ -3885,7 +3926,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             } else if (processo.tipoPeticao === 'criminal') {
                 document.getElementById('promotor-nome').value = processo.promotorNome || '';
                 document.getElementById('inquerito-numero').value = processo.inqueritoNumero || '';
-                document.getElementById('crime-imputado').value = processo.crimeImputado || '';
             }
 
             // Configurar modo de edição
