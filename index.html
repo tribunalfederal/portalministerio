@@ -644,9 +644,7 @@
         let usuariosCadastrados = {};
 
         // Usuário logado atualmente
-        let usuarioLogado = null;        // ===== SISTEMA DE NOTIFICAÇÕES EM TEMPO REAL =====
-        let notificacoesAtivas = [];
-        let contadorNotificacoes = 0;
+        let usuarioLogado = null;
         
         // ===== SISTEMA DE NOTIFICAÇÕES UNIVERSAL V4.0 =====
         let notificacoesAtivas = [];
@@ -654,6 +652,7 @@
         let listeners = [];
         let notificacoesListener = null;
         let isNotificacoesOnline = false;
+        let contadorNotificacoes = 0;
         
         // Carregar notificações lidas do localStorage
         function carregarNotificacoesLidas() {
@@ -4074,7 +4073,7 @@ document.addEventListener('input', function(e) {
                 <div class="w-12 h-1 bg-gradient-to-r from-yellow-600 to-yellow-500 mx-auto mt-3 rounded-full"></div>
             </div>
             
-            <form id="form-primeiro-acesso" class="space-y-4">
+            <form id="form-primeiro-acesso-admin" class="space-y-4">
                 <div>
                     <label class="block text-white font-bold mb-2 text-sm flex items-center">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4084,10 +4083,10 @@ document.addEventListener('input', function(e) {
                     </label>
                     <input 
                         type="text" 
-                        id="oab-recebida" 
+                        id="oab-recebida-admin" 
                         placeholder="Digite o número liberado pelo admin..." 
                         class="w-full px-4 py-3 rounded-lg bg-gray-800/80 border-2 border-yellow-600/50 text-white placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
-                        onblur="verificarOABLiberada()"
+                        onblur="verificarOABLiberadaAdmin()"
                     >
                     <p class="text-yellow-300 text-xs mt-1">💡 Use o número fornecido pelo administrador</p>
                 </div>
@@ -4111,10 +4110,10 @@ document.addEventListener('input', function(e) {
                     </label>
                     <input 
                         type="text" 
-                        id="nome-completo" 
+                        id="nome-completo-admin" 
                         placeholder="Digite seu nome completo..." 
                         class="w-full px-4 py-3 rounded-lg bg-gray-800/80 border-2 border-yellow-600/50 text-white placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
-                        oninput="atualizarPreviewEmail()"
+                        oninput="atualizarPreviewEmailAdmin()"
                     >
                 </div>
                 
@@ -4141,7 +4140,7 @@ document.addEventListener('input', function(e) {
                     </label>
                     <input 
                         type="password" 
-                        id="nova-senha" 
+                        id="nova-senha-admin" 
                         placeholder="Crie uma senha segura..." 
                         class="w-full px-4 py-3 rounded-lg bg-gray-800/80 border-2 border-yellow-600/50 text-white placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
                     >
@@ -4156,7 +4155,7 @@ document.addEventListener('input', function(e) {
                     </label>
                     <input 
                         type="password" 
-                        id="confirmar-senha" 
+                        id="confirmar-senha-admin" 
                         placeholder="Repita a senha..." 
                         class="w-full px-4 py-3 rounded-lg bg-gray-800/80 border-2 border-yellow-600/50 text-white placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/50 transition-all text-sm"
                     >
@@ -6517,6 +6516,31 @@ document.addEventListener('input', function(e) {
             } else {
                 previewDiv.classList.add('hidden');
             }
+        }
+        
+        // Função para admin (segunda instância)
+        function atualizarPreviewEmailAdmin() {
+            const oab = document.getElementById('oab-recebida-admin').value.trim();
+            const nome = document.getElementById('nome-completo-admin').value.trim();
+            const previewDiv = document.getElementById('preview-email-admin');
+            
+            if (oab && nome && registrosOAB[oab] && registrosOAB[oab].ativo && !registrosOAB[oab].utilizada) {
+                const dadosOAB = registrosOAB[oab];
+                const emailGerado = gerarEmailPorCargo(nome, dadosOAB.cargo);
+                
+                if (document.getElementById('email-preview-admin')) {
+                    document.getElementById('email-preview-admin').textContent = emailGerado;
+                }
+                if (previewDiv) previewDiv.classList.remove('hidden');
+            } else {
+                if (previewDiv) previewDiv.classList.add('hidden');
+            }
+        }
+        
+        // Função para verificar OAB liberada (admin)
+        function verificarOABLiberadaAdmin() {
+            const oab = document.getElementById('oab-recebida-admin').value.trim();
+            verificarOABLiberada(oab, 'admin');
         }
 
         // Gerar email baseado no cargo
