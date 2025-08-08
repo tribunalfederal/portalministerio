@@ -2727,12 +2727,16 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 title: 'Habeas Corpus',
                 icon: 'fas fa-unlock',
                 fields: [
-                    { name: 'paciente', label: 'Nome do Paciente', type: 'text', required: true },
-                    { name: 'pacienteRG', label: 'RG do Paciente', type: 'text', required: true },
+                    { name: 'paciente', label: 'Nome do Paciente (Preso/Coagido)', type: 'text', required: true },
+                    { name: 'pacienteRG', label: 'RG/CPF do Paciente', type: 'text', required: true },
+                    { name: 'pacienteNascimento', label: 'Data de Nascimento do Paciente', type: 'date', required: true },
                     { name: 'autoridade', label: 'Autoridade Coatora', type: 'text', required: true },
-                    { name: 'situacao', label: 'Situação Atual', type: 'textarea', required: true },
-                    { name: 'ilegalidade', label: 'Ilegalidade ou Abuso', type: 'textarea', required: true },
-                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                    { name: 'localPrisao', label: 'Local da Prisão/Coação', type: 'text', required: true },
+                    { name: 'dataPrisao', label: 'Data da Prisão/Coação', type: 'date', required: true },
+                    { name: 'situacao', label: 'Situação Atual do Paciente', type: 'textarea', required: true },
+                    { name: 'ilegalidade', label: 'Ilegalidade ou Abuso de Poder', type: 'textarea', required: true },
+                    { name: 'fundamentacaoJuridica', label: 'Fundamentação Jurídica', type: 'textarea', required: true },
+                    { name: 'pedidos', label: 'Pedidos (Libertação Imediata, etc.)', type: 'textarea', required: true }
                 ]
             },
             'mandado-seguranca': {
@@ -2740,11 +2744,17 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 icon: 'fas fa-shield-alt',
                 fields: [
                     { name: 'impetrante', label: 'Nome do Impetrante', type: 'text', required: true },
-                    { name: 'impetranteRG', label: 'RG do Impetrante', type: 'text', required: true },
+                    { name: 'impetranteRG', label: 'RG/CPF do Impetrante', type: 'text', required: true },
+                    { name: 'impetranteQualificacao', label: 'Qualificação do Impetrante', type: 'text', required: true },
                     { name: 'autoridade', label: 'Autoridade Impetrada', type: 'text', required: true },
-                    { name: 'direito', label: 'Direito Violado', type: 'textarea', required: true },
-                    { name: 'ato', label: 'Ato Impugnado', type: 'textarea', required: true },
-                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
+                    { name: 'cargoAutoridade', label: 'Cargo da Autoridade', type: 'text', required: true },
+                    { name: 'atoImpugnado', label: 'Ato Administrativo Impugnado', type: 'textarea', required: true },
+                    { name: 'dataAto', label: 'Data do Ato Impugnado', type: 'date', required: true },
+                    { name: 'direitoLiquido', label: 'Direito Líquido e Certo Violado', type: 'textarea', required: true },
+                    { name: 'fundamentacaoJuridica', label: 'Fundamentação Jurídica', type: 'textarea', required: true },
+                    { name: 'urgencia', label: 'Urgência e Necessidade da Medida', type: 'textarea', required: true },
+                    { name: 'pedidoLiminar', label: 'Pedido de Liminar', type: 'textarea', required: false },
+                    { name: 'pedidos', label: 'Pedidos Finais', type: 'textarea', required: true }
                 ]
             },
             'contestacao': {
