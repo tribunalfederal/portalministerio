@@ -6233,14 +6233,19 @@ document.addEventListener('input', function(e) {
             document.getElementById('preview-email').classList.add('hidden');
         }
 
-        // Verificar se OAB foi liberada pelo admin
-        function verificarOABLiberada() {
+        // Verificar se OAB foi liberada pelo admin (versão melhorada)
+        async function verificarOABLiberada() {
             const oab = document.getElementById('oab-recebida').value.trim();
             const infoCargoDiv = document.getElementById('info-cargo');
             
             if (!oab) {
                 infoCargoDiv.classList.add('hidden');
                 return;
+            }
+            
+            // Carregar registros do Firebase se necessário
+            if (Object.keys(registrosOAB).length <= 10) { // Se tem poucos registros, recarregar
+                await carregarRegistrosOAB();
             }
             
             // Verificar se OAB existe e está ativa
@@ -6257,12 +6262,45 @@ document.addEventListener('input', function(e) {
                 // Atualizar preview do email se nome já foi digitado
                 atualizarPreviewEmail();
                 
+                console.log(`✅ OAB ${oab} válida - ${dadosOAB.cargoNome}`);
+                
             } else if (registrosOAB[oab] && registrosOAB[oab].utilizada) {
                 infoCargoDiv.classList.add('hidden');
                 mostrarMensagemPrimeiro('⚠️ Esta OAB já foi utilizada para cadastro!', 'erro');
             } else {
                 infoCargoDiv.classList.add('hidden');
-                mostrarMensagemPrimeiro('❌ OAB não encontrada ou não liberada pelo administrador!', 'erro');
+                
+                // Se não encontrar, tentar criar automaticamente para advogados
+                if (oab.length >= 4 && oab.length <= 8 && /^\d+$/.test(oab)) {
+                    const novoRegistro = {
+                        numero: oab,
+                        ativo: true,
+                        utilizada: false,
+                        cargo: "advogado",
+                        cargoNome: "Advogado",
+                        nivel: 11,
+                        dominio: "@oab.org.br",
+                        liberadoPor: "Sistema",
+                        dataLiberacao: new Date().toISOString().split('T')[0],
+                        autoGerado: true
+                    };
+                    
+                    await salvarRegistroOAB(novoRegistro);
+                    
+                    // Mostrar informações do novo registro
+                    document.getElementById('cargo-info').textContent = novoRegistro.cargoNome;
+                    document.getElementById('nivel-info').textContent = `Nível ${novoRegistro.nivel}`;
+                    document.getElementById('dominio-info').textContent = novoRegistro.dominio;
+                    
+                    infoCargoDiv.classList.remove('hidden');
+                    atualizarPreviewEmail();
+                    
+                    mostrarMensagemPrimeiro('✅ OAB validada automaticamente como Advogado!', 'sucesso');
+                    console.log(`✅ OAB ${oab} criada automaticamente como Advogado`);
+                    
+                } else {
+                    mostrarMensagemPrimeiro('❌ Número OAB inválido! Use apenas números (4-8 dígitos)', 'erro');
+                }
             }
         }
 

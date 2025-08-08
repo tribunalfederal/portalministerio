@@ -1183,9 +1183,27 @@
 
         // ===== SISTEMA DE PROCESSOS 24/7 - PORTAL DO ADVOGADO =====
         
-        let processosAdvogado = [];
+        let processosAdvogado = JSON.parse(localStorage.getItem('processosAdvogado_cache') || '[]');
         let proximoNumeroProcesso = 1;
         let nomeAdvogadoAtual = '';
+
+        // Salvar processos no cache local
+        function salvarProcessosNoCache() {
+            localStorage.setItem('processosAdvogado_cache', JSON.stringify(processosAdvogado));
+            localStorage.setItem('processosAdvogado_lastSync', Date.now().toString());
+        }
+
+        // Verificar se o cache está desatualizado
+        function isCacheDesatualizado() {
+            const lastSync = localStorage.getItem('processosAdvogado_lastSync');
+            if (!lastSync) return true;
+            
+            const agora = Date.now();
+            const ultimaSync = parseInt(lastSync);
+            const umMinuto = 60 * 1000;
+            
+            return (agora - ultimaSync) > umMinuto;
+        }
 
         // Inicializar sistema de processos
         function inicializarSistemaProcessosAdvogado() {
@@ -1193,7 +1211,14 @@
             adicionarLogProcessos('Portal do Advogado iniciado');
             adicionarLogProcessos('Sistema de processos 24/7 conectado');
             
-            // Carregar processos do Firebase
+            // Carregar do cache primeiro para experiência rápida
+            if (processosAdvogado.length > 0) {
+                atualizarListaProcessosAdvogado();
+                atualizarEstatisticasAdvogado();
+                console.log(`📁 ${processosAdvogado.length} processos carregados do cache local`);
+            }
+            
+            // Carregar processos do Firebase (com sincronização inteligente)
             if (window.firebaseDB) {
                 carregarProcessosDoAdvogado();
                 iniciarListenerNotificacoesAdvogado();
@@ -1236,6 +1261,7 @@
             };
             
             processosAdvogado.push(novoProcesso);
+            salvarProcessosNoCache(); // Salvar no cache local imediatamente
             salvarProcessoFirebaseAdvogado(novoProcesso);
             
             adicionarLogProcessos(`📋 Processo ${numeroProcesso} aberto por ${nomeAdvogado}`);
@@ -1409,7 +1435,7 @@
             }
         }
 
-        // Carregar processos do Firebase (v3.0 otimizado)
+        // Carregar processos do Firebase (v3.0 otimizado com cache)
         function carregarProcessosDoAdvogado() {
             if (!window.firebaseDB) return;
             
@@ -1432,14 +1458,24 @@
                         return timestampB - timestampA;
                     });
                     
-                    processosAdvogado = processosCarregados;
-                    atualizarListaProcessosAdvogado();
-                    atualizarEstatisticasAdvogado();
+                    // Sincronizar apenas se houve mudanças ou cache desatualizado
+                    const processosChanged = JSON.stringify(processosCarregados) !== JSON.stringify(processosAdvogado);
                     
-                    console.log(`🔄 ${processosCarregados.length} processos sincronizados - Portal Advogado`);
+                    if (processosChanged || isCacheDesatualizado()) {
+                        processosAdvogado = processosCarregados;
+                        salvarProcessosNoCache();
+                        atualizarListaProcessosAdvogado();
+                        atualizarEstatisticasAdvogado();
+                        
+                        console.log(`🔄 ${processosCarregados.length} processos sincronizados e salvos no cache - Portal Advogado`);
+                    }
                 });
             } catch (error) {
                 console.error('❌ Erro ao carregar processos:', error);
+                // Em caso de erro, usar cache se disponível
+                if (processosAdvogado.length > 0) {
+                    console.log('📁 Usando processos do cache devido a erro de conexão');
+                }
             }
         }
 
