@@ -176,15 +176,6 @@
                         <span class="hidden sm:inline">Portais</span>
                     </button>
 
-                    <!-- Botão Notificações -->
-                    <button onclick="mostrarNotificacoes()" class="bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 hover:text-yellow-300 px-3 py-2.5 rounded-lg border border-yellow-500/20 transition-all text-sm h-12 flex items-center relative" id="btn-notificacoes">
-                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-                        </svg>
-                        <span class="hidden sm:inline">Notificações</span>
-                        <span id="badge-notificacoes" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
-                    </button>
-
                     <!-- Botão Logout -->
                     <button onclick="logout()" class="bg-slate-600/50 hover:bg-slate-600 text-slate-300 hover:text-white px-3 py-2.5 rounded-lg border border-slate-600/50 transition-all hidden text-sm h-12 flex items-center" id="btn-logout">
                         <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
@@ -1419,7 +1410,536 @@
                 modal.remove();
             }
         }
+
+        // ===== SISTEMA DE MEMBROS ONLINE UNIVERSAL =====
+        let usuariosOnline = {};
+        let intervalUsuariosOnline = null;
+
+        // Inicializar sistema de usuários online
+        function inicializarSistemaUsuariosOnline() {
+            if (!usuarioLogado) return;
+            
+            // Marcar usuário como online
+            marcarUsuarioOnline();
+            
+            // Iniciar listener
+            iniciarListenerUsuariosOnline();
+            
+            // Atualizar a cada 30 segundos
+            intervalUsuariosOnline = setInterval(() => {
+                marcarUsuarioOnline();
+                atualizarListaUsuariosOnline();
+            }, 30000);
+            
+            console.log('🟢 Sistema de usuários online inicializado - Promotor');
+        }
+
+        // Marcar usuário como online
+        async function marcarUsuarioOnline() {
+            if (!usuarioLogado || !db) return;
+            
+            try {
+                const { collection, doc, setDoc } = window.firebaseModules;
+                const userKey = `${usuarioLogado.email}_${Date.now()}`;
+                const portal = 'Ministério Público';
+                
+                await setDoc(doc(db, 'usuarios_online', userKey), {
+                    nome: usuarioLogado.nome,
+                    email: usuarioLogado.email,
+                    cargo: usuarioLogado.cargo || 'Promotor de Justiça',
+                    portal: portal,
+                    nivel: usuarioLogado.nivel || 5,
+                    timestamp: new Date(),
+                    userKey: userKey
+                });
+                
+                // Limpar registros antigos deste usuário
+                await limparRegistrosAntigos();
+                
+            } catch (error) {
+                console.error('❌ Erro ao marcar usuário online:', error);
+            }
+        }
+
+        // Limpar registros antigos
+        async function limparRegistrosAntigos() {
+            try {
+                const { collection, getDocs, deleteDoc, doc } = window.firebaseModules;
+                const snapshot = await getDocs(collection(db, 'usuarios_online'));
+                const agora = new Date();
+                
+                snapshot.docs.forEach(async (docSnapshot) => {
+                    const data = docSnapshot.data();
+                    const timestamp = data.timestamp?.toDate() || new Date(0);
+                    const diffMinutos = (agora - timestamp) / (1000 * 60);
+                    
+                    // Remover registros com mais de 2 minutos
+                    if (diffMinutos > 2) {
+                        await deleteDoc(doc(db, 'usuarios_online', docSnapshot.id));
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Erro ao limpar registros antigos:', error);
+            }
+        }
+
+        // Iniciar listener de usuários online
+        function iniciarListenerUsuariosOnline() {
+            try {
+                const { collection, onSnapshot } = window.firebaseModules;
+                
+                onSnapshot(collection(db, 'usuarios_online'), (snapshot) => {
+                    usuariosOnline = {};
+                    
+                    snapshot.docs.forEach(doc => {
+                        const data = doc.data();
+                        const userKey = data.email; // Usar email como chave única
+                        
+                        // Manter apenas o registro mais recente de cada usuário
+                        if (!usuariosOnline[userKey] || 
+                            (data.timestamp?.toDate() > usuariosOnline[userKey].timestamp?.toDate())) {
+                            usuariosOnline[userKey] = data;
+                        }
+                    });
+                    
+                    atualizarContadorUsuariosOnline();
+                    if (!document.getElementById('membros-online-sidebar').classList.contains('hidden')) {
+                        atualizarListaUsuariosOnline();
+                    }
+                });
+                
+                console.log('✅ Listener de usuários online iniciado');
+            } catch (error) {
+                console.error('❌ Erro ao iniciar listener usuários online:', error);
+            }
+        }
+
+        // Atualizar contador de usuários online
+        function atualizarContadorUsuariosOnline() {
+            const agora = new Date();
+            const usuariosAtivos = Object.values(usuariosOnline).filter(usuario => {
+                const timestamp = usuario.timestamp?.toDate() || new Date(0);
+                const diffMinutos = (agora - timestamp) / (1000 * 60);
+                return diffMinutos <= 2; // Considerado online se ativo nos últimos 2 minutos
+            });
+            
+            const totalOnline = usuariosAtivos.length;
+            
+            // Atualizar contadores
+            const contadorBtn = document.getElementById('contador-btn');
+            const contadorMembros = document.getElementById('contador-membros');
+            const btnMembrosOnline = document.getElementById('btn-membros-online');
+            
+            if (contadorBtn) contadorBtn.textContent = totalOnline;
+            if (contadorMembros) contadorMembros.textContent = totalOnline;
+            
+            // Mostrar/ocultar botão baseado na quantidade
+            if (btnMembrosOnline) {
+                if (totalOnline > 1) { // Mostrar se há outros usuários online além do atual
+                    btnMembrosOnline.classList.remove('hidden');
+                } else {
+                    btnMembrosOnline.classList.add('hidden');
+                }
+            }
+        }
+
+        // Atualizar lista de usuários online
+        function atualizarListaUsuariosOnline() {
+            const lista = document.getElementById('lista-membros-sidebar');
+            if (!lista) return;
+            
+            const agora = new Date();
+            const usuariosAtivos = Object.values(usuariosOnline).filter(usuario => {
+                const timestamp = usuario.timestamp?.toDate() || new Date(0);
+                const diffMinutos = (agora - timestamp) / (1000 * 60);
+                return diffMinutos <= 2;
+            });
+            
+            // Ordenar por cargo/nível (hierarquia judicial)
+            usuariosAtivos.sort((a, b) => {
+                const nivelA = a.nivel || 11;
+                const nivelB = b.nivel || 11;
+                return nivelA - nivelB; // Menor nível = maior autoridade
+            });
+            
+            if (usuariosAtivos.length === 0) {
+                lista.innerHTML = '<div class="text-center py-8 text-slate-400">Nenhum usuário online</div>';
+                return;
+            }
+            
+            lista.innerHTML = usuariosAtivos.map(usuario => {
+                const nivelIcons = {
+                    1: '👑', 2: '⚖️', 3: '🏛️', 4: '🏛️', 5: '🏛️', 
+                    6: '⚖️', 7: '⚖️', 8: '⚖️', 11: '👨‍💼'
+                };
+                
+                const nivelCores = {
+                    1: 'text-yellow-400', 2: 'text-purple-400', 3: 'text-blue-400', 
+                    4: 'text-blue-400', 5: 'text-red-400', 6: 'text-red-400', 
+                    7: 'text-red-400', 8: 'text-red-400', 11: 'text-green-400'
+                };
+                
+                const nivel = usuario.nivel || 11;
+                const icon = nivelIcons[nivel] || '👤';
+                const cor = nivelCores[nivel] || 'text-gray-400';
+                
+                const timestamp = usuario.timestamp?.toDate();
+                const tempoOnline = timestamp ? 
+                    Math.round((agora - timestamp) / (1000 * 60)) : 0;
+                
+                return `
+                    <div class="flex items-center space-x-3 p-3 rounded-lg bg-slate-700/30 hover:bg-slate-700/50 transition-colors">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-lg">
+                            ${icon}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center space-x-2">
+                                <h4 class="text-white font-medium text-sm truncate">${usuario.nome}</h4>
+                                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                            </div>
+                            <p class="${cor} text-xs">${usuario.cargo}</p>
+                            <p class="text-slate-400 text-xs">${usuario.portal}</p>
+                            <p class="text-slate-500 text-xs">Online há ${tempoOnline}min</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Abrir sidebar de membros online
+        function abrirMembrosOnline() {
+            const sidebar = document.getElementById('membros-online-sidebar');
+            if (sidebar) {
+                sidebar.classList.remove('hidden');
+                setTimeout(() => {
+                    sidebar.classList.remove('translate-x-full');
+                }, 10);
+                atualizarListaUsuariosOnline();
+            }
+        }
+
+        // Fechar sidebar de membros online
+        function fecharMembrosOnline() {
+            const sidebar = document.getElementById('membros-online-sidebar');
+            if (sidebar) {
+                sidebar.classList.add('translate-x-full');
+                setTimeout(() => {
+                    sidebar.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // ===== SISTEMA DE NOTIFICAÇÕES SIDEBAR =====
+        
+        // Abrir sidebar de notificações
+        function abrirNotificacoesSidebar() {
+            const sidebar = document.getElementById('notificacoes-sidebar');
+            if (sidebar) {
+                sidebar.classList.remove('hidden');
+                setTimeout(() => {
+                    sidebar.classList.remove('translate-x-full');
+                }, 10);
+                carregarNotificacoesSidebar();
+            }
+        }
+
+        // Fechar sidebar de notificações
+        function fecharNotificacoesSidebar() {
+            const sidebar = document.getElementById('notificacoes-sidebar');
+            if (sidebar) {
+                sidebar.classList.add('translate-x-full');
+                setTimeout(() => {
+                    sidebar.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // Carregar notificações no sidebar
+        async function carregarNotificacoesSidebar() {
+            if (!usuarioLogado) return;
+            
+            const { collection, getDocs } = window.firebaseModules;
+            
+            try {
+                const lista = document.getElementById('lista-notificacoes-sidebar');
+                if (!lista) return;
+                
+                lista.innerHTML = '<div class="text-center py-4 text-gray-400">Carregando...</div>';
+                
+                const notificacoesRef = collection(db, 'notificacoes');
+                const snapshot = await getDocs(notificacoesRef);
+                
+                const notificacoes = [];
+                snapshot.docs.forEach(doc => {
+                    const notificacao = doc.data();
+                    if (notificacao.para === usuarioLogado.email || notificacao.para === 'todos') {
+                        notificacoes.push({ id: doc.id, ...notificacao });
+                    }
+                });
+                
+                // Ordenar por data (mais recentes primeiro)
+                notificacoes.sort((a, b) => {
+                    const dataA = a.timestamp?.toDate() || new Date(0);
+                    const dataB = b.timestamp?.toDate() || new Date(0);
+                    return dataB - dataA;
+                });
+                
+                if (notificacoes.length === 0) {
+                    lista.innerHTML = `
+                        <div class="text-center py-12 text-gray-400">
+                            <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                            </svg>
+                            <p class="text-lg">Nenhuma notificação</p>
+                            <p class="text-sm">Quando houver novas notificações, elas aparecerão aqui</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                lista.innerHTML = notificacoes.map(notificacao => {
+                    const data = notificacao.timestamp?.toDate();
+                    const dataFormatada = data ? 
+                        data.toLocaleDateString('pt-BR') + ' ' + 
+                        data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 
+                        'Data não disponível';
+                    
+                    const tipoIcons = {
+                        'info': 'fa-info-circle text-blue-400',
+                        'success': 'fa-check-circle text-green-400',
+                        'warning': 'fa-exclamation-triangle text-yellow-400',
+                        'error': 'fa-times-circle text-red-400'
+                    };
+                    
+                    const icon = tipoIcons[notificacao.tipo] || tipoIcons.info;
+                    const lida = notificacao.lida ? 'opacity-60' : '';
+                    
+                    return `
+                        <div class="bg-gray-700/30 rounded-lg p-4 border border-gray-600/30 ${lida} mb-3" id="notificacao-${notificacao.id}">
+                            <div class="flex items-start space-x-3">
+                                <i class="fas ${icon} text-lg mt-1"></i>
+                                <div class="flex-1">
+                                    <h4 class="text-white font-medium mb-1">${notificacao.titulo}</h4>
+                                    <p class="text-gray-300 text-sm mb-2">${notificacao.mensagem}</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-gray-500 text-xs">${dataFormatada}</span>
+                                        <div class="flex space-x-2">
+                                            ${!notificacao.lida ? `
+                                                <button onclick="marcarComoLida('${notificacao.id}')" 
+                                                        class="text-blue-400 hover:text-blue-300 text-xs">
+                                                    <i class="fas fa-eye mr-1"></i>Marcar como lida
+                                                </button>
+                                            ` : `
+                                                <span class="text-green-400 text-xs">
+                                                    <i class="fas fa-check mr-1"></i>Lida
+                                                </span>
+                                            `}
+                                            <button onclick="excluirNotificacao('${notificacao.id}')" 
+                                                    class="text-red-400 hover:text-red-300 text-xs">
+                                                <i class="fas fa-trash mr-1"></i>Excluir
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar notificações sidebar:', error);
+                const lista = document.getElementById('lista-notificacoes-sidebar');
+                if (lista) {
+                    lista.innerHTML = '<div class="text-center py-4 text-red-400">Erro ao carregar notificações</div>';
+                }
+            }
+        }
+
+        // Atualizar contador de notificações do sidebar
+        function atualizarContadorNotificacoesSidebar() {
+            if (!usuarioLogado) return;
+            
+            const { collection, getDocs } = window.firebaseModules;
+            
+            try {
+                const notificacoesRef = collection(db, 'notificacoes');
+                getDocs(notificacoesRef).then(snapshot => {
+                    let naoLidas = 0;
+                    snapshot.docs.forEach(doc => {
+                        const notificacao = doc.data();
+                        if ((notificacao.para === usuarioLogado.email || notificacao.para === 'todos') && 
+                            !notificacao.lida) {
+                            naoLidas++;
+                        }
+                    });
+                    
+                    const badgeFloat = document.getElementById('badge-notificacoes-float');
+                    const contadorSidebar = document.getElementById('contador-notif-sidebar');
+                    
+                    if (badgeFloat) {
+                        if (naoLidas > 0) {
+                            badgeFloat.textContent = naoLidas;
+                            badgeFloat.classList.remove('hidden');
+                        } else {
+                            badgeFloat.classList.add('hidden');
+                        }
+                    }
+                    
+                    if (contadorSidebar) {
+                        contadorSidebar.textContent = naoLidas;
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Erro ao atualizar contador sidebar:', error);
+            }
+        }
+
+        // Inicializar sistema ao carregar
+        setTimeout(() => {
+            if (window.firebaseDB) {
+                db = window.firebaseDB;
+                inicializarSistemaUsuariosOnline();
+                atualizarContadorNotificacoesSidebar();
+                setInterval(atualizarContadorNotificacoesSidebar, 30000);
+            }
+        }, 2000);
+
+        // Limpar usuário online ao sair da página
+        window.addEventListener('beforeunload', async () => {
+            if (usuarioLogado && db) {
+                try {
+                    const { collection, getDocs, deleteDoc, doc } = window.firebaseModules;
+                    const snapshot = await getDocs(collection(db, 'usuarios_online'));
+                    
+                    snapshot.docs.forEach(async (docSnapshot) => {
+                        const data = docSnapshot.data();
+                        if (data.email === usuarioLogado.email) {
+                            await deleteDoc(doc(db, 'usuarios_online', docSnapshot.id));
+                        }
+                    });
+                } catch (error) {
+                    console.error('❌ Erro ao limpar usuário online:', error);
+                }
+            }
+            
+            // Limpar interval
+            if (intervalUsuariosOnline) {
+                clearInterval(intervalUsuariosOnline);
+            }
+        });
     </script>
+
+    <!-- ===== WIDGETS FLUTUANTES UNIVERSAIS ===== -->
+    
+    <!-- Botão Flutuante - Membros Online -->
+    <button onclick="abrirMembrosOnline()" id="btn-membros-online" 
+            class="fixed top-20 right-4 w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-full shadow-2xl hover:shadow-emerald-500/25 transition-all duration-300 hover:scale-110 z-40 flex items-center justify-center group hidden">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+        <span id="contador-btn" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold shadow-lg">0</span>
+        
+        <!-- Tooltip -->
+        <div class="absolute right-16 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl">
+            Membros Online
+            <div class="absolute top-1/2 -right-1 transform -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+        </div>
+    </button>
+
+    <!-- Botão Flutuante - Notificações -->
+    <button onclick="abrirNotificacoesSidebar()" id="btn-notificacoes-float" 
+            class="fixed top-36 right-4 w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full shadow-2xl hover:shadow-amber-500/25 transition-all duration-300 hover:scale-110 z-40 flex items-center justify-center group">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+        </svg>
+        <span id="badge-notificacoes-float" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold shadow-lg hidden">0</span>
+        
+        <!-- Tooltip -->
+        <div class="absolute right-16 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl">
+            Notificações
+            <div class="absolute top-1/2 -right-1 transform -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+        </div>
+    </button>
+
+    <!-- Sidebar - Membros Online (estilo Discord) -->
+    <div id="membros-online-sidebar" class="fixed top-0 right-0 h-full w-80 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white transform translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-2xl border-l border-slate-700/50 hidden">
+        <div class="p-6 border-b border-slate-700/50 bg-gradient-to-r from-slate-800 to-slate-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold text-white">👥 Membros Online</h3>
+                    <p class="text-slate-300 text-sm mt-1">
+                        <span id="contador-membros">0</span> usuários conectados
+                    </p>
+                </div>
+                <button onclick="fecharMembrosOnline()" class="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700/50 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-4 flex-1 overflow-y-auto">
+            <div class="mb-4">
+                <div class="flex items-center space-x-2 text-sm text-slate-400 mb-3">
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>Sistema Nacional Integrado</span>
+                </div>
+            </div>
+            
+            <div id="lista-membros-sidebar" class="space-y-3">
+                <!-- Lista será preenchida dinamicamente -->
+                <div class="text-center py-8 text-slate-400">
+                    <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    <p class="text-lg">Carregando usuários...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar - Notificações -->
+    <div id="notificacoes-sidebar" class="fixed top-0 right-0 h-full w-96 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white transform translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-2xl border-l border-slate-700/50 hidden">
+        <div class="p-6 border-b border-slate-700/50 bg-gradient-to-r from-slate-800 to-slate-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold text-white">🔔 Notificações</h3>
+                    <p class="text-slate-300 text-sm mt-1">
+                        <span id="contador-notif-sidebar">0</span> não lidas
+                    </p>
+                </div>
+                <button onclick="fecharNotificacoesSidebar()" class="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700/50 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-4 border-b border-slate-700/30">
+            <div class="flex space-x-2">
+                <button onclick="marcarTodasComoLidas()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                    <i class="fas fa-check-double mr-2"></i>Marcar todas como lidas
+                </button>
+                <button onclick="limparTodasNotificacoes()" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                    <i class="fas fa-trash mr-2"></i>Limpar todas
+                </button>
+            </div>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-4">
+            <div id="lista-notificacoes-sidebar">
+                <!-- Lista será preenchida dinamicamente -->
+                <div class="text-center py-12 text-slate-400">
+                    <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                    </svg>
+                    <p class="text-lg">Carregando notificações...</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
