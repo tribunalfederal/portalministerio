@@ -1118,7 +1118,7 @@
                 </div>
 
                 <!-- Estatísticas Rápidas -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                     <div class="card p-4 text-center">
                         <div class="text-2xl font-bold text-green-400 mb-1" id="total-processos">0</div>
                         <div class="text-blue-200 text-sm">Total de Processos</div>
@@ -1155,7 +1155,7 @@
                                     Dados do Advogado Responsável
                                 </h4>
                                 
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                                     <div>
                                         <label class="block text-blue-300 font-semibold mb-2">
                                             <i class="fas fa-user mr-2"></i>Nome do Advogado *
@@ -1170,6 +1170,31 @@
                                         </label>
                                         <input type="text" id="advogado-oab" required readonly
                                                class="w-full px-4 py-3 bg-slate-700/50 border border-blue-300/30 rounded-lg text-gray-300 cursor-not-allowed">
+                                    </div>
+                                </div>
+                                
+                                <!-- Natureza do Processo (agora dentro da mesma seção) -->
+                                <div class="border-t border-blue-400/20 pt-6">
+                                    <h5 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
+                                        <i class="fas fa-scales-balanced text-blue-400"></i>
+                                        Natureza do Processo
+                                    </h5>
+                                    
+                                    <div class="mb-4">
+                                        <label class="block text-blue-300 font-semibold mb-2">
+                                            <i class="fas fa-gavel mr-2"></i>Área Jurídica *
+                                        </label>
+                                        <select id="tipo-peticao" required onchange="toggleProcessFields()"
+                                                class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
+                                            <option value="">Selecione a área jurídica</option>
+                                            <option value="civil">Processo Cível (Civil)</option>
+                                            <option value="criminal">Processo Criminal (Penal)</option>
+                                        </select>
+                                        <p class="text-blue-300/70 text-xs mt-2">
+                                            <i class="fas fa-info-circle mr-1"></i>
+                                            <strong>Cível:</strong> Disputas entre particulares (cobrança, indenização, divórcio, etc.)<br>
+                                            <strong>Criminal:</strong> Crimes processados pelo Estado (defesa de acusados)
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -1259,111 +1284,104 @@
                                 </div>
                             </div>
 
-                            <!-- Natureza do Processo -->
-                            <div class="bg-purple-900/20 rounded-lg p-6 border border-purple-400/30">
-                                <h4 class="text-purple-300 font-semibold mb-4 flex items-center gap-2">
-                                    <i class="fas fa-scales-balanced text-purple-400"></i>
-                                    Natureza do Processo
+
+
+                            <!-- Dados do Processo -->
+                            <div class="bg-slate-800/50 rounded-lg p-6 border border-slate-600/30">
+                                <h4 class="text-blue-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-gavel text-blue-400"></i>
+                                    Dados do Processo
                                 </h4>
-                                
-                                <div class="mb-4">
-                                    <label class="block text-purple-300 font-semibold mb-2">
-                                        <i class="fas fa-gavel mr-2"></i>Área Jurídica *
-                                    </label>
-                                    <select id="tipo-peticao" required onchange="toggleProcessFields()"
-                                            class="w-full px-4 py-3 bg-slate-800/50 border border-purple-300/30 rounded-lg text-white focus:border-purple-400 focus:outline-none">
-                                        <option value="">Selecione a área jurídica</option>
-                                        <option value="civil">Processo Cível (Civil)</option>
-                                        <option value="criminal">Processo Criminal (Penal)</option>
-                                    </select>
-                                    <p class="text-purple-300/70 text-xs mt-2">
-                                        <i class="fas fa-info-circle mr-1"></i>
-                                        <strong>Cível:</strong> Disputas entre particulares (cobrança, indenização, divórcio, etc.)<br>
-                                        <strong>Criminal:</strong> Crimes processados pelo Estado (defesa de acusados)
-                                    </p>
-                                </div>
-                            </div>
 
-                            <!-- Tipo de Processo -->
-                            <div>
-                                <label class="block text-blue-300 font-semibold mb-2">
-                                    <i class="fas fa-balance-scale mr-2"></i>Tipo de Processo *
-                                </label>
-                                <select id="tipo-processo" required 
-                                        class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
-                                    <option value="">Selecione o tipo de processo</option>
-                                    <optgroup label="🏆 Mais Utilizados em BRASILÂNDIA">
-                                        <option value="limpeza-ficha">Limpeza de Ficha Criminal</option>
-                                        <option value="porte-armas">Porte de Armas</option>
-                                    </optgroup>
-                                    <optgroup label="📋 Cível">
-                                        <option value="acao-cobranca">Ação de Cobrança</option>
-                                        <option value="acao-indenizacao">Ação de Indenização</option>
-                                        <option value="acao-despejo">Ação de Despejo</option>
-                                        <option value="divorcio">Divórcio</option>
-                                        <option value="inventario">Inventário</option>
-                                        <option value="usucapiao">Usucapião</option>
-                                    </optgroup>
-                                    <optgroup label="⚖️ Criminal">
-                                        <option value="queixa-crime">Queixa-Crime</option>
-                                        <option value="habeas-corpus">Habeas Corpus</option>
-                                        <option value="revisao-criminal">Revisão Criminal</option>
-                                    </optgroup>
-                                    <optgroup label="👨‍💼 Trabalhista">
-                                        <option value="reclamacao-trabalhista">Reclamação Trabalhista</option>
-                                        <option value="acao-acidente-trabalho">Ação de Acidente de Trabalho</option>
-                                    </optgroup>
-                                    <optgroup label="🏛️ Administrativo">
-                                        <option value="acao-popular">Ação Popular</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-
-                            <!-- Assunto do Processo -->
-                            <div>
-                                <label class="block text-blue-300 font-semibold mb-2">
-                                    <i class="fas fa-heading mr-2"></i>Assunto/Resumo do Processo *
-                                </label>
-                                <input type="text" id="assunto-processo" required 
-                                       class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                       placeholder="Ex: Cobrança de honorários advocatícios">
-                            </div>
-
-                            <!-- Descrição Detalhada -->
-                            <div>
-                                <label class="block text-blue-300 font-semibold mb-2">
-                                    <i class="fas fa-align-left mr-2"></i>Descrição Detalhada do Caso
-                                </label>
-                                <textarea id="descricao-processo" rows="4" 
-                                          class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                          placeholder="Descreva os detalhes do caso, fatos relevantes, pedidos principais..."></textarea>
-                            </div>
-
-                            <!-- Valor da Causa -->
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div>
+                                <!-- Tipo de Processo -->
+                                <div class="mb-6">
                                     <label class="block text-blue-300 font-semibold mb-2">
-                                        <i class="fas fa-dollar-sign mr-2"></i>Valor da Causa (R$)
+                                        <i class="fas fa-balance-scale mr-2"></i>Tipo de Processo *
                                     </label>
-                                    <input type="number" id="valor-causa" step="0.01" 
-                                           class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                           placeholder="0,00">
-                                </div>
-
-                                <div>
-                                    <label class="block text-blue-300 font-semibold mb-2">
-                                        <i class="fas fa-gavel mr-2"></i>Vara/Instância
-                                    </label>
-                                    <select id="vara-instancia" 
+                                    <select id="tipo-processo" required 
                                             class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
-                                        <option value="">Selecione a vara</option>
-                                        <option value="1-vara-civel">1ª Vara Cível</option>
-                                        <option value="2-vara-civel">2ª Vara Cível</option>
-                                        <option value="vara-criminal">Vara Criminal</option>
-                                        <option value="vara-trabalhista">Vara Trabalhista</option>
-                                        <option value="vara-federal">Vara Federal</option>
-                                        <option value="tribunal-justica">Tribunal de Justiça</option>
+                                        <option value="">Selecione o tipo de processo</option>
+                                        <optgroup label="🏆 Mais Utilizados em BRASILÂNDIA">
+                                            <option value="limpeza-ficha">Limpeza de Ficha Criminal</option>
+                                            <option value="porte-armas">Porte de Armas</option>
+                                        </optgroup>
+                                        <optgroup label="📋 Cível">
+                                            <option value="acao-cobranca">Ação de Cobrança</option>
+                                            <option value="acao-indenizacao">Ação de Indenização</option>
+                                            <option value="acao-despejo">Ação de Despejo</option>
+                                            <option value="divorcio">Divórcio</option>
+                                            <option value="inventario">Inventário</option>
+                                            <option value="usucapiao">Usucapião</option>
+                                        </optgroup>
+                                        <optgroup label="⚖️ Criminal">
+                                            <option value="queixa-crime">Queixa-Crime</option>
+                                            <option value="habeas-corpus">Habeas Corpus</option>
+                                            <option value="revisao-criminal">Revisão Criminal</option>
+                                        </optgroup>
+                                        <optgroup label="👨‍💼 Trabalhista">
+                                            <option value="reclamacao-trabalhista">Reclamação Trabalhista</option>
+                                            <option value="acao-acidente-trabalho">Ação de Acidente de Trabalho</option>
+                                        </optgroup>
+                                        <optgroup label="🏛️ Administrativo">
+                                            <option value="acao-popular">Ação Popular</option>
+                                        </optgroup>
                                     </select>
+                                </div>
+
+                                <!-- Assunto do Processo -->
+                                <div class="mb-6">
+                                    <label class="block text-blue-300 font-semibold mb-2">
+                                        <i class="fas fa-heading mr-2"></i>Assunto/Resumo do Processo *
+                                    </label>
+                                    <input type="text" id="assunto-processo" required 
+                                           class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                           placeholder="Ex: Cobrança de honorários advocatícios">
+                                </div>
+
+                                <!-- Descrição Detalhada -->
+                                <div>
+                                    <label class="block text-blue-300 font-semibold mb-2">
+                                        <i class="fas fa-align-left mr-2"></i>Descrição Detalhada do Caso
+                                    </label>
+                                    <textarea id="descricao-processo" rows="4" 
+                                              class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                              placeholder="Descreva os detalhes do caso, fatos relevantes, pedidos principais..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Informações Adicionais -->
+                            <div class="bg-slate-700/30 rounded-lg p-6 border border-slate-500/30">
+                                <h4 class="text-blue-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-info-circle text-blue-400"></i>
+                                    Informações Adicionais
+                                </h4>
+
+                                <!-- Valor da Causa -->
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-blue-300 font-semibold mb-2">
+                                            <i class="fas fa-dollar-sign mr-2"></i>Valor da Causa (R$)
+                                        </label>
+                                        <input type="number" id="valor-causa" step="0.01" 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                               placeholder="0,00">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-blue-300 font-semibold mb-2">
+                                            <i class="fas fa-gavel mr-2"></i>Vara/Instância
+                                        </label>
+                                        <select id="vara-instancia" 
+                                                class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
+                                            <option value="">Selecione a vara</option>
+                                            <option value="1-vara-civel">1ª Vara Cível</option>
+                                            <option value="2-vara-civel">2ª Vara Cível</option>
+                                            <option value="vara-criminal">Vara Criminal</option>
+                                            <option value="vara-trabalhista">Vara Trabalhista</option>
+                                            <option value="vara-federal">Vara Federal</option>
+                                            <option value="tribunal-justica">Tribunal de Justiça</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
