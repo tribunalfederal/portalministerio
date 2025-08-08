@@ -1276,6 +1276,12 @@
                 inicializarSistemaProcessos();
                 console.log('🏛️ Sistema de processos 24/7 iniciado');
             }, 2000);
+            
+            // Carregar registros OAB
+            setTimeout(() => {
+                carregarRegistrosOAB();
+                console.log('📋 Sistema OAB inicializado');
+            }, 4000);
         });
         
         // Tornar funções disponíveis globalmente
@@ -6233,6 +6239,73 @@ document.addEventListener('input', function(e) {
             document.getElementById('preview-email').classList.add('hidden');
         }
 
+        // ===== SISTEMA FIREBASE PARA OAB =====
+
+        // Carregar registros OAB do Firebase
+        async function carregarRegistrosOAB() {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { collection, getDocs } = window.firebaseModules;
+                const oabRef = collection(window.firebaseDB, 'registros_oab');
+                const snapshot = await getDocs(oabRef);
+                
+                snapshot.docs.forEach(doc => {
+                    const dados = doc.data();
+                    registrosOAB[dados.numero] = dados;
+                });
+                
+                console.log('📋 Registros OAB carregados do Firebase');
+            } catch (error) {
+                console.error('❌ Erro ao carregar registros OAB:', error);
+            }
+        }
+
+        // Salvar novo registro OAB no Firebase
+        async function salvarRegistroOAB(dadosOAB) {
+            if (!window.firebaseDB) return;
+            
+            try {
+                const { collection, addDoc } = window.firebaseModules;
+                const oabRef = collection(window.firebaseDB, 'registros_oab');
+                await addDoc(oabRef, dadosOAB);
+                
+                // Atualizar local também
+                registrosOAB[dadosOAB.numero] = dadosOAB;
+                
+                console.log(`✅ OAB ${dadosOAB.numero} salva no Firebase`);
+            } catch (error) {
+                console.error('❌ Erro ao salvar OAB:', error);
+            }
+        }
+
+        // Marcar OAB como utilizada
+        async function marcarOABUtilizada(numeroOAB) {
+            if (registrosOAB[numeroOAB]) {
+                registrosOAB[numeroOAB].utilizada = true;
+                registrosOAB[numeroOAB].dataUtilizacao = new Date().toISOString();
+                
+                // Atualizar no Firebase também
+                try {
+                    const { collection, doc, updateDoc, query, where, getDocs } = window.firebaseModules;
+                    const oabRef = collection(window.firebaseDB, 'registros_oab');
+                    const q = query(oabRef, where('numero', '==', numeroOAB));
+                    const snapshot = await getDocs(q);
+                    
+                    snapshot.docs.forEach(async (docSnapshot) => {
+                        await updateDoc(doc(window.firebaseDB, 'registros_oab', docSnapshot.id), {
+                            utilizada: true,
+                            dataUtilizacao: new Date().toISOString()
+                        });
+                    });
+                    
+                    console.log(`✅ OAB ${numeroOAB} marcada como utilizada`);
+                } catch (error) {
+                    console.error('❌ Erro ao marcar OAB como utilizada:', error);
+                }
+            }
+        }
+
         // Verificar se OAB foi liberada pelo admin (versão melhorada)
         async function verificarOABLiberada() {
             const oab = document.getElementById('oab-recebida').value.trim();
@@ -6286,6 +6359,9 @@ document.addEventListener('input', function(e) {
                     };
                     
                     await salvarRegistroOAB(novoRegistro);
+                    
+                    // Marcar OAB como utilizada
+                    await marcarOABUtilizada(numeroOAB);
                     
                     // Mostrar informações do novo registro
                     document.getElementById('cargo-info').textContent = novoRegistro.cargoNome;
@@ -6430,7 +6506,7 @@ document.addEventListener('input', function(e) {
                     };
 
                     // Marcar OAB como utilizada
-                    registrosOAB[oab].utilizada = true;
+                    await marcarOABUtilizada(oab);
                     registrosOAB[oab].usuarioEmail = emailUsuario;
                     registrosOAB[oab].nomeUsuario = nomeCompleto;
                     registrosOAB[oab].dataUtilizacao = new Date().toISOString();
