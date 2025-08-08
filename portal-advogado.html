@@ -381,9 +381,9 @@
                 </button>
                 <h2 class="text-white text-3xl font-bold mb-2">
                     <i class="fas fa-calculator mr-3 text-red-400"></i>
-                    Calculadora de Penas v3.0
+                    Calculadora de Sentenças v4.0 - Brasilândia
                 </h2>
-                <p class="text-blue-200">Sistema completo de cálculo de penas e sentenças</p>
+                <p class="text-blue-200">Sistema oficial de cálculo de sentenças conforme Código Penal de Brasilândia</p>
             </div>
 
             <div class="grid-responsive grid-main gap-8">
@@ -426,16 +426,24 @@
                             <h4 class="text-white font-semibold mb-2">Informações do Crime:</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                 <div>
-                                    <span class="text-blue-300">Pena Mínima:</span>
-                                    <span id="crimeMinPena" class="text-white font-medium"></span>
+                                    <span class="text-blue-300">Serviços Comunitários:</span>
+                                    <span id="crimeServices" class="text-white font-medium"></span>
                                 </div>
                                 <div>
-                                    <span class="text-blue-300">Pena Máxima:</span>
-                                    <span id="crimeMaxPena" class="text-white font-medium"></span>
+                                    <span class="text-blue-300">Multa:</span>
+                                    <span id="crimeFine" class="text-white font-medium"></span>
                                 </div>
                                 <div class="md:col-span-2">
                                     <span class="text-blue-300">Artigo:</span>
                                     <span id="crimeArtigo" class="text-white font-medium"></span>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <span class="text-blue-300">Categoria:</span>
+                                    <span id="crimeCategory" class="text-white font-medium"></span>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <span class="text-blue-300">Descrição:</span>
+                                    <span id="crimeDescription" class="text-white font-medium"></span>
                                 </div>
                             </div>
                         </div>
@@ -445,39 +453,43 @@
                     <div class="card p-6">
                         <h3 class="text-white text-xl font-bold mb-4">
                             <i class="fas fa-balance-scale mr-2 text-blue-400"></i>
-                            Circunstâncias Modificadoras
+                            Circunstâncias Modificadoras (Sistema Brasilândia)
                         </h3>
                         
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <!-- Atenuantes -->
                             <div>
                                 <h4 class="text-green-400 font-semibold mb-3">
-                                    <i class="fas fa-arrow-down mr-2"></i>Atenuantes
+                                    <i class="fas fa-arrow-down mr-2"></i>Atenuantes (Redução de Serviços)
                                 </h4>
                                 <div class="space-y-2 max-h-60 overflow-y-auto">
                                     <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.17" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Confissão espontânea (-1/6)</span>
+                                        <input type="checkbox" class="atenuante mt-1" value="0.20" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Confissão espontânea (-20%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.17" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Colaboração premiada (-1/6)</span>
+                                        <input type="checkbox" class="atenuante mt-1" value="0.25" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Colaboração com autoridades (-25%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.125" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Menor de 21 anos (-1/8)</span>
+                                        <input type="checkbox" class="atenuante mt-1" value="0.15" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Menor de 21 anos (-15%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.125" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Maior de 70 anos (-1/8)</span>
+                                        <input type="checkbox" class="atenuante mt-1" value="0.15" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Maior de 65 anos (-15%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
                                         <input type="checkbox" class="atenuante mt-1" value="0.10" onchange="calculateSentence()">
                                         <span class="text-blue-200 text-sm">Reparação do dano (-10%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="atenuante mt-1" value="0.08" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Bons antecedentes (-8%)</span>
+                                        <input type="checkbox" class="atenuante mt-1" value="0.12" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Bons antecedentes (-12%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="atenuante mt-1" value="0.30" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Primeira vez cometendo crime (-30%)</span>
                                     </label>
                                 </div>
                             </div>
@@ -485,7 +497,7 @@
                             <!-- Agravantes -->
                             <div>
                                 <h4 class="text-red-400 font-semibold mb-3">
-                                    <i class="fas fa-arrow-up mr-2"></i>Agravantes
+                                    <i class="fas fa-arrow-up mr-2"></i>Agravantes (Aumento de Serviços)
                                 </h4>
                                 <div class="space-y-2 max-h-60 overflow-y-auto">
                                     <label class="flex items-start space-x-3 cursor-pointer">
@@ -493,24 +505,28 @@
                                         <span class="text-blue-200 text-sm">Reincidência (+50%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="agravante mt-1" value="0.35" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Crime contra funcionário público (+35%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
                                         <input type="checkbox" class="agravante mt-1" value="0.25" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Crime hediondo (+25%)</span>
+                                        <span class="text-blue-200 text-sm">Uso de violência (+25%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
                                         <input type="checkbox" class="agravante mt-1" value="0.20" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Violência doméstica (+20%)</span>
+                                        <span class="text-blue-200 text-sm">Crime em local público (+20%)</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" class="agravante mt-1" value="0.30" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Crime organizado/quadrilha (+30%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
                                         <input type="checkbox" class="agravante mt-1" value="0.15" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Contra menor/idoso (+15%)</span>
+                                        <span class="text-blue-200 text-sm">Uso de arma (+15%)</span>
                                     </label>
                                     <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="agravante mt-1" value="0.12" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Crime organizado (+12%)</span>
-                                    </label>
-                                    <label class="flex items-start space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="agravante mt-1" value="0.10" onchange="calculateSentence()">
-                                        <span class="text-blue-200 text-sm">Uso de arma (+10%)</span>
+                                        <input type="checkbox" class="agravante mt-1" value="0.40" onchange="calculateSentence()">
+                                        <span class="text-blue-200 text-sm">Resistência à prisão (+40%)</span>
                                     </label>
                                 </div>
                             </div>
@@ -527,16 +543,16 @@
                         <div id="resultContainer" class="hidden">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <div class="bg-slate-800/30 rounded-lg p-4 text-center border border-blue-300/20">
-                                    <div class="text-2xl font-bold text-green-400" id="finalSentence">0 anos</div>
-                                    <div class="text-blue-200 text-sm">Pena Final</div>
+                                    <div class="text-2xl font-bold text-green-400" id="finalServices">0 serviços</div>
+                                    <div class="text-blue-200 text-sm">Serviços Comunitários</div>
                                 </div>
                                 <div class="bg-slate-800/30 rounded-lg p-4 text-center border border-blue-300/20">
-                                    <div class="text-2xl font-bold text-yellow-400" id="reductionTotal">0%</div>
-                                    <div class="text-blue-200 text-sm">Redução Total</div>
+                                    <div class="text-2xl font-bold text-yellow-400" id="finalFine">R$ 0,00</div>
+                                    <div class="text-blue-200 text-sm">Multa Final</div>
                                 </div>
                                 <div class="bg-slate-800/30 rounded-lg p-4 text-center border border-blue-300/20">
-                                    <div class="text-2xl font-bold text-red-400" id="increaseTotal">0%</div>
-                                    <div class="text-blue-200 text-sm">Agravamento</div>
+                                    <div class="text-2xl font-bold text-red-400" id="modificationTotal">0%</div>
+                                    <div class="text-blue-200 text-sm">Modificação Total</div>
                                 </div>
                             </div>
                             
@@ -726,107 +742,129 @@
 
         // === CALCULADORA DE PENAS - SISTEMA COMPLETO ===
         
-        // Base de dados de crimes
+        // Base de dados de crimes - CÓDIGO PENAL DE BRASILÂNDIA
         const crimesDatabase = [
-            // Crimes contra a vida
-            { name: "Homicídio Simples", min: 6, max: 20, article: "Art. 121, CP", category: "Vida" },
-            { name: "Homicídio Qualificado", min: 12, max: 30, article: "Art. 121, §2º, CP", category: "Vida" },
-            { name: "Infanticídio", min: 2, max: 6, article: "Art. 123, CP", category: "Vida" },
-            { name: "Aborto", min: 1, max: 3, article: "Art. 124, CP", category: "Vida" },
-            { name: "Lesão Corporal Simples", min: 0.25, max: 1, article: "Art. 129, CP", category: "Vida" },
-            { name: "Lesão Corporal Grave", min: 1, max: 5, article: "Art. 129, §1º, CP", category: "Vida" },
-            { name: "Lesão Corporal Gravíssima", min: 2, max: 8, article: "Art. 129, §2º, CP", category: "Vida" },
-            
-            // Crimes contra o patrimônio
-            { name: "Furto Simples", min: 1, max: 4, article: "Art. 155, CP", category: "Patrimônio" },
-            { name: "Furto Qualificado", min: 2, max: 8, article: "Art. 155, §4º, CP", category: "Patrimônio" },
-            { name: "Roubo Simples", min: 4, max: 10, article: "Art. 157, CP", category: "Patrimônio" },
-            { name: "Roubo Majorado", min: 5, max: 15, article: "Art. 157, §2º, CP", category: "Patrimônio" },
-            { name: "Latrocínio", min: 20, max: 30, article: "Art. 157, §3º, CP", category: "Patrimônio" },
-            { name: "Extorsão", min: 4, max: 10, article: "Art. 158, CP", category: "Patrimônio" },
-            { name: "Extorsão mediante Sequestro", min: 8, max: 15, article: "Art. 159, CP", category: "Patrimônio" },
-            { name: "Estelionato", min: 1, max: 5, article: "Art. 171, CP", category: "Patrimônio" },
-            { name: "Apropriação Indébita", min: 1, max: 4, article: "Art. 168, CP", category: "Patrimônio" },
-            { name: "Receptação", min: 1, max: 4, article: "Art. 180, CP", category: "Patrimônio" },
-            { name: "Dano", min: 0.08, max: 0.5, article: "Art. 163, CP", category: "Patrimônio" },
-            
-            // Crimes contra a dignidade sexual
-            { name: "Estupro", min: 6, max: 10, article: "Art. 213, CP", category: "Sexual" },
-            { name: "Estupro de Vulnerável", min: 8, max: 15, article: "Art. 217-A, CP", category: "Sexual" },
-            { name: "Assédio Sexual", min: 1, max: 2, article: "Art. 216-A, CP", category: "Sexual" },
-            { name: "Violação Sexual mediante Fraude", min: 2, max: 6, article: "Art. 215, CP", category: "Sexual" },
-            
-            // Crimes contra a honra
-            { name: "Calúnia", min: 0.5, max: 2, article: "Art. 138, CP", category: "Honra" },
-            { name: "Difamação", min: 0.25, max: 1, article: "Art. 139, CP", category: "Honra" },
-            { name: "Injúria", min: 0.08, max: 0.5, article: "Art. 140, CP", category: "Honra" },
-            { name: "Injúria Racial", min: 1, max: 3, article: "Art. 140, §3º, CP", category: "Honra" },
-            
-            // Crimes contra a liberdade
-            { name: "Sequestro", min: 1, max: 3, article: "Art. 148, CP", category: "Liberdade" },
-            { name: "Cárcere Privado", min: 0.25, max: 1, article: "Art. 148, CP", category: "Liberdade" },
-            { name: "Ameaça", min: 0.08, max: 0.5, article: "Art. 147, CP", category: "Liberdade" },
-            { name: "Constrangimento Ilegal", min: 0.25, max: 1, article: "Art. 146, CP", category: "Liberdade" },
-            
-            // Crimes contra a Administração Pública
-            { name: "Peculato", min: 2, max: 12, article: "Art. 312, CP", category: "Administração" },
-            { name: "Corrupção Passiva", min: 2, max: 12, article: "Art. 317, CP", category: "Administração" },
-            { name: "Corrupção Ativa", min: 2, max: 12, article: "Art. 333, CP", category: "Administração" },
-            { name: "Prevaricação", min: 0.25, max: 2, article: "Art. 319, CP", category: "Administração" },
-            { name: "Concussão", min: 2, max: 8, article: "Art. 316, CP", category: "Administração" },
-            
-            // Crimes contra a fé pública
-            { name: "Falsificação de Documento Público", min: 2, max: 6, article: "Art. 297, CP", category: "Fé Pública" },
-            { name: "Falsificação de Documento Particular", min: 1, max: 5, article: "Art. 298, CP", category: "Fé Pública" },
-            { name: "Falsidade Ideológica", min: 1, max: 5, article: "Art. 299, CP", category: "Fé Pública" },
-            { name: "Uso de Documento Falso", min: 1, max: 5, article: "Art. 304, CP", category: "Fé Pública" },
-            
-            // Lei de Drogas
-            { name: "Tráfico de Drogas", min: 5, max: 15, article: "Art. 33, Lei 11.343/06", category: "Drogas" },
-            { name: "Associação para Tráfico", min: 3, max: 10, article: "Art. 35, Lei 11.343/06", category: "Drogas" },
-            { name: "Posse de Drogas para Consumo", min: 0.17, max: 0.83, article: "Art. 28, Lei 11.343/06", category: "Drogas" },
-            { name: "Financiamento do Tráfico", min: 8, max: 20, article: "Art. 36, Lei 11.343/06", category: "Drogas" },
-            
-            // Lei Maria da Penha
-            { name: "Violência Doméstica", min: 0.25, max: 3, article: "Lei 11.340/06", category: "Violência Doméstica" },
-            { name: "Descumprimento de Medida Protetiva", min: 0.25, max: 2, article: "Art. 24-A, Lei 11.340/06", category: "Violência Doméstica" },
-            
-            // Estatuto da Criança e Adolescente
-            { name: "Maus-tratos contra Criança", min: 0.17, max: 1, article: "Art. 136, CP c/c ECA", category: "ECA" },
-            { name: "Abandono de Incapaz", min: 0.5, max: 3, article: "Art. 133, CP", category: "ECA" },
-            
-            // Crimes de Trânsito
-            { name: "Homicídio Culposo no Trânsito", min: 2, max: 4, article: "Art. 302, CTB", category: "Trânsito" },
-            { name: "Lesão Corporal Culposa no Trânsito", min: 0.5, max: 2, article: "Art. 303, CTB", category: "Trânsito" },
-            { name: "Embriaguez ao Volante", min: 0.5, max: 3, article: "Art. 306, CTB", category: "Trânsito" },
-            { name: "Fuga do Local do Acidente", min: 0.5, max: 1, article: "Art. 305, CTB", category: "Trânsito" },
-            
-            // Crimes Ambientais
-            { name: "Crime contra Fauna", min: 0.5, max: 1, article: "Art. 29, Lei 9.605/98", category: "Ambiental" },
-            { name: "Crime contra Flora", min: 0.5, max: 1, article: "Art. 38, Lei 9.605/98", category: "Ambiental" },
-            { name: "Poluição", min: 1, max: 4, article: "Art. 54, Lei 9.605/98", category: "Ambiental" },
-            
-            // Crimes Eleitorais
-            { name: "Corrupção Eleitoral", min: 1, max: 4, article: "Art. 299, Código Eleitoral", category: "Eleitoral" },
-            { name: "Boca de Urna", min: 0.5, max: 2, article: "Art. 39, §5º, Lei 9.504/97", category: "Eleitoral" },
-            
-            // Crimes Tributários
-            { name: "Sonegação Fiscal", min: 2, max: 5, article: "Art. 1º, Lei 8.137/90", category: "Tributário" },
-            { name: "Apropriação Indébita Previdenciária", min: 2, max: 5, article: "Art. 168-A, CP", category: "Tributário" },
-            
-            // Crimes Financeiros
-            { name: "Lavagem de Dinheiro", min: 3, max: 10, article: "Art. 1º, Lei 9.613/98", category: "Financeiro" },
-            { name: "Evasão de Divisas", min: 2, max: 6, article: "Art. 22, Lei 7.492/86", category: "Financeiro" },
-            { name: "Gestão Fraudulenta", min: 3, max: 12, article: "Art. 4º, Lei 7.492/86", category: "Financeiro" },
-            
-            // Estatuto do Idoso
-            { name: "Discriminação contra Idoso", min: 0.5, max: 3, article: "Art. 96, Lei 10.741/03", category: "Idoso" },
-            { name: "Abandono de Idoso", min: 0.17, max: 1, article: "Art. 98, Lei 10.741/03", category: "Idoso" },
-            
-            // Lei de Contravenções Penais
-            { name: "Perturbação da Tranquilidade", min: 0.08, max: 0.17, article: "Art. 42, LCP", category: "Contravenção" },
-            { name: "Vias de Fato", min: 0.08, max: 0.17, article: "Art. 21, LCP", category: "Contravenção" },
-            { name: "Porte Ilegal de Arma", min: 0.25, max: 1, article: "Art. 19, LCP", category: "Contravenção" }
+            // === CRIMES DE TRÂNSITO ===
+            { name: "Alta Velocidade", services: 0, fine: 600, article: "Art. 218", category: "Trânsito", 
+              description: "Limite de velocidade dentro da cidade de 120km/h e de veículos de grande porte, 90km/h. Aumenta-se R$ 25,00 a cada 20 km/h excedido." },
+            { name: "Direção Perigosa", services: 0, fine: 2000, article: "Art. 175", category: "Trânsito", 
+              description: "Uso negligente ou imprudente de um veículo" },
+            { name: "Estacionar em local proibido", services: 0, fine: 650, article: "Art. 181", category: "Trânsito", 
+              description: "Deixar o veículo em local indevido" },
+            { name: "Disputar corrida", services: 0, fine: 650, article: "Art. 173", category: "Trânsito", 
+              description: "Praticar rachas/corridas ilegais" },
+            { name: "Avançar sinal vermelho", services: 0, fine: 650, article: "Art. 183", category: "Trânsito", 
+              description: "Insufilme, carro rebaixado" },
+            { name: "Veículo Abandonado", services: 0, fine: 700, article: "Art. 181", category: "Trânsito", 
+              description: "Abandonar veículo em local indevido" },
+            { name: "Transitar na contramão", services: 0, fine: 600, article: "Art. 176", category: "Trânsito", 
+              description: "Andar na via de mão contrária" },
+            { name: "Omissão de Socorro", services: 0, fine: 650, article: "Art. 304", category: "Trânsito", 
+              description: "Quando o causador do dano ou lesão ao cidadão, abandona o local sem prestar socorro" },
+            { name: "Falta de combustível", services: 0, fine: 150, article: "Art. 162", category: "Trânsito", 
+              description: "Ter seu veículo imobilizado na via por falta de combustível" },
+            { name: "Dirigir sem habilitação", services: 0, fine: 150, article: "Art. 162", category: "Trânsito", 
+              description: "Dirigir sem possuir habilitação, podendo ser recolhida a atenção do veículo" },
+            { name: "Ultrapassar blitz", services: 0, fine: 850, article: "Art. 210", category: "Trânsito", 
+              description: "Transpor, sem autorização, bloqueio viário policial" },
+            { name: "Recusar-se a ser submetido ao teste do bafômetro", services: 0, fine: 1000, article: "Art. 165-A", category: "Trânsito", 
+              description: "Resistência para realizar o teste do bafômetro" },
+            { name: "Seguir veículo policial que esteja em situação emergencial", services: 0, fine: 1000, article: "Art. 218", category: "Trânsito", 
+              description: "Seguir viaturas em ocorrências, fugas ou socorro" },
+            { name: "Conduzir motocicletas sem usar capacete", services: 0, fine: 1300, article: "Art. 244", category: "Trânsito", 
+              description: "Trafegar com motos sem capacete" },
+            { name: "Transitar de marcha ré", services: 0, fine: 300, article: "Art. 194", category: "Trânsito", 
+              description: "Ultrapassar faixa de retenção para realizar manobra de ultrapassagem" },
+            { name: "Ultrapassar pela direita", services: 0, fine: 1000, article: "Art. 199", category: "Trânsito", 
+              description: "Utilizar a faixa da direita para realizar uma ultrapassagem" },
+
+            // === CRIMES CONTRA A PESSOA ===
+            { name: "Homicídio", services: 40, fine: 850, article: "Art. 121", category: "Contra a Pessoa", 
+              description: "Matar alguém" },
+            { name: "Homicídio de funcionário público", services: 60, fine: 3000, article: "Art. 121-A", category: "Contra a Pessoa", 
+              description: "Matar funcionário público, durante a sua função ou em razão dela" },
+            { name: "Homicídio culposo", services: 30, fine: 1500, article: "Art. 121-B", category: "Contra a Pessoa", 
+              description: "Matar alguém em razão de imprudência, negligência ou imperícia" },
+            { name: "Lesão corporal", services: 3, fine: 550, article: "Art. 129", category: "Contra a Pessoa", 
+              description: "Ofender a integridade física ou saúde de outrem" },
+            { name: "Calúnia", services: 10, fine: 450, article: "Art. 130", category: "Contra a Pessoa", 
+              description: "Imputar falsamente a alguém fato definido como crime" },
+            { name: "Difamação", services: 10, fine: 450, article: "Art. 139", category: "Contra a Pessoa", 
+              description: "Imputar fato ofensivo à sua reputação alheia" },
+            { name: "Ameaça", services: 10, fine: 600, article: "Art. 147", category: "Contra a Pessoa", 
+              description: "Ameaçar alguém, por qualquer meio, de causar mal injusto e grave" },
+            { name: "Sequestro e cárcere privado", services: 40, fine: 1500, article: "Art. 148", category: "Contra a Pessoa", 
+              description: "Privar alguém de sua liberdade, mediante sequestro ou cárcere privado" },
+            { name: "Genocídio", services: 60, fine: 3000, article: "Art. 3", category: "Contra a Pessoa", 
+              description: "Praticar homicídio doloso, direcionado por motivos de etnia ou condição do sexo feminino" },
+            { name: "Lesão corporal seguida de morte", services: 30, fine: 1500, article: "Art. 129 III", category: "Contra a Pessoa", 
+              description: "Ofender a integridade física ou saúde de outrem" },
+            { name: "Incitação e/ou apologia ao crime", services: 25, fine: 850, article: "Art. 287", category: "Contra a Pessoa", 
+              description: "Fazer apologia de fato criminoso ou de autor de crime, elogiar a prática de crimes" },
+
+            // === CRIMES CONTRA O PATRIMÔNIO ===
+            { name: "Furto qualificado", services: 30, fine: 550, article: "Art. 155 I", category: "Contra o Patrimônio", 
+              description: "Subtrair, para si ou para outrem, coisa alheia móvel" },
+            { name: "Furto", services: 25, fine: 350, article: "Art. 155", category: "Contra o Patrimônio", 
+              description: "Subtrair, para si ou para outrem, coisa alheia móvel" },
+            { name: "Roubo", services: 40, fine: 750, article: "Art. 157", category: "Contra o Patrimônio", 
+              description: "Subtrair coisa alheia móvel, para si ou para outrem, mediante violência ou grave ameaça" },
+            { name: "Roubo seguido de morte (latrocínio)", services: 50, fine: 1000, article: "Art. 157-B", category: "Contra o Patrimônio", 
+              description: "Subtrair coisa alheia móvel, para si ou outrem, mediante violência ou grave ameaça, com resultado morte" },
+            { name: "Roubo qualificado", services: 50, fine: 900, article: "Art. 157 II", category: "Contra o Patrimônio", 
+              description: "Apropriar-se de bens, valores ou dinheiro sob sua responsabilidade" },
+            { name: "Estelionato", services: 12, fine: 2500, article: "Art. 171", category: "Contra o Patrimônio", 
+              description: "Obter, para si ou outrem, vantagem ilícita, em prejuízo alheio, por meio de fraude, erro, artifício ou ardil" },
+            { name: "Desmonte de veículos", services: 10, fine: 2500, article: "Art. 126", category: "Contra o Patrimônio", 
+              description: "Adquirir, receber, transportar, desmontar, conduzir ou ocultar, automotor terrestre" },
+            { name: "Receptação", services: 10, fine: 2500, article: "Art. 180", category: "Contra o Patrimônio", 
+              description: "Adquirir, receber, transportar, conduzir ou ocultar, em proveito próprio ou alheio, coisa que saiba ser produto de crime" },
+
+            // === CRIMES CONTRA A ORDEM PÚBLICA ===
+            { name: "Roupas Policiais", services: 50, fine: 5000, article: "Art. 200-A", category: "Contra a Ordem Pública", 
+              description: "Utilizar qualquer acessório ou roupa de uso exclusivamente policial" },
+            { name: "Roupas Militares", services: 50, fine: 5000, article: "Art. 200-B", category: "Contra a Ordem Pública", 
+              description: "Utilizar qualquer acessório ou roupa de cunho militar (coletes, etc) em locais públicos como Hospital, Mecânicas, Praça, Delegacia" },
+            { name: "Ocultação facial", services: 5, fine: 1000, article: "Art. 200-C", category: "Contra a Ordem Pública", 
+              description: "Utilizar máscaras ou vestes que tampem o rosto em locais públicos como Hospital, Mecânicas, Praça, Delegacia" },
+            { name: "Produtos ilícitos", services: 10, fine: 2000, article: "Art. 288", category: "Contra a Ordem Pública", 
+              description: "Portar ou possuir objetos ilícitos, conforme decreto judicial" },
+            { name: "Associação Criminosa", services: 15, fine: 2000, article: "Art. 288", category: "Contra a Ordem Pública", 
+              description: "Associar-se em 03 ou mais pessoas, para o fim específico de cometer crimes" },
+            { name: "Dinheiro ilícito", services: 18, fine: 1500, article: "Art. 289", category: "Contra a Ordem Pública", 
+              description: "Portar dinheiro ilícito" },
+            { name: "Falsidade ideológica", services: 15, fine: 1750, article: "Art. 299", category: "Contra a Ordem Pública", 
+              description: "Falsificar, no todo ou em parte, documento particular, ou alterar ou atestar vantagem ou prejudicar outrem" },
+            { name: "Desobediência", services: 10, fine: 1500, article: "Art. 330", category: "Contra a Ordem Pública", 
+              description: "Desacatar a ordem legal de funcionário público" },
+            { name: "Desacato", services: 12, fine: 1500, article: "Art. 331", category: "Contra a Ordem Pública", 
+              description: "Desacatar funcionário público no exercício da função ou em razão dela, com intuito de menosprezá-lo" },
+            { name: "Corrupção", services: 15, fine: 2500, article: "Art. 333", category: "Contra a Ordem Pública", 
+              description: "Oferecer ou prometer vantagem indevida a funcionário público, em razão da função pública. Parágrafo único: o fato constitui crime, salvo quando não houver violação" },
+            { name: "Suborno", services: 25, fine: 2500, article: "Art. 337", category: "Contra a Ordem Pública", 
+              description: "Obter, para si ou para outrem, vantagem indevida, em função pública" },
+            { name: "Denúncia caluniosa", services: 12, fine: 1750, article: "Art. 339", category: "Contra a Ordem Pública", 
+              description: "Causar a instauração de investigação policial ou processo judicial, contra alguém, imputando-lhe crime de que sabe ser inocente" },
+            { name: "Falso testemunho", services: 10, fine: 1500, article: "Art. 342", category: "Contra a Ordem Pública", 
+              description: "Fazer afirmação falsa, negar ou calar verdade, na posição da testemunha" },
+            { name: "Uso de pessoas utilizando máscara", services: 12, fine: 2500, article: "Art. 311", category: "Contra a Ordem Pública", 
+              description: "Utilizar máscara ou objetos por razões de terrorismo contra órgãos públicos quando cometido com finalidade de terror" },
+            { name: "Abuso de autoridade", services: 12, fine: 5000, article: "Art. 355", category: "Contra a Ordem Pública", 
+              description: "Abusar da posição pública, no intuito de obter vantagem ou promover injusto à outrem, conforme decreto judicial" },
+            { name: "Obstrução de Justiça", services: 32, fine: 5000, article: "Art. 357", category: "Contra a Ordem Pública", 
+              description: "Atrapalhar o andamento de instrução processual ou de ordem judicial" },
+
+            // === CRIMES DE ARMAS E DROGAS ===
+            { name: "Porte ou posse ilegal de arma classe 1", services: 14, fine: 2000, article: "Art. 16", category: "Armas e Drogas", 
+              description: "Porte ou posse ilegal de armamento semi-automático" },
+            { name: "Porte ou posse ilegal de arma classe 2", services: 14, fine: 3000, article: "Art. 17", category: "Armas e Drogas", 
+              description: "Porte ou posse ilegal de armamento automático" },
+            { name: "Tráfico de munições", services: 10, fine: 3500, article: "Art. 18", category: "Armas e Drogas", 
+              description: "Porte de múltiplas unidades, dependerá da comprovação de dolo de comercialização/traficância para configurar o crime" },
+            { name: "Tráfico de armamento", services: 20, fine: 5000, article: "Art. 19", category: "Armas e Drogas", 
+              description: "Posse ou porte de 02 armamentos, impedindo-se o uso de ambos" },
+            { name: "Tráfico de drogas", services: 25, fine: 5000, article: "Art. 33", category: "Armas e Drogas", 
+              description: "Posse de mais de 02 entorpecentes, interditando-se o máximo de 04 unidades" }
         ];
 
         let calculationHistory = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
@@ -888,9 +926,11 @@
             
             const crime = crimesDatabase[crimeIndex];
             
-            document.getElementById('crimeMinPena').textContent = formatPenalty(crime.min);
-            document.getElementById('crimeMaxPena').textContent = formatPenalty(crime.max);
+            document.getElementById('crimeServices').textContent = crime.services + ' serviços comunitários';
+            document.getElementById('crimeFine').textContent = formatCurrency(crime.fine);
             document.getElementById('crimeArtigo').textContent = crime.article;
+            document.getElementById('crimeCategory').textContent = crime.category;
+            document.getElementById('crimeDescription').textContent = crime.description;
             
             crimeInfo.classList.remove('hidden');
             document.getElementById('selectCrimeMessage').classList.add('hidden');
@@ -898,7 +938,7 @@
             calculateSentence();
         }
 
-        // Calcular sentença
+        // Calcular sentença (Sistema Brasilândia)
         function calculateSentence() {
             const crimeIndex = document.getElementById('crimeSelect').value;
             if (crimeIndex === '') return;
@@ -907,7 +947,8 @@
             const atenuantes = document.querySelectorAll('.atenuante:checked');
             const agravantes = document.querySelectorAll('.agravante:checked');
             
-            let basePenalty = crime.min; // Usando pena mínima como base
+            let baseServices = crime.services;
+            let baseFine = crime.fine;
             let totalReduction = 0;
             let totalIncrease = 0;
             
@@ -921,47 +962,48 @@
                 totalIncrease += parseFloat(agravante.value);
             });
             
-            // Aplicar cálculos
-            let finalPenalty = basePenalty;
+            // Aplicar cálculos nos serviços comunitários
+            let finalServices = baseServices;
+            let finalFine = baseFine;
             
-            // Aplicar reduções primeiro
-            if (totalReduction > 0) {
-                finalPenalty = finalPenalty * (1 - Math.min(totalReduction, 0.8)); // Máximo 80% de redução
+            // Aplicar modificações
+            let netModification = totalIncrease - totalReduction;
+            
+            if (netModification !== 0) {
+                finalServices = Math.round(baseServices * (1 + netModification));
+                finalFine = Math.round(baseFine * (1 + netModification));
             }
             
-            // Aplicar agravamentos
-            if (totalIncrease > 0) {
-                finalPenalty = finalPenalty * (1 + totalIncrease);
-            }
-            
-            // Não pode ser menor que 1 mês nem maior que a pena máxima * 2
-            finalPenalty = Math.max(0.083, Math.min(finalPenalty, crime.max * 2));
+            // Não pode ser menor que 0
+            finalServices = Math.max(0, finalServices);
+            finalFine = Math.max(0, finalFine);
             
             // Atualizar display
-            document.getElementById('finalSentence').textContent = formatPenalty(finalPenalty);
-            document.getElementById('reductionTotal').textContent = (totalReduction * 100).toFixed(1) + '%';
-            document.getElementById('increaseTotal').textContent = (totalIncrease * 100).toFixed(1) + '%';
+            document.getElementById('finalServices').textContent = finalServices + ' serviços';
+            document.getElementById('finalFine').textContent = formatCurrency(finalFine);
+            document.getElementById('modificationTotal').textContent = (netModification * 100).toFixed(1) + '%';
             
             // Atualizar contadores
             document.getElementById('activeAtenuantes').textContent = atenuantes.length;
             document.getElementById('activeAgravantes').textContent = agravantes.length;
             
             // Mostrar detalhes do cálculo
-            updateCalculationDetails(crime, basePenalty, finalPenalty, totalReduction, totalIncrease);
+            updateCalculationDetails(crime, baseServices, baseFine, finalServices, finalFine, totalReduction, totalIncrease);
             
             document.getElementById('resultContainer').classList.remove('hidden');
             
             // Adicionar ao histórico
-            addToHistory(crime, finalPenalty, totalReduction, totalIncrease);
+            addToHistory(crime, finalServices, finalFine, totalReduction, totalIncrease);
         }
 
         // Atualizar detalhes do cálculo
-        function updateCalculationDetails(crime, basePenalty, finalPenalty, totalReduction, totalIncrease) {
+        function updateCalculationDetails(crime, baseServices, baseFine, finalServices, finalFine, totalReduction, totalIncrease) {
             const details = document.getElementById('calculationDetails');
             let html = '';
             
             html += `<div>📋 <strong>Crime:</strong> ${crime.name}</div>`;
-            html += `<div>⚖️ <strong>Pena base:</strong> ${formatPenalty(basePenalty)}</div>`;
+            html += `<div>⚖️ <strong>Serviços base:</strong> ${baseServices} serviços comunitários</div>`;
+            html += `<div>💰 <strong>Multa base:</strong> ${formatCurrency(baseFine)}</div>`;
             
             if (totalReduction > 0) {
                 html += `<div>📉 <strong>Reduções aplicadas:</strong> -${(totalReduction * 100).toFixed(1)}%</div>`;
@@ -971,35 +1013,27 @@
                 html += `<div>📈 <strong>Agravamentos aplicados:</strong> +${(totalIncrease * 100).toFixed(1)}%</div>`;
             }
             
-            html += `<div>✅ <strong>Pena final:</strong> ${formatPenalty(finalPenalty)}</div>`;
+            html += `<div>✅ <strong>Serviços finais:</strong> ${finalServices} serviços comunitários</div>`;
+            html += `<div>✅ <strong>Multa final:</strong> ${formatCurrency(finalFine)}</div>`;
             
             details.innerHTML = html;
         }
 
-        // Formatar pena em anos/meses
-        function formatPenalty(years) {
-            if (years >= 1) {
-                const wholePart = Math.floor(years);
-                const decimalPart = years - wholePart;
-                const months = Math.round(decimalPart * 12);
-                
-                if (months === 0) {
-                    return `${wholePart} ${wholePart === 1 ? 'ano' : 'anos'}`;
-                } else {
-                    return `${wholePart} ${wholePart === 1 ? 'ano' : 'anos'} e ${months} ${months === 1 ? 'mês' : 'meses'}`;
-                }
-            } else {
-                const months = Math.round(years * 12);
-                return `${months} ${months === 1 ? 'mês' : 'meses'}`;
-            }
+        // Formatar moeda brasileira
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
         }
 
         // Adicionar ao histórico
-        function addToHistory(crime, finalPenalty, totalReduction, totalIncrease) {
+        function addToHistory(crime, finalServices, finalFine, totalReduction, totalIncrease) {
             const entry = {
                 id: Date.now(),
                 crime: crime.name,
-                penalty: finalPenalty,
+                services: finalServices,
+                fine: finalFine,
                 reduction: totalReduction,
                 increase: totalIncrease,
                 timestamp: new Date().toLocaleString('pt-BR')
@@ -1026,7 +1060,7 @@
                 html += `
                     <div class="bg-slate-800/30 rounded-lg p-3 border border-blue-300/10">
                         <div class="text-white text-sm font-medium">${entry.crime}</div>
-                        <div class="text-blue-300 text-xs">Pena: ${formatPenalty(entry.penalty)}</div>
+                        <div class="text-blue-300 text-xs">Serviços: ${entry.services} | Multa: ${formatCurrency(entry.fine)}</div>
                         <div class="text-blue-400 text-xs">${entry.timestamp}</div>
                     </div>
                 `;
@@ -1058,24 +1092,33 @@
             }
             
             const crime = crimesDatabase[crimeIndex];
-            const finalPenalty = document.getElementById('finalSentence').textContent;
+            const finalServices = document.getElementById('finalServices').textContent;
+            const finalFine = document.getElementById('finalFine').textContent;
             const timestamp = new Date().toLocaleString('pt-BR');
             
             const content = `
-RELATÓRIO DE CÁLCULO DE PENA
-============================
+RELATÓRIO DE CÁLCULO DE SENTENÇA - BRASILÂNDIA
+============================================
 
 Crime: ${crime.name}
 Artigo: ${crime.article}
-Pena Final: ${finalPenalty}
+Categoria: ${crime.category}
+
+SENTENÇA FINAL:
+- Serviços Comunitários: ${finalServices}
+- Multa: ${finalFine}
+
 Data/Hora: ${timestamp}
 
 Calculado pelo Sistema Jurídico BRASILÂNDIA
-Portal do Advogado - Calculadora de Penas v3.0
+Portal do Advogado - Calculadora de Penas v4.0 (Brasilândia)
+
+OBSERVAÇÃO: Este documento foi gerado automaticamente
+pelo sistema e deve ser validado pelas autoridades competentes.
             `.trim();
             
             if (format === 'txt') {
-                downloadFile(content, `calculo-pena-${Date.now()}.txt`, 'text/plain');
+                downloadFile(content, `sentenca-brasilandia-${Date.now()}.txt`, 'text/plain');
             } else if (format === 'pdf') {
                 // Simulação de exportação PDF
                 alert('Funcionalidade de PDF em desenvolvimento. Use TXT por enquanto.');
