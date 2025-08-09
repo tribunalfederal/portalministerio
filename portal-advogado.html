@@ -3227,14 +3227,10 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         }
 
         // Gerar imagem do documento com formatação profissional e PDF intermediário
+        // SISTEMA SIMPLIFICADO - Gerar imagem direta do documento
         function generateDocumentImage(documentTitle) {
-            console.log('🖨️ Iniciando geração de imagem do documento...');
+            console.log('🖨️ SISTEMA SIMPLIFICADO - Gerando imagens diretas...');
             
-            // Configurações de página A4 em pixels (300 DPI)
-            const PAGE_WIDTH = 794; // A4 width
-            const PAGE_HEIGHT = 1123; // A4 height
-            const MARGIN = 60;
-
             // Obter dados do formulário atual
             const template = documentTemplates[currentDocumentType];
             const formData = {};
@@ -3245,43 +3241,38 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 }
             });
 
-            // Adicionar conteúdo expandido se necessário (como no preview)
+            // Adicionar conteúdo expandido se necessário
             let expandedData = { ...formData };
             const content = generateDocumentContent(currentDocumentType, formData);
             if (content.length < 800) {
-                console.log('📝 Expandindo conteúdo para download...');
+                console.log('📝 Expandindo conteúdo...');
                 expandedData.observacoes = (expandedData.observacoes || '') + 
                     '\n\nDOS FATOS:\n\n' +
                     'O requerente vem, por meio desta petição, expor e requerer o que segue. ' +
                     'Os fatos narrados nesta inicial demonstram claramente a necessidade de ' +
-                    'intervenção do Poder Judiciário para a resolução da presente questão. ' +
-                    'Conforme será demonstrado, há fundamentos jurídicos sólidos que amparam ' +
-                    'os pedidos formulados nesta petição.\n\n' +
+                    'intervenção do Poder Judiciário para a resolução da presente questão.\n\n' +
                     'DA FUNDAMENTAÇÃO JURÍDICA:\n\n' +
                     'A presente ação encontra amparo legal nos dispositivos constitucionais ' +
                     'e infraconstitucionais aplicáveis à espécie. O direito pleiteado está ' +
-                    'devidamente fundamentado na legislação vigente e na jurisprudência ' +
-                    'consolidada dos tribunais superiores. A análise dos precedentes ' +
-                    'jurisprudenciais demonstra a viabilidade jurídica dos pedidos formulados.\n\n' +
+                    'devidamente fundamentado na legislação vigente.\n\n' +
                     'DOS PEDIDOS:\n\n' +
                     'Diante do exposto, requer-se a Vossa Excelência que se digne a deferir ' +
-                    'os pedidos formulados nesta petição, tendo em vista a presença dos ' +
-                    'requisitos legais necessários e a fundamentação jurídica apresentada.';
+                    'os pedidos formulados nesta petição.';
             }
 
-            // Gerar páginas em tamanho A4 para download
-            console.log('📄 Gerando páginas em tamanho A4 para download...');
-            const downloadPages = generateProfessionalPages(expandedData, documentTitle, PAGE_WIDTH, PAGE_HEIGHT, MARGIN);
+            // Gerar páginas em tamanho A4
+            console.log('📄 Gerando páginas A4...');
+            const downloadPages = generateProfessionalPages(expandedData, documentTitle, 794, 1123, 60);
             
-            console.log(`✅ ${downloadPages.length} páginas geradas para download`);
+            console.log(`✅ ${downloadPages.length} páginas prontas para download`);
             
-            // Usar as páginas geradas para download
-            generatePagesAsImages(downloadPages, documentTitle, PAGE_WIDTH, PAGE_HEIGHT, MARGIN);
+            // Download direto das imagens
+            downloadPagesDirectly(downloadPages, documentTitle);
         }
 
-        // Gerar páginas com formatação profissional - SISTEMA COMPLETAMENTE NOVO
+        // SISTEMA SIMPLIFICADO - Gerar páginas com formatação profissional
         function generateProfessionalPages(data, title, pageWidth, pageHeight, margin) {
-            console.log('📄 Iniciando geração de páginas profissionais...');
+            console.log('📄 Sistema SIMPLIFICADO - Gerando páginas...');
             const pages = [];
             const userProfile = JSON.parse(localStorage.getItem('advogado-profile')) || {};
             
@@ -3289,98 +3280,35 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const content = generateDocumentContent(currentDocumentType, data);
             const formattedContent = formatDocumentContentHTML(content);
             
-            console.log('📝 Conteúdo formatado gerado:', formattedContent.length, 'caracteres');
+            console.log('📝 Conteúdo gerado:', formattedContent.length, 'caracteres');
             
-            // Quebrar conteúdo em parágrafos menores para melhor controle
-            const paragraphs = formattedContent.split('</p>').filter(p => p.trim());
+            // FORÇAR SEMPRE 2 PÁGINAS para teste
+            const allText = formattedContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            const midPoint = Math.floor(allText.length / 2);
             
-            // Configurações de página - AUMENTADAS para mais conteúdo
-            const maxLinesPerPage = 45; // Linhas máximas por página (aumentado de 25)
-            const maxCharsPerPage = 4500; // Caracteres máximos por página (aumentado de 2000)
+            // Primeira página - primeira metade do conteúdo
+            const firstHalfHTML = formattedContent.substring(0, midPoint + 200);
+            const page1 = createSimplePage(firstHalfHTML, 1, pageWidth, pageHeight, margin, title, userProfile, true);
+            pages.push(page1);
             
-            let currentPageParagraphs = [];
-            let currentPageChars = 0;
-            let currentPageLines = 0;
-            let pageNumber = 1;
+            // Segunda página - segunda metade do conteúdo + assinatura
+            const secondHalfHTML = formattedContent.substring(midPoint + 200);
+            const page2 = createSimplePage(secondHalfHTML, 2, pageWidth, pageHeight, margin, title, userProfile, false);
+            pages.push(page2);
             
-            console.log('📋 Total de parágrafos para processar:', paragraphs.length);
-            
-            for (let i = 0; i < paragraphs.length; i++) {
-                const paragraph = paragraphs[i].trim() + '</p>';
-                const paragraphChars = paragraph.replace(/<[^>]*>/g, '').length; // Texto sem HTML
-                const paragraphLines = Math.ceil(paragraphChars / 80); // Estimar linhas
-                
-                // Verificar se precisa quebrar página - LÓGICA MAIS PERMISSIVA
-                const wouldExceedChars = currentPageChars + paragraphChars > maxCharsPerPage;
-                const wouldExceedLines = currentPageLines + paragraphLines > maxLinesPerPage;
-                const hasContent = currentPageParagraphs.length > 0;
-                const isVeryLongParagraph = paragraphChars > 1000; // Não quebrar parágrafos muito longos
-                
-                if ((wouldExceedChars || wouldExceedLines) && hasContent && !isVeryLongParagraph) {
-                    // Criar página atual
-                    const pageContent = currentPageParagraphs.join('\n');
-                    const pageHTML = createFormattedPage(
-                        pageContent, 
-                        pageNumber, 
-                        pageWidth, 
-                        pageHeight, 
-                        margin, 
-                        title,
-                        userProfile,
-                        pageNumber === 1
-                    );
-                    
-                    pages.push(pageHTML);
-                    console.log(`✅ Página ${pageNumber} criada com ${currentPageChars} caracteres e ${currentPageLines} linhas`);
-                    
-                    // Resetar para nova página
-                    currentPageParagraphs = [paragraph];
-                    currentPageChars = paragraphChars;
-                    currentPageLines = paragraphLines;
-                    pageNumber++;
-                } else {
-                    // Adicionar parágrafo à página atual
-                    currentPageParagraphs.push(paragraph);
-                    currentPageChars += paragraphChars;
-                    currentPageLines += paragraphLines;
-                }
-            }
-            
-            // Adicionar última página se houver conteúdo restante
-            if (currentPageParagraphs.length > 0) {
-                const pageContent = currentPageParagraphs.join('\n');
-                const pageHTML = createFormattedPage(
-                    pageContent, 
-                    pageNumber, 
-                    pageWidth, 
-                    pageHeight, 
-                    margin, 
-                    title,
-                    userProfile,
-                    pageNumber === 1
-                );
-                
-                pages.push(pageHTML);
-                console.log(`✅ Página final ${pageNumber} criada com ${currentPageChars} caracteres`);
-            }
-            
-            console.log(`🎉 Total de páginas geradas: ${pages.length}`);
+            console.log(`✅ ${pages.length} páginas criadas (sistema simplificado)`);
             return pages;
         }
 
-        // Criar página formatada com cabeçalho (só primeira) e rodapé (demais)
-        function createFormattedPage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
+        // Criar página simples e funcional
+        function createSimplePage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
             const headerHTML = isFirstPage ? `
-                <div style="text-align: center; margin-bottom: 25px; border-bottom: 3px solid #1e40af; padding-bottom: 25px;">
+                <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1e40af; padding-bottom: 20px;">
                     <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 80px; height: 80px; margin: 0 auto 15px; display: block;">
                     <div style="font-size: 18px; font-weight: bold; color: #1e40af; letter-spacing: 2px; margin-bottom: 8px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
                     <div style="font-size: 16px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
                 </div>
-            ` : '';
-
-            // Título do documento separado, abaixo da linha azul
-            const titleHTML = isFirstPage ? `
-                <div style="text-align: center; margin: 30px 0 40px 0;">
+                <div style="text-align: center; margin: 20px 0 30px 0;">
                     <div style="font-size: 16px; font-weight: bold; color: #000; text-decoration: underline;">${title.toUpperCase()}</div>
                 </div>
             ` : '';
@@ -3388,10 +3316,22 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const footerHTML = !isFirstPage ? `
                 <div style="position: absolute; bottom: ${margin}px; left: ${margin}px; right: ${margin}px; text-align: center; font-size: 11px; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
                     <div style="margin-bottom: 5px;">
-                        <strong>${userProfile.name || 'Advogado'}</strong> - OAB/SP ${userProfile.oab || 'XXXXX'}
+                        <strong>${userProfile.name || 'Dr(a). Advogado(a)'}</strong> - OAB/SP ${userProfile.oab || 'XXXXX'}
                     </div>
                     <div style="font-size: 10px;">
                         ${userProfile.email || 'email@exemplo.com'} | Tel: ${userProfile.phone || '(11) 9999-9999'} | Página ${pageNumber}
+                    </div>
+                </div>
+            ` : '';
+
+            // Adicionar assinatura na última página
+            const signatureHTML = !isFirstPage ? `
+                <div style="margin-top: 50px; text-align: center;">
+                    <div style="margin: 40px 0 20px 0;">
+                        <div style="border-top: 1px solid #000; width: 300px; margin: 0 auto; padding-top: 10px;">
+                            <strong>${userProfile.name || 'Dr(a). Advogado(a)'}</strong><br>
+                            OAB/SP ${userProfile.oab || 'XXXXX'}
+                        </div>
                     </div>
                 </div>
             ` : '';
@@ -3408,11 +3348,12 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     padding: ${margin}px;
                     box-sizing: border-box;
                     color: #000;
+                    overflow: hidden;
                 ">
                     ${headerHTML}
-                    ${titleHTML}
-                    <div style="text-align: justify; margin-bottom: ${!isFirstPage ? '80px' : '40px'};">
+                    <div style="text-align: justify; margin-bottom: ${!isFirstPage ? '100px' : '40px'}; min-height: ${height - (margin * 2) - 200}px;">
                         ${content}
+                        ${signatureHTML}
                     </div>
                     ${footerHTML}
                 </div>
@@ -3451,291 +3392,82 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         }
 
         // Gerar imagens PNG para cada página
-        function generatePagesAsImages(pages, documentTitle, width, height, margin) {
+        // Download direto e simples das páginas
+        function downloadPagesDirectly(pages, documentTitle) {
             const totalPages = pages.length;
+            console.log(`📦 Iniciando download direto de ${totalPages} páginas...`);
+            
+            showNotification(`Baixando ${totalPages} página(s)...`, 'info');
+            
+            let currentPage = 0;
+            
+            function downloadNextPage() {
+                if (currentPage >= totalPages) {
+                    console.log('🎉 Todas as páginas baixadas!');
+                    showNotification(`${totalPages} página(s) baixada(s) com sucesso!`, 'success');
+                    closeDocumentGenerator();
+                    return;
+                }
+                
+                const pageIndex = currentPage + 1;
+                console.log(`📥 Baixando página ${pageIndex}...`);
+                
+                // Criar elemento temporário
+                const pageElement = document.createElement('div');
+                pageElement.style.cssText = `
+                    position: absolute;
+                    left: -9999px;
+                    top: 0;
+                    width: 794px;
+                    height: 1123px;
+                    background: white;
+                `;
+                pageElement.innerHTML = pages[currentPage];
+                document.body.appendChild(pageElement);
 
-            if (totalPages > 1) {
-                // Mostrar modal de seleção de páginas
-                showPageSelectionModal(pages, documentTitle, width, height, totalPages);
-            } else {
-                // Baixar página única diretamente
-                downloadAllPages(pages, documentTitle, width, height);
-            }
-        }
-
-        // Mostrar modal de seleção de páginas
-        function showPageSelectionModal(pages, documentTitle, width, height, totalPages) {
-            const modalHTML = `
-                <div id="pageSelectionModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center">
-                    <div class="bg-slate-900/95 border border-blue-300/20 rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl">
-                        <h3 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
-                            <i class="fas fa-download text-blue-400"></i>
-                            Selecionar Páginas
-                        </h3>
-                        
-                        <div class="text-blue-200 mb-6">
-                            <p class="mb-2">O documento tem <strong class="text-white">${totalPages} páginas</strong>.</p>
-                            <p class="text-sm">Escolha quais páginas deseja baixar:</p>
-                        </div>
-                        
-                        <div class="space-y-4 mb-6">
-                            <button onclick="downloadAllPagesFromModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                <i class="fas fa-download"></i>
-                                Baixar TODAS as ${totalPages} páginas
-                            </button>
+                // Render e download
+                setTimeout(() => {
+                    html2canvas(pageElement, {
+                        backgroundColor: '#ffffff',
+                        scale: 1.5,
+                        width: 794,
+                        height: 1123,
+                        useCORS: true,
+                        allowTaint: true
+                    }).then(canvas => {
+                        // Download da imagem
+                        canvas.toBlob(function(blob) {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${documentTitle.replace(/\s+/g, '_')}_Pagina_${pageIndex.toString().padStart(2, '0')}.png`;
+                            a.style.display = 'none';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            window.URL.revokeObjectURL(url);
                             
-                            <div class="border-t border-gray-600 pt-4">
-                                <label class="text-blue-200 text-sm block mb-2">Páginas específicas:</label>
-                                <input type="text" id="pageSelectionInput" placeholder="Ex: 1,3,5 ou 1-3" 
-                                       class="w-full p-3 rounded bg-slate-800 border border-gray-600 text-white focus:border-blue-400 focus:outline-none">
-                                <div class="text-xs text-gray-400 mt-2">
-                                    • Use vírgula para páginas específicas: 1,3,5<br>
-                                    • Use hífen para intervalos: 1-3<br>
-                                    • Digite "all" para todas as páginas
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex gap-3">
-                            <button onclick="closePageSelectionModal()" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white p-3 rounded-lg transition-colors">
-                                Cancelar
-                            </button>
-                            <button onclick="downloadSelectedPagesFromModal()" class="flex-1 bg-green-600 hover:bg-green-500 text-white p-3 rounded-lg transition-colors">
-                                Baixar Selecionadas
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Adicionar modal ao body
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            
-            // Salvar dados para uso nas funções do modal
-            window.modalData = { pages, documentTitle, width, height, totalPages };
-        }
-
-        // Fechar modal de seleção
-        function closePageSelectionModal() {
-            const modal = document.getElementById('pageSelectionModal');
-            if (modal) {
-                modal.remove();
-                delete window.modalData;
-            }
-        }
-
-        // Baixar todas as páginas a partir do modal
-        function downloadAllPagesFromModal() {
-            const { pages, documentTitle, width, height } = window.modalData;
-            closePageSelectionModal();
-            downloadAllPages(pages, documentTitle, width, height);
-        }
-
-        // Baixar páginas selecionadas a partir do modal
-        function downloadSelectedPagesFromModal() {
-            const input = document.getElementById('pageSelectionInput').value.trim();
-            const { pages, documentTitle, width, height, totalPages } = window.modalData;
-            
-            if (!input) {
-                showNotification('Digite as páginas que deseja baixar', 'warning');
-                return;
-            }
-            
-            const selectedPages = parsePageSelection(input, totalPages);
-            if (selectedPages.length === 0) {
-                showNotification('Seleção de páginas inválida. Tente novamente.', 'error');
-                return;
-            }
-            
-            closePageSelectionModal();
-            downloadSelectedPages(pages, selectedPages, documentTitle, width, height);
-        }
-
-        // Interpretar seleção de páginas do usuário
-        function parsePageSelection(input, totalPages) {
-            const selected = [];
-            
-            if (input.toLowerCase() === 'all') {
-                for (let i = 0; i < totalPages; i++) {
-                    selected.push(i);
-                }
-                return selected;
-            }
-
-            const parts = input.split(',');
-            for (const part of parts) {
-                const trimmed = part.trim();
-                
-                if (trimmed.includes('-')) {
-                    // Range de páginas (ex: 1-3)
-                    const [start, end] = trimmed.split('-').map(n => parseInt(n.trim()));
-                    if (start >= 1 && end <= totalPages && start <= end) {
-                        for (let i = start - 1; i < end; i++) {
-                            if (!selected.includes(i)) selected.push(i);
-                        }
-                    }
-                } else {
-                    // Página única
-                    const pageNum = parseInt(trimmed);
-                    if (pageNum >= 1 && pageNum <= totalPages) {
-                        const index = pageNum - 1;
-                        if (!selected.includes(index)) selected.push(index);
-                    }
-                }
-            }
-
-            return selected.sort((a, b) => a - b);
-        }
-
-        // Baixar páginas selecionadas
-        function downloadSelectedPages(pages, selectedIndexes, documentTitle, width, height) {
-            const totalSelected = selectedIndexes.length;
-            let processed = 0;
-
-            showNotification(`Baixando ${totalSelected} página(s) selecionada(s)...`, 'info');
-
-            function processNext(currentIndex) {
-                if (currentIndex >= selectedIndexes.length) {
-                    showNotification(`${totalSelected} página(s) baixada(s) com sucesso!`, 'success');
-                    closeDocumentGenerator();
-                    return;
-                }
-
-                const pageIndex = selectedIndexes[currentIndex];
-                const pageNumber = pageIndex + 1;
-                
-                downloadSinglePage(pages[pageIndex], pageNumber, documentTitle, width, height, () => {
-                    processed++;
-                    console.log(`Página ${pageNumber} baixada (${processed}/${totalSelected})`);
-                    
-                    // Processar próxima página após delay
-                    setTimeout(() => {
-                        processNext(currentIndex + 1);
-                    }, 1000); // Delay maior para estabilidade
-                });
-            }
-
-            processNext(0);
-        }
-
-        // Baixar todas as páginas
-        function downloadAllPages(pages, documentTitle, width, height) {
-            const totalPages = pages.length;
-            let processed = 0;
-
-            console.log(`📦 Iniciando download de ${totalPages} páginas...`);
-            showNotification(`Gerando documento com ${totalPages} página(s)...`, 'info');
-
-            function processPage(index) {
-                if (index >= pages.length) {
-                    console.log(`🎉 Todas as ${totalPages} páginas foram processadas!`);
-                    showNotification(`Documento gerado com sucesso! ${totalPages} página(s) baixada(s).`, 'success');
-                    closeDocumentGenerator();
-                    return;
-                }
-
-                console.log(`⏳ Processando página ${index + 1} de ${totalPages}...`);
-                
-                downloadSinglePage(pages[index], index + 1, documentTitle, width, height, () => {
-                    processed++;
-                    console.log(`✅ Página ${index + 1} processada com sucesso. Total processado: ${processed}/${totalPages}`);
-                    
-                    // Processar próxima página após delay
-                    setTimeout(() => {
-                        processPage(index + 1);
-                    }, 1500); // Aumentado para 1.5s para maior estabilidade
-                });
-            }
-
-            processPage(0);
-        }
-
-        // Baixar uma única página
-        function downloadSinglePage(pageHTML, pageNumber, documentTitle, width, height, callback) {
-            console.log(`📥 Baixando página ${pageNumber} - Tamanho: ${width}x${height}`);
-            
-            // Criar elemento temporário para a página
-            const pageElement = document.createElement('div');
-            pageElement.style.cssText = `
-                position: absolute;
-                left: -9999px;
-                top: 0;
-                width: ${width}px;
-                height: ${height}px;
-                background: white;
-                box-sizing: border-box;
-                font-family: 'Times New Roman', serif;
-                font-size: 14px;
-                line-height: 1.8;
-                color: #000;
-            `;
-            pageElement.innerHTML = pageHTML;
-            document.body.appendChild(pageElement);
-
-            console.log(`📄 Elemento criado para página ${pageNumber}:`, pageElement.offsetWidth, 'x', pageElement.offsetHeight);
-
-            // Configurações do html2canvas OTIMIZADAS
-            const options = {
-                backgroundColor: '#ffffff',
-                scale: 1.5, // Reduzido de 2 para melhor performance
-                useCORS: true,
-                allowTaint: true,
-                width: width,
-                height: height,
-                scrollX: 0,
-                scrollY: 0,
-                x: 0,
-                y: 0,
-                foreignObjectRendering: true,
-                logging: false
-            };
-
-            // Aguardar renderização completa
-            setTimeout(() => {
-                console.log(`🎨 Iniciando renderização da página ${pageNumber}...`);
-                
-                html2canvas(pageElement, options).then(canvas => {
-                    console.log(`✅ Canvas gerado para página ${pageNumber}:`, canvas.width, 'x', canvas.height);
-                    
-                    canvas.toBlob(function(blob) {
-                        if (!blob) {
-                            console.error(`❌ Erro: Blob vazio para página ${pageNumber}`);
+                            console.log(`✅ Página ${pageIndex} baixada!`);
+                            
+                            // Limpar e próxima página
                             document.body.removeChild(pageElement);
-                            if (callback) callback();
-                            return;
-                        }
-
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        
-                        // Nome do arquivo com número da página
-                        const pageNumberFormatted = pageNumber.toString().padStart(2, '0');
-                        const fileName = `${documentTitle.replace(/\s+/g, '_')}_Pagina_${pageNumberFormatted}.png`;
-                        
-                        a.download = fileName;
-                        a.style.display = 'none';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        window.URL.revokeObjectURL(url);
-                        
-                        console.log(`💾 Página ${pageNumber} baixada: ${fileName}`);
-                        
-                        // Remover elemento temporário
+                            currentPage++;
+                            
+                            setTimeout(() => {
+                                downloadNextPage();
+                            }, 1000);
+                            
+                        }, 'image/png', 0.95);
+                    }).catch(error => {
+                        console.error(`❌ Erro na página ${pageIndex}:`, error);
                         document.body.removeChild(pageElement);
-                        
-                        if (callback) callback();
-                        
-                    }, 'image/png', 0.92); // Qualidade levemente reduzida para melhor performance
-                }).catch(error => {
-                    console.error(`❌ Erro ao gerar página ${pageNumber}:`, error);
-                    document.body.removeChild(pageElement);
-                    
-                    showNotification(`Erro ao processar página ${pageNumber}`, 'error');
-                    if (callback) callback();
-                });
-            }, 500); // Aumentado para 500ms para garantir renderização
+                        currentPage++;
+                        downloadNextPage();
+                    });
+                }, 300);
+            }
+            
+            downloadNextPage();
         }
 
         // Gerar conteúdo do documento
