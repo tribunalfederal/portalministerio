@@ -3551,15 +3551,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Criar página HTML formatada
         function createDocumentPage(content, title) {
-            // SVG logo embutido 
-            const logoSvg = `data:image/svg+xml;base64,${btoa(`
-                <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="40" cy="40" r="35" fill="#1e40af" stroke="#0369a1" stroke-width="2"/>
-                    <rect x="20" y="25" width="40" height="30" fill="#ffffff" rx="2"/>
-                    <text x="40" y="42" text-anchor="middle" fill="#1e40af" font-family="serif" font-size="14" font-weight="bold">⚖</text>
-                    <text x="40" y="60" text-anchor="middle" fill="#1e40af" font-family="serif" font-size="8" font-weight="bold">TRIBUNAL</text>
-                </svg>
-            `)}`;
+            // SVG logo embutido com encoding seguro
+            const logoSvgContent = `<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="35" fill="#1e40af" stroke="#0369a1" stroke-width="2"/><rect x="20" y="25" width="40" height="30" fill="#ffffff" rx="2"/><text x="40" y="42" text-anchor="middle" fill="#1e40af" font-family="serif" font-size="14" font-weight="bold">&#9878;</text><text x="40" y="60" text-anchor="middle" fill="#1e40af" font-family="serif" font-size="8" font-weight="bold">TRIBUNAL</text></svg>`;
+            const logoSvg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(logoSvgContent)}`;
             
             return `
 <!DOCTYPE html>
