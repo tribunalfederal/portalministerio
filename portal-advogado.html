@@ -29,7 +29,7 @@
         
         body { 
             font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e3a8a 50%, #1e1b4b 100%) fixed;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 50%, #1e3a8a 100%) fixed;
             min-height: 100vh;
             line-height: 1.6;
         }
@@ -71,12 +71,12 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+            background: #3b82f6;
             color: white;
         }
         
         .btn-primary:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            background: #2563eb;
             transform: translateY(-1px);
             box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
         }
@@ -827,6 +827,9 @@
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-xl font-bold text-white" id="titulo-documento">Documento</h3>
                             <div class="space-x-2">
+                                <button onclick="downloadDocumentPDF()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-all">
+                                    📄 Baixar PDF
+                                </button>
                                 <button onclick="capturarFotoDocumento()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg transition-all">
                                     📸 Gerar Foto HD
                                 </button>
@@ -4869,36 +4872,47 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const body = document.body;
             
             if (isDarkMode) {
-                // Aplicar tema escuro (padrão atual)
-                body.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%)';
+                // Tema escuro - azul mais escuro
+                body.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3730a3 100%)';
                 body.classList.add('dark-theme');
                 body.classList.remove('light-theme');
+                
+                // Cards com azul escuro transparente
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    card.style.backgroundColor = 'rgba(30, 58, 138, 0.3)';
+                    card.style.color = '';
+                    card.style.border = '';
+                });
+                
+                // Manter textos brancos
+                const textElements = document.querySelectorAll('.text-white');
+                textElements.forEach(element => {
+                    element.style.color = '';
+                });
             } else {
-                // Aplicar tema claro
-                body.style.background = 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 50%, #d1d5db 100%)';
+                // Tema claro - azul mais claro (não branco!)
+                body.style.background = 'linear-gradient(135deg, #93c5fd 0%, #60a5fa 50%, #3b82f6 100%)';
                 body.classList.add('light-theme');
                 body.classList.remove('dark-theme');
                 
-                // Ajustar cores dos elementos para tema claro
+                // Cards com azul claro transparente (NÃO BRANCO)
                 const cards = document.querySelectorAll('.card');
                 cards.forEach(card => {
-                    if (isDarkMode) {
-                        card.style.backgroundColor = '';
-                        card.style.color = '';
-                    } else {
-                        card.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-                        card.style.color = '#1f2937';
-                        card.style.border = '1px solid #e5e7eb';
-                    }
+                    card.style.backgroundColor = 'rgba(147, 197, 253, 0.4)';
+                    card.style.color = '#1e40af';
+                    card.style.border = '1px solid rgba(59, 130, 246, 0.3)';
                 });
                 
-                // Ajustar textos
+                // Textos ficam azul escuro (mas ícones mantêm cores originais)
                 const textElements = document.querySelectorAll('.text-white');
                 textElements.forEach(element => {
-                    if (!isDarkMode && !element.closest('.bg-gradient-to-r')) {
-                        element.style.color = '#1f2937';
-                    } else if (isDarkMode) {
-                        element.style.color = '';
+                    // NÃO mudar ícones - apenas textos sem classes específicas de cor
+                    if (!element.classList.contains('fas') && 
+                        !element.classList.contains('fa') && 
+                        !element.closest('.bg-gradient-to-r') &&
+                        !element.closest('i')) {
+                        element.style.color = '#1e40af';
                     }
                 });
             }
