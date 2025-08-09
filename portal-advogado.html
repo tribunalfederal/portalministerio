@@ -3293,182 +3293,199 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             downloadPagesDirectly(downloadPages, documentTitle);
         }
 
-        // SISTEMA INTELIGENTE - Gerar páginas preservando TODO o conteúdo
+        // === NOVO SISTEMA DE GERAÇÃO DE PÁGINAS - REFATORADO DO ZERO ===
         function generateProfessionalPages(data, title, pageWidth, pageHeight, margin) {
-            console.log('� === DEBUG INÍCIO ===');
-            console.log('�📄 Sistema INTELIGENTE - Gerando páginas...');
-            console.log('📋 Dados recebidos:', data);
-            console.log('📋 Título:', title);
+            console.log('🔄 === NOVO SISTEMA DE PAGINAÇÃO - INICIANDO ===');
             
             const pages = [];
             const userProfile = JSON.parse(localStorage.getItem('advogado-profile')) || {};
             
-            // Gerar conteúdo formatado
-            const content = generateDocumentContent(currentDocumentType, data);
-            console.log('📝 CONTEÚDO ORIGINAL COMPLETO:');
-            console.log('📝 Tamanho:', content.length, 'caracteres');
-            console.log('📝 Conteúdo:', content.substring(0, 500) + '...');
+            // Gerar o conteúdo completo do documento
+            const fullContent = generateDocumentContent(currentDocumentType, data);
+            console.log('📝 Conteúdo completo gerado:', fullContent.length, 'caracteres');
             
-            const formattedContent = formatDocumentContentHTML(content);
-            console.log('📝 CONTEÚDO FORMATADO:');
-            console.log('📝 Tamanho formatado:', formattedContent.length, 'caracteres');
-            console.log('📝 Início formatado:', formattedContent.substring(0, 300) + '...');
+            // Aplicar formatação HTML
+            const formattedContent = formatDocumentContentHTML(fullContent);
+            console.log('🎨 Conteúdo formatado:', formattedContent.length, 'caracteres HTML');
             
-            // Dividir conteúdo por seções para preservar formatação
-            const sections = formattedContent.split('</div>').filter(section => section.trim());
-            console.log('📋 Seções encontradas:', sections.length);
+            // === ALGORITMO NOVO: DIVISÃO POR ALTURA REAL ===
             
-            // Se não há seções div, dividir por parágrafos
-            let contentParts = sections;
-            if (sections.length <= 1) {
-                contentParts = formattedContent.split('</p>').filter(part => part.trim());
-                console.log('📋 Usando divisão por parágrafos:', contentParts.length, 'partes');
-            }
+            // Calcular quantas linhas cabem por página
+            const lineHeight = 22; // pixels por linha
+            const fontSize = 13;
+            const headerHeightFirstPage = 140;
+            const headerHeightOtherPages = 40;
+            const footerHeight = 30;
             
-            // DEBUG DETALHADO: Mostrar cada parte do conteúdo
-            console.log('🔍 === DEBUG DETALHADO DAS PARTES ===');
-            for (let i = 0; i < Math.min(contentParts.length, 5); i++) {
-                const partText = contentParts[i].replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-                console.log(`📝 Parte ${i + 1}/${contentParts.length}:`, partText.substring(0, 150) + '...');
-                console.log(`📏 Parte ${i + 1} tamanho:`, partText.length, 'caracteres');
-            }
-            console.log('🔍 === FIM DEBUG DETALHADO ===');
+            const contentHeightFirstPage = pageHeight - (margin * 2) - headerHeightFirstPage - footerHeight;
+            const contentHeightOtherPages = pageHeight - (margin * 2) - headerHeightOtherPages - footerHeight;
             
-            // Calcular altura disponível por página (MAXIMIZAR aproveitamento)
-            const headerHeight = 150;
-            const footerHeight = 100;
-            const availableHeight = pageHeight - (margin * 2) - headerHeight - footerHeight;
-            const charsPerPage = Math.floor(availableHeight / 25 * 100); // Aumentado de 80 para 100 para MÁXIMO aproveitamento
+            const linesPerFirstPage = Math.floor(contentHeightFirstPage / lineHeight);
+            const linesPerOtherPages = Math.floor(contentHeightOtherPages / lineHeight);
             
-            console.log('📏 Altura disponível:', availableHeight, 'px');
-            console.log('📏 Caracteres por página (MAXIMIZADO):', charsPerPage);
+            console.log(`� Linhas por página: Primeira=${linesPerFirstPage}, Outras=${linesPerOtherPages}`);
             
-            // Se há muito conteúdo, usar paginação MAIS agressiva no preenchimento
-            if (formattedContent.length > 2500) { // Aumentado de 2000 para 2500
-                console.log('📚 CONTEÚDO EXTENSO DETECTADO - Maximizando preenchimento das páginas...');
-                // MUITO mais agressivo - páginas mais cheias
-                const forcedCharsPerPage = Math.min(charsPerPage, 2000); // Aumentado de 1400 para 2000
-                console.log('📏 Caracteres por página (MÁXIMO PREENCHIMENTO):', forcedCharsPerPage);
+            // Converter conteúdo formatado em texto puro para cálculo
+            const plainText = formattedContent
+                .replace(/<[^>]*>/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            
+            console.log('� Texto puro para divisão:', plainText.length, 'caracteres');
+            
+            // Estimar caracteres por linha (baseado na largura da página)
+            const pageContentWidth = pageWidth - (margin * 2);
+            const avgCharWidth = 7; // pixels por caractere
+            const charsPerLine = Math.floor(pageContentWidth / avgCharWidth);
+            
+            console.log(`📏 Caracteres por linha estimado: ${charsPerLine}`);
+            
+            // Calcular quantos caracteres cabem em cada página
+            const charsFirstPage = linesPerFirstPage * charsPerLine;
+            const charsOtherPages = linesPerOtherPages * charsPerLine;
+            
+            console.log(`� Capacidade: Primeira página=${charsFirstPage} chars, Outras=${charsOtherPages} chars`);
+            
+            // === DIVISÃO INTELIGENTE DO CONTEÚDO ===
+            
+            let remainingText = plainText;
+            let pageNumber = 1;
+            
+            while (remainingText.length > 0) {
+                const isFirstPage = pageNumber === 1;
+                const pageCapacity = isFirstPage ? charsFirstPage : charsOtherPages;
                 
-                let currentPageContent = '';
-                let currentPageText = '';
-                let pageNumber = 1;
+                console.log(`\n� === CRIANDO PÁGINA ${pageNumber} ===`);
+                console.log(`� Capacidade da página: ${pageCapacity} caracteres`);
+                console.log(`📝 Texto restante: ${remainingText.length} caracteres`);
                 
-                // Processar cada parte do conteúdo com limite MUITO forçado
-                for (let i = 0; i < contentParts.length; i++) {
-                    const part = contentParts[i] + (sections.length > 1 ? '</div>' : '</p>');
-                    const partText = part.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                let pageText;
+                
+                if (remainingText.length <= pageCapacity) {
+                    // Todo o texto restante cabe nesta página
+                    pageText = remainingText;
+                    remainingText = '';
+                    console.log(`✅ Última página - todo texto restante (${pageText.length} chars)`);
+                } else {
+                    // Precisa dividir o texto
+                    let cutPoint = pageCapacity;
                     
-                    console.log(`📝 Processando parte ${i + 1}/${contentParts.length}:`, partText.substring(0, 100) + '...');
+                    // Tentar cortar em um ponto mais natural (espaço, quebra de linha, ponto final)
+                    const searchArea = Math.min(100, Math.floor(pageCapacity * 0.1)); // 10% de margem para busca
                     
-                    // QUEBRA MUITO RIGOROSA - só quebra quando realmente necessário
-                    const wouldExceedLimit = currentPageText.length + partText.length > forcedCharsPerPage;
-                    const hasSubstantialContent = currentPageContent.length > 800; // Aumentado de 300 para 800 - muito mais rigoroso
-                    const isReallyFull = currentPageText.length > forcedCharsPerPage * 0.85; // Só quebra quando 85% cheio
-                    
-                    if (wouldExceedLimit && (hasSubstantialContent || isReallyFull)) {
-                        // Criar página atual apenas se realmente estiver cheia
-                        console.log(`📄 === CRIANDO PÁGINA ${pageNumber} (PÁGINA REALMENTE CHEIA) ===`);
-                        console.log(`📏 Conteúdo atual: ${currentPageText.length} caracteres (${Math.round(currentPageText.length/forcedCharsPerPage*100)}% da capacidade)`);
-                        console.log(`📝 Texto atual: "${currentPageText.substring(0, 200)}..."`);
-                        console.log(`📄 HTML atual: "${currentPageContent.substring(0, 300)}..."`);
-                        
-                        const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
-                        pages.push(page);
-                        
-                        // Iniciar nova página
-                        pageNumber++;
-                        currentPageContent = part;
-                        currentPageText = partText;
-                        
-                        console.log(`🔄 Iniciando nova página ${pageNumber} com nova parte`);
-                        console.log(`📝 Nova parte: "${partText.substring(0, 100)}..."`);
-                    } else {
-                        // Adicionar parte à página atual - PRIORIZAR PREENCHIMENTO
-                        if (wouldExceedLimit && !hasSubstantialContent && !isReallyFull) {
-                            console.log(`⚠️ FORÇANDO mais conteúdo na página ${pageNumber} - atual: ${currentPageText.length} chars (${Math.round(currentPageText.length/forcedCharsPerPage*100)}%)`);
+                    for (let i = cutPoint; i > cutPoint - searchArea && i > 0; i--) {
+                        const char = remainingText[i];
+                        if (char === '\n' || char === '.' || char === '!' || char === '?') {
+                            cutPoint = i + 1;
+                            console.log(`� Corte natural encontrado na posição ${cutPoint} (${char})`);
+                            break;
                         }
-                        console.log(`➕ Adicionando parte ${i + 1} à página ${pageNumber} (${partText.length} chars) - Total: ${currentPageText.length + partText.length}`);
-                        currentPageContent += part;
-                        currentPageText += ' ' + partText;
                     }
-                }
-                
-                // Adicionar última página se houver conteúdo
-                if (currentPageContent.length > 0) {
-                    console.log(`📄 === CRIANDO PÁGINA FINAL ${pageNumber} ===`);
-                    console.log(`📏 Conteúdo final: ${currentPageText.length} caracteres`);
-                    console.log(`📝 Texto final: "${currentPageText.substring(0, 200)}..."`);
-                    console.log(`📄 HTML final: "${currentPageContent.substring(0, 300)}..."`);
                     
-                    const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
-                    pages.push(page);
-                }
-                
-                // REMOVER divisão por caracteres problemática - manter apenas divisão inteligente
-                console.log(`✅ ${pages.length} páginas criadas com algoritmo inteligente - MANTENDO TODAS!`);
-                
-                // Debug: verificar se o conteúdo foi distribuído corretamente
-                console.log('🔍 === VERIFICAÇÃO FINAL DO CONTEÚDO DAS PÁGINAS ===');
-                for (let i = 0; i < pages.length; i++) {
-                    // Extrair apenas o conteúdo principal da página (sem header/footer)
-                    const pageHtml = pages[i];
-                    const contentMatch = pageHtml.match(/<div style="text-align: justify[^>]*">(.*?)<\/div>/s);
-                    if (contentMatch) {
-                        const pageContent = contentMatch[1];
-                        const pageText = pageContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-                        console.log(`📄 Página ${i + 1} CONTEÚDO (${pageText.length} chars): "${pageText.substring(0, 200)}..."`);
-                        
-                        if (pageText.length < 50) {
-                            console.log(`⚠️  ATENÇÃO: Página ${i + 1} tem muito pouco conteúdo!`);
-                            console.log(`📄 HTML completo da página ${i + 1}:`, pageContent.substring(0, 500));
+                    // Se não encontrou ponto natural, tentar espaço
+                    if (cutPoint === pageCapacity) {
+                        for (let i = cutPoint; i > cutPoint - searchArea && i > 0; i--) {
+                            if (remainingText[i] === ' ') {
+                                cutPoint = i;
+                                console.log(`� Corte em espaço encontrado na posição ${cutPoint}`);
+                                break;
+                            }
                         }
-                    } else {
-                        console.log(`❌ Página ${i + 1}: Não foi possível extrair conteúdo!`);
                     }
-                }
-                console.log('🔍 === FIM VERIFICAÇÃO FINAL ===');
-            } else {
-                console.log('📄 CONTEÚDO PEQUENO - Usando algoritmo padrão...');
-                
-                // Algoritmo padrão para conteúdo pequeno
-                let currentPageContent = '';
-                let currentPageText = '';
-                let pageNumber = 1;
-                
-                for (let i = 0; i < contentParts.length; i++) {
-                    const part = contentParts[i] + (sections.length > 1 ? '</div>' : '</p>');
-                    const partText = part.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
                     
-                    // Quebra MUITO rigorosa também no algoritmo padrão
-                    const wouldExceedLimit = currentPageText.length + partText.length > charsPerPage;
-                    const hasSubstantialContent = currentPageContent.length > 1000; // Ainda mais rigoroso para conteúdo pequeno
-                    const isReallyFull = currentPageText.length > charsPerPage * 0.9; // 90% cheio para conteúdo pequeno
+                    pageText = remainingText.substring(0, cutPoint).trim();
+                    remainingText = remainingText.substring(cutPoint).trim();
                     
-                    if (wouldExceedLimit && (hasSubstantialContent || isReallyFull)) {
-                        console.log(`📄 Criando página padrão ${pageNumber} - ${currentPageText.length} chars (${Math.round(currentPageText.length/charsPerPage*100)}% cheio)`);
-                        const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
-                        pages.push(page);
-                        pageNumber++;
-                        currentPageContent = part;
-                        currentPageText = partText;
-                    } else {
-                        console.log(`➕ Adicionando ao padrão página ${pageNumber} (${partText.length} chars) - Total: ${currentPageText.length + partText.length}`);
-                        currentPageContent += part;
-                        currentPageText += ' ' + partText;
-                    }
+                    console.log(`✂️ Texto dividido: página atual=${pageText.length} chars, restante=${remainingText.length} chars`);
                 }
                 
-                if (currentPageContent.length > 0) {
-                    const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
-                    pages.push(page);
+                // Converter o texto da página de volta para HTML formatado
+                const pageHtmlContent = convertTextToFormattedHTML(pageText);
+                
+                // Criar a página
+                const pageHtml = createNewPage(pageHtmlContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, isFirstPage);
+                pages.push(pageHtml);
+                
+                console.log(`✅ Página ${pageNumber} criada com ${pageText.length} caracteres`);
+                pageNumber++;
+                
+                // Segurança: evitar loop infinito
+                if (pageNumber > 20) {
+                    console.error('⚠️ Limite de páginas atingido (20) - interrompendo');
+                    break;
                 }
             }
             
-            console.log(`✅ ${pages.length} páginas criadas (sistema inteligente)`);
-            console.log('🔍 === DEBUG FIM ===');
+            console.log(`🎉 === NOVO SISTEMA COMPLETO ===`);
+            console.log(`📚 Total de páginas criadas: ${pages.length}`);
+            
             return pages;
         }
+
+        // === FUNÇÕES AUXILIARES DO NOVO SISTEMA ===
+
+        // Função auxiliar para converter texto puro de volta para HTML formatado
+        function convertTextToFormattedHTML(text) {
+            return text
+                // Quebras de linha duplas viram parágrafos
+                .replace(/\n\n/g, '</p><p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
+                // Quebras simples viram <br>
+                .replace(/\n/g, '<br>')
+                // Envolver em parágrafo inicial
+                .replace(/^/, '<p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
+                // Fechar último parágrafo
+                .replace(/$/, '</p>')
+                // Aplicar formatações específicas
+                .replace(/(EXCELENTÍSSIMO\(A\)\s+SENHOR\(A\)\s+DOUTOR\(A\)\s+JUIZ\(A\)\s+DE\s+DIREITO)/gmi, 
+                         '<div style="font-weight: bold; font-size: 18px; margin: 25px 0 20px 0; text-align: left; color: #000; text-indent: 0; line-height: 1.4;"><strong>$1</strong></div>')
+                .replace(/^(DOS FATOS|DA FUNDAMENTAÇÃO JURÍDICA|DOS PEDIDOS|DAS PROVAS|DO VALOR DA CAUSA):/gm, 
+                         '<div style="font-weight: bold; font-size: 16px; margin: 30px 0 15px 0; text-transform: uppercase; color: #000; text-align: left; text-indent: 0;"><strong>$1:</strong></div>')
+                .replace(/^(AUTOR|RÉU|PACIENTE\/RÉU):\s*([^\n]+)/gm, '<div style="margin: 20px 0; text-align: left; text-indent: 0;"><strong>$1:</strong> <strong>$2</strong></div>');
+        }
+
+        // Função auxiliar para criar página com novo layout
+        function createNewPage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
+            const headerHTML = isFirstPage ? `
+                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1e40af; padding-bottom: 15px;">
+                    <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 60px; height: 60px; margin: 0 auto 10px; display: block;">
+                    <div style="font-size: 14px; font-weight: bold; color: #1e40af; margin-bottom: 5px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
+                    <div style="font-size: 12px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
+                </div>
+                <div style="text-align: center; margin: 15px 0 20px 0;">
+                    <div style="font-size: 14px; font-weight: bold; color: #000; text-decoration: underline;">${title.toUpperCase()}</div>
+                </div>
+            ` : '';
+
+            const footerHTML = !isFirstPage ? `
+                <div style="position: absolute; bottom: ${margin}px; left: ${margin}px; right: ${margin}px; text-align: center; font-size: 10px; color: #666; border-top: 1px solid #ccc; padding-top: 5px;">
+                    Página ${pageNumber}
+                </div>
+            ` : '';
+
+            return `
+                <div style="
+                    position: relative;
+                    width: ${width}px;
+                    height: ${height}px;
+                    background: white;
+                    font-family: 'Times New Roman', serif;
+                    font-size: 13px;
+                    line-height: 1.6;
+                    padding: ${margin}px;
+                    box-sizing: border-box;
+                    color: #000;
+                    overflow: hidden;
+                ">
+                    ${headerHTML}
+                    <div style="text-align: justify;">
+                        ${content}
+                    </div>
+                    ${footerHTML}
+                </div>
+            `;
+        }
+
+        // === FUNÇÃO ANTIGA COMO BACKUP ===
 
         // Criar página inteligente preservando todo o conteúdo
         function createIntelligentPage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
