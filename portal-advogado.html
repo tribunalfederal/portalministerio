@@ -1393,32 +1393,30 @@
                                 </div>
                             </div>
 
-                            <!-- Upload de Petição -->
+                            <!-- Upload de Múltiplos Anexos -->
                             <div class="border-2 border-dashed border-blue-300/30 rounded-lg p-6 bg-slate-800/30">
                                 <div class="text-center">
-                                    <i class="fas fa-image text-4xl text-blue-400 mb-4"></i>
-                                    <h4 class="text-white font-semibold mb-2">Anexar Petição Inicial</h4>
-                                    <p class="text-blue-200 text-sm mb-4">Faça upload da imagem da petição inicial (PNG, JPG, JPEG) - Máximo 10MB</p>
+                                    <i class="fas fa-paperclip text-4xl text-blue-400 mb-4"></i>
+                                    <h4 class="text-white font-semibold mb-2">Anexar Documentos</h4>
+                                    <p class="text-blue-200 text-sm mb-4">Anexe múltiplos documentos (PDF, DOC, DOCX, PNG, JPG, JPEG) - Máximo 10MB por arquivo</p>
                                     
-                                    <input type="file" id="peticao-upload" accept=".png,.jpg,.jpeg" 
-                                           class="hidden" onchange="handlePetitionUpload(event)">
+                                    <input type="file" id="documentos-upload" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" 
+                                           class="hidden" multiple onchange="handleMultipleFilesUpload(event)">
                                     
-                                    <button type="button" onclick="document.getElementById('peticao-upload').click()" 
-                                            class="btn bg-blue-600 hover:bg-blue-700 text-white">
-                                        <i class="fas fa-upload mr-2"></i>Selecionar Imagem
+                                    <button type="button" onclick="document.getElementById('documentos-upload').click()" 
+                                            class="btn bg-blue-600 hover:bg-blue-700 text-white mb-4">
+                                        <i class="fas fa-upload mr-2"></i>Selecionar Documentos
                                     </button>
                                     
-                                    <div id="arquivo-selecionado" class="hidden mt-4 p-3 bg-green-600/20 rounded-lg border border-green-500/30">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-2">
-                                                <i class="fas fa-image text-blue-400"></i>
-                                                <span class="text-white" id="nome-arquivo"></span>
-                                                <span class="text-green-400 text-sm" id="tamanho-arquivo"></span>
-                                            </div>
-                                            <button type="button" onclick="removePetitionFile()" class="text-red-400 hover:text-red-300">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
+                                    <!-- Lista de Arquivos Anexados -->
+                                    <div id="lista-arquivos-anexados" class="space-y-2">
+                                        <!-- Arquivos serão listados aqui dinamicamente -->
+                                    </div>
+                                    
+                                    <!-- Estatísticas dos Anexos -->
+                                    <div id="stats-anexos" class="hidden mt-4 flex justify-between text-sm text-blue-300 bg-slate-700/50 rounded-lg p-3">
+                                        <span>Total de arquivos: <span id="total-arquivos" class="text-white font-semibold">0</span></span>
+                                        <span>Tamanho total: <span id="tamanho-total" class="text-white font-semibold">0 KB</span></span>
                                     </div>
                                 </div>
                             </div>
@@ -2712,7 +2710,10 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Base de dados dos processos (em produção será Firebase/Backend)
         let processosData = JSON.parse(localStorage.getItem('processosAdvogado')) || [];
-        let selectedPetitionFile = null;
+        // Sistema de Anexos Múltiplos
+        let selectedFiles = [];
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        const ALLOWED_TYPES = ['.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg'];
 
         // Mostrar formulário de novo processo
         function showNewProcessForm() {
@@ -2740,42 +2741,129 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Limpar formulário
         function clearProcessForm() {
             document.getElementById('processForm').reset();
-            removePetitionFile();
+            clearAllFiles();
         }
 
-        // Lidar com upload de petição
-        function handlePetitionUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // Lidar com upload de múltiplos arquivos
+        function handleMultipleFilesUpload(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
 
-            // Verificar tamanho (10MB max)
-            const maxSize = 10 * 1024 * 1024; // 10MB
-            if (file.size > maxSize) {
-                showNotification('Arquivo muito grande! Máximo 10MB', 'error');
-                return;
-            }
+            files.forEach(file => {
+                // Verificar tamanho
+                if (file.size > MAX_FILE_SIZE) {
+                    showNotification(`Arquivo "${file.name}" muito grande! Máximo 10MB`, 'error');
+                    return;
+                }
 
-            // Verificar tipo (agora aceita imagens)
-            const allowedTypes = ['.png', '.jpg', '.jpeg'];
-            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-            if (!allowedTypes.includes(fileExtension)) {
-                showNotification('Tipo de arquivo não permitido! Use PNG, JPG ou JPEG', 'error');
-                return;
-            }
+                // Verificar tipo
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                if (!ALLOWED_TYPES.includes(fileExtension)) {
+                    showNotification(`Tipo de arquivo "${file.name}" não permitido! Use PDF, DOC, DOCX, PNG, JPG ou JPEG`, 'error');
+                    return;
+                }
 
-            selectedPetitionFile = file;
+                // Verificar se não é duplicado
+                if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    showNotification(`Arquivo "${file.name}" já foi anexado`, 'warning');
+                    return;
+                }
+
+                selectedFiles.push(file);
+            });
+
+            updateFilesList();
+            updateFilesStats();
             
-            // Mostrar arquivo selecionado
-            document.getElementById('nome-arquivo').textContent = file.name;
-            document.getElementById('tamanho-arquivo').textContent = formatFileSize(file.size);
-            document.getElementById('arquivo-selecionado').classList.remove('hidden');
+            // Limpar input para permitir re-seleção
+            event.target.value = '';
         }
 
-        // Remover arquivo de petição
-        function removePetitionFile() {
-            selectedPetitionFile = null;
-            document.getElementById('peticao-upload').value = '';
-            document.getElementById('arquivo-selecionado').classList.add('hidden');
+        // Remover arquivo específico
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFilesList();
+            updateFilesStats();
+        }
+
+        // Limpar todos os arquivos
+        function clearAllFiles() {
+            selectedFiles = [];
+            updateFilesList();
+            updateFilesStats();
+            document.getElementById('documentos-upload').value = '';
+        }
+
+        // Atualizar lista de arquivos na interface
+        function updateFilesList() {
+            const container = document.getElementById('lista-arquivos-anexados');
+            
+            if (selectedFiles.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = selectedFiles.map((file, index) => {
+                const iconClass = getFileIcon(file.name);
+                return `
+                    <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg border border-blue-300/20">
+                        <div class="flex items-center gap-3">
+                            <i class="${iconClass} text-blue-400"></i>
+                            <div>
+                                <div class="text-white font-medium">${file.name}</div>
+                                <div class="text-blue-300 text-sm">${formatFileSize(file.size)} • ${getFileTypeLabel(file.name)}</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="removeFile(${index})" 
+                                class="text-red-400 hover:text-red-300 p-1">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Atualizar estatísticas dos arquivos
+        function updateFilesStats() {
+            const statsContainer = document.getElementById('stats-anexos');
+            
+            if (selectedFiles.length === 0) {
+                statsContainer.classList.add('hidden');
+                return;
+            }
+
+            const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
+            document.getElementById('total-arquivos').textContent = selectedFiles.length;
+            document.getElementById('tamanho-total').textContent = formatFileSize(totalSize);
+            statsContainer.classList.remove('hidden');
+        }
+
+        // Obter ícone do arquivo baseado na extensão
+        function getFileIcon(filename) {
+            const extension = filename.split('.').pop().toLowerCase();
+            switch (extension) {
+                case 'pdf': return 'fas fa-file-pdf';
+                case 'doc':
+                case 'docx': return 'fas fa-file-word';
+                case 'png':
+                case 'jpg':
+                case 'jpeg': return 'fas fa-file-image';
+                default: return 'fas fa-file';
+            }
+        }
+
+        // Obter label do tipo de arquivo
+        function getFileTypeLabel(filename) {
+            const extension = filename.split('.').pop().toLowerCase();
+            switch (extension) {
+                case 'pdf': return 'PDF';
+                case 'doc': return 'Word 97-2003';
+                case 'docx': return 'Word';
+                case 'png': return 'PNG';
+                case 'jpg':
+                case 'jpeg': return 'JPEG';
+                default: return extension.toUpperCase();
+            }
         }
 
         // Formatar tamanho do arquivo
@@ -3313,7 +3401,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         function generatePeticaoInicial(formData) {
             const data = new Date().toLocaleDateString('pt-BR');
             return `
-**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ${formData.vara || 'VARA'} VARA ${formData.tipoJustica || 'CÍVEL'} DA COMARCA DE ${formData.comarca || 'CIDADE'}**
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ${formData.vara || '1ª VARA'} ${formData.tipoJustica || 'CÍVEL'} DA COMARCA DE ${formData.comarca || 'CIDADE'}**
 
 **${formData.autorNome || 'AUTOR'}**, ${formData.autorQualificacao || 'qualificação'}, residente e domiciliado(a) à ${formData.autorEndereco || 'endereço'}, ${formData.autorCidade || 'cidade'} - ${formData.autorEstado || 'UF'}, CEP ${formData.autorCEP || '00000-000'}, ${formData.autorDocumento ? 'portador(a) do ' + formData.autorDocumento : 'devidamente qualificado(a)'}, por meio de seu advogado que esta subscreve (OAB ${formData.advogadoOAB || 'nº'}), com escritório situado à ${formData.advogadoEndereco || 'endereço'}, vem, respeitosamente, perante Vossa Excelência, propor a presente
 
@@ -3453,7 +3541,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         function generateContestacao(formData) {
             const data = new Date().toLocaleDateString('pt-BR');
             return `
-**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ${formData.vara || 'VARA'}**
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ${formData.vara || '1ª VARA CÍVEL'}**
 
 **${formData.reuNome || 'RÉU'}**, já qualificado(a) nos autos da ação proposta por ${formData.autorNome || 'AUTOR'}, processo nº ${formData.numeroProcesso || '0000000-00.0000.0.00.0000'}, por meio de seu advogado que esta subscreve, vem, respeitosamente, apresentar
 
@@ -4052,10 +4140,10 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 .trim()
                 
                 // === CABEÇALHOS JUDICIAIS - FORMATAÇÃO ESPECIAL ===
-                .replace(/(EXCELENTÍSSIMO\(A\)\s+SENHOR\(A\)\s+DOUTOR\(A\).*?(?=\n\n|\*\*|\n\w))/gims, 
+                .replace(/(EXCELENTÍSSIMO\(A\)\s+SENHOR\(A\)\s+DOUTOR\(A\)\s+JUIZ\(A\)\s+DE\s+DIREITO[^*\n]*)/gims, 
                          '<div style="font-weight: bold; font-size: 16px; margin: 30px 0 25px 0; text-align: center; color: #000; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3;">$1</div>')
                 
-                .replace(/(ILMO\.\s+SR\.\s+DELEGADO-CHEFE.*?(?=\n\n|\*\*|\n\w))/gims,
+                .replace(/(ILMO\.\s+SR\.\s+DELEGADO-CHEFE[^*\n]*)/gims,
                          '<div style="font-weight: bold; font-size: 16px; margin: 30px 0 25px 0; text-align: center; color: #000; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3;">$1</div>')
                 
                 // === TÍTULOS DE DOCUMENTOS EM NEGRITO E CENTRALIZADO ===
@@ -4074,20 +4162,18 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 .replace(/\*\*([^*]{1,100})\*\*/g, '<strong style="font-weight: bold; color: #000;">$1</strong>')
                 
                 // === QUEBRAS DE LINHA E ESTRUTURA ===
-                .replace(/\n\n+/g, '||PARAGRAPH_BREAK||')
-                .replace(/\n/g, '<br>')
-                .replace(/\|\|PARAGRAPH_BREAK\|\|/g, '</p><p style="margin: 20px 0; text-indent: 40px; text-align: justify; line-height: 1.8; color: #000;">')
+                .replace(/\n\n+/g, '</p><p style="margin: 20px 0; text-indent: 40px; text-align: justify; line-height: 1.8; color: #000;">')
+                .replace(/\n/g, ' ') // Substituir quebras simples por espaços para manter continuidade
                 
                 // === PARÁGRAFOS ESPECIAIS SEM INDENTAÇÃO ===
                 .replace(/<p[^>]*>(\s*<div[^>]*>.*?<\/div>\s*)<\/p>/g, '$1')
                 .replace(/<p[^>]*>(\s*<strong[^>]*>.*?<\/strong>\s*)<\/p>/g, '<div style="margin: 15px 0; text-align: justify; line-height: 1.6;">$1</div>')
                 
                 // === FORMATAÇÕES ESPECÍFICAS ===
-                .replace(/([a-z])\s*\)/g, '$1)') // Corrigir espaços antes de parênteses em listas
                 .replace(/(Termos em que,|Pede e espera deferimento\.|Nestes termos,|Pede deferimento\.)/g, '<div style="margin: 30px 0 20px 0; text-align: left; font-weight: bold;">$1</div>')
                 
                 // === ASSINATURA E DATA ===
-                .replace(/(_+\s*\n.*?OAB.*?\d+)/gms, '<div style="margin: 40px 0 20px 0; text-align: center; font-weight: bold; border-top: 1px solid #000; padding-top: 10px; width: 300px; margin-left: auto; margin-right: auto;">$1</div>')
+                .replace(/(_+\s*.*?OAB.*?\d+)/gms, '<div style="margin: 40px 0 20px 0; text-align: center; font-weight: bold; border-top: 1px solid #000; padding-top: 10px; width: 300px; margin-left: auto; margin-right: auto;">$1</div>')
                 
                 // === DADOS FINAIS (CIDADE, DATA) ===
                 .replace(/([A-Z][a-z]+,\s*\d{1,2}\s*de\s*[a-z]+\s*de\s*\d{4})/gi, '<div style="margin: 30px 0; text-align: right; font-weight: bold;">$1</div>')
@@ -4098,7 +4184,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 
                 // === LIMPEZA FINAL ===
                 .replace(/<p[^>]*>\s*<\/p>/g, '') // Remover parágrafos vazios
-                .replace(/\s+/g, ' ') // Normalizar espaços
+                .replace(/\s{2,}/g, ' ') // Normalizar múltiplos espaços para um só
                 .replace(/>\s+</g, '><'); // Remover espaços entre tags
                 
             console.log('✅ Formatação HTML PROFISSIONAL aplicada com sucesso');
@@ -4865,11 +4951,12 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 valorCausa: parseFloat(document.getElementById('valor-causa').value) || 0,
                 varaInstancia: document.getElementById('vara-instancia').value,
                 observacoesProcesso: document.getElementById('observacoes-processo').value,
-                peticaoFile: selectedPetitionFile ? {
-                    name: selectedPetitionFile.name,
-                    size: selectedPetitionFile.size,
-                    type: selectedPetitionFile.type
-                } : null
+                anexos: selectedFiles.map(file => ({
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    lastModified: file.lastModified
+                }))
             };
 
             // Adicionar dados específicos por tipo de petição
@@ -4955,6 +5042,44 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             }, 2000);
         }
 
+        // Renderizar informações dos anexos
+        function renderAnexosInfo(processo) {
+            // Verificar anexos do novo sistema
+            if (processo.anexos && processo.anexos.length > 0) {
+                const totalSize = processo.anexos.reduce((sum, anexo) => sum + (anexo.size || 0), 0);
+                const tipos = [...new Set(processo.anexos.map(anexo => getFileTypeLabel(anexo.name)))];
+                
+                return `
+                    <div class="mt-2 p-2 bg-blue-600/10 rounded border border-blue-400/20">
+                        <div class="flex items-center gap-2 text-blue-300">
+                            <i class="fas fa-paperclip"></i>
+                            <span><strong>Anexos:</strong> ${processo.anexos.length} arquivo${processo.anexos.length > 1 ? 's' : ''}</span>
+                            <span class="text-blue-400">•</span>
+                            <span>${formatFileSize(totalSize)}</span>
+                            <span class="text-blue-400">•</span>
+                            <span>${tipos.join(', ')}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Verificar anexo do sistema antigo (peticaoFile)
+            if (processo.peticaoFile) {
+                return `
+                    <div class="mt-2 p-2 bg-blue-600/10 rounded border border-blue-400/20">
+                        <div class="flex items-center gap-2 text-blue-300">
+                            <i class="fas fa-image"></i>
+                            <span><strong>Petição:</strong> ${processo.peticaoFile.name}</span>
+                            <span class="text-blue-400">•</span>
+                            <span>${formatFileSize(processo.peticaoFile.size)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return '';
+        }
+
         // Atualizar lista de processos
         function updateProcessList() {
             const container = document.getElementById('processos-container');
@@ -4986,6 +5111,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                                 <div><strong>Tipo:</strong> ${getTipoProcessoText(processo.tipoProcesso)}</div>
                                 ${processo.valorCausa > 0 ? `<div><strong>Valor:</strong> R$ ${processo.valorCausa.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>` : ''}
                                 <div><strong>Data:</strong> ${formatDate(processo.dataAberto)}</div>
+                                ${renderAnexosInfo(processo)}
                             </div>
                         </div>
                         
@@ -5145,6 +5271,70 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         }
 
         // Visualizar processo detalhado
+        // Renderizar detalhes dos anexos na visualização
+        function renderDetalhesAnexos(processo) {
+            let html = '';
+            
+            // Anexos do novo sistema
+            if (processo.anexos && processo.anexos.length > 0) {
+                const totalSize = processo.anexos.reduce((sum, anexo) => sum + (anexo.size || 0), 0);
+                
+                html += `
+                    <div class="bg-indigo-900/20 rounded-lg p-6 border border-indigo-400/30">
+                        <h5 class="text-indigo-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-paperclip text-indigo-400"></i>
+                            Documentos Anexados (${processo.anexos.length} arquivo${processo.anexos.length > 1 ? 's' : ''})
+                        </h5>
+                        
+                        <div class="space-y-3">
+                            ${processo.anexos.map((anexo, index) => `
+                                <div class="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg border border-indigo-300/20">
+                                    <div class="flex items-center gap-3">
+                                        <i class="${getFileIcon(anexo.name)} text-indigo-400 text-lg"></i>
+                                        <div>
+                                            <div class="text-white font-medium">${anexo.name}</div>
+                                            <div class="text-indigo-300 text-sm">${formatFileSize(anexo.size)} • ${getFileTypeLabel(anexo.name)}</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-indigo-300 text-sm">
+                                        ${anexo.lastModified ? new Date(anexo.lastModified).toLocaleDateString('pt-BR') : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-indigo-400/20">
+                            <div class="flex justify-between text-sm text-indigo-200">
+                                <span>Total de documentos: <strong class="text-white">${processo.anexos.length}</strong></span>
+                                <span>Tamanho total: <strong class="text-white">${formatFileSize(totalSize)}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Anexo do sistema antigo (retrocompatibilidade)
+            if (processo.peticaoFile) {
+                html += `
+                    <div class="bg-indigo-900/20 rounded-lg p-6 border border-indigo-400/30">
+                        <h5 class="text-indigo-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-file-image text-indigo-400"></i>
+                            Petição Inicial (Sistema Antigo)
+                        </h5>
+                        <div class="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-indigo-300/20">
+                            <i class="fas fa-image text-indigo-400 text-lg"></i>
+                            <div>
+                                <div class="text-white font-medium">${processo.peticaoFile.name}</div>
+                                <div class="text-indigo-300 text-sm">${formatFileSize(processo.peticaoFile.size)} • Imagem</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return html;
+        }
+
         function viewProcess(processId) {
             const processo = processosData.find(p => p.id === processId);
             if (!processo) return;
@@ -5271,19 +5461,8 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                     </div>
                     ` : ''}
 
-                    <!-- Petição Anexada -->
-                    ${processo.peticaoFile ? `
-                    <div class="bg-indigo-900/20 rounded-lg p-6 border border-indigo-400/30">
-                        <h5 class="text-indigo-300 font-semibold mb-4 flex items-center gap-2">
-                            <i class="fas fa-file-image text-indigo-400"></i>
-                            Petição Inicial Anexada
-                        </h5>
-                        <div class="text-white">
-                            <i class="fas fa-image mr-2"></i>
-                            ${processo.peticaoFile.name} (${formatFileSize(processo.peticaoFile.size)})
-                        </div>
-                    </div>
-                    ` : ''}
+                    <!-- Documentos Anexados -->
+                    ${renderDetalhesAnexos(processo)}
                 </div>
             `;
 
