@@ -425,10 +425,6 @@
             .modal-body .grid {
                 grid-template-columns: 1fr !important;
             }
-
-            #document-preview {
-                height: 300px !important;
-            }
         }
     </style>
 </head>
@@ -762,9 +758,9 @@
                     </div>
                     
                     <div class="modal-body">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                             <!-- Formulário -->
-                            <div>
+                            <div class="order-2 xl:order-1">
                                 <h4 class="text-white font-semibold mb-4">
                                     <i class="fas fa-edit mr-2"></i>Preencher Dados
                                 </h4>
@@ -774,11 +770,11 @@
                             </div>
                             
                             <!-- Preview -->
-                            <div>
+                            <div class="order-1 xl:order-2">
                                 <h4 class="text-white font-semibold mb-4">
                                     <i class="fas fa-eye mr-2"></i>Preview do Documento
                                 </h4>
-                                <div id="document-preview" class="bg-white/10 rounded-lg p-4 h-96 overflow-y-auto border border-blue-300/20">
+                                <div id="document-preview" class="bg-white/10 rounded-lg p-4 border border-blue-300/20">
                                     <div class="text-blue-200 text-sm text-center py-8">
                                         <i class="fas fa-file-alt text-4xl mb-3"></i>
                                         <p>Preencha os dados para ver o preview</p>
