@@ -4085,6 +4085,74 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         }
 
         // ========================================
+        // FUNÇÃO AUXILIAR GLOBAL
+        // ========================================
+
+        // Função helper para proteger dados faltando
+        function safeData(field, fallback = '[CAMPO NÃO PREENCHIDO]') {
+            if (typeof field === 'object' && field !== null) {
+                return field;
+            }
+            return field && field.toString().trim() ? field.toString() : fallback;
+        }
+
+        // Função para gerar conteúdo específico por tipo de documento
+        function generateSpecificContent(documentType, formData, template) {
+            const today = new Date();
+            const dataFormatada = today.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+            
+            const userProfile = getUserProfileData();
+            
+            switch (documentType) {
+                case 'peticao-inicial':
+                    return createPeticaoInicial(formData, dataFormatada, userProfile);
+                case 'recurso-apelacao':
+                    return createRecursoApelacao(formData, dataFormatada, userProfile);
+                case 'habeas-corpus':
+                    return createHabeasCorpus(formData, dataFormatada, userProfile);
+                case 'contestacao':
+                    return createContestacao(formData, dataFormatada, userProfile);
+                case 'liberdade-provisoria':
+                    return createLiberdadeProvisoria(formData, dataFormatada, userProfile);
+                case 'peticao-fianca':
+                    return createPeticaoFianca(formData, dataFormatada, userProfile);
+                case 'alegacoes-finais':
+                    return createAlegacoesFinais(formData, dataFormatada, userProfile);
+                case 'requerimento-provas':
+                    return createRequerimentoProvas(formData, dataFormatada, userProfile);
+                case 'porte-armas':
+                    return createPorteArmas(formData, dataFormatada, userProfile);
+                case 'limpeza-ficha':
+                    return createLimpezaFicha(formData, dataFormatada, userProfile);
+                case 'embargos-declaracao':
+                    return createEmbargosDeclaracao(formData, dataFormatada, userProfile);
+                default:
+                    return createPeticaoInicial(formData, dataFormatada, userProfile);
+            }
+        }
+
+        // Função para obter dados do perfil do usuário
+        function getUserProfileData() {
+            const savedProfile = localStorage.getItem('userProfile');
+            if (savedProfile) {
+                return JSON.parse(savedProfile);
+            }
+            
+            return {
+                name: 'Dr. Alexandre Tribunal',
+                oab: 'SP 123.456',
+                email: 'alexandre@tribunalfederal.adv.br',
+                phone: '(11) 99999-9999',
+                address: 'Rua dos Advogados, 123, Centro, São Paulo - SP',
+                specialization: 'Direito Civil e Criminal'
+            };
+        }
+
+        // ========================================
         // FUNÇÃO DE VISUALIZAÇÃO DO DOCUMENTO
         // ========================================
 
@@ -5963,7 +6031,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <div class="flex-1">
                             <div class="flex items-center gap-3 mb-2">
-                                <h4 class="text-white font-semibold text-lg">${safeData(processo.assunto)}</h4>
+                                <h4 class="text-white font-semibold text-lg">${safeData(processo.assunto, 'Assunto não informado')}</h4>
                                 <span class="px-3 py-1 rounded-full text-sm ${getStatusBadgeClass(processo.status)}">
                                     ${getStatusText(processo.status)}
                                 </span>
@@ -5973,12 +6041,12 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                                 <div class="text-blue-200">
                                     <i class="fas fa-user mr-2"></i>
                                     <strong>Requerente:</strong><br>
-                                    ${safeData(processo.requerente)}
+                                    ${safeData(processo.requerente, 'Não informado')}
                                 </div>
                                 <div class="text-green-200">
                                     <i class="fas fa-balance-scale mr-2"></i>
                                     <strong>Tipo:</strong><br>
-                                    ${safeData(processo.tipoProcesso)}
+                                    ${safeData(processo.tipoProcesso, 'Não informado')}
                                 </div>
                                 <div class="text-yellow-200">
                                     <i class="fas fa-calendar mr-2"></i>
