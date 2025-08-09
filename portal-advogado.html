@@ -3306,11 +3306,17 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Criar página formatada com cabeçalho (só primeira) e rodapé (demais)
         function createFormattedPage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
             const headerHTML = isFirstPage ? `
-                <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #1e40af; padding-bottom: 25px;">
+                <div style="text-align: center; margin-bottom: 25px; border-bottom: 3px solid #1e40af; padding-bottom: 25px;">
                     <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 80px; height: 80px; margin: 0 auto 15px; display: block;">
                     <div style="font-size: 18px; font-weight: bold; color: #1e40af; letter-spacing: 2px; margin-bottom: 8px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
-                    <div style="font-size: 16px; font-weight: bold; color: #1e40af; margin-bottom: 15px;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
-                    <div style="font-size: 16px; font-weight: bold; color: #000; text-decoration: underline; margin-top: 20px;">${title.toUpperCase()}</div>
+                    <div style="font-size: 16px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
+                </div>
+            ` : '';
+
+            // Título do documento separado, abaixo da linha azul
+            const titleHTML = isFirstPage ? `
+                <div style="text-align: center; margin: 30px 0 40px 0;">
+                    <div style="font-size: 16px; font-weight: bold; color: #000; text-decoration: underline;">${title.toUpperCase()}</div>
                 </div>
             ` : '';
 
@@ -3339,6 +3345,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     color: #000;
                 ">
                     ${headerHTML}
+                    ${titleHTML}
                     <div style="text-align: justify; margin-bottom: ${!isFirstPage ? '80px' : '40px'};">
                         ${content}
                     </div>
@@ -3350,9 +3357,13 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Formatar conteúdo com HTML para negritos e formatação profissional
         function formatDocumentContentHTML(content) {
             return content
-                // Seções principais em negrito e maiúsculo
+                // Excelentíssimo em negrito e alinhado à esquerda
+                .replace(/^(EXCELENTÍSSIMO\s+SENHOR\s+DOUTOR?\s+JUIZ[A-Z\s]*)/gmi, 
+                         '<div style="font-weight: bold; font-size: 14px; margin: 20px 0 25px 0; text-align: left; color: #000;">$1</div>')
+                
+                // Seções principais em negrito e maiúsculo - COR PRETA
                 .replace(/^(DOS FATOS|DA FUNDAMENTAÇÃO JURÍDICA|DOS PEDIDOS|DAS PROVAS|DO VALOR DA CAUSA|DA DEFESA|ALEGAÇÕES FINAIS|RECURSO|CONTESTAÇÃO|AUTOR|RÉU|PACIENTE\/RÉU):/gm, 
-                         '<div style="font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; text-transform: uppercase; color: #1e40af;">$1:</div>')
+                         '<div style="font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; text-transform: uppercase; color: #000;">$1:</div>')
                 
                 // Artigos de lei em negrito
                 .replace(/\b(art\.|artigo)\s*(\d+)/gi, '<strong>$1 $2</strong>')
@@ -3381,7 +3392,19 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
             showNotification(`Gerando documento com ${totalPages} página(s)...`, 'info');
 
-            pages.forEach((pageHTML, index) => {
+            // Função para processar uma página por vez com delay
+            function processPage(index) {
+                if (index >= pages.length) {
+                    showNotification(
+                        `Documento gerado com sucesso! ${totalPages} página(s) baixada(s).`, 
+                        'success'
+                    );
+                    closeDocumentGenerator();
+                    return;
+                }
+
+                const pageHTML = pages[index];
+                
                 // Criar elemento temporário para a página
                 const pageElement = document.createElement('div');
                 pageElement.style.cssText = `
@@ -3429,14 +3452,13 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         
                         processedPages++;
                         
-                        // Notificar quando todas as páginas estiverem prontas
-                        if (processedPages === totalPages) {
-                            showNotification(
-                                `Documento gerado com sucesso! ${totalPages} página(s) baixada(s).`, 
-                                'success'
-                            );
-                            closeDocumentGenerator();
-                        }
+                        console.log(`Página ${index + 1} de ${totalPages} processada`);
+                        
+                        // Processar próxima página após delay
+                        setTimeout(() => {
+                            processPage(index + 1);
+                        }, 500); // Delay de 500ms entre downloads
+                        
                     }, 'image/png', 1.0);
 
                     // Remover elemento temporário
@@ -3445,11 +3467,15 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     console.error('Erro ao gerar página:', error);
                     document.body.removeChild(pageElement);
                     
-                    if (processedPages === 0) {
-                        showNotification('Erro ao gerar documento', 'error');
-                    }
+                    // Tentar próxima página mesmo com erro
+                    setTimeout(() => {
+                        processPage(index + 1);
+                    }, 500);
                 });
-            });
+            }
+
+            // Iniciar processamento da primeira página
+            processPage(0);
         }
 
         // Gerar conteúdo do documento
