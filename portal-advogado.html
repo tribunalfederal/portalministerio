@@ -3426,39 +3426,121 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Função auxiliar para converter texto puro de volta para HTML formatado
         function convertTextToFormattedHTML(text) {
+            console.log('🎨 Aplicando formatação HTML ao texto...');
+            
             return text
-                // Quebras de linha duplas viram parágrafos
-                .replace(/\n\n/g, '</p><p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
-                // Quebras simples viram <br>
-                .replace(/\n/g, '<br>')
-                // Envolver em parágrafo inicial
-                .replace(/^/, '<p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
-                // Fechar último parágrafo
-                .replace(/$/, '</p>')
-                // Aplicar formatações específicas
+                // === FORMATAÇÕES PRINCIPAIS ===
+                
+                // EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO - NEGRITO, FONTE MAIOR, ALINHADO À ESQUERDA
                 .replace(/(EXCELENTÍSSIMO\(A\)\s+SENHOR\(A\)\s+DOUTOR\(A\)\s+JUIZ\(A\)\s+DE\s+DIREITO)/gmi, 
                          '<div style="font-weight: bold; font-size: 18px; margin: 25px 0 20px 0; text-align: left; color: #000; text-indent: 0; line-height: 1.4;"><strong>$1</strong></div>')
-                .replace(/^(DOS FATOS|DA FUNDAMENTAÇÃO JURÍDICA|DOS PEDIDOS|DAS PROVAS|DO VALOR DA CAUSA):/gm, 
+                
+                // EXCELENTÍSSIMO SENHOR DOUTOR JUIZ (versão sem parênteses) - MESMA FORMATAÇÃO
+                .replace(/(EXCELENTÍSSIMO\s+SENHOR\s+DOUTOR?\s+JUIZ[^:\n]*)/gmi, 
+                         '<div style="font-weight: bold; font-size: 18px; margin: 25px 0 20px 0; text-align: left; color: #000; text-indent: 0; line-height: 1.4;"><strong>$1</strong></div>')
+                
+                // === SEÇÕES PRINCIPAIS EM NEGRITO FORTE ===
+                .replace(/\b(DOS FATOS|DA FUNDAMENTAÇÃO JURÍDICA|DOS PEDIDOS|DAS PROVAS|DO VALOR DA CAUSA|DA DEFESA|ALEGAÇÕES FINAIS|RECURSO|CONTESTAÇÃO|DA DECISÃO EMBARGADA|DA OMISSÃO|DA CONTRADIÇÃO|DA OBSCURIDADE|DO VÍCIO ENCONTRADO):\s*/gmi, 
                          '<div style="font-weight: bold; font-size: 16px; margin: 30px 0 15px 0; text-transform: uppercase; color: #000; text-align: left; text-indent: 0;"><strong>$1:</strong></div>')
-                .replace(/^(AUTOR|RÉU|PACIENTE\/RÉU):\s*([^\n]+)/gm, '<div style="margin: 20px 0; text-align: left; text-indent: 0;"><strong>$1:</strong> <strong>$2</strong></div>');
+                
+                // === NOMES DAS PARTES EM NEGRITO ===
+                .replace(/\b(AUTOR|RÉU|PACIENTE\/RÉU|EMBARGANTE|APELANTE|REQUERENTE|IMPETRANTE):\s*([^\n]+)/gmi, 
+                         '<div style="margin: 20px 0; text-align: left; text-indent: 0;"><strong>$1:</strong> <strong>$2</strong></div>')
+                
+                // === DADOS PROCESSUAIS EM NEGRITO ===
+                .replace(/\b(PROCESSO\s+N[ºº°]?|AUTORIDADE COATORA|AUTORIDADE IMPETRADA|PROFISSÃO|ENDEREÇO|TEMPO DECORRIDO|VALOR DA FIANÇA):\s*([^\n]+)/gmi, 
+                         '<div style="margin: 15px 0; text-align: left; text-indent: 0;"><strong>$1:</strong> <strong>$2</strong></div>')
+                
+                // === ARTIGOS DE LEI EM NEGRITO ===
+                .replace(/\b(art\.|artigo)\s*(\d+[º°]?)/gi, '<strong>$1 $2</strong>')
+                
+                // === LEIS E CÓDIGOS EM NEGRITO ===
+                .replace(/\b(lei|código|decreto|portaria|resolução)\s*n[ºº°]?\s*[\d\.\/\-]+/gi, '<strong>$&</strong>')
+                
+                // === DATAS EM NEGRITO ===
+                .replace(/\b(\d{1,2}\/\d{1,2}\/\d{2,4})\b/g, '<strong>$1</strong>')
+                
+                // === VALORES MONETÁRIOS EM NEGRITO ===
+                .replace(/\bR\$\s*[\d\.,]+/g, '<strong>$&</strong>')
+                
+                // === OAB EM NEGRITO ===
+                .replace(/\b(OAB\s*[A-Z]{2}?\s*[\d\.,]+)/gi, '<strong>$1</strong>')
+                
+                // === ASSINATURA EM NEGRITO ===
+                .replace(/(Pede deferimento\.)/g, '<strong>$1</strong>')
+                .replace(/(Termos em que,)/g, '<strong>$1</strong>')
+                
+                // === QUEBRAS DE LINHA E PARÁGRAFOS ===
+                
+                // Quebras de linha duplas viram fechamento/abertura de parágrafos
+                .replace(/\n\n+/g, '</p><p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
+                
+                // Quebras simples viram <br>
+                .replace(/\n/g, '<br>')
+                
+                // === PARÁGRAFO INICIAL E FINAL ===
+                
+                // Envolver em parágrafo inicial
+                .replace(/^/, '<p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
+                
+                // Fechar último parágrafo
+                .replace(/$/, '</p>')
+                
+                // === LIMPEZA FINAL ===
+                
+                // Limpar espaços extras e caracteres especiais
+                .replace(/&nbsp;/g, ' ')
+                .replace(/\s+/g, ' ')
+                .replace(/\s*<\/p>\s*<p[^>]*>\s*/g, '</p><p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
+                
+                // Corrigir parágrafos vazios
+                .replace(/<p[^>]*>\s*<\/p>/g, '')
+                
+                // Corrigir divs dentro de parágrafos
+                .replace(/<p[^>]*>(\s*<div[^>]*>.*?<\/div>\s*)<\/p>/g, '$1')
+                
+                console.log('✅ Formatação HTML aplicada com sucesso');
         }
 
         // Função auxiliar para criar página com novo layout
         function createNewPage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
             const headerHTML = isFirstPage ? `
-                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1e40af; padding-bottom: 15px;">
-                    <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 60px; height: 60px; margin: 0 auto 10px; display: block;">
-                    <div style="font-size: 14px; font-weight: bold; color: #1e40af; margin-bottom: 5px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
-                    <div style="font-size: 12px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
+                <div style="text-align: center; margin-bottom: 25px; border-bottom: 3px solid #1e40af; padding-bottom: 20px;">
+                    <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 70px; height: 70px; margin: 0 auto 15px; display: block;">
+                    <div style="font-size: 16px; font-weight: bold; color: #1e40af; letter-spacing: 1px; margin-bottom: 8px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
+                    <div style="font-size: 14px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
                 </div>
-                <div style="text-align: center; margin: 15px 0 20px 0;">
-                    <div style="font-size: 14px; font-weight: bold; color: #000; text-decoration: underline;">${title.toUpperCase()}</div>
+                <div style="text-align: center; margin: 20px 0 30px 0;">
+                    <div style="font-size: 16px; font-weight: bold; color: #000; text-decoration: underline;">${title.toUpperCase()}</div>
                 </div>
             ` : '';
 
             const footerHTML = !isFirstPage ? `
-                <div style="position: absolute; bottom: ${margin}px; left: ${margin}px; right: ${margin}px; text-align: center; font-size: 10px; color: #666; border-top: 1px solid #ccc; padding-top: 5px;">
-                    Página ${pageNumber}
+                <div style="position: absolute; bottom: ${margin}px; left: ${margin}px; right: ${margin}px; text-align: center; font-size: 11px; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
+                    <div style="font-size: 10px;">Página ${pageNumber}</div>
+                </div>
+            ` : '';
+
+            // Assinatura completa apenas na ÚLTIMA página (será adicionada pelo sistema principal)
+            const hasSignature = content.includes('Termos em que') || content.includes('Pede deferimento');
+            const signatureHTML = hasSignature ? `
+                <div style="margin-top: 40px; text-align: left;">
+                    <div style="margin: 20px 0; text-align: justify;">
+                        <strong>Termos em que,<br>
+                        Pede deferimento.</strong>
+                    </div>
+                    <div style="margin: 30px 0 20px 0; text-align: left;">
+                        <strong>${new Date().toLocaleDateString('pt-BR', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        }).replace(/^(\w)/, match => match.toUpperCase())}</strong>
+                    </div>
+                    <div style="margin: 40px 0 0 0; text-align: left;">
+                        <div style="border-top: 1px solid #000; width: 300px; margin-bottom: 5px;"></div>
+                        <strong>${userProfile.name || 'Dr(a). Roberto Silva'}</strong><br>
+                        <strong>OAB ${userProfile.oab || '123.456'}</strong>
+                    </div>
                 </div>
             ` : '';
 
@@ -3469,16 +3551,17 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     height: ${height}px;
                     background: white;
                     font-family: 'Times New Roman', serif;
-                    font-size: 13px;
-                    line-height: 1.6;
+                    font-size: 14px;
+                    line-height: 1.7;
                     padding: ${margin}px;
                     box-sizing: border-box;
                     color: #000;
                     overflow: hidden;
                 ">
                     ${headerHTML}
-                    <div style="text-align: justify;">
+                    <div style="text-align: justify; margin-bottom: ${!isFirstPage ? '50px' : '30px'};">
                         ${content}
+                        ${signatureHTML}
                     </div>
                     ${footerHTML}
                 </div>
