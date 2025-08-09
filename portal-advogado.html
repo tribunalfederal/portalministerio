@@ -1598,11 +1598,20 @@
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Portal do Advogado carregado com sucesso!');
+            console.log('🚀 Portal do Advogado iniciando...');
+            
+            // Mostrar dashboard por padrão
             showSection('dashboard');
-            initializeCalculator();
-            loadUserData(); // Carregar dados do perfil do usuário
-            initializeHierarchy(); // Inicializar sistema de hierarquia
+            
+            // Inicializar sistemas básicos
+            try {
+                initializeCalculator();
+                loadUserData();
+                initializeHierarchy();
+                console.log('✅ Portal carregado com sucesso!');
+            } catch (error) {
+                console.warn('⚠️ Alguns recursos podem não funcionar:', error);
+            }
         });
 
         // === CALCULADORA DE PENAS - SISTEMA COMPLETO ===
@@ -3405,35 +3414,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     break;
                 default:
                     content = createPeticaoInicial(formData, dataFormatada, userProfile);
-                    break;
-            }
-                    break;
-                case 'contestacao':
-                    content = createContestacao(formData, dataFormatada, userProfile);
-                    break;
-                case 'liberdade-provisoria':
-                    content = createLiberdadeProvisoria(formData, dataFormatada, userProfile);
-                    break;
-                case 'peticao-fianca':
-                    content = createPeticaoFianca(formData, dataFormatada, userProfile);
-                    break;
-                case 'alegacoes-finais':
-                    content = createAlegacoesFinais(formData, dataFormatada, userProfile);
-                    break;
-                case 'requerimento-provas':
-                    content = createRequerimentoProvas(formData, dataFormatada, userProfile);
-                    break;
-                case 'porte-armas':
-                    content = createPorteArmas(formData, dataFormatada, userProfile);
-                    break;
-                case 'limpeza-ficha':
-                    content = createLimpezaFicha(formData, dataFormatada, userProfile);
-                    break;
-                case 'embargos-declaracao':
-                    content = createEmbargosDeclaracao(formData, dataFormatada, userProfile);
-                    break;
-                default:
-                    content = createDocumentoGenerico(formData, dataFormatada, userProfile, template.title);
                     break;
             }
             
