@@ -809,9 +809,6 @@
                         <button onclick="closeDocumentGenerator()" class="btn btn-secondary mr-3">
                             <i class="fas fa-times mr-2"></i>Cancelar
                         </button>
-                        <button onclick="generateDocument('image')" class="btn bg-green-600 hover:bg-green-700 text-white mr-3">
-                            <i class="fas fa-image mr-2"></i>Gerar Imagem
-                        </button>
                         <button onclick="generateDocument('pdf')" class="btn btn-primary">
                             <i class="fas fa-file-pdf mr-2"></i>Baixar PDF
                         </button>
@@ -3353,11 +3350,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 // Gerar HTML profissional
                 const documentHTML = createProfessionalDocumentHTML(currentDocumentType, formData, template);
                 
-                if (outputType === 'pdf') {
-                    downloadAsPDF(documentHTML, template.title);
-                } else {
-                    downloadAsImage(documentHTML, template.title);
-                }
+                // Sempre gerar PDF automaticamente
+                downloadAsPDF(documentHTML, template.title);
                 
             } catch (error) {
                 console.error('❌ Erro:', error);
@@ -3420,90 +3414,138 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             return createDocumentPage(content, template.title);
         }
 
-        // Download direto como PDF
+        // Download automático como PDF usando jsPDF
         function downloadAsPDF(documentHTML, title) {
-            console.log('📥 Baixando como PDF:', title);
+            console.log('📥 Gerando PDF automaticamente:', title);
             
-            // Criar janela temporária para renderizar o documento
-            const printWindow = window.open('', '_blank', 'width=800,height=600');
-            
-            if (!printWindow) {
-                showNotification('❌ Popup bloqueado. Permita popups para baixar PDF', 'error');
+            if (typeof jsPDF === 'undefined') {
+                showNotification('❌ Biblioteca jsPDF não encontrada', 'error');
                 return;
             }
 
-            // Escrever HTML na janela
-            printWindow.document.write(documentHTML);
-            printWindow.document.close();
-            
-            // Aguardar carregamento e baixar automaticamente
-            printWindow.onload = function() {
-                setTimeout(() => {
-                    printWindow.print();
-                    
-                    // Fechar janela após impressão
-                    printWindow.onafterprint = function() {
-                        printWindow.close();
-                    };
-                    
-                    showNotification('✅ PDF gerado! Salve usando Ctrl+P → Salvar como PDF', 'success');
-                }, 500);
-            };
+            try {
+                showNotification('📄 Gerando PDF...', 'info');
+                
+                // Criar container temporário para renderizar o documento
+                const container = document.createElement('div');
+                container.style.cssText = `
+                    position: fixed;
+                    left: -9999px;
+                    top: 0;
+                    width: 210mm;
+                    min-height: 297mm;
+                    background: white;
+                    font-family: 'Times New Roman', serif;
+                    font-size: 12pt;
+                    line-height: 1.6;
+                    color: #000;
+                    padding: 20mm;
+                    box-sizing: border-box;
+                `;
+                
+                // Extrair apenas o body do HTML
+                const bodyMatch = documentHTML.match(/<body[^>]*>([\s\S]*)<\/body>/);
+                if (bodyMatch) {
+                    container.innerHTML = bodyMatch[1];
+                } else {
+                    container.innerHTML = documentHTML;
+                }
+                
+                document.body.appendChild(container);
+                
+                // Usar html2canvas para converter em imagem e depois PDF
+                if (typeof html2canvas !== 'undefined') {
+                    html2canvas(container, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: false,
+                        backgroundColor: '#ffffff',
+                        width: container.scrollWidth,
+                        height: container.scrollHeight
+                    }).then(canvas => {
+                        // Criar PDF com jsPDF
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        
+                        const imgWidth = 210;
+                        const pageHeight = 297;
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                        let heightLeft = imgHeight;
+                        let position = 0;
+                        
+                        // Adicionar imagem à primeira página
+                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                        
+                        // Adicionar páginas extras se necessário
+                        while (heightLeft >= 0) {
+                            position = heightLeft - imgHeight;
+                            pdf.addPage();
+                            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                            heightLeft -= pageHeight;
+                        }
+                        
+                        // Download automático
+                        const fileName = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                        pdf.save(fileName);
+                        
+                        // Limpar
+                        document.body.removeChild(container);
+                        showNotification('✅ PDF baixado automaticamente!', 'success');
+                        
+                    }).catch(error => {
+                        console.error('Erro html2canvas:', error);
+                        document.body.removeChild(container);
+                        
+                        // Fallback: usar método simples do jsPDF
+                        generateSimplePDF(documentHTML, title);
+                    });
+                } else {
+                    // Fallback sem html2canvas
+                    document.body.removeChild(container);
+                    generateSimplePDF(documentHTML, title);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                showNotification('❌ Erro ao gerar PDF', 'error');
+            }
         }
 
-        // Download como imagem
-        function downloadAsImage(documentHTML, title) {
-            console.log('🖼️ Baixando como imagem:', title);
-            
-            // Criar container temporário
-            const container = document.createElement('div');
-            container.style.cssText = `
-                position: absolute;
-                left: -9999px;
-                top: 0;
-                width: 794px;
-                min-height: 1123px;
-                background: white;
-                font-family: 'Times New Roman', serif;
-                font-size: 12pt;
-                padding: 60px;
-                box-sizing: border-box;
-            `;
-            
-            // Extrair apenas o body do HTML
-            const bodyMatch = documentHTML.match(/<body[^>]*>([\s\S]*)<\/body>/);
-            if (bodyMatch) {
-                container.innerHTML = bodyMatch[1];
-            } else {
-                container.innerHTML = documentHTML;
-            }
-            
-            document.body.appendChild(container);
-            
-            // Usar html2canvas para gerar imagem
-            if (typeof html2canvas !== 'undefined') {
-                html2canvas(container, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: false,
-                    backgroundColor: '#ffffff'
-                }).then(canvas => {
-                    // Download da imagem
-                    const link = document.createElement('a');
-                    link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                    
-                    document.body.removeChild(container);
-                    showNotification('✅ Imagem baixada com sucesso!', 'success');
-                }).catch(error => {
-                    console.error('Erro html2canvas:', error);
-                    document.body.removeChild(container);
-                    showNotification('❌ Erro ao gerar imagem', 'error');
+        // Método alternativo simples para PDF
+        function generateSimplePDF(documentHTML, title) {
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                // Extrair texto do HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = documentHTML;
+                const text = tempDiv.textContent || tempDiv.innerText || '';
+                
+                // Dividir em linhas
+                const lines = pdf.splitTextToSize(text, 180);
+                
+                // Adicionar texto ao PDF
+                let yPosition = 20;
+                lines.forEach(line => {
+                    if (yPosition > 280) {
+                        pdf.addPage();
+                        yPosition = 20;
+                    }
+                    pdf.text(line, 15, yPosition);
+                    yPosition += 6;
                 });
-            } else {
-                document.body.removeChild(container);
-                showNotification('❌ Biblioteca html2canvas não disponível', 'error');
+                
+                // Download
+                const fileName = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                pdf.save(fileName);
+                
+                showNotification('✅ PDF gerado automaticamente!', 'success');
+                
+            } catch (error) {
+                console.error('Erro PDF simples:', error);
+                showNotification('❌ Erro ao gerar PDF', 'error');
             }
         }
 
