@@ -3551,6 +3551,16 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Criar página HTML formatada
         function createDocumentPage(content, title) {
+            // SVG logo embutido 
+            const logoSvg = `data:image/svg+xml;base64,${btoa(`
+                <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="40" cy="40" r="35" fill="#1e40af" stroke="#0369a1" stroke-width="2"/>
+                    <rect x="20" y="25" width="40" height="30" fill="#ffffff" rx="2"/>
+                    <text x="40" y="42" text-anchor="middle" fill="#1e40af" font-family="serif" font-size="14" font-weight="bold">⚖</text>
+                    <text x="40" y="60" text-anchor="middle" fill="#1e40af" font-family="serif" font-size="8" font-weight="bold">TRIBUNAL</text>
+                </svg>
+            `)}`;
+            
             return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -3625,11 +3635,18 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 </head>
 <body>
     <div class="header">
-        <div style="font-size: 14pt; font-weight: bold; color: #1e40af; margin-bottom: 5px;">
-            REPÚBLICA FEDERATIVA DE BRASILÂNDIA
-        </div>
-        <div style="font-size: 12pt; font-weight: bold; color: #1e40af;">
-            TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+            <img src="${logoSvg}" 
+                 alt="Logo Tribunal" 
+                 style="height: 60px; width: auto; margin-right: 15px;">
+            <div style="text-align: center;">
+                <div style="font-size: 14pt; font-weight: bold; color: #1e40af; margin-bottom: 5px;">
+                    REPÚBLICA FEDERATIVA DE BRASILÂNDIA
+                </div>
+                <div style="font-size: 12pt; font-weight: bold; color: #1e40af;">
+                    TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO
+                </div>
+            </div>
         </div>
     </div>
     
@@ -3721,15 +3738,20 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     </div>
 
     <div class="paragrafo">
-        <strong>${formData.cliente || 'NOME DO CLIENTE'}</strong>, através de seu advogado, vem, respeitosamente, interpor <strong>RECURSO DE APELAÇÃO</strong> da decisão proferida pelo MM. Juiz nos autos do processo em epígrafe.
+        <strong>${formData.apelante || 'NOME DO APELANTE'}</strong>, portador do RG nº ${formData.apelanteRG || '00.000.000-0'}, através de seu advogado, vem, respeitosamente, interpor <strong>RECURSO DE APELAÇÃO</strong> da decisão proferida pelo MM. Juiz nos autos do processo nº ${formData.numeroProcesso || '[NÚMERO DO PROCESSO]'}.
     </div>
 
-    <div class="secao">I - DOS FUNDAMENTOS</div>
+    <div class="secao">I - DA DECISÃO RECORRIDA</div>
+    <div class="paragrafo">
+        ${formData.sentenca || 'Relatar aqui a decisão que está sendo recorrida...'}
+    </div>
+
+    <div class="secao">II - DOS FUNDAMENTOS DO RECURSO</div>
     <div class="paragrafo">
         ${formData.fundamentacao || 'A decisão recorrida merece reforma pelos seguintes fundamentos...'}
     </div>
 
-    <div class="secao">II - DOS PEDIDOS</div>
+    <div class="secao">III - DOS PEDIDOS</div>
     <div class="paragrafo">
         ${formData.pedidos || 'Requer-se a reforma da decisão recorrida...'}
     </div>
@@ -3757,20 +3779,31 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     </div>
 
     <div class="paragrafo">
-        <strong>${userProfile.name || 'Nome do Advogado'}</strong>, advogado inscrito na OAB sob nº ${userProfile.oab || 'SP 000.000'}, vem, respeitosamente, impetrar o presente <strong>HABEAS CORPUS</strong> em favor de <strong>${formData.paciente || 'NOME DO PACIENTE'}</strong>.
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong>, advogado inscrito na OAB sob nº ${userProfile.oab || 'SP 000.000'}, vem, respeitosamente, impetrar o presente <strong>HABEAS CORPUS</strong> em favor de <strong>${formData.paciente || 'NOME DO PACIENTE'}</strong>, portador do RG nº ${formData.pacienteRG || '00.000.000-0'}, nascido em ${formData.pacienteNascimento || '[DATA DE NASCIMENTO]'}.
     </div>
 
-    <div class="secao">I - DOS FATOS</div>
+    <div class="secao">I - DA SITUAÇÃO ATUAL DO PACIENTE</div>
     <div class="paragrafo">
-        ${formData.fatos || 'Relatar os fatos que motivam a impetração do habeas corpus...'}
+        ${formData.situacao || 'Relatar a situação atual do paciente...'}
     </div>
 
-    <div class="secao">II - DO CONSTRANGIMENTO ILEGAL</div>
     <div class="paragrafo">
-        ${formData.constrangimento || 'Demonstrar o constrangimento ilegal sofrido pelo paciente...'}
+        <strong>Autoridade Coatora:</strong> ${formData.autoridade || '[AUTORIDADE COATORA]'}<br>
+        <strong>Local da Prisão/Coação:</strong> ${formData.localPrisao || '[LOCAL DA PRISÃO]'}<br>
+        <strong>Data da Prisão/Coação:</strong> ${formData.dataPrisao || '[DATA DA PRISÃO]'}
     </div>
 
-    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="secao">II - DA ILEGALIDADE OU ABUSO DE PODER</div>
+    <div class="paragrafo">
+        ${formData.ilegalidade || 'Demonstrar a ilegalidade ou abuso de poder...'}
+    </div>
+
+    <div class="secao">III - DA FUNDAMENTAÇÃO JURÍDICA</div>
+    <div class="paragrafo">
+        ${formData.fundamentacaoJuridica || 'Apresentar a fundamentação jurídica aplicável...'}
+    </div>
+
+    <div class="secao">IV - DOS PEDIDOS</div>
     <div class="paragrafo">
         ${formData.pedidos || 'Requer-se a concessão da ordem para...'}
     </div>
@@ -3798,20 +3831,22 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     </div>
 
     <div class="paragrafo">
-        <strong>${formData.cliente || 'NOME DO RÉU/CONTESTANTE'}</strong>, brasileiro, por meio de seu advogado, vem, tempestivamente, apresentar <strong>CONTESTAÇÃO</strong> à ação proposta por ${formData.autor || 'NOME DO AUTOR'}.
+        <strong>${formData.reu || 'NOME DO RÉU/CONTESTANTE'}</strong>, portador do RG nº ${formData.reuRG || '00.000.000-0'}, por meio de seu advogado, vem, tempestivamente, apresentar <strong>CONTESTAÇÃO</strong> à ação proposta nos autos do processo nº ${formData.numeroProcesso || '[NÚMERO DO PROCESSO]'}.
     </div>
 
-    <div class="secao">I - PRELIMINARES</div>
+    <div class="secao">I - DOS ARGUMENTOS DE DEFESA</div>
     <div class="paragrafo">
-        ${formData.preliminares || 'Das preliminares a serem alegadas...'}
+        ${formData.defesa || 'Apresentar os argumentos de defesa...'}
     </div>
 
-    <div class="secao">II - DO MÉRITO</div>
+    ${formData.contraprovas ? `
+    <div class="secao">II - DAS CONTRAPROVAS</div>
     <div class="paragrafo">
-        ${formData.merito || 'Quanto ao mérito, a ação não merece prosperar pelos seguintes fundamentos...'}
+        ${formData.contraprovas}
     </div>
+    ` : ''}
 
-    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="secao">${formData.contraprovas ? 'III' : 'II'} - DOS PEDIDOS</div>
     <div class="paragrafo">
         ${formData.pedidos || 'Requer-se a improcedência total da ação...'}
     </div>
@@ -3839,20 +3874,22 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     </div>
 
     <div class="paragrafo">
-        <strong>${userProfile.name || 'Nome do Advogado'}</strong>, advogado inscrito na OAB sob nº ${userProfile.oab || 'SP 000.000'}, vem requerer a <strong>LIBERDADE PROVISÓRIA</strong> de <strong>${formData.acusado || 'NOME DO ACUSADO'}</strong>.
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong>, advogado inscrito na OAB sob nº ${userProfile.oab || 'SP 000.000'}, vem requerer a <strong>LIBERDADE PROVISÓRIA</strong> de <strong>${formData.requerente || 'NOME DO REQUERENTE'}</strong>, portador do RG nº ${formData.requerenteRG || '00.000.000-0'}, nos autos do processo nº ${formData.numeroProcesso || '[NÚMERO DO PROCESSO]'}.
     </div>
 
-    <div class="secao">I - DOS FATOS</div>
+    <div class="secao">I - DA FUNDAMENTAÇÃO LEGAL</div>
     <div class="paragrafo">
-        ${formData.fatos || 'Relatar a situação processual do acusado...'}
+        ${formData.fundamentacao || 'A liberdade provisória deve ser concedida com base na legislação aplicável...'}
     </div>
 
-    <div class="secao">II - DOS FUNDAMENTOS JURÍDICOS</div>
+    ${formData.medidas ? `
+    <div class="secao">II - DAS MEDIDAS CAUTELARES PROPOSTAS</div>
     <div class="paragrafo">
-        ${formData.fundamentacao || 'A liberdade provisória deve ser concedida com base no artigo 310 do CPP...'}
+        ${formData.medidas}
     </div>
+    ` : ''}
 
-    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="secao">${formData.medidas ? 'III' : 'II'} - DOS PEDIDOS</div>
     <div class="paragrafo">
         ${formData.pedidos || 'Requer-se a concessão da liberdade provisória...'}
     </div>
@@ -3880,29 +3917,23 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     </div>
 
     <div class="paragrafo">
-        <strong>${userProfile.name || 'Nome do Advogado'}</strong>, advogado inscrito na OAB sob nº ${userProfile.oab || 'SP 000.000'}, vem requerer a <strong>CONCESSÃO DE FIANÇA</strong> para <strong>${formData.acusado || 'NOME DO ACUSADO'}</strong>.
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong>, advogado inscrito na OAB sob nº ${userProfile.oab || 'SP 000.000'}, vem requerer a <strong>CONCESSÃO DE FIANÇA</strong> para <strong>${formData.requerente || 'NOME DO REQUERENTE'}</strong>, portador do RG nº ${formData.requerenteRG || '00.000.000-0'}, nos autos do processo nº ${formData.numeroProcesso || '[NÚMERO DO PROCESSO]'}.
     </div>
 
-    <div class="secao">I - DOS FATOS</div>
+    <div class="secao">I - DA FUNDAMENTAÇÃO LEGAL</div>
     <div class="paragrafo">
-        ${formData.fatos || 'Relatar a situação que enseja o pedido de fiança...'}
+        ${formData.fundamentacao || 'O direito à fiança está previsto na legislação aplicável...'}
     </div>
 
-    <div class="secao">II - DO DIREITO À FIANÇA</div>
+    <div class="secao">II - DO VALOR DA FIANÇA</div>
     <div class="paragrafo">
-        ${formData.fundamentacao || 'O direito à fiança está previsto no artigo 322 do CPP...'}
+        Propõe-se o valor de <strong>R$ ${formData.valorFianca || '[VALOR DA FIANÇA]'}</strong> como fiança, considerando as condições econômicas do requerente e a natureza do delito.
     </div>
 
     <div class="secao">III - DOS PEDIDOS</div>
     <div class="paragrafo">
-        ${formData.pedidos || 'Requer-se a fixação de fiança no valor de...'}
+        ${formData.pedidos || 'Requer-se a fixação de fiança no valor proposto...'}
     </div>
-
-    ${formData.valorFianca ? `
-    <div class="paragrafo">
-        <strong>VALOR DA FIANÇA PROPOSTO:</strong> R$ ${formData.valorFianca}
-    </div>
-    ` : ''}
 
     <div class="data-local">
         São Paulo, ${data}
@@ -3927,22 +3958,22 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     </div>
 
     <div class="paragrafo">
-        <strong>${formData.cliente || 'NOME DO CLIENTE'}</strong>, por meio de seu advogado, vem apresentar suas <strong>ALEGAÇÕES FINAIS</strong> nos presentes autos.
+        <strong>${formData.parte || 'NOME DA PARTE'}</strong>, portador do RG nº ${formData.parteRG || '00.000.000-0'}, por meio de seu advogado, vem apresentar suas <strong>ALEGAÇÕES FINAIS</strong> nos autos do processo nº ${formData.numeroProcesso || '[NÚMERO DO PROCESSO]'}.
     </div>
 
-    <div class="secao">I - DOS FATOS PROVADOS</div>
+    <div class="secao">I - RESUMO DOS FATOS</div>
     <div class="paragrafo">
-        ${formData.fatosProvados || 'Durante a instrução processual, restaram demonstrados os seguintes fatos...'}
+        ${formData.resumoFatos || 'Durante a instrução processual, restaram demonstrados os seguintes fatos...'}
     </div>
 
-    <div class="secao">II - DO DIREITO APLICÁVEL</div>
+    <div class="secao">II - DA ARGUMENTAÇÃO JURÍDICA</div>
     <div class="paragrafo">
-        ${formData.direitoAplicavel || 'Com base nas provas produzidas, aplica-se ao caso...'}
+        ${formData.argumentacao || 'Com base nas provas produzidas, aplica-se ao caso...'}
     </div>
 
-    <div class="secao">III - DAS CONCLUSÕES</div>
+    <div class="secao">III - DOS PEDIDOS FINAIS</div>
     <div class="paragrafo">
-        ${formData.conclusoes || 'Diante do exposto, requer-se a procedência dos pedidos...'}
+        ${formData.pedidos || 'Diante do exposto, requer-se...'}
     </div>
 
     <div class="data-local">
@@ -3968,22 +3999,22 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     </div>
 
     <div class="paragrafo">
-        <strong>${formData.cliente || 'NOME DO CLIENTE'}</strong>, por meio de seu advogado, vem requerer a produção das seguintes provas:
+        <strong>${formData.requerente || 'NOME DO REQUERENTE'}</strong>, portador do RG nº ${formData.requerenteRG || '00.000.000-0'}, por meio de seu advogado, vem requerer a produção das seguintes provas nos autos do processo nº ${formData.numeroProcesso || '[NÚMERO DO PROCESSO]'}:
     </div>
 
-    <div class="secao">I - PROVA TESTEMUNHAL</div>
+    <div class="secao">I - DAS PROVAS SOLICITADAS</div>
     <div class="paragrafo">
-        ${formData.provaTestemunhal || 'Requer-se a oitiva das seguintes testemunhas...'}
+        ${formData.provasSolicitadas || 'Requer-se a produção das seguintes provas...'}
     </div>
 
-    <div class="secao">II - PROVA PERICIAL</div>
+    <div class="secao">II - DA JUSTIFICATIVA</div>
     <div class="paragrafo">
-        ${formData.provaPericial || 'Requer-se a realização de perícia para...'}
+        ${formData.justificativa || 'A produção das provas solicitadas justifica-se por...'}
     </div>
 
-    <div class="secao">III - PROVA DOCUMENTAL</div>
+    <div class="secao">III - DOS PEDIDOS</div>
     <div class="paragrafo">
-        ${formData.provaDocumental || 'Requer-se a juntada dos seguintes documentos...'}
+        ${formData.pedidos || 'Requer-se o deferimento da produção das provas solicitadas...'}
     </div>
 
     <div class="data-local">
@@ -4005,26 +4036,31 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     </div>
 
     <div class="titulo-documento">
-        REQUERIMENTO DE PORTE DE ARMA
+        REQUERIMENTO DE PORTE DE ARMA DE FOGO
     </div>
 
     <div class="paragrafo">
-        <strong>${formData.requerente || 'NOME DO REQUERENTE'}</strong>, brasileiro, portador do CPF nº ${formData.cpf || '000.000.000-00'}, vem requerer a concessão de porte de arma de fogo.
+        <strong>${formData.requerente || 'NOME DO REQUERENTE'}</strong>, portador do RG nº ${formData.requerenteRG || '00.000.000-0'}, profissão ${formData.profissao || '[PROFISSÃO]'}, residente e domiciliado à ${formData.endereco || '[ENDEREÇO COMPLETO]'}, vem requerer a concessão de porte de arma de fogo.
     </div>
 
-    <div class="secao">I - DA NECESSIDADE</div>
+    <div class="secao">I - DA MOTIVAÇÃO PARA O PORTE</div>
     <div class="paragrafo">
-        ${formData.necessidade || 'A necessidade do porte de arma justifica-se por...'}
+        ${formData.motivacao || 'A necessidade do porte de arma justifica-se por...'}
     </div>
 
-    <div class="secao">II - DOS REQUISITOS</div>
+    <div class="secao">II - DA EXPERIÊNCIA COM ARMAS DE FOGO</div>
     <div class="paragrafo">
-        ${formData.requisitos || 'O requerente preenche todos os requisitos legais...'}
+        ${formData.experiencia || 'O requerente possui a seguinte experiência com armas de fogo...'}
     </div>
 
-    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="secao">III - DOS ANTECEDENTES CRIMINAIS</div>
     <div class="paragrafo">
-        ${formData.pedidos || 'Requer-se a concessão do porte de arma...'}
+        ${formData.antecedentes || 'Declaro não possuir antecedentes criminais...'}
+    </div>
+
+    <div class="secao">IV - DOS PEDIDOS</div>
+    <div class="paragrafo">
+        ${formData.pedidos || 'Requer-se a concessão do porte de arma de fogo...'}
     </div>
 
     <div class="data-local">
@@ -4050,20 +4086,35 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     </div>
 
     <div class="paragrafo">
-        <strong>${formData.requerente || 'NOME DO REQUERENTE'}</strong>, por meio de seu advogado, vem requerer sua <strong>REABILITAÇÃO CRIMINAL</strong>.
+        <strong>${formData.requerente || 'NOME DO REQUERENTE'}</strong>, portador do RG nº ${formData.requerenteRG || '00.000.000-0'}, por meio de seu advogado, vem requerer sua <strong>REABILITAÇÃO CRIMINAL</strong>.
     </div>
 
-    <div class="secao">I - DOS FATOS</div>
+    <div class="secao">I - DOS CRIMES/PROCESSOS ANTERIORES</div>
     <div class="paragrafo">
-        ${formData.fatos || 'O requerente foi condenado por...'}
+        ${formData.crimesAnteriores || 'O requerente foi condenado por...'}
     </div>
 
-    <div class="secao">II - DOS REQUISITOS</div>
+    <div class="secao">II - DO TEMPO DECORRIDO</div>
     <div class="paragrafo">
-        ${formData.requisitos || 'Estão preenchidos todos os requisitos do art. 94 do CP...'}
+        ${formData.tempoDecorrido || 'Transcorreu o prazo de...'}
     </div>
 
-    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="secao">III - DO COMPORTAMENTO POSTERIOR</div>
+    <div class="paragrafo">
+        ${formData.comportamento || 'Após o cumprimento da pena, o requerente apresentou...'}
+    </div>
+
+    <div class="secao">IV - DAS EVIDÊNCIAS DE REABILITAÇÃO</div>
+    <div class="paragrafo">
+        ${formData.reabilitacao || 'As evidências de reabilitação são...'}
+    </div>
+
+    <div class="secao">V - DA FUNDAMENTAÇÃO LEGAL</div>
+    <div class="paragrafo">
+        ${formData.fundamentacao || 'Estão preenchidos todos os requisitos legais...'}
+    </div>
+
+    <div class="secao">VI - DOS PEDIDOS</div>
     <div class="paragrafo">
         ${formData.pedidos || 'Requer-se a concessão da reabilitação criminal...'}
     </div>
@@ -4091,25 +4142,23 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
     </div>
 
     <div class="paragrafo">
-        <strong>${formData.cliente || 'NOME DO CLIENTE'}</strong>, por meio de seu advogado, vem opor <strong>EMBARGOS DE DECLARAÇÃO</strong> contra a decisão proferida nos autos.
+        <strong>${formData.embargante || 'NOME DO EMBARGANTE'}</strong>, portador do RG nº ${formData.embarganteRG || '00.000.000-0'}, por meio de seu advogado, vem opor <strong>EMBARGOS DE DECLARAÇÃO</strong> contra a decisão proferida nos autos do processo nº ${formData.numeroProcesso || '[NÚMERO DO PROCESSO]'}.
     </div>
 
-    <div class="secao">I - DA OMISSÃO</div>
+    <div class="secao">I - DA DECISÃO EMBARGADA</div>
     <div class="paragrafo">
-        ${formData.omissao || 'A decisão embargada é omissa quanto a...'}
+        ${formData.decisaoEmbargada || 'A decisão embargada apresenta...'}
     </div>
 
-    <div class="secao">II - DA CONTRADIÇÃO</div>
+    <div class="secao">II - DO VÍCIO IDENTIFICADO</div>
     <div class="paragrafo">
-        ${formData.contradicao || 'Verifica-se contradição na decisão...'}
+        ${formData.tipoVicio === 'omissao' ? 'A decisão é omissa quanto a...' : 
+          formData.tipoVicio === 'contradicao' ? 'Verifica-se contradição na decisão...' :
+          formData.tipoVicio === 'obscuridade' ? 'A decisão é obscura no que se refere a...' :
+          'A decisão apresenta vício que necessita correção...'}
     </div>
 
-    <div class="secao">III - DA OBSCURIDADE</div>
-    <div class="paragrafo">
-        ${formData.obscuridade || 'A decisão é obscura no que se refere a...'}
-    </div>
-
-    <div class="secao">IV - DOS PEDIDOS</div>
+    <div class="secao">III - DOS PEDIDOS</div>
     <div class="paragrafo">
         ${formData.pedidos || 'Requer-se o acolhimento dos embargos para...'}
     </div>
@@ -4213,9 +4262,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 // Coletar dados do formulário
                 const formData = {};
                 template.fields.forEach(field => {
-                    const element = document.getElementById(field.id);
+                    const element = document.getElementById(`field-${field.name}`);
                     if (element) {
-                        formData[field.id] = element.value || field.defaultValue || '';
+                        formData[field.name] = element.value || '';
                     }
                 });
                 
