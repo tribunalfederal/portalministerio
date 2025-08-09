@@ -13,9 +13,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
         :root {
-            --primary-blue: #1e40af;
+            --primary-blue: #000;
             --secondary-blue: #3b82f6;
-            --accent-red: #dc2626;
+            --accent-red: #000;
             --dark-bg: #0f172a;
             --card-bg: rgba(255, 255, 255, 0.1);
             --hover-bg: rgba(255, 255, 255, 0.15);
@@ -92,13 +92,13 @@
         }
         
         .btn-secondary {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            background: linear-gradient(135deg, #000 0%, #b91c1c 100%);
             color: white;
-            border: 1px solid #dc2626;
+            border: 1px solid #000;
         }
         
         .btn-secondary:hover {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: linear-gradient(135deg, #ef4444 0%, #000 100%);
             transform: translateY(-1px);
             box-shadow: 0 8px 16px rgba(220, 38, 38, 0.3);
         }
@@ -1748,10 +1748,27 @@
             janela.print();
         }
 
-        // ===== DOCUMENTOS ESPECÍFICOS ÚNICOS =====
+        // Função para obter dados do advogado logado
+        function obterDadosAdvogado() {
+            // Aqui você pode integrar com sistema de login
+            // Por enquanto retorna dados padrão que podem ser editados
+            return {
+                nome: localStorage.getItem('advogado_nome') || 'Dr(a). [NOME DO ADVOGADO]',
+                oab: localStorage.getItem('advogado_oab') || '[UF] nº [NÚMERO]',
+                cidade: localStorage.getItem('advogado_cidade') || '[CIDADE]'
+            };
+        }
+
+        // Função para definir dados do advogado (pode ser chamada no login)
+        function definirDadosAdvogado(nome, oab, cidade) {
+            localStorage.setItem('advogado_nome', nome);
+            localStorage.setItem('advogado_oab', oab);
+            localStorage.setItem('advogado_cidade', cidade);
+        }
 
         // PETIÇÃO INICIAL - Documento específico único
         function criarPeticaoInicialEspecifica() {
+            const dadosAdvogado = obterDadosAdvogado();
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
                     <!-- Cabeçalho do Documento -->
@@ -1766,33 +1783,33 @@
                     <!-- Conteúdo da Petição -->
                     <div class="space-y-6 text-justify">
                         <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA 
-                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[COMARCA/JUÍZO]</span></p>
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[COMARCA/JUÍZO]</span></p>
                         
                         <div class="my-6">
-                            <p><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[NOME DO AUTOR]</span>, 
-                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[QUALIFICAÇÃO COMPLETA]</span>, 
+                            <p><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO AUTOR]</span>, 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[QUALIFICAÇÃO COMPLETA]</span>, 
                             residente e domiciliado(a) à 
-                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[ENDEREÇO COMPLETO]</span>, 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[ENDEREÇO COMPLETO]</span>, 
                             vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, propor a presente</p>
                             
-                            <h3 class="text-center text-lg font-bold my-4">AÇÃO <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[TIPO DE AÇÃO]</span></h3>
+                            <h3 class="text-center text-lg font-bold my-4">AÇÃO <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[TIPO DE AÇÃO]</span></h3>
                             
-                            <p>em face de <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[NOME DO RÉU]</span></strong>, 
-                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[QUALIFICAÇÃO DO RÉU]</span>, 
+                            <p>em face de <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO RÉU]</span></strong>, 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[QUALIFICAÇÃO DO RÉU]</span>, 
                             pelos fatos e fundamentos jurídicos a seguir expostos:</p>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">I - DOS FATOS</h3>
                             <div class="border border-gray-300 p-4 min-h-32">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">Narre aqui os fatos que deram origem à demanda, de forma clara, cronológica e detalhada, apresentando todas as circunstâncias relevantes para o deslinde da questão. Inclua datas, locais, pessoas envolvidas e documentos pertinentes.</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Narre aqui os fatos que deram origem à demanda, de forma clara, cronológica e detalhada, apresentando todas as circunstâncias relevantes para o deslinde da questão. Inclua datas, locais, pessoas envolvidas e documentos pertinentes.</span>
                             </div>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">II - DO DIREITO</h3>
                             <div class="border border-gray-300 p-4 min-h-32">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">Apresente aqui a fundamentação jurídica da pretensão, citando dispositivos legais, jurisprudência e doutrina aplicáveis ao caso concreto. Demonstre o direito violado ou ameaçado e a necessidade da tutela jurisdicional.</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Apresente aqui a fundamentação jurídica da pretensão, citando dispositivos legais, jurisprudência e doutrina aplicáveis ao caso concreto. Demonstre o direito violado ou ameaçado e a necessidade da tutela jurisdicional.</span>
                             </div>
                         </div>
 
@@ -1800,14 +1817,14 @@
                             <h3 class="text-lg font-bold mb-3">III - DOS PEDIDOS</h3>
                             <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
                             <div class="border border-gray-300 p-4 min-h-24">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">a) Cite o(a) requerido(a) para responder aos termos da presente ação no prazo legal;<br>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">a) Cite o(a) requerido(a) para responder aos termos da presente ação no prazo legal;<br>
                                 b) Ao final, julgue totalmente procedente o pedido formulado;<br>
                                 c) Condene o(a) requerido(a) ao pagamento das custas processuais e honorários advocatícios.</span>
                             </div>
                         </div>
 
                         <div class="my-6">
-                            <p><strong>Dá-se à causa o valor de R$ <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[VALOR DA CAUSA]</span>.</strong></p>
+                            <p><strong>Dá-se à causa o valor de R$ <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[VALOR DA CAUSA]</span>.</strong></p>
                         </div>
 
                         <div class="my-6">
@@ -1818,12 +1835,12 @@
                         <!-- Rodapé -->
                         <div class="mt-12 text-center">
                             <p class="mb-8">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[Cidade]</span>, 
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.cidade}</span>, 
                                 ${new Date().toLocaleDateString('pt-BR')}.
                             </p>
                             <div class="border-t border-gray-400 w-64 mx-auto pt-2">
-                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[NOME DO ADVOGADO]</span></p>
-                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[UF]</span> nº <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[NÚMERO]</span></p>
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
                             </div>
                         </div>
                     </div>
@@ -1833,6 +1850,7 @@
 
         // RECURSO DE APELAÇÃO - Documento específico único
         function criarRecursoApelacaoEspecifico() {
+            const dadosAdvogado = obterDadosAdvogado();
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
                     <!-- Cabeçalho do Documento -->
@@ -1847,44 +1865,44 @@
                     <!-- Conteúdo do Recurso -->
                     <div class="space-y-6 text-justify">
                         <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DESEMBARGADOR(A) RELATOR(A) DO 
-                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[TRIBUNAL]</span></p>
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[TRIBUNAL]</span></p>
                         
                         <div class="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded">
-                            <p><strong>Processo nº:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[NÚMERO DO PROCESSO]</span></p>
-                            <p><strong>Comarca:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[COMARCA DE ORIGEM]</span></p>
-                            <p><strong>Apelante:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[NOME DO APELANTE]</span></p>
-                            <p><strong>Apelado:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[NOME DO APELADO]</span></p>
+                            <p><strong>Processo nº:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">[NÚMERO DO PROCESSO]</span></p>
+                            <p><strong>Comarca:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">[COMARCA DE ORIGEM]</span></p>
+                            <p><strong>Apelante:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">[NOME DO APELANTE]</span></p>
+                            <p><strong>Apelado:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">[NOME DO APELADO]</span></p>
                         </div>
 
                         <div class="my-6">
-                            <p><strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[APELANTE]</span></strong>, 
+                            <p><strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">[APELANTE]</span></strong>, 
                             já qualificado nos autos do processo em epígrafe, vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, interpor o presente</p>
                             
                             <h3 class="text-center text-lg font-bold my-4">RECURSO DE APELAÇÃO</h3>
                             
                             <p>contra a r. sentença proferida em 
-                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[DATA DA SENTENÇA]</span>, 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">[DATA DA SENTENÇA]</span>, 
                             pelas razões de fato e de direito a seguir expostas:</p>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">I - DO CABIMENTO E TEMPESTIVIDADE</h3>
                             <div class="border border-gray-300 p-4 min-h-24">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">O presente recurso é cabível nos termos do art. 1009 do CPC, sendo tempestivo conforme certidão de publicação em [data]. O preparo foi devidamente recolhido conforme comprovante anexo.</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">O presente recurso é cabível nos termos do art. 1009 do CPC, sendo tempestivo conforme certidão de publicação em [data]. O preparo foi devidamente recolhido conforme comprovante anexo.</span>
                             </div>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">II - DOS ERROS DE FATO E DE DIREITO</h3>
                             <div class="border border-gray-300 p-4 min-h-32">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">Demonstre aqui os erros de fato e de direito identificados na sentença recorrida, apontando especificamente os vícios que maculam a decisão e prejudicam o direito do apelante.</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Demonstre aqui os erros de fato e de direito identificados na sentença recorrida, apontando especificamente os vícios que maculam a decisão e prejudicam o direito do apelante.</span>
                             </div>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">III - DA ARGUMENTAÇÃO JURÍDICA</h3>
                             <div class="border border-gray-300 p-4 min-h-32">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">Apresente aqui os fundamentos jurídicos que sustentam o pedido de reforma da decisão, citando legislação aplicável, jurisprudência consolidada e doutrina pertinente ao caso.</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Apresente aqui os fundamentos jurídicos que sustentam o pedido de reforma da decisão, citando legislação aplicável, jurisprudência consolidada e doutrina pertinente ao caso.</span>
                             </div>
                         </div>
 
@@ -1892,7 +1910,7 @@
                             <h3 class="text-lg font-bold mb-3">IV - DO PEDIDO</h3>
                             <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
                             <div class="border border-gray-300 p-4 min-h-24">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">a) Conhecer do presente recurso por atender a todos os requisitos legais;<br>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">a) Conhecer do presente recurso por atender a todos os requisitos legais;<br>
                                 b) Dar-lhe provimento para reformar integralmente a sentença recorrida;<br>
                                 c) Julgar procedente o pedido formulado pelo apelante.</span>
                             </div>
@@ -1905,12 +1923,12 @@
                         <!-- Rodapé -->
                         <div class="mt-12 text-center">
                             <p class="mb-8">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[Cidade]</span>, 
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">[Cidade]</span>, 
                                 ${new Date().toLocaleDateString('pt-BR')}.
                             </p>
                             <div class="border-t border-gray-400 w-64 mx-auto pt-2">
-                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[NOME DO ADVOGADO]</span></p>
-                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[UF]</span> nº <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[NÚMERO]</span></p>
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
                             </div>
                         </div>
                     </div>
@@ -1920,6 +1938,7 @@
 
         // HABEAS CORPUS - Documento específico único
         function criarHabeasCorpusEspecifico() {
+            const dadosAdvogado = obterDadosAdvogado();
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
                     <div class="text-center mb-8 border-b-2 border-red-500 pb-4">
@@ -1932,25 +1951,25 @@
                         <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO</p>
                         <div class="my-6">
                             <h3 class="text-center text-lg font-bold my-4">HABEAS CORPUS</h3>
-                            <p><strong>Impetrante:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[IMPETRANTE]</span></p>
-                            <p><strong>Paciente:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[PACIENTE]</span></p>
+                            <p><strong>Impetrante:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                            <p><strong>Paciente:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">[PACIENTE]</span></p>
                         </div>
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">I - DOS FATOS</h3>
                             <div class="border border-gray-300 p-4 min-h-32">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">Narre os fatos que demonstram a ilegalidade ou abuso de poder...</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Narre os fatos que demonstram a ilegalidade ou abuso de poder...</span>
                             </div>
                         </div>
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">II - DO PEDIDO</h3>
                             <div class="border border-gray-300 p-4 min-h-24">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">a) Conceder a ordem de habeas corpus;<br>b) Determinar a soltura do paciente;</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">a) Conceder a ordem de habeas corpus;<br>b) Determinar a soltura do paciente;</span>
                             </div>
                         </div>
                         <div class="mt-12 text-center">
                             <div class="border-t border-gray-400 w-64 mx-auto pt-2">
-                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[ADVOGADO]</span></p>
-                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[UF]</span></p>
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
                             </div>
                         </div>
                     </div>
@@ -1959,14 +1978,778 @@
         }
 
         // Demais documentos específicos únicos
-        function criarContestacaoEspecifica() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-purple-800">CONTESTAÇÃO</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
-        function criarLiberdadeProvisoriaEspecifica() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-yellow-600">LIBERDADE PROVISÓRIA</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
-        function criarPeticaoFiancaEspecifica() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-green-600">PETIÇÃO DE FIANÇA</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
-        function criarAlegacoesFinaisEspecificas() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-indigo-600">ALEGAÇÕES FINAIS</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
-        function criarRequerimentoProvasEspecifico() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-orange-600">REQUERIMENTO DE PROVAS</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
-        function criarPorteArmasEspecifico() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-gray-600">PORTE DE ARMAS</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
-        function criarLimpezaFichaEspecifica() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-pink-600">LIMPEZA DE FICHA</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
-        function criarEmbargosDeclaracaoEspecifico() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-yellow-600">EMBARGOS DE DECLARAÇÃO</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
+        function criarContestacaoEspecifica() { 
+            const dadosAdvogado = obterDadosAdvogado();
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <!-- Cabeçalho do Documento -->
+                    <div class="text-center mb-8 border-b-2 border-purple-500 pb-4">
+                        <div class="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">CONTESTAÇÃO</h2>
+                    </div>
+
+                    <!-- Conteúdo da Contestação -->
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA 
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[COMARCA/JUÍZO]</span></p>
+                        
+                        <div class="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded">
+                            <p><strong>Processo nº:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NÚMERO DO PROCESSO]</span></p>
+                            <p><strong>Autor:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO AUTOR]</span></p>
+                            <p><strong>Réu:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO RÉU]</span></p>
+                            <p><strong>Ação:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[TIPO DE AÇÃO]</span></p>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO RÉU]</span></strong>, 
+                            já qualificado nos autos do processo em epígrafe, vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, apresentar</p>
+                            
+                            <h3 class="text-center text-lg font-bold my-4">CONTESTAÇÃO</h3>
+                            
+                            <p>à ação <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[TIPO DE AÇÃO]</span> 
+                            proposta por <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO AUTOR]</span></strong>, 
+                            tempestivamente, pelas razões de fato e de direito a seguir expostas:</p>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - DA PRELIMINAR DE ILEGITIMIDADE (se aplicável)</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Sustente aqui eventual ilegitimidade ativa ou passiva, falta de interesse de agir ou impossibilidade jurídica do pedido, demonstrando a ausência dos pressupostos processuais necessários.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - DO MÉRITO</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Refute aqui os fatos alegados pelo autor, apresente a versão dos fatos sob a ótica do réu, demonstre a improcedência do pedido através de fundamentação jurídica sólida, citando legislação, jurisprudência e doutrina aplicáveis.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">III - DO PEDIDO CONTRAPOSTO (se aplicável)</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Caso seja o caso, formule aqui pedido contraposto contra o autor, demonstrando os fundamentos jurídicos e o direito do réu de obter tutela jurisdicional.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">IV - DOS PEDIDOS</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">a) Acolher as preliminares arguidas, extinguindo o processo sem resolução do mérito;<br>
+                                b) Subsidiariamente, julgar totalmente improcedente o pedido formulado pelo autor;<br>
+                                c) Condenar o autor ao pagamento das custas processuais e honorários advocatícios;</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <p>Protesta-se por todos os meios de prova em direito admitidas, especialmente prova documental, testemunhal, pericial e depoimento pessoal do autor.</p>
+                            <p class="mt-4">Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="mt-12 text-center">
+                            <p class="mb-8">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.cidade}</span>, 
+                                ${new Date().toLocaleDateString('pt-BR')}.
+                            </p>
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        function criarLiberdadeProvisoriaEspecifica() { 
+            const dadosAdvogado = obterDadosAdvogado();
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <!-- Cabeçalho do Documento -->
+                    <div class="text-center mb-8 border-b-2 border-yellow-500 pb-4">
+                        <div class="bg-gradient-to-r from-yellow-600 to-yellow-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">REQUERIMENTO DE LIBERDADE PROVISÓRIA</h2>
+                    </div>
+
+                    <!-- Conteúdo do Requerimento -->
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA 
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[VARA CRIMINAL/JUÍZO]</span></p>
+                        
+                        <div class="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded">
+                            <p><strong>Processo nº:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NÚMERO DO PROCESSO]</span></p>
+                            <p><strong>Investigado/Acusado:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO CUSTODIADO]</span></p>
+                            <p><strong>Tipo Penal:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[ARTIGO E CRIME IMPUTADO]</span></p>
+                            <p><strong>Data da Prisão:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[DATA DA PRISÃO]</span></p>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong>${dadosAdvogado.nome}</strong>, advogado inscrito na OAB sob nº ${dadosAdvogado.oab}, 
+                            vem, respeitosamente, à presença de Vossa Excelência, requerer a concessão de</p>
+                            
+                            <h3 class="text-center text-lg font-bold my-4">LIBERDADE PROVISÓRIA</h3>
+                            
+                            <p>em favor de <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO CUSTODIADO]</span></strong>, 
+                            pelas razões de fato e de direito a seguir expostas:</p>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - DOS FATOS</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Narre aqui sucintamente os fatos que levaram à prisão preventiva do custodiado, contextualizando a situação processual e as circunstâncias da custódia.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - DA AUSÊNCIA DOS REQUISITOS DA PRISÃO PREVENTIVA</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Demonstre aqui a ausência dos requisitos do art. 312 do CPP (garantia da ordem pública, da ordem econômica, por conveniência da instrução criminal ou para assegurar a aplicação da lei penal), bem como a desnecessidade da custódia cautelar.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">III - DOS REQUISITOS PARA LIBERDADE PROVISÓRIA</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Demonstre que o custodiado possui residência fixa, trabalho lícito, bons antecedentes, não oferece perigo à ordem pública e se compromete a comparecer aos atos processuais. Mencione vínculos familiares e sociais que garantam o cumprimento das medidas cautelares.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">IV - DAS MEDIDAS CAUTELARES PROPOSTAS</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Proponha aqui medidas cautelares alternativas à prisão (art. 319 do CPP): comparecimento mensal, proibição de ausentar-se da comarca, recolhimento domiciliar, suspensão de atividades, etc.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">V - DOS PEDIDOS</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">a) Conceder a liberdade provisória do custodiado;<br>
+                                b) Fixar as medidas cautelares adequadas e necessárias;<br>
+                                c) Expedir o competente alvará de soltura;</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <p>Protesta-se por todos os meios de prova em direito admitidas.</p>
+                            <p class="mt-4">Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="mt-12 text-center">
+                            <p class="mb-8">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.cidade}</span>, 
+                                ${new Date().toLocaleDateString('pt-BR')}.
+                            </p>
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        function criarPeticaoFiancaEspecifica() { 
+            const dadosAdvogado = obterDadosAdvogado();
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <!-- Cabeçalho do Documento -->
+                    <div class="text-center mb-8 border-b-2 border-green-500 pb-4">
+                        <div class="bg-gradient-to-r from-green-600 to-green-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">REQUERIMENTO DE FIANÇA</h2>
+                    </div>
+
+                    <!-- Conteúdo do Requerimento -->
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) DELEGADO(A) DE POLÍCIA / JUIZ(A) DE DIREITO DA 
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[DELEGACIA/VARA CRIMINAL]</span></p>
+                        
+                        <div class="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded">
+                            <p><strong>Boletim de Ocorrência:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NÚMERO DO BO]</span></p>
+                            <p><strong>Autuado:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO AUTUADO]</span></p>
+                            <p><strong>Tipo Penal:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[ARTIGO E CRIME]</span></p>
+                            <p><strong>Data do Flagrante:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[DATA]</span></p>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong>${dadosAdvogado.nome}</strong>, advogado inscrito na OAB sob nº ${dadosAdvogado.oab}, 
+                            constituído procurador de <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO AUTUADO]</span></strong>, 
+                            vem, respeitosamente, à presença de Vossa Senhoria, requerer a concessão de</p>
+                            
+                            <h3 class="text-center text-lg font-bold my-4">FIANÇA</h3>
+                            
+                            <p>em favor do autuado, pelas razões de fato e de direito a seguir expostas:</p>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - DO CABIMENTO DA FIANÇA</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">O crime imputado ao autuado é afiançável nos termos do art. 323 do CPP, não se enquadrando nas hipóteses de vedação do art. 323, incisos I a IV. A pena máxima prevista não excede 4 anos, sendo cabível a concessão de fiança.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - DOS ANTECEDENTES E CONDIÇÕES PESSOAIS</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">O autuado é pessoa de bons antecedentes, possui residência fixa, trabalho lícito, vínculos familiares e sociais na comarca, não oferecendo perigo à ordem pública ou risco de fuga.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">III - DO VALOR DA FIANÇA</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Considerando a situação econômica do autuado e os parâmetros do art. 325 do CPP, requer-se que a fiança seja fixada no valor de R$ <strong>[VALOR PROPOSTO]</strong>, valor compatível com suas condições financeiras.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">IV - DOS PEDIDOS</h3>
+                            <p>Diante do exposto, requer-se a Vossa Senhoria que se digne:</p>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">a) Conceder fiança ao autuado no valor proposto ou em valor que entender adequado;<br>
+                                b) Após o recolhimento da fiança, expedir o competente alvará de soltura;<br>
+                                c) Fixar as condições para o cumprimento da fiança;</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <p>Declara-se que o autuado se compromete a comparecer perante a autoridade sempre que for intimado, a não se ausentar da comarca sem autorização e a cumprir todas as condições impostas.</p>
+                            <p class="mt-4">Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="mt-12 text-center">
+                            <p class="mb-8">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.cidade}</span>, 
+                                ${new Date().toLocaleDateString('pt-BR')}.
+                            </p>
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        function criarAlegacoesFinaisEspecificas() { 
+            const dadosAdvogado = obterDadosAdvogado();
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <!-- Cabeçalho do Documento -->
+                    <div class="text-center mb-8 border-b-2 border-indigo-500 pb-4">
+                        <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">ALEGAÇÕES FINAIS</h2>
+                    </div>
+
+                    <!-- Conteúdo das Alegações -->
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA 
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[VARA CRIMINAL/JUÍZO]</span></p>
+                        
+                        <div class="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded">
+                            <p><strong>Processo nº:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NÚMERO DO PROCESSO]</span></p>
+                            <p><strong>Acusado:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO RÉU]</span></p>
+                            <p><strong>Tipo Penal:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[ARTIGO E CRIME]</span></p>
+                            <p><strong>Ministério Público:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[PROMOTOR(A)]</span></p>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong>${dadosAdvogado.nome}</strong>, advogado inscrito na OAB sob nº ${dadosAdvogado.oab}, 
+                            constituído defensor de <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO RÉU]</span></strong>, 
+                            vem, respeitosamente, à presença de Vossa Excelência, apresentar</p>
+                            
+                            <h3 class="text-center text-lg font-bold my-4">ALEGAÇÕES FINAIS</h3>
+                            
+                            <p>nos autos da ação penal em epígrafe, pelas razões de fato e de direito a seguir expostas:</p>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - DO RESUMO DOS FATOS</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Faça aqui um resumo sucinto dos fatos objeto da acusação, contextualizando o caso e as circunstâncias que levaram ao oferecimento da denúncia.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - DA ANÁLISE DAS PROVAS</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Analise aqui detalhadamente as provas produzidas durante a instrução, demonstrando contradições, inconsistências ou fragilidades que comprometem a acusação. Comente os depoimentos, documentos e perícias realizadas.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">III - DA TESE DEFENSIVA</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Apresente aqui a tese central da defesa: inexistência do fato, ausência de autoria, legítima defesa, estado de necessidade, inexigibilidade de conduta diversa, prescrição, ou qualquer outra excludente aplicável ao caso.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">IV - DO PRINCÍPIO DA PRESUNÇÃO DE INOCÊNCIA</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Invoque o princípio constitucional da presunção de inocência e do in dubio pro reo, demonstrando que as provas não são suficientes para uma condenação além de qualquer dúvida razoável.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">V - DOS PEDIDOS</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">a) Julgar totalmente improcedente a denúncia, absolvendo o acusado;<br>
+                                b) Subsidiariamente, reconhecer causa de diminuição de pena ou circunstâncias atenuantes;<br>
+                                c) Em caso de condenação, aplicar pena em regime aberto e com substituição por restritiva de direitos;</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <p>Protesta-se pelo julgamento favorável ao acusado, em observância aos princípios constitucionais e ao devido processo legal.</p>
+                            <p class="mt-4">Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="mt-12 text-center">
+                            <p class="mb-8">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.cidade}</span>, 
+                                ${new Date().toLocaleDateString('pt-BR')}.
+                            </p>
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        function criarRequerimentoProvasEspecifico() { 
+            const dadosAdvogado = obterDadosAdvogado();
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <!-- Cabeçalho do Documento -->
+                    <div class="text-center mb-8 border-b-2 border-orange-500 pb-4">
+                        <div class="bg-gradient-to-r from-orange-600 to-orange-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">REQUERIMENTO DE PRODUÇÃO DE PROVAS</h2>
+                    </div>
+
+                    <!-- Conteúdo do Requerimento -->
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA 
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[VARA/JUÍZO]</span></p>
+                        
+                        <div class="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded">
+                            <p><strong>Processo nº:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NÚMERO DO PROCESSO]</span></p>
+                            <p><strong>Requerente:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[PARTE REQUERENTE]</span></p>
+                            <p><strong>Requerido:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[PARTE REQUERIDA]</span></p>
+                            <p><strong>Fase Processual:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[INSTRUÇÃO/SANEAMENTO]</span></p>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong>${dadosAdvogado.nome}</strong>, advogado inscrito na OAB sob nº ${dadosAdvogado.oab}, 
+                            constituído procurador de <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO CLIENTE]</span></strong>, 
+                            vem, respeitosamente, à presença de Vossa Excelência, requerer a produção das seguintes provas:</p>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - PROVA TESTEMUNHAL</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Requer-se a oitiva das seguintes testemunhas:<br>
+                                1. [Nome completo] - [Qualificação] - [Endereço] - [Fatos que pode esclarecer]<br>
+                                2. [Nome completo] - [Qualificação] - [Endereço] - [Fatos que pode esclarecer]<br>
+                                3. [Nome completo] - [Qualificação] - [Endereço] - [Fatos que pode esclarecer]</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - PROVA PERICIAL</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Requer-se a realização de perícia [técnica/contábil/médica/etc.] para esclarecer [objeto da perícia], sendo essencial para a elucidação dos fatos e demonstração do direito pleiteado.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">III - PROVA DOCUMENTAL</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Requer-se a juntada/requisição dos seguintes documentos:<br>
+                                - [Documento 1] - [Local onde se encontra]<br>
+                                - [Documento 2] - [Local onde se encontra]<br>
+                                - [Documento 3] - [Local onde se encontra]</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">IV - DEPOIMENTO PESSOAL</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Requer-se a tomada do depoimento pessoal da parte contrária, nos termos do art. 385 do CPC, para esclarecimento dos fatos controvertidos.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">V - DA NECESSIDADE E PERTINÊNCIA</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">As provas requeridas são necessárias e pertinentes para o esclarecimento dos fatos controvertidos, sendo indispensáveis para a formação do convencimento judicial e para a demonstração do direito pleiteado.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">VI - DOS PEDIDOS</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">a) Deferir a produção das provas requeridas;<br>
+                                b) Designar audiência de instrução e julgamento;<br>
+                                c) Expedir os ofícios e mandados necessários;</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <p class="mt-4">Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="mt-12 text-center">
+                            <p class="mb-8">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.cidade}</span>, 
+                                ${new Date().toLocaleDateString('pt-BR')}.
+                            </p>
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        function criarPorteArmasEspecifico() { 
+            const dadosAdvogado = obterDadosAdvogado();
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <!-- Cabeçalho do Documento -->
+                    <div class="text-center mb-8 border-b-2 border-gray-500 pb-4">
+                        <div class="bg-gradient-to-r from-gray-600 to-gray-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">REQUERIMENTO DE PORTE DE ARMA</h2>
+                    </div>
+
+                    <!-- Conteúdo do Requerimento -->
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">ILMO. SR. DELEGADO-CHEFE DA DIVISÃO DE PRODUTOS CONTROLADOS DA POLÍCIA CIVIL DO ESTADO DE 
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[ESTADO]</span></p>
+                        
+                        <div class="my-6">
+                            <p><strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME COMPLETO]</span></strong>, 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NACIONALIDADE, ESTADO CIVIL, PROFISSÃO]</span>, 
+                            portador do RG nº <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[RG]</span> 
+                            e CPF nº <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[CPF]</span>, 
+                            residente e domiciliado à <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[ENDEREÇO COMPLETO]</span>, 
+                            vem, respeitosamente, à presença de Vossa Senhoria, requerer a concessão de</p>
+                            
+                            <h3 class="text-center text-lg font-bold my-4">PORTE DE ARMA DE FOGO</h3>
+                            
+                            <p>pelas razões a seguir expostas:</p>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - DA QUALIFICAÇÃO E DADOS PESSOAIS</h3>
+                            <div class="border border-gray-300 p-4 space-y-2">
+                                <p><strong>Nome:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME COMPLETO]</span></p>
+                                <p><strong>Data de Nascimento:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[DATA]</span></p>
+                                <p><strong>Profissão:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[PROFISSÃO]</span></p>
+                                <p><strong>Local de Trabalho:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[ENDEREÇO DO TRABALHO]</span></p>
+                                <p><strong>Telefone:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[TELEFONE]</span></p>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - DA JUSTIFICATIVA DA NECESSIDADE</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">O requerente exerce atividade de risco [descrever a atividade], estando constantemente exposto a situações que colocam em perigo sua integridade física e de terceiros. [Detalhar as circunstâncias que justificam a necessidade do porte, como: transporte de valores, exercício de profissão de risco, ameaças comprovadas, etc.]</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">III - DA CAPACIDADE TÉCNICA E PSICOLÓGICA</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">O requerente possui [certificado de curso de tiro, comprovação de aptidão técnica, exames psicológicos favoráveis], demonstrando capacidade para o manuseio seguro de arma de fogo.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">IV - DOS ANTECEDENTES</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">O requerente é pessoa de bons antecedentes, não possuindo qualquer envolvimento com a criminalidade, conforme certidões que acompanham o presente requerimento.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">V - DOS PEDIDOS</h3>
+                            <p>Diante do exposto, requer-se a Vossa Senhoria que se digne:</p>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">a) Deferir o presente requerimento, concedendo o porte de arma de fogo;<br>
+                                b) Expedir a competente autorização nos termos da legislação vigente;<br>
+                                c) Determinar as providências necessárias para a regularização do porte;</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong>Documentos anexos:</strong></p>
+                            <ul class="list-disc ml-6 space-y-1">
+                                <li>Cópia do RG e CPF</li>
+                                <li>Comprovante de residência</li>
+                                <li>Comprovante de capacidade técnica</li>
+                                <li>Atestado de aptidão psicológica</li>
+                                <li>Certidões de antecedentes criminais</li>
+                                <li>Comprovantes da necessidade do porte</li>
+                            </ul>
+                            <p class="mt-4">Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="mt-12 text-center">
+                            <p class="mb-8">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.cidade}</span>, 
+                                ${new Date().toLocaleDateString('pt-BR')}.
+                            </p>
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO REQUERENTE]</span></p>
+                                <p class="text-sm">Requerente</p>
+                                <br>
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                                <p class="text-sm">Advogado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        function criarLimpezaFichaEspecifica() { 
+            const dadosAdvogado = obterDadosAdvogado();
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <!-- Cabeçalho do Documento -->
+                    <div class="text-center mb-8 border-b-2 border-pink-500 pb-4">
+                        <div class="bg-gradient-to-r from-pink-600 to-pink-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">REQUERIMENTO DE EXCLUSÃO DE ANTECEDENTES CRIMINAIS</h2>
+                    </div>
+
+                    <!-- Conteúdo do Requerimento -->
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA 
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[VARA DE EXECUÇÕES CRIMINAIS]</span></p>
+                        
+                        <div class="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded">
+                            <p><strong>Processo nº:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NÚMERO DO PROCESSO]</span></p>
+                            <p><strong>Requerente:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO REQUERENTE]</span></p>
+                            <p><strong>Crime:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[TIPO PENAL]</span></p>
+                            <p><strong>Data da Condenação:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[DATA]</span></p>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO REQUERENTE]</span></strong>, 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[QUALIFICAÇÃO COMPLETA]</span>, 
+                            por intermédio de seu advogado signatário, vem, respeitosamente, à presença de Vossa Excelência, requerer a</p>
+                            
+                            <h3 class="text-center text-lg font-bold my-4">EXCLUSÃO DOS ANTECEDENTES CRIMINAIS</h3>
+                            
+                            <p>pelas razões de fato e de direito a seguir expostas:</p>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - DOS FATOS</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">O requerente foi condenado em [data] pela prática do crime previsto no art. [artigo] do Código Penal, tendo cumprido integralmente a pena imposta. Desde então, transcorreu o prazo legal para a reabilitação criminal.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - DO CUMPRIMENTO DA PENA</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">A pena foi integralmente cumprida em [período], não havendo qualquer pendência ou débito com a Justiça. O requerente cumpriu todas as obrigações impostas pela sentença condenatória.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">III - DO TRANSCURSO DO PRAZO LEGAL</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Nos termos do art. 93 do Código Penal, transcorreu o prazo de [2/4/8] anos desde o cumprimento ou extinção da pena, período durante o qual o requerente não praticou novo crime, demonstrando sua reabilitação social.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">IV - DA CONDUTA SOCIAL EXEMPLAR</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Durante todo o período pós-cumprimento da pena, o requerente manteve conduta ilibada, dedicando-se ao trabalho honesto e à vida familiar, comprovando sua completa ressocialização e merecimento da exclusão dos antecedentes.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">V - DO DIREITO À REABILITAÇÃO</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">A reabilitação é direito constitucional que visa permitir a reintegração social do indivíduo, removendo os efeitos da condenação. Preenchidos os requisitos legais, faz jus o requerente à exclusão de seus antecedentes criminais.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">VI - DOS PEDIDOS</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">a) Deferir o presente requerimento, declarando a reabilitação criminal do requerente;<br>
+                                b) Determinar a exclusão dos antecedentes criminais dos órgãos oficiais;<br>
+                                c) Expedir ofícios aos órgãos competentes para cumprimento da decisão;</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong>Documentos anexos:</strong></p>
+                            <ul class="list-disc ml-6 space-y-1">
+                                <li>Certidão de cumprimento da pena</li>
+                                <li>Certidões de antecedentes criminais atualizadas</li>
+                                <li>Comprovantes de boa conduta social</li>
+                                <li>Documentos pessoais</li>
+                            </ul>
+                            <p class="mt-4">Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="mt-12 text-center">
+                            <p class="mb-8">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.cidade}</span>, 
+                                ${new Date().toLocaleDateString('pt-BR')}.
+                            </p>
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        function criarEmbargosDeclaracaoEspecifico() { 
+            const dadosAdvogado = obterDadosAdvogado();
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <!-- Cabeçalho do Documento -->
+                    <div class="text-center mb-8 border-b-2 border-yellow-500 pb-4">
+                        <div class="bg-gradient-to-r from-yellow-600 to-yellow-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">EMBARGOS DE DECLARAÇÃO</h2>
+                    </div>
+
+                    <!-- Conteúdo dos Embargos -->
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA 
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[VARA/JUÍZO]</span></p>
+                        
+                        <div class="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded">
+                            <p><strong>Processo nº:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NÚMERO DO PROCESSO]</span></p>
+                            <p><strong>Embargante:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO EMBARGANTE]</span></p>
+                            <p><strong>Embargado:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO EMBARGADO]</span></p>
+                            <p><strong>Decisão:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[SENTENÇA/ACÓRDÃO/DECISÃO]</span></p>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[NOME DO EMBARGANTE]</span></strong>, 
+                            já qualificado nos autos do processo em epígrafe, vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, opor</p>
+                            
+                            <h3 class="text-center text-lg font-bold my-4">EMBARGOS DE DECLARAÇÃO</h3>
+                            
+                            <p>contra a <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[decisão/sentença/acórdão]</span></strong> 
+                            proferida em <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">[data]</span>, 
+                            pelos fundamentos a seguir expostos:</p>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - DA TEMPESTIVIDADE</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Os presentes embargos são tempestivos, sendo interpostos dentro do prazo de 5 (cinco) dias contados da publicação/intimação da decisão embargada, conforme certidão dos autos.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - DA OBSCURIDADE (se aplicável)</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">A decisão embargada apresenta obscuridade no tocante a [ponto específico], não sendo possível compreender exatamente o alcance da determinação judicial, o que prejudica o cumprimento adequado da decisão.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">III - DA CONTRADIÇÃO (se aplicável)</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Verifica-se contradição na decisão embargada, pois [demonstrar a contradição entre partes da decisão ou entre a fundamentação e o dispositivo], sendo necessário o esclarecimento para harmonizar o julgado.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">IV - DA OMISSÃO (se aplicável)</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">A decisão embargada incorreu em omissão ao deixar de se pronunciar sobre [ponto específico suscitado pelas partes], questão essencial para o deslinde da causa que deve ser objeto de manifestação judicial.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">V - DO ERRO MATERIAL (se aplicável)</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Verifica-se erro material na decisão embargada, especificamente [descrever o erro: data, nome, valor, cálculo, etc.], sendo necessária a correção para adequar a decisão aos fatos e ao direito.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">VI - DOS PEDIDOS</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">a) Conhecer dos presentes embargos de declaração por preencherem os requisitos legais;<br>
+                                b) No mérito, acolhê-los para sanar a [obscuridade/contradição/omissão/erro] apontada;<br>
+                                c) Esclarecer/retificar a decisão embargada nos termos pleiteados;</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <p>Os embargos não possuem caráter protelatório, visando apenas o aperfeiçoamento da prestação jurisdicional.</p>
+                            <p class="mt-4">Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="mt-12 text-center">
+                            <p class="mb-8">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.cidade}</span>, 
+                                ${new Date().toLocaleDateString('pt-BR')}.
+                            </p>
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
 
         // ===== FORMULÁRIOS ESPECÍFICOS PARA CADA DOCUMENTO =====
 
@@ -2562,8 +3345,8 @@
             return `
                 <div style="max-width: 800px; margin: 0 auto; font-family: 'Times New Roman', serif; line-height: 1.6; background: white; padding: 40px;">
                     <!-- Cabeçalho -->
-                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #1e40af; padding-bottom: 20px;">
-                        <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 15px; margin-bottom: 15px; border-radius: 8px;">
+                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #000; padding-bottom: 20px;">
+                        <div style="background: linear-gradient(135deg, #000 0%, #3b82f6 100%); color: white; padding: 15px; margin-bottom: 15px; border-radius: 8px;">
                             <h1 style="margin: 0; font-size: 28px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">PORTAL JURÍDICO DIGITAL</h1>
                             <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Sistema Integrado de Gestão Jurídica</p>
                         </div>
@@ -2691,8 +3474,8 @@
             return `
                 <div style="max-width: 800px; margin: 0 auto; font-family: 'Times New Roman', serif; line-height: 1.6; background: white; padding: 40px;">
                     <!-- Cabeçalho -->
-                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #dc2626; padding-bottom: 20px;">
-                        <div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; padding: 15px; margin-bottom: 15px; border-radius: 8px;">
+                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #000; padding-bottom: 20px;">
+                        <div style="background: linear-gradient(135deg, #000 0%, #ef4444 100%); color: white; padding: 15px; margin-bottom: 15px; border-radius: 8px;">
                             <h1 style="margin: 0; font-size: 28px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">PORTAL JURÍDICO DIGITAL</h1>
                             <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Sistema Integrado de Gestão Jurídica</p>
                         </div>
@@ -2765,28 +3548,28 @@
                 <div style="max-width: 800px; margin: 0 auto; padding: 40px; background: #fff; font-family: 'Times New Roman', serif; line-height: 1.6;">
                     ${criarCabecalhoOficial()}
                     
-                    <div style="text-align: center; margin-bottom: 40px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 20px; border-radius: 10px;">
+                    <div style="text-align: center; margin-bottom: 40px; background: linear-gradient(135deg, #000 0%, #3b82f6 100%); color: white; padding: 20px; border-radius: 10px;">
                         <h2 style="font-size: 24px; font-weight: bold; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); letter-spacing: 1px;">PETIÇÃO INICIAL</h2>
                         <div style="width: 80px; height: 3px; background: white; margin: 15px auto; border-radius: 2px;"></div>
                         <p style="margin: 0; font-size: 14px; opacity: 0.9;">Documento Oficial • Tribunal de Brasilândia</p>
                     </div>
 
-                    <div style="margin-bottom: 30px; background: #f9f9f9; border-left: 5px solid #1e40af; padding: 20px; border-radius: 5px;">
+                    <div style="margin-bottom: 30px; background: #f9f9f9; border-left: 5px solid #000; padding: 20px; border-radius: 5px;">
                         <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; font-weight: bold; width: 25%;">Processo nº:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #3b82f6 100%); color: white; font-weight: bold; width: 25%;">Processo nº:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">0001234-56.2025.8.26.0000</td>
                             </tr>
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; font-weight: bold;">Requerente:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #3b82f6 100%); color: white; font-weight: bold;">Requerente:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">________________</td>
                             </tr>
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; font-weight: bold;">RG:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #3b82f6 100%); color: white; font-weight: bold;">RG:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">________________</td>
                             </tr>
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; font-weight: bold;">Requerido:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #3b82f6 100%); color: white; font-weight: bold;">Requerido:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">________________</td>
                             </tr>
                         </table>
@@ -2795,31 +3578,31 @@
                     <div style="margin-bottom: 40px; text-align: justify; font-size: 14px; color: #333;">
                         <div style="background: #f8f8f8; border: 1px solid #ddd; border-radius: 10px; padding: 25px;">
                             <p style="text-indent: 50px; margin-bottom: 20px; font-weight: 500;">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; font-weight: bold; border-bottom: 1px dashed #1e40af;" title="Clique para editar">________________</span>, brasileiro, <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; font-weight: bold; border-bottom: 1px dashed #1e40af;" title="Clique para editar">estado civil</span>, <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; font-weight: bold; border-bottom: 1px dashed #1e40af;" title="Clique para editar">profissão</span>, portador do RG nº <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; font-weight: bold; border-bottom: 1px dashed #1e40af;" title="Clique para editar">________________</span>, residente e domiciliado na <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; font-weight: bold; border-bottom: 1px dashed #1e40af;" title="Clique para editar">________________</span>, por meio de seu advogado que esta subscreve, vem respeitosamente à presença de Vossa Excelência, propor a presente
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">________________</span>, brasileiro, <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">estado civil</span>, <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">profissão</span>, portador do RG nº <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">________________</span>, residente e domiciliado na <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">________________</span>, por meio de seu advogado que esta subscreve, vem respeitosamente à presença de Vossa Excelência, propor a presente
                             </p>
                             
-                            <h3 style="text-align: center; font-size: 18px; font-weight: bold; color: #1e40af; margin: 30px 0;">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; border-bottom: 1px dashed #1e40af;" title="Clique para editar">AÇÃO [TIPO DA AÇÃO]</span>
+                            <h3 style="text-align: center; font-size: 18px; font-weight: bold; color: #000; margin: 30px 0;">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; border-bottom: 1px dashed #000;" title="Clique para editar">AÇÃO [TIPO DA AÇÃO]</span>
                             </h3>
                             
                             <p style="text-indent: 50px; margin-bottom: 20px;">
-                                em face de <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; font-weight: bold; border-bottom: 1px dashed #1e40af;" title="Clique para editar">________________</span>, pelos fundamentos de fato e de direito a seguir expostos:
+                                em face de <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">________________</span>, pelos fundamentos de fato e de direito a seguir expostos:
                             </p>
                             
-                            <h4 style="font-weight: bold; color: #1e40af; margin: 25px 0 15px 0;">I - DOS FATOS</h4>
+                            <h4 style="font-weight: bold; color: #000; margin: 25px 0 15px 0;">I - DOS FATOS</h4>
                             <p style="text-indent: 50px; margin-bottom: 20px;">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; border-bottom: 1px dashed #1e40af;" title="Clique para editar">Descrever aqui os fatos que deram origem à demanda, de forma clara e objetiva, observando a ordem cronológica dos acontecimentos...</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Descrever aqui os fatos que deram origem à demanda, de forma clara e objetiva, observando a ordem cronológica dos acontecimentos...</span>
                             </p>
                             
-                            <h4 style="font-weight: bold; color: #1e40af; margin: 25px 0 15px 0;">II - DO DIREITO</h4>
+                            <h4 style="font-weight: bold; color: #000; margin: 25px 0 15px 0;">II - DO DIREITO</h4>
                             <p style="text-indent: 50px; margin-bottom: 20px;">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; border-bottom: 1px dashed #1e40af;" title="Clique para editar">Apresentar a fundamentação jurídica aplicável, citando artigos de lei, jurisprudência e doutrina pertinentes...</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Apresentar a fundamentação jurídica aplicável, citando artigos de lei, jurisprudência e doutrina pertinentes...</span>
                             </p>
                             
-                            <h4 style="font-weight: bold; color: #1e40af; margin: 25px 0 15px 0;">III - DOS PEDIDOS</h4>
+                            <h4 style="font-weight: bold; color: #000; margin: 25px 0 15px 0;">III - DOS PEDIDOS</h4>
                             <p style="margin-bottom: 15px;">Diante do exposto, requer-se:</p>
-                            <p style="margin-bottom: 10px;">a) <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; border-bottom: 1px dashed #1e40af;" title="Clique para editar">Pedido principal</span>;</p>
-                            <p style="margin-bottom: 10px;">b) <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; border-bottom: 1px dashed #1e40af;" title="Clique para editar">Pedidos secundários</span>;</p>
+                            <p style="margin-bottom: 10px;">a) <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Pedido principal</span>;</p>
+                            <p style="margin-bottom: 10px;">b) <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Pedidos secundários</span>;</p>
                             <p style="margin-bottom: 10px;">c) A condenação da parte requerida ao pagamento das custas processuais e honorários advocatícios;</p>
                             <p style="margin-bottom: 20px;">d) A produção de todas as provas em direito admitidas.</p>
                             
@@ -2906,28 +3689,28 @@
                 <div style="max-width: 800px; margin: 0 auto; padding: 40px; background: #fff; font-family: 'Times New Roman', serif; line-height: 1.6;">
                     ${criarCabecalhoOficial()}
                     
-                    <div style="text-align: center; margin-bottom: 40px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 20px; border-radius: 10px;">
+                    <div style="text-align: center; margin-bottom: 40px; background: linear-gradient(135deg, #000 0%, #10b981 100%); color: white; padding: 20px; border-radius: 10px;">
                         <h2 style="font-size: 24px; font-weight: bold; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); letter-spacing: 1px;">HABEAS CORPUS</h2>
                         <div style="width: 80px; height: 3px; background: white; margin: 15px auto; border-radius: 2px;"></div>
                         <p style="margin: 0; font-size: 14px; opacity: 0.9;">Art. 5º, LXVIII, CF • Liberdade de Locomoção</p>
                     </div>
 
-                    <div style="margin-bottom: 30px; background: #f9f9f9; border-left: 5px solid #059669; padding: 20px; border-radius: 5px;">
+                    <div style="margin-bottom: 30px; background: #f9f9f9; border-left: 5px solid #000; padding: 20px; border-radius: 5px;">
                         <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; font-weight: bold; width: 25%;">Paciente:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #10b981 100%); color: white; font-weight: bold; width: 25%;">Paciente:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">________________</td>
                             </tr>
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; font-weight: bold;">RG:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #10b981 100%); color: white; font-weight: bold;">RG:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">________________</td>
                             </tr>
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; font-weight: bold;">Autoridade:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #10b981 100%); color: white; font-weight: bold;">Autoridade:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">________________</td>
                             </tr>
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; font-weight: bold;">Local da Prisão:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #10b981 100%); color: white; font-weight: bold;">Local da Prisão:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">________________</td>
                             </tr>
                         </table>
@@ -2936,29 +3719,29 @@
                     <div style="margin-bottom: 40px; text-align: justify; font-size: 14px; color: #333;">
                         <div style="background: #f8f8f8; border: 1px solid #ddd; border-radius: 10px; padding: 25px;">
                             <p style="text-indent: 50px; margin-bottom: 20px; font-weight: 500;">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; font-weight: bold; border-bottom: 1px dashed #059669;" title="Clique para editar">________________</span>, por meio de seu advogado que esta subscreve, vem respeitosamente à presença de Vossa Excelência, impetrar o presente
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">________________</span>, por meio de seu advogado que esta subscreve, vem respeitosamente à presença de Vossa Excelência, impetrar o presente
                             </p>
                             
-                            <h3 style="text-align: center; font-size: 18px; font-weight: bold; color: #059669; margin: 30px 0;">HABEAS CORPUS</h3>
+                            <h3 style="text-align: center; font-size: 18px; font-weight: bold; color: #000; margin: 30px 0;">HABEAS CORPUS</h3>
                             
                             <p style="text-indent: 50px; margin-bottom: 20px;">
-                                em favor de <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; font-weight: bold; border-bottom: 1px dashed #059669;" title="Clique para editar">________________</span>, pelos fundamentos que passa a expor:
+                                em favor de <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">________________</span>, pelos fundamentos que passa a expor:
                             </p>
                             
-                            <h4 style="font-weight: bold; color: #059669; margin: 25px 0 15px 0;">I - DOS FATOS</h4>
+                            <h4 style="font-weight: bold; color: #000; margin: 25px 0 15px 0;">I - DOS FATOS</h4>
                             <p style="text-indent: 50px; margin-bottom: 20px;">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">Narrar os fatos que levaram à prisão do paciente e as circunstâncias que a tornam ilegal...</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Narrar os fatos que levaram à prisão do paciente e as circunstâncias que a tornam ilegal...</span>
                             </p>
                             
-                            <h4 style="font-weight: bold; color: #059669; margin: 25px 0 15px 0;">II - DA ILEGALIDADE</h4>
+                            <h4 style="font-weight: bold; color: #000; margin: 25px 0 15px 0;">II - DA ILEGALIDADE</h4>
                             <p style="text-indent: 50px; margin-bottom: 20px;">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">Demonstrar a ilegalidade ou abuso de poder na prisão, citando os dispositivos legais violados...</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Demonstrar a ilegalidade ou abuso de poder na prisão, citando os dispositivos legais violados...</span>
                             </p>
                             
-                            <h4 style="font-weight: bold; color: #059669; margin: 25px 0 15px 0;">III - DO PEDIDO</h4>
+                            <h4 style="font-weight: bold; color: #000; margin: 25px 0 15px 0;">III - DO PEDIDO</h4>
                             <p style="margin-bottom: 15px;">Diante do exposto, requer-se:</p>
                             <p style="margin-bottom: 10px;">a) A concessão da ordem de habeas corpus;</p>
-                            <p style="margin-bottom: 10px;">b) <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">A imediata soltura do paciente</span>;</p>
+                            <p style="margin-bottom: 10px;">b) <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">A imediata soltura do paciente</span>;</p>
                             <p style="margin-bottom: 20px;">c) Que se oficie à autoridade coatora para cumprimento da ordem.</p>
                             
                             <p style="text-align: center; font-weight: bold; margin: 30px 0;">Termos em que, Pede deferimento.</p>
@@ -2975,24 +3758,24 @@
                 <div style="max-width: 800px; margin: 0 auto; padding: 40px; background: #fff; font-family: 'Times New Roman', serif; line-height: 1.6;">
                     ${criarCabecalhoOficial()}
                     
-                    <div style="text-align: center; margin-bottom: 40px; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; padding: 20px; border-radius: 10px;">
+                    <div style="text-align: center; margin-bottom: 40px; background: linear-gradient(135deg, #000 0%, #ef4444 100%); color: white; padding: 20px; border-radius: 10px;">
                         <h2 style="font-size: 24px; font-weight: bold; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); letter-spacing: 1px;">CONTESTAÇÃO</h2>
                         <div style="width: 80px; height: 3px; background: white; margin: 15px auto; border-radius: 2px;"></div>
                         <p style="margin: 0; font-size: 14px; opacity: 0.9;">Resposta do Réu • Art. 297, CPC</p>
                     </div>
 
-                    <div style="margin-bottom: 30px; background: #f9f9f9; border-left: 5px solid #dc2626; padding: 20px; border-radius: 5px;">
+                    <div style="margin-bottom: 30px; background: #f9f9f9; border-left: 5px solid #000; padding: 20px; border-radius: 5px;">
                         <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; font-weight: bold; width: 25%;">Processo nº:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #ef4444 100%); color: white; font-weight: bold; width: 25%;">Processo nº:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">0001234-56.2025.8.26.0000</td>
                             </tr>
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; font-weight: bold;">Réu:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #ef4444 100%); color: white; font-weight: bold;">Réu:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">________________</td>
                             </tr>
                             <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; font-weight: bold;">Autor:</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; background: linear-gradient(135deg, #000 0%, #ef4444 100%); color: white; font-weight: bold;">Autor:</td>
                                 <td style="padding: 12px; border: 1px solid #ddd; cursor: pointer; background: white;" onclick="tornarEditavel(this)" title="Clique para editar">________________</td>
                             </tr>
                         </table>
@@ -3001,29 +3784,29 @@
                     <div style="margin-bottom: 40px; text-align: justify; font-size: 14px; color: #333;">
                         <div style="background: #f8f8f8; border: 1px solid #ddd; border-radius: 10px; padding: 25px;">
                             <p style="text-indent: 50px; margin-bottom: 20px; font-weight: 500;">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; font-weight: bold; border-bottom: 1px dashed #dc2626;" title="Clique para editar">________________</span>, por meio de seu advogado que esta subscreve, vem respeitosamente à presença de Vossa Excelência, apresentar
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">________________</span>, por meio de seu advogado que esta subscreve, vem respeitosamente à presença de Vossa Excelência, apresentar
                             </p>
                             
-                            <h3 style="text-align: center; font-size: 18px; font-weight: bold; color: #dc2626; margin: 30px 0;">CONTESTAÇÃO</h3>
+                            <h3 style="text-align: center; font-size: 18px; font-weight: bold; color: #000; margin: 30px 0;">CONTESTAÇÃO</h3>
                             
                             <p style="text-indent: 50px; margin-bottom: 20px;">
-                                à ação proposta por <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; font-weight: bold; border-bottom: 1px dashed #dc2626;" title="Clique para editar">________________</span>, pelos fundamentos que passa a expor:
+                                à ação proposta por <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">________________</span>, pelos fundamentos que passa a expor:
                             </p>
                             
-                            <h4 style="font-weight: bold; color: #dc2626; margin: 25px 0 15px 0;">I - DAS PRELIMINARES</h4>
+                            <h4 style="font-weight: bold; color: #000; margin: 25px 0 15px 0;">I - DAS PRELIMINARES</h4>
                             <p style="text-indent: 50px; margin-bottom: 20px;">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">Apresentar as questões preliminares processuais, se houver (ilegitimidade, incompetência, inépcia da inicial, etc.)...</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Apresentar as questões preliminares processuais, se houver (ilegitimidade, incompetência, inépcia da inicial, etc.)...</span>
                             </p>
                             
-                            <h4 style="font-weight: bold; color: #dc2626; margin: 25px 0 15px 0;">II - DO MÉRITO</h4>
+                            <h4 style="font-weight: bold; color: #000; margin: 25px 0 15px 0;">II - DO MÉRITO</h4>
                             <p style="text-indent: 50px; margin-bottom: 20px;">
-                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">Refutar os argumentos da petição inicial, apresentando a versão dos fatos e a fundamentação jurídica da defesa...</span>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Refutar os argumentos da petição inicial, apresentando a versão dos fatos e a fundamentação jurídica da defesa...</span>
                             </p>
                             
-                            <h4 style="font-weight: bold; color: #dc2626; margin: 25px 0 15px 0;">III - DA IMPROCEDÊNCIA</h4>
+                            <h4 style="font-weight: bold; color: #000; margin: 25px 0 15px 0;">III - DA IMPROCEDÊNCIA</h4>
                             <p style="margin-bottom: 15px;">Diante do exposto, requer-se:</p>
                             <p style="margin-bottom: 10px;">a) O acolhimento das preliminares arguidas;</p>
-                            <p style="margin-bottom: 10px;">b) <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">A total improcedência dos pedidos</span>;</p>
+                            <p style="margin-bottom: 10px;">b) <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">A total improcedência dos pedidos</span>;</p>
                             <p style="margin-bottom: 10px;">c) A condenação do autor ao pagamento das custas e honorários;</p>
                             <p style="margin-bottom: 20px;">d) A produção de todas as provas em direito admitidas.</p>
                             
@@ -3173,11 +3956,11 @@
 
         function criarCabecalhoOficial() {
             return `
-                <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px double #1e40af; padding-bottom: 30px; background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);">
+                <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px double #000; padding-bottom: 30px; background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);">
                     <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
                         <div style="text-align: center;">
-                            <h1 style="margin: 0; font-size: 20px; font-weight: bold; text-transform: uppercase; color: #1e40af; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">PODER JUDICIÁRIO</h1>
-                            <div style="width: 100%; height: 2px; background: linear-gradient(to right, transparent, #1e40af, transparent); margin: 10px 0;"></div>
+                            <h1 style="margin: 0; font-size: 20px; font-weight: bold; text-transform: uppercase; color: #000; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">PODER JUDICIÁRIO</h1>
+                            <div style="width: 100%; height: 2px; background: linear-gradient(to right, transparent, #000, transparent); margin: 10px 0;"></div>
                             <h2 style="margin: 8px 0; font-size: 16px; font-weight: bold; color: #2C1810;">TRIBUNAL DE JUSTIÇA DO ESTADO DE SÃO PAULO</h2>
                             <h3 style="margin: 8px 0; font-size: 14px; font-weight: bold; color: #2C1810;">COMARCA DE BRASILÂNDIA</h3>
                             <h4 style="margin: 8px 0; font-size: 12px; color: #555; font-style: italic;">1ª VARA CÍVEL</h4>
@@ -3191,12 +3974,12 @@
             return `
                 <div style="margin-top: 50px; text-align: center;">
                     <div style="background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%); border-radius: 10px; padding: 30px; border: 1px solid #ddd;">
-                        <p style="margin-bottom: 5px; font-size: 14px; color: #666;">Brasilândia, <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; font-weight: bold; border-bottom: 1px dashed #1e40af;" title="Clique para editar">${new Date().getDate()}</span> de <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; font-weight: bold; border-bottom: 1px dashed #1e40af;" title="Clique para editar">${new Date().toLocaleDateString('pt-BR', { month: 'long' })}</span> de <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; font-weight: bold; border-bottom: 1px dashed #1e40af;" title="Clique para editar">${new Date().getFullYear()}</span></p>
+                        <p style="margin-bottom: 5px; font-size: 14px; color: #666;">Brasilândia, <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">${new Date().getDate()}</span> de <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">${new Date().toLocaleDateString('pt-BR', { month: 'long' })}</span> de <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">${new Date().getFullYear()}</span></p>
                         <div style="margin: 40px 0;">
-                            <div style="width: 300px; height: 2px; background: #1e40af; margin: 0 auto;"></div>
+                            <div style="width: 300px; height: 2px; background: #000; margin: 0 auto;"></div>
                         </div>
-                        <p style="font-weight: bold; font-size: 16px; color: #1e40af; margin: 5px 0;"><span onclick="tornarEditavel(this)" style="cursor: pointer; border-bottom: 1px dashed #1e40af;" title="Clique para editar">Dr(a). Nome do Advogado</span></p>
-                        <p style="color: #666; font-size: 14px; margin: 0;">OAB/SP <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #1e40af; font-weight: bold; border-bottom: 1px dashed #1e40af;" title="Clique para editar">000.000</span></p>
+                        <p style="font-weight: bold; font-size: 16px; color: #000; margin: 5px 0;"><span onclick="tornarEditavel(this)" style="cursor: pointer; border-bottom: 1px dashed #000;" title="Clique para editar">Dr(a). Nome do Advogado</span></p>
+                        <p style="color: #666; font-size: 14px; margin: 0;">OAB/SP <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; font-weight: bold; border-bottom: 1px dashed #000;" title="Clique para editar">000.000</span></p>
                     </div>
                 </div>
             `;
@@ -5216,7 +5999,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Criar página HTML formatada
         function createDocumentPage(content, title) {
             // SVG logo embutido com encoding seguro
-            const logoSvgContent = `<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="35" fill="#1e40af" stroke="#0369a1" stroke-width="2"/><rect x="20" y="25" width="40" height="30" fill="#ffffff" rx="2"/><text x="40" y="42" text-anchor="middle" fill="#1e40af" font-family="serif" font-size="14" font-weight="bold">&#9878;</text><text x="40" y="60" text-anchor="middle" fill="#1e40af" font-family="serif" font-size="8" font-weight="bold">TRIBUNAL</text></svg>`;
+            const logoSvgContent = `<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="35" fill="#000" stroke="#0369a1" stroke-width="2"/><rect x="20" y="25" width="40" height="30" fill="#ffffff" rx="2"/><text x="40" y="42" text-anchor="middle" fill="#000" font-family="serif" font-size="14" font-weight="bold">&#9878;</text><text x="40" y="60" text-anchor="middle" fill="#000" font-family="serif" font-size="8" font-weight="bold">TRIBUNAL</text></svg>`;
             const logoSvg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(logoSvgContent)}`;
             
             return `
@@ -5240,7 +6023,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         .header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #1e40af;
+            border-bottom: 2px solid #000;
             padding-bottom: 15px;
         }
         .cabecalho {
@@ -5298,10 +6081,10 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                  alt="Logo Tribunal" 
                  style="height: 60px; width: auto; margin-right: 15px;">
             <div style="text-align: center;">
-                <div style="font-size: 14pt; font-weight: bold; color: #1e40af; margin-bottom: 5px;">
+                <div style="font-size: 14pt; font-weight: bold; color: #000; margin-bottom: 5px;">
                     REPÚBLICA FEDERATIVA DE BRASILÂNDIA
                 </div>
-                <div style="font-size: 12pt; font-weight: bold; color: #1e40af;">
+                <div style="font-size: 12pt; font-weight: bold; color: #000;">
                     TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO
                 </div>
             </div>
@@ -6758,10 +7541,10 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         // Função auxiliar para criar página com novo layout
         function createNewPage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
             const headerHTML = isFirstPage ? `
-                <div style="text-align: center; margin-bottom: 25px; border-bottom: 3px solid #1e40af; padding-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 25px; border-bottom: 3px solid #000; padding-bottom: 20px;">
                     <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 70px; height: 70px; margin: 0 auto 15px; display: block;">
-                    <div style="font-size: 16px; font-weight: bold; color: #1e40af; letter-spacing: 1px; margin-bottom: 8px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
-                    <div style="font-size: 14px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
+                    <div style="font-size: 16px; font-weight: bold; color: #000; letter-spacing: 1px; margin-bottom: 8px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
+                    <div style="font-size: 14px; font-weight: bold; color: #000;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
                 </div>
                 <div style="text-align: center; margin: 20px 0 30px 0;">
                     <div style="font-size: 16px; font-weight: bold; color: #000; text-decoration: underline;">${title.toUpperCase()}</div>
@@ -6826,10 +7609,10 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         // Criar página inteligente preservando todo o conteúdo
         function createIntelligentPage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
             const headerHTML = isFirstPage ? `
-                <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #1e40af; padding-bottom: 15px;">
+                <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #000; padding-bottom: 15px;">
                     <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 70px; height: 70px; margin: 0 auto 10px; display: block;">
-                    <div style="font-size: 16px; font-weight: bold; color: #1e40af; letter-spacing: 1px; margin-bottom: 5px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
-                    <div style="font-size: 14px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
+                    <div style="font-size: 16px; font-weight: bold; color: #000; letter-spacing: 1px; margin-bottom: 5px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
+                    <div style="font-size: 14px; font-weight: bold; color: #000;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
                 </div>
                 <div style="text-align: center; margin: 15px 0 20px 0;">
                     <div style="font-size: 15px; font-weight: bold; color: #000; text-decoration: underline;">${title.toUpperCase()}</div>
@@ -9304,4 +10087,6 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
     </script>
 </body>
 </html>
+
+
 
