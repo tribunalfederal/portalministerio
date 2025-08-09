@@ -3302,49 +3302,85 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 console.log('📋 Usando divisão por parágrafos:', contentParts.length, 'partes');
             }
             
-            // Calcular altura disponível por página (mais conservador)
+            // Calcular altura disponível por página (mais agressivo para forçar páginas)
             const headerHeight = 150;
             const footerHeight = 100;
             const availableHeight = pageHeight - (margin * 2) - headerHeight - footerHeight;
-            const charsPerPage = Math.floor(availableHeight / 20 * 60); // Mais conservador
+            const charsPerPage = Math.floor(availableHeight / 25 * 50); // MUITO mais conservador para forçar páginas
             
             console.log('📏 Altura disponível:', availableHeight, 'px');
-            console.log('📏 Caracteres por página (estimativa):', charsPerPage);
+            console.log('📏 Caracteres por página (FORÇANDO MÚLTIPLAS PÁGINAS):', charsPerPage);
             
-            let currentPageContent = '';
-            let currentPageText = '';
-            let pageNumber = 1;
-            
-            // Processar cada parte do conteúdo
-            for (let i = 0; i < contentParts.length; i++) {
-                const part = contentParts[i] + (sections.length > 1 ? '</div>' : '</p>');
-                const partText = part.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            // Se há muito conteúdo, forçar múltiplas páginas
+            if (formattedContent.length > 1500) {
+                console.log('📚 CONTEÚDO EXTENSO DETECTADO - Forçando múltiplas páginas...');
+                // Reduzir ainda mais para garantir múltiplas páginas
+                const forcedCharsPerPage = Math.min(charsPerPage, 1200);
+                console.log('📏 Caracteres por página (FORÇADO):', forcedCharsPerPage);
                 
-                console.log(`📝 Processando parte ${i + 1}/${contentParts.length}:`, partText.substring(0, 100) + '...');
+                let currentPageContent = '';
+                let currentPageText = '';
+                let pageNumber = 1;
                 
-                // Se adicionar esta parte ultrapassar o limite E já há conteúdo na página
-                if (currentPageText.length + partText.length > charsPerPage && currentPageContent.length > 0) {
-                    // Criar página atual
-                    console.log(`📄 Criando página ${pageNumber} com ${currentPageText.length} caracteres`);
+                // Processar cada parte do conteúdo com limite forçado
+                for (let i = 0; i < contentParts.length; i++) {
+                    const part = contentParts[i] + (sections.length > 1 ? '</div>' : '</p>');
+                    const partText = part.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                    
+                    console.log(`📝 Processando parte ${i + 1}/${contentParts.length}:`, partText.substring(0, 100) + '...');
+                    
+                    // FORÇAR quebra de página com limite menor
+                    if (currentPageText.length + partText.length > forcedCharsPerPage && currentPageContent.length > 0) {
+                        // Criar página atual
+                        console.log(`📄 Criando página ${pageNumber} com ${currentPageText.length} caracteres (FORÇADO)`);
+                        const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
+                        pages.push(page);
+                        
+                        // Iniciar nova página
+                        pageNumber++;
+                        currentPageContent = part;
+                        currentPageText = partText;
+                    } else {
+                        // Adicionar parte à página atual
+                        currentPageContent += part;
+                        currentPageText += ' ' + partText;
+                    }
+                }
+                
+                // Adicionar última página se houver conteúdo
+                if (currentPageContent.length > 0) {
+                    console.log(`📄 Criando página final ${pageNumber} com ${currentPageText.length} caracteres (FORÇADO)`);
                     const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
                     pages.push(page);
-                    
-                    // Iniciar nova página
-                    pageNumber++;
-                    currentPageContent = part;
-                    currentPageText = partText;
-                } else {
-                    // Adicionar parte à página atual
-                    currentPageContent += part;
-                    currentPageText += ' ' + partText;
                 }
-            }
-            
-            // Adicionar última página se houver conteúdo
-            if (currentPageContent.length > 0) {
-                console.log(`📄 Criando página final ${pageNumber} com ${currentPageText.length} caracteres`);
-                const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
-                pages.push(page);
+            } else {
+                console.log('📄 CONTEÚDO PEQUENO - Usando algoritmo padrão...');
+                
+                // Algoritmo padrão para conteúdo pequeno
+                let currentPageContent = '';
+                let currentPageText = '';
+                let pageNumber = 1;
+                
+                for (let i = 0; i < contentParts.length; i++) {
+                    const part = contentParts[i] + (sections.length > 1 ? '</div>' : '</p>');
+                    const partText = part.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                    
+                    if (currentPageText.length + partText.length > charsPerPage && currentPageContent.length > 0) {
+                        const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
+                        pages.push(page);
+                        pageNumber++;
+                        currentPageContent = part;
+                        currentPageText = partText;
+                    } else {
+                        currentPageContent += part;
+                        currentPageText += ' ' + partText;
+                    }
+                }
+                
+                if (currentPageContent.length > 0) {
+                    const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
+                    pages.push(page);
+                }
             }
             
             console.log(`✅ ${pages.length} páginas criadas (sistema inteligente)`);
