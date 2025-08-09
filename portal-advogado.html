@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -3912,17 +3913,18 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
         // === NOVO SISTEMA DE GERAÇÃO DE PÁGINAS - REFATORADO DO ZERO ===
         function generateProfessionalPages(data, title, pageWidth, pageHeight, margin) {
-            console.log('🔄 === NOVO SISTEMA DE PAGINAÇÃO - INICIANDO ===');
+            console.log('🔄 === NOVO SISTEMA DE PAGINAÇÃO PROFISSIONAL - INICIANDO ===');
             
             const pages = [];
             const userProfile = JSON.parse(localStorage.getItem('advogado-profile')) || {};
             
-            // Gerar o conteúdo completo do documento
-            const fullContent = generateDocumentContent(currentDocumentType, data);
-            console.log('📝 Conteúdo completo gerado:', fullContent.length, 'caracteres');
+            // Usar o novo sistema de conteúdo específico
+            const template = documentTemplates[currentDocumentType];
+            const fullContent = generateSpecificContent(currentDocumentType, data, template);
+            console.log('📝 Conteúdo específico gerado:', fullContent.length, 'caracteres');
             
-            // Aplicar formatação HTML
-            const formattedContent = formatDocumentContentHTML(fullContent);
+            // Aplicar formatação HTML profissional
+            const formattedContent = convertTextToFormattedHTML(fullContent);
             console.log('🎨 Conteúdo formatado:', formattedContent.length, 'caracteres HTML');
             
             // === ALGORITMO NOVO: DIVISÃO POR ALTURA REAL ===
@@ -6157,6 +6159,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
         // Criar container de visualização profissional
         function createProfessionalPreview(documentContent, title) {
+            // Para preview rápido, criar container simples
             const container = document.createElement('div');
             container.style.cssText = `
                 position: absolute;
@@ -6181,53 +6184,264 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             return container;
         }
 
-        // Gerar saída em PDF
+        // Gerar saída em PDF usando sistema multi-páginas
         function generatePDFOutput(container, title) {
-            showNotification('Funcionalidade PDF em desenvolvimento...', 'info');
-            // TODO: Implementar geração de PDF real
-            // Por enquanto, usar a geração de imagem
-            generateImageOutput(container, title);
+            console.log('📄 Iniciando geração de PDF profissional...');
+            
+            // Remover container temporário
+            if (container.parentNode) {
+                document.body.removeChild(container);
+            }
+            
+            // Usar sistema existente de múltiplas páginas
+            generateMultiPagePDF(title);
         }
 
-        // Gerar saída em imagem
+        // Gerar saída em imagem usando sistema multi-páginas
         function generateImageOutput(container, title) {
+            console.log('🖼️ Iniciando geração de imagem profissional...');
+            
+            // Remover container temporário
+            if (container.parentNode) {
+                document.body.removeChild(container);
+            }
+            
+            // Usar sistema existente de múltiplas páginas
+            generateMultiPageImages(title);
+        }
+
+        // Gerar PDF multi-páginas
+        function generateMultiPagePDF(title) {
             try {
-                html2canvas(container, {
-                    scale: 3,
-                    useCORS: true,
-                    allowTaint: false,
-                    backgroundColor: '#ffffff',
-                    width: container.offsetWidth,
-                    height: container.offsetHeight
-                }).then(canvas => {
-                    // Criar link de download
-                    const link = document.createElement('a');
-                    link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    
-                    // Fazer download
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    // Remover container temporário
-                    document.body.removeChild(container);
-                    
-                    showNotification('Documento gerado com sucesso!', 'success');
-                }).catch(error => {
-                    console.error('Erro na geração da imagem:', error);
-                    showNotification('Erro ao gerar imagem do documento', 'error');
-                    if (container.parentNode) {
-                        document.body.removeChild(container);
+                showNotification('Gerando PDF com múltiplas páginas...', 'info');
+                
+                // Obter dados do formulário atual
+                const template = documentTemplates[currentDocumentType];
+                const formData = {};
+                template.fields.forEach(field => {
+                    const element = document.getElementById(`field-${field.name}`);
+                    if (element) {
+                        formData[field.name] = element.value.trim();
                     }
                 });
-            } catch (error) {
-                console.error('Erro na captura de tela:', error);
-                showNotification('Erro ao processar documento', 'error');
-                if (container.parentNode) {
-                    document.body.removeChild(container);
+
+                // Gerar conteúdo específico
+                const documentContent = generateSpecificContent(currentDocumentType, formData, template);
+                
+                // Usar sistema existente de geração de páginas para PDF
+                const pages = generateProfessionalPages(formData, title, 794, 1123, 60);
+                
+                if (pages && pages.length > 0) {
+                    console.log(`📄 PDF: ${pages.length} páginas geradas`);
+                    
+                    // Converter páginas para PDF
+                    generatePDFFromPages(pages, title);
+                } else {
+                    showNotification('Erro: Nenhuma página gerada para PDF', 'error');
                 }
+            } catch (error) {
+                console.error('Erro na geração do PDF:', error);
+                showNotification('Erro ao gerar PDF', 'error');
             }
+        }
+
+        // Gerar imagens multi-páginas
+        function generateMultiPageImages(title) {
+            try {
+                showNotification('Gerando imagens com múltiplas páginas...', 'info');
+                
+                // Obter dados do formulário atual
+                const template = documentTemplates[currentDocumentType];
+                const formData = {};
+                template.fields.forEach(field => {
+                    const element = document.getElementById(`field-${field.name}`);
+                    if (element) {
+                        formData[field.name] = element.value.trim();
+                    }
+                });
+
+                // Usar sistema existente de geração de páginas para imagens
+                const pages = generateProfessionalPages(formData, title, 794, 1123, 60);
+                
+                if (pages && pages.length > 0) {
+                    console.log(`🖼️ Imagem: ${pages.length} páginas geradas`);
+                    
+                    // Baixar todas as páginas como imagens
+                    downloadPagesDirectly(pages, title);
+                } else {
+                    showNotification('Erro: Nenhuma página gerada para imagem', 'error');
+                }
+            } catch (error) {
+                console.error('Erro na geração da imagem:', error);
+                showNotification('Erro ao gerar imagem', 'error');
+            }
+        }
+
+        // Gerar PDF a partir das páginas HTML
+        function generatePDFFromPages(pages, title) {
+            console.log('📄 Convertendo páginas HTML para PDF real...');
+            
+            try {
+                // Verificar se jsPDF está disponível
+                if (typeof window.jsPDF === 'undefined') {
+                    console.log('jsPDF não disponível, usando método alternativo...');
+                    generatePDFAlternative(pages, title);
+                    return;
+                }
+
+                const { jsPDF } = window.jsPDF;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                let pageProcessed = 0;
+                
+                function processNextPage() {
+                    if (pageProcessed >= pages.length) {
+                        // Finalizar PDF
+                        const pdfBlob = pdf.output('blob');
+                        const url = URL.createObjectURL(pdfBlob);
+                        
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                        
+                        showNotification(`PDF (${pages.length} páginas) gerado com sucesso!`, 'success');
+                        return;
+                    }
+                    
+                    // Processar página atual
+                    const pageContent = pages[pageProcessed];
+                    
+                    // Criar container temporário para a página
+                    const pageContainer = document.createElement('div');
+                    pageContainer.style.cssText = `
+                        position: absolute;
+                        left: -9999px;
+                        top: 0;
+                        width: 210mm;
+                        min-height: 297mm;
+                        background: white;
+                        padding: 20mm;
+                        box-sizing: border-box;
+                        font-family: 'Times New Roman', serif;
+                        font-size: 12pt;
+                        line-height: 1.6;
+                        color: black;
+                    `;
+                    
+                    pageContainer.innerHTML = pageContent;
+                    document.body.appendChild(pageContainer);
+                    
+                    // Converter página para imagem e adicionar ao PDF
+                    html2canvas(pageContainer, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: false,
+                        backgroundColor: '#ffffff',
+                        width: 210 * 3.779527559, // 210mm em pixels (96 DPI)
+                        height: 297 * 3.779527559  // 297mm em pixels (96 DPI)
+                    }).then(canvas => {
+                        const imgData = canvas.toDataURL('image/png');
+                        
+                        // Adicionar nova página se não for a primeira
+                        if (pageProcessed > 0) {
+                            pdf.addPage();
+                        }
+                        
+                        // Adicionar imagem ao PDF (A4: 210x297mm)
+                        pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+                        
+                        // Remover container temporário
+                        document.body.removeChild(pageContainer);
+                        
+                        pageProcessed++;
+                        
+                        // Processar próxima página
+                        setTimeout(processNextPage, 100);
+                        
+                    }).catch(error => {
+                        console.error('Erro ao processar página:', error);
+                        document.body.removeChild(pageContainer);
+                        pageProcessed++;
+                        setTimeout(processNextPage, 100);
+                    });
+                }
+                
+                // Iniciar processamento
+                processNextPage();
+                
+            } catch (error) {
+                console.error('Erro na geração do PDF:', error);
+                generatePDFAlternative(pages, title);
+            }
+        }
+
+        // Método alternativo para PDF (usando html2canvas apenas)
+        function generatePDFAlternative(pages, title) {
+            console.log('📄 Gerando PDF alternativo usando imagens...');
+            
+            // Criar container temporário para todas as páginas
+            const pdfContainer = document.createElement('div');
+            pdfContainer.style.cssText = `
+                position: absolute;
+                left: -9999px;
+                top: 0;
+                width: 210mm;
+                background: white;
+                font-family: 'Times New Roman', serif;
+            `;
+            
+            // Adicionar todas as páginas ao container
+            pages.forEach((pageContent, index) => {
+                const pageDiv = document.createElement('div');
+                pageDiv.style.cssText = `
+                    width: 210mm;
+                    min-height: 297mm;
+                    background: white;
+                    padding: 20mm;
+                    box-sizing: border-box;
+                    page-break-after: always;
+                    font-size: 12pt;
+                    line-height: 1.6;
+                    color: black;
+                    margin-bottom: 20px;
+                `;
+                pageDiv.innerHTML = pageContent;
+                pdfContainer.appendChild(pageDiv);
+            });
+            
+            document.body.appendChild(pdfContainer);
+            
+            // Usar html2canvas para capturar todas as páginas
+            html2canvas(pdfContainer, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: '#ffffff',
+                width: pdfContainer.offsetWidth,
+                height: pdfContainer.offsetHeight
+            }).then(canvas => {
+                // Salvar como imagem PNG de alta resolução
+                const link = document.createElement('a');
+                link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}_PDF.png`;
+                link.href = canvas.toDataURL('image/png');
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                document.body.removeChild(pdfContainer);
+                
+                showNotification(`PDF (${pages.length} páginas) gerado como imagem de alta resolução!`, 'success');
+            }).catch(error => {
+                console.error('Erro na geração do PDF alternativo:', error);
+                showNotification('Erro ao gerar PDF', 'error');
+                if (pdfContainer.parentNode) {
+                    document.body.removeChild(pdfContainer);
+                }
+            });
         }
     </script>
 </body>
