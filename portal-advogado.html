@@ -3228,19 +3228,55 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Gerar imagem do documento com formatação profissional e PDF intermediário
         function generateDocumentImage(documentTitle) {
-            // Verificar se há páginas no preview
-            if (!previewPages || previewPages.length === 0) {
-                showNotification('Erro: Nenhuma página encontrada. Preencha os dados primeiro.', 'error');
-                return;
-            }
-
+            console.log('🖨️ Iniciando geração de imagem do documento...');
+            
             // Configurações de página A4 em pixels (300 DPI)
             const PAGE_WIDTH = 794; // A4 width
             const PAGE_HEIGHT = 1123; // A4 height
             const MARGIN = 60;
 
-            // Usar as páginas já geradas no preview
-            generatePagesAsImages(previewPages, documentTitle, PAGE_WIDTH, PAGE_HEIGHT, MARGIN);
+            // Obter dados do formulário atual
+            const template = documentTemplates[currentDocumentType];
+            const formData = {};
+            template.fields.forEach(field => {
+                const element = document.getElementById(`field-${field.name}`);
+                if (element) {
+                    formData[field.name] = element.value.trim();
+                }
+            });
+
+            // Adicionar conteúdo expandido se necessário (como no preview)
+            let expandedData = { ...formData };
+            const content = generateDocumentContent(currentDocumentType, formData);
+            if (content.length < 800) {
+                console.log('📝 Expandindo conteúdo para download...');
+                expandedData.observacoes = (expandedData.observacoes || '') + 
+                    '\n\nDOS FATOS:\n\n' +
+                    'O requerente vem, por meio desta petição, expor e requerer o que segue. ' +
+                    'Os fatos narrados nesta inicial demonstram claramente a necessidade de ' +
+                    'intervenção do Poder Judiciário para a resolução da presente questão. ' +
+                    'Conforme será demonstrado, há fundamentos jurídicos sólidos que amparam ' +
+                    'os pedidos formulados nesta petição.\n\n' +
+                    'DA FUNDAMENTAÇÃO JURÍDICA:\n\n' +
+                    'A presente ação encontra amparo legal nos dispositivos constitucionais ' +
+                    'e infraconstitucionais aplicáveis à espécie. O direito pleiteado está ' +
+                    'devidamente fundamentado na legislação vigente e na jurisprudência ' +
+                    'consolidada dos tribunais superiores. A análise dos precedentes ' +
+                    'jurisprudenciais demonstra a viabilidade jurídica dos pedidos formulados.\n\n' +
+                    'DOS PEDIDOS:\n\n' +
+                    'Diante do exposto, requer-se a Vossa Excelência que se digne a deferir ' +
+                    'os pedidos formulados nesta petição, tendo em vista a presença dos ' +
+                    'requisitos legais necessários e a fundamentação jurídica apresentada.';
+            }
+
+            // Gerar páginas em tamanho A4 para download
+            console.log('📄 Gerando páginas em tamanho A4 para download...');
+            const downloadPages = generateProfessionalPages(expandedData, documentTitle, PAGE_WIDTH, PAGE_HEIGHT, MARGIN);
+            
+            console.log(`✅ ${downloadPages.length} páginas geradas para download`);
+            
+            // Usar as páginas geradas para download
+            generatePagesAsImages(downloadPages, documentTitle, PAGE_WIDTH, PAGE_HEIGHT, MARGIN);
         }
 
         // Gerar páginas com formatação profissional - SISTEMA COMPLETAMENTE NOVO
@@ -3587,23 +3623,27 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const totalPages = pages.length;
             let processed = 0;
 
+            console.log(`📦 Iniciando download de ${totalPages} páginas...`);
             showNotification(`Gerando documento com ${totalPages} página(s)...`, 'info');
 
             function processPage(index) {
                 if (index >= pages.length) {
+                    console.log(`🎉 Todas as ${totalPages} páginas foram processadas!`);
                     showNotification(`Documento gerado com sucesso! ${totalPages} página(s) baixada(s).`, 'success');
                     closeDocumentGenerator();
                     return;
                 }
 
+                console.log(`⏳ Processando página ${index + 1} de ${totalPages}...`);
+                
                 downloadSinglePage(pages[index], index + 1, documentTitle, width, height, () => {
                     processed++;
-                    console.log(`Página ${index + 1} de ${totalPages} processada`);
+                    console.log(`✅ Página ${index + 1} processada com sucesso. Total processado: ${processed}/${totalPages}`);
                     
                     // Processar próxima página após delay
                     setTimeout(() => {
                         processPage(index + 1);
-                    }, 1000); // Delay maior para maior estabilidade
+                    }, 1500); // Aumentado para 1.5s para maior estabilidade
                 });
             }
 
@@ -3612,6 +3652,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Baixar uma única página
         function downloadSinglePage(pageHTML, pageNumber, documentTitle, width, height, callback) {
+            console.log(`📥 Baixando página ${pageNumber} - Tamanho: ${width}x${height}`);
+            
             // Criar elemento temporário para a página
             const pageElement = document.createElement('div');
             pageElement.style.cssText = `
@@ -3622,26 +3664,47 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 height: ${height}px;
                 background: white;
                 box-sizing: border-box;
+                font-family: 'Times New Roman', serif;
+                font-size: 14px;
+                line-height: 1.8;
+                color: #000;
             `;
             pageElement.innerHTML = pageHTML;
             document.body.appendChild(pageElement);
 
-            // Configurações do html2canvas
+            console.log(`📄 Elemento criado para página ${pageNumber}:`, pageElement.offsetWidth, 'x', pageElement.offsetHeight);
+
+            // Configurações do html2canvas OTIMIZADAS
             const options = {
                 backgroundColor: '#ffffff',
-                scale: 2,
+                scale: 1.5, // Reduzido de 2 para melhor performance
                 useCORS: true,
                 allowTaint: true,
                 width: width,
                 height: height,
                 scrollX: 0,
-                scrollY: 0
+                scrollY: 0,
+                x: 0,
+                y: 0,
+                foreignObjectRendering: true,
+                logging: false
             };
 
-            // Aguardar um pouco para renderização
+            // Aguardar renderização completa
             setTimeout(() => {
+                console.log(`🎨 Iniciando renderização da página ${pageNumber}...`);
+                
                 html2canvas(pageElement, options).then(canvas => {
+                    console.log(`✅ Canvas gerado para página ${pageNumber}:`, canvas.width, 'x', canvas.height);
+                    
                     canvas.toBlob(function(blob) {
+                        if (!blob) {
+                            console.error(`❌ Erro: Blob vazio para página ${pageNumber}`);
+                            document.body.removeChild(pageElement);
+                            if (callback) callback();
+                            return;
+                        }
+
                         const url = window.URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
@@ -3651,25 +3714,28 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         const fileName = `${documentTitle.replace(/\s+/g, '_')}_Pagina_${pageNumberFormatted}.png`;
                         
                         a.download = fileName;
+                        a.style.display = 'none';
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
                         window.URL.revokeObjectURL(url);
+                        
+                        console.log(`💾 Página ${pageNumber} baixada: ${fileName}`);
                         
                         // Remover elemento temporário
                         document.body.removeChild(pageElement);
                         
                         if (callback) callback();
                         
-                    }, 'image/png', 1.0);
+                    }, 'image/png', 0.92); // Qualidade levemente reduzida para melhor performance
                 }).catch(error => {
-                    console.error('Erro ao gerar página:', error);
+                    console.error(`❌ Erro ao gerar página ${pageNumber}:`, error);
                     document.body.removeChild(pageElement);
                     
                     showNotification(`Erro ao processar página ${pageNumber}`, 'error');
                     if (callback) callback();
                 });
-            }, 200); // Aguardar renderização
+            }, 500); // Aumentado para 500ms para garantir renderização
         }
 
         // Gerar conteúdo do documento
