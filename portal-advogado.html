@@ -3334,21 +3334,21 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             }
             console.log('🔍 === FIM DEBUG DETALHADO ===');
             
-            // Calcular altura disponível por página (OTIMIZADO para melhor utilização)
+            // Calcular altura disponível por página (MAXIMIZAR aproveitamento)
             const headerHeight = 150;
             const footerHeight = 100;
             const availableHeight = pageHeight - (margin * 2) - headerHeight - footerHeight;
-            const charsPerPage = Math.floor(availableHeight / 25 * 80); // Aumentado de 50 para 80 para melhor aproveitamento
+            const charsPerPage = Math.floor(availableHeight / 25 * 100); // Aumentado de 80 para 100 para MÁXIMO aproveitamento
             
             console.log('📏 Altura disponível:', availableHeight, 'px');
-            console.log('📏 Caracteres por página (OTIMIZADO):', charsPerPage);
+            console.log('📏 Caracteres por página (MAXIMIZADO):', charsPerPage);
             
-            // Se há muito conteúdo, usar paginação inteligente (não super agressiva)
-            if (formattedContent.length > 2000) { // Aumentado de 1500 para 2000
-                console.log('📚 CONTEÚDO EXTENSO DETECTADO - Usando paginação inteligente...');
-                // Mais inteligente - permite mais conteúdo por página
-                const forcedCharsPerPage = Math.min(charsPerPage, 1400); // Aumentado de 800 para 1400
-                console.log('📏 Caracteres por página (INTELIGENTE):', forcedCharsPerPage);
+            // Se há muito conteúdo, usar paginação MAIS agressiva no preenchimento
+            if (formattedContent.length > 2500) { // Aumentado de 2000 para 2500
+                console.log('📚 CONTEÚDO EXTENSO DETECTADO - Maximizando preenchimento das páginas...');
+                // MUITO mais agressivo - páginas mais cheias
+                const forcedCharsPerPage = Math.min(charsPerPage, 2000); // Aumentado de 1400 para 2000
+                console.log('📏 Caracteres por página (MÁXIMO PREENCHIMENTO):', forcedCharsPerPage);
                 
                 let currentPageContent = '';
                 let currentPageText = '';
@@ -3361,14 +3361,15 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     
                     console.log(`📝 Processando parte ${i + 1}/${contentParts.length}:`, partText.substring(0, 100) + '...');
                     
-                    // QUEBRA INTELIGENTE - verificar se realmente precisa quebrar
+                    // QUEBRA MUITO RIGOROSA - só quebra quando realmente necessário
                     const wouldExceedLimit = currentPageText.length + partText.length > forcedCharsPerPage;
-                    const hasMinimumContent = currentPageContent.length > 300; // Mínimo de 300 chars antes de quebrar
+                    const hasSubstantialContent = currentPageContent.length > 800; // Aumentado de 300 para 800 - muito mais rigoroso
+                    const isReallyFull = currentPageText.length > forcedCharsPerPage * 0.85; // Só quebra quando 85% cheio
                     
-                    if (wouldExceedLimit && hasMinimumContent) {
-                        // Criar página atual apenas se tiver conteúdo mínimo
-                        console.log(`📄 === CRIANDO PÁGINA ${pageNumber} ===`);
-                        console.log(`📏 Conteúdo atual: ${currentPageText.length} caracteres`);
+                    if (wouldExceedLimit && (hasSubstantialContent || isReallyFull)) {
+                        // Criar página atual apenas se realmente estiver cheia
+                        console.log(`📄 === CRIANDO PÁGINA ${pageNumber} (PÁGINA REALMENTE CHEIA) ===`);
+                        console.log(`📏 Conteúdo atual: ${currentPageText.length} caracteres (${Math.round(currentPageText.length/forcedCharsPerPage*100)}% da capacidade)`);
                         console.log(`📝 Texto atual: "${currentPageText.substring(0, 200)}..."`);
                         console.log(`📄 HTML atual: "${currentPageContent.substring(0, 300)}..."`);
                         
@@ -3383,11 +3384,11 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         console.log(`🔄 Iniciando nova página ${pageNumber} com nova parte`);
                         console.log(`📝 Nova parte: "${partText.substring(0, 100)}..."`);
                     } else {
-                        // Adicionar parte à página atual
-                        if (wouldExceedLimit && !hasMinimumContent) {
-                            console.log(`⚠️ Página ${pageNumber} seria muito pequena (${currentPageText.length} chars) - forçando mais conteúdo`);
+                        // Adicionar parte à página atual - PRIORIZAR PREENCHIMENTO
+                        if (wouldExceedLimit && !hasSubstantialContent && !isReallyFull) {
+                            console.log(`⚠️ FORÇANDO mais conteúdo na página ${pageNumber} - atual: ${currentPageText.length} chars (${Math.round(currentPageText.length/forcedCharsPerPage*100)}%)`);
                         }
-                        console.log(`➕ Adicionando parte ${i + 1} à página ${pageNumber} (${partText.length} chars)`);
+                        console.log(`➕ Adicionando parte ${i + 1} à página ${pageNumber} (${partText.length} chars) - Total: ${currentPageText.length + partText.length}`);
                         currentPageContent += part;
                         currentPageText += ' ' + partText;
                     }
@@ -3439,17 +3440,20 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     const part = contentParts[i] + (sections.length > 1 ? '</div>' : '</p>');
                     const partText = part.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
                     
-                    // Quebra inteligente também no algoritmo padrão
+                    // Quebra MUITO rigorosa também no algoritmo padrão
                     const wouldExceedLimit = currentPageText.length + partText.length > charsPerPage;
-                    const hasMinimumContent = currentPageContent.length > 400; // Mínimo ainda maior para conteúdo pequeno
+                    const hasSubstantialContent = currentPageContent.length > 1000; // Ainda mais rigoroso para conteúdo pequeno
+                    const isReallyFull = currentPageText.length > charsPerPage * 0.9; // 90% cheio para conteúdo pequeno
                     
-                    if (wouldExceedLimit && hasMinimumContent) {
+                    if (wouldExceedLimit && (hasSubstantialContent || isReallyFull)) {
+                        console.log(`📄 Criando página padrão ${pageNumber} - ${currentPageText.length} chars (${Math.round(currentPageText.length/charsPerPage*100)}% cheio)`);
                         const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
                         pages.push(page);
                         pageNumber++;
                         currentPageContent = part;
                         currentPageText = partText;
                     } else {
+                        console.log(`➕ Adicionando ao padrão página ${pageNumber} (${partText.length} chars) - Total: ${currentPageText.length + partText.length}`);
                         currentPageContent += part;
                         currentPageText += ' ' + partText;
                     }
@@ -3469,26 +3473,25 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Criar página inteligente preservando todo o conteúdo
         function createIntelligentPage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
             const headerHTML = isFirstPage ? `
-                <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1e40af; padding-bottom: 20px;">
-                    <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 80px; height: 80px; margin: 0 auto 15px; display: block;">
-                    <div style="font-size: 18px; font-weight: bold; color: #1e40af; letter-spacing: 2px; margin-bottom: 8px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
-                    <div style="font-size: 16px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
+                <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px solid #1e40af; padding-bottom: 15px;">
+                    <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 70px; height: 70px; margin: 0 auto 10px; display: block;">
+                    <div style="font-size: 16px; font-weight: bold; color: #1e40af; letter-spacing: 1px; margin-bottom: 5px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
+                    <div style="font-size: 14px; font-weight: bold; color: #1e40af;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
                 </div>
-                <div style="text-align: center; margin: 20px 0 30px 0;">
-                    <div style="font-size: 16px; font-weight: bold; color: #000; text-decoration: underline;">${title.toUpperCase()}</div>
+                <div style="text-align: center; margin: 15px 0 20px 0;">
+                    <div style="font-size: 15px; font-weight: bold; color: #000; text-decoration: underline;">${title.toUpperCase()}</div>
                 </div>
             ` : '';
 
-            // Rodapé simples apenas com número da página (SEM assinatura duplicada)
+            // Rodapé mais compacto
             const footerHTML = !isFirstPage ? `
-                <div style="position: absolute; bottom: ${margin}px; left: ${margin}px; right: ${margin}px; text-align: center; font-size: 11px; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
-                    <div style="font-size: 10px;">
-                        Página ${pageNumber}
-                    </div>
+                <div style="position: absolute; bottom: ${margin}px; left: ${margin}px; right: ${margin}px; text-align: center; font-size: 10px; color: #666; border-top: 1px solid #ccc; padding-top: 8px;">
+                    Página ${pageNumber}
                 </div>
             ` : '';
 
-            // REMOVIDO: signatureHTML duplicada - a assinatura já está no conteúdo do documento
+            // MAXIMIZAR área de conteúdo - header e footer mais compactos
+            const contentAreaHeight = height - (margin * 2) - (isFirstPage ? 120 : 50); // Menos espaço para header/footer
 
             return `
                 <div style="
@@ -3497,15 +3500,15 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     height: ${height}px;
                     background: white;
                     font-family: 'Times New Roman', serif;
-                    font-size: 14px;
-                    line-height: 1.8;
+                    font-size: 13px;
+                    line-height: 1.6;
                     padding: ${margin}px;
                     box-sizing: border-box;
                     color: #000;
                     overflow: hidden;
                 ">
                     ${headerHTML}
-                    <div style="text-align: justify; margin-bottom: ${!isFirstPage ? '50px' : '40px'}; min-height: ${height - (margin * 2) - 150}px;">
+                    <div style="text-align: justify; margin-bottom: ${!isFirstPage ? '30px' : '25px'}; min-height: ${contentAreaHeight}px; max-height: ${contentAreaHeight}px; overflow: hidden;">
                         ${content}
                     </div>
                     ${footerHTML}
