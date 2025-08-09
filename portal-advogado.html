@@ -3083,6 +3083,29 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     { name: 'fundamentacao', label: 'Fundamentação Legal', type: 'textarea', required: true },
                     { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true }
                 ]
+            },
+            'embargos-declaracao': {
+                title: 'Embargos de Declaração',
+                icon: 'fas fa-file-contract',
+                fields: [
+                    { name: 'embargante', label: 'Nome do Embargante', type: 'text', required: true },
+                    { name: 'embarganteRG', label: 'RG do Embargante', type: 'text', required: true },
+                    { name: 'numeroProcesso', label: 'Número do Processo', type: 'text', required: true },
+                    { name: 'decisaoEmbargada', label: 'Decisão Embargada', type: 'textarea', required: true, 
+                      hint: 'Transcreva a parte da decisão que contém omissão, contradição ou obscuridade' },
+                    { name: 'tipoVicio', label: 'Tipo de Vício', type: 'select', required: true,
+                      options: [
+                          { value: '', text: 'Selecione o tipo de vício' },
+                          { value: 'omissao', text: 'Omissão (deixou de se pronunciar sobre questão)' },
+                          { value: 'contradicao', text: 'Contradição (decisões conflitantes)' },
+                          { value: 'obscuridade', text: 'Obscuridade (decisão confusa ou ambígua)' }
+                      ]
+                    },
+                    { name: 'fundamentacao', label: 'Fundamentação Jurídica', type: 'textarea', required: true,
+                      hint: 'Explique detalhadamente o vício encontrado na decisão' },
+                    { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true,
+                      hint: 'Ex: Que seja sanado o vício, que se pronuncie sobre a questão omitida, etc.' }
+                ]
             }
         };
 
@@ -3311,21 +3334,21 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             }
             console.log('🔍 === FIM DEBUG DETALHADO ===');
             
-            // Calcular altura disponível por página (mais agressivo para forçar páginas)
+            // Calcular altura disponível por página (OTIMIZADO para melhor utilização)
             const headerHeight = 150;
             const footerHeight = 100;
             const availableHeight = pageHeight - (margin * 2) - headerHeight - footerHeight;
-            const charsPerPage = Math.floor(availableHeight / 25 * 50); // MUITO mais conservador para forçar páginas
+            const charsPerPage = Math.floor(availableHeight / 25 * 80); // Aumentado de 50 para 80 para melhor aproveitamento
             
             console.log('📏 Altura disponível:', availableHeight, 'px');
-            console.log('📏 Caracteres por página (FORÇANDO MÚLTIPLAS PÁGINAS):', charsPerPage);
+            console.log('📏 Caracteres por página (OTIMIZADO):', charsPerPage);
             
-            // Se há muito conteúdo, forçar múltiplas páginas
-            if (formattedContent.length > 1500) {
-                console.log('📚 CONTEÚDO EXTENSO DETECTADO - Forçando MÁXIMO de páginas...');
-                // MUITO mais agressivo para garantir múltiplas páginas
-                const forcedCharsPerPage = Math.min(charsPerPage, 800); // Reduzido de 1200 para 800
-                console.log('📏 Caracteres por página (SUPER FORÇADO):', forcedCharsPerPage);
+            // Se há muito conteúdo, usar paginação inteligente (não super agressiva)
+            if (formattedContent.length > 2000) { // Aumentado de 1500 para 2000
+                console.log('📚 CONTEÚDO EXTENSO DETECTADO - Usando paginação inteligente...');
+                // Mais inteligente - permite mais conteúdo por página
+                const forcedCharsPerPage = Math.min(charsPerPage, 1400); // Aumentado de 800 para 1400
+                console.log('📏 Caracteres por página (INTELIGENTE):', forcedCharsPerPage);
                 
                 let currentPageContent = '';
                 let currentPageText = '';
@@ -3338,9 +3361,12 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     
                     console.log(`📝 Processando parte ${i + 1}/${contentParts.length}:`, partText.substring(0, 100) + '...');
                     
-                    // FORÇAR quebra de página com limite MUITO menor
-                    if (currentPageText.length + partText.length > forcedCharsPerPage && currentPageContent.length > 0) {
-                        // Criar página atual
+                    // QUEBRA INTELIGENTE - verificar se realmente precisa quebrar
+                    const wouldExceedLimit = currentPageText.length + partText.length > forcedCharsPerPage;
+                    const hasMinimumContent = currentPageContent.length > 300; // Mínimo de 300 chars antes de quebrar
+                    
+                    if (wouldExceedLimit && hasMinimumContent) {
+                        // Criar página atual apenas se tiver conteúdo mínimo
                         console.log(`📄 === CRIANDO PÁGINA ${pageNumber} ===`);
                         console.log(`📏 Conteúdo atual: ${currentPageText.length} caracteres`);
                         console.log(`📝 Texto atual: "${currentPageText.substring(0, 200)}..."`);
@@ -3358,6 +3384,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         console.log(`📝 Nova parte: "${partText.substring(0, 100)}..."`);
                     } else {
                         // Adicionar parte à página atual
+                        if (wouldExceedLimit && !hasMinimumContent) {
+                            console.log(`⚠️ Página ${pageNumber} seria muito pequena (${currentPageText.length} chars) - forçando mais conteúdo`);
+                        }
                         console.log(`➕ Adicionando parte ${i + 1} à página ${pageNumber} (${partText.length} chars)`);
                         currentPageContent += part;
                         currentPageText += ' ' + partText;
@@ -3410,7 +3439,11 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     const part = contentParts[i] + (sections.length > 1 ? '</div>' : '</p>');
                     const partText = part.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
                     
-                    if (currentPageText.length + partText.length > charsPerPage && currentPageContent.length > 0) {
+                    // Quebra inteligente também no algoritmo padrão
+                    const wouldExceedLimit = currentPageText.length + partText.length > charsPerPage;
+                    const hasMinimumContent = currentPageContent.length > 400; // Mínimo ainda maior para conteúdo pequeno
+                    
+                    if (wouldExceedLimit && hasMinimumContent) {
                         const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
                         pages.push(page);
                         pageNumber++;
@@ -3764,6 +3797,25 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     content += `DAS EVIDÊNCIAS DE REABILITAÇÃO:\n${data.reabilitacao}\n\n`;
                     content += `DA FUNDAMENTAÇÃO LEGAL:\n${data.fundamentacao}\n\n`;
                     content += `DOS PEDIDOS:\n${data.pedidos}\n\n`;
+                    break;
+                    
+                case 'embargos-declaracao':
+                    content += `EMBARGANTE: ${safeData('embargante')} - RG: ${safeData('embarganteRG')}\n`;
+                    content += `PROCESSO Nº: ${safeData('numeroProcesso')}\n\n`;
+                    
+                    const tipoVicio = data.tipoVicio;
+                    let tituloVicio = 'DO VÍCIO ENCONTRADO';
+                    if (tipoVicio === 'omissao') {
+                        tituloVicio = 'DA OMISSÃO';
+                    } else if (tipoVicio === 'contradicao') {
+                        tituloVicio = 'DA CONTRADIÇÃO';
+                    } else if (tipoVicio === 'obscuridade') {
+                        tituloVicio = 'DA OBSCURIDADE';
+                    }
+                    
+                    content += `DA DECISÃO EMBARGADA:\n${safeData('decisaoEmbargada')}\n\n`;
+                    content += `${tituloVicio}:\n${safeData('fundamentacao')}\n\n`;
+                    content += `DOS PEDIDOS:\n${safeData('pedidos')}\n\n`;
                     break;
                     
                 default:
