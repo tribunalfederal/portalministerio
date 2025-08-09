@@ -3313,26 +3313,26 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             
             // Se há muito conteúdo, forçar múltiplas páginas
             if (formattedContent.length > 1500) {
-                console.log('📚 CONTEÚDO EXTENSO DETECTADO - Forçando múltiplas páginas...');
-                // Reduzir ainda mais para garantir múltiplas páginas
-                const forcedCharsPerPage = Math.min(charsPerPage, 1200);
-                console.log('📏 Caracteres por página (FORÇADO):', forcedCharsPerPage);
+                console.log('📚 CONTEÚDO EXTENSO DETECTADO - Forçando MÁXIMO de páginas...');
+                // MUITO mais agressivo para garantir múltiplas páginas
+                const forcedCharsPerPage = Math.min(charsPerPage, 800); // Reduzido de 1200 para 800
+                console.log('📏 Caracteres por página (SUPER FORÇADO):', forcedCharsPerPage);
                 
                 let currentPageContent = '';
                 let currentPageText = '';
                 let pageNumber = 1;
                 
-                // Processar cada parte do conteúdo com limite forçado
+                // Processar cada parte do conteúdo com limite MUITO forçado
                 for (let i = 0; i < contentParts.length; i++) {
                     const part = contentParts[i] + (sections.length > 1 ? '</div>' : '</p>');
                     const partText = part.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
                     
                     console.log(`📝 Processando parte ${i + 1}/${contentParts.length}:`, partText.substring(0, 100) + '...');
                     
-                    // FORÇAR quebra de página com limite menor
+                    // FORÇAR quebra de página com limite MUITO menor
                     if (currentPageText.length + partText.length > forcedCharsPerPage && currentPageContent.length > 0) {
                         // Criar página atual
-                        console.log(`📄 Criando página ${pageNumber} com ${currentPageText.length} caracteres (FORÇADO)`);
+                        console.log(`📄 Criando página ${pageNumber} com ${currentPageText.length} caracteres (SUPER FORÇADO)`);
                         const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
                         pages.push(page);
                         
@@ -3349,9 +3349,35 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 
                 // Adicionar última página se houver conteúdo
                 if (currentPageContent.length > 0) {
-                    console.log(`📄 Criando página final ${pageNumber} com ${currentPageText.length} caracteres (FORÇADO)`);
+                    console.log(`📄 Criando página final ${pageNumber} com ${currentPageText.length} caracteres (SUPER FORÇADO)`);
                     const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
                     pages.push(page);
+                }
+                
+                // Se ainda temos poucas páginas, forçar divisão por caracteres
+                if (pages.length < 3 && formattedContent.length > 2000) {
+                    console.log('🔪 FORÇANDO DIVISÃO POR CARACTERES - Conteúdo muito denso!');
+                    pages.length = 0; // Limpar páginas
+                    
+                    const textContent = formattedContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                    const charLimit = 600; // Limite MUITO baixo por página
+                    let currentIndex = 0;
+                    pageNumber = 1;
+                    
+                    while (currentIndex < textContent.length) {
+                        const endIndex = Math.min(currentIndex + charLimit, textContent.length);
+                        const pageText = textContent.substring(currentIndex, endIndex);
+                        
+                        // Converter texto de volta para HTML básico
+                        const pageHTML = `<p style="margin: 15px 0; text-indent: 40px; text-align: justify;">${pageText}</p>`;
+                        
+                        console.log(`📄 Criando página ${pageNumber} por caracteres: ${pageText.length} chars`);
+                        const page = createIntelligentPage(pageHTML, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
+                        pages.push(page);
+                        
+                        currentIndex = endIndex;
+                        pageNumber++;
+                    }
                 }
             } else {
                 console.log('📄 CONTEÚDO PEQUENO - Usando algoritmo padrão...');
