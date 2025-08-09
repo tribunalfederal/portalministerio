@@ -3306,92 +3306,855 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             }
         }
 
-        // Sistema de Geração Profissional de Documentos
-        function generateDocument(outputType = 'image') {
-            const template = documentTemplates[currentDocumentType];
+        // ========================================
+        // SISTEMA DE GERAÇÃO DE DOCUMENTOS NOVO
+        // Reconstruído do zero - simples e funcional
+        // ========================================
+
+        function generateDocument(outputType = 'pdf') {
+            console.log('🚀 SISTEMA NOVO: Gerando documento', outputType);
             
+            const template = documentTemplates[currentDocumentType];
             if (!template) {
-                showNotification('Erro: tipo de documento inválido', 'error');
+                showNotification('❌ Tipo de documento não encontrado', 'error');
                 return;
             }
 
-            // Validar campos obrigatórios e coletar dados
-            let isValid = true;
+            // Coletar dados do formulário
             const formData = {};
-
+            let hasData = false;
+            
             template.fields.forEach(field => {
                 const element = document.getElementById(`field-${field.name}`);
-                const value = element.value.trim();
-                
-                if (field.required && !value) {
-                    isValid = false;
-                    element.style.borderColor = '#ef4444';
-                } else {
-                    element.style.borderColor = '';
+                if (element) {
+                    const value = element.value.trim();
                     formData[field.name] = value;
+                    if (value) hasData = true;
                 }
             });
 
-            if (!isValid) {
-                showNotification('Preencha todos os campos obrigatórios', 'error');
+            if (!hasData) {
+                showNotification('❌ Preencha pelo menos um campo', 'warning');
                 return;
             }
 
-            // Gerar documento profissional
-            generateProfessionalDocument(formData, template, outputType);
-        }
-
-        // Função principal de geração profissional
-        function generateProfessionalDocument(formData, template, outputType) {
             try {
-                showNotification('Gerando documento profissional...', 'info');
+                showNotification('📄 Gerando documento...', 'info');
                 
-                // Gerar conteúdo específico baseado no tipo de documento
-                const documentContent = generateSpecificContent(currentDocumentType, formData, template);
+                // Gerar HTML profissional
+                const documentHTML = createProfessionalDocumentHTML(currentDocumentType, formData, template);
                 
-                // Criar container de visualização
-                const previewContainer = createProfessionalPreview(documentContent, template.title);
-                
-                // Processar saída conforme tipo solicitado
                 if (outputType === 'pdf') {
-                    generatePDFOutput(previewContainer, template.title);
+                    downloadAsPDF(documentHTML, template.title);
                 } else {
-                    generateImageOutput(previewContainer, template.title);
+                    downloadAsImage(documentHTML, template.title);
                 }
                 
             } catch (error) {
-                console.error('Erro na geração do documento:', error);
-                showNotification('Erro ao gerar documento. Tente novamente.', 'error');
+                console.error('❌ Erro:', error);
+                showNotification('❌ Erro ao gerar documento', 'error');
             }
         }
 
-        // Geração de conteúdo específico por tipo de documento
-        function generateSpecificContent(documentType, formData, template) {
+        // Criar HTML formatado profissional
+        function createProfessionalDocumentHTML(documentType, formData, template) {
+            const today = new Date();
+            const dataFormatada = today.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+            
+            const userProfile = getUserProfileData();
+            
+            let content = '';
+            
             switch (documentType) {
                 case 'peticao-inicial':
-                    return generatePeticaoInicial(formData);
+                    content = createPeticaoInicial(formData, dataFormatada, userProfile);
+                    break;
                 case 'recurso-apelacao':
-                    return generateRecursoApelacao(formData);
+                    content = createRecursoApelacao(formData, dataFormatada, userProfile);
+                    break;
                 case 'habeas-corpus':
-                    return generateHabeasCorpus(formData);
+                    content = createHabeasCorpus(formData, dataFormatada, userProfile);
+                    break;
                 case 'contestacao':
-                    return generateContestacao(formData);
+                    content = createContestacao(formData, dataFormatada, userProfile);
+                    break;
                 case 'liberdade-provisoria':
-                    return generateLiberdadeProvisoria(formData);
+                    content = createLiberdadeProvisoria(formData, dataFormatada, userProfile);
+                    break;
                 case 'peticao-fianca':
-                    return generatePeticaoFianca(formData);
+                    content = createPeticaoFianca(formData, dataFormatada, userProfile);
+                    break;
                 case 'alegacoes-finais':
-                    return generateAlegacoesFinais(formData);
+                    content = createAlegacoesFinais(formData, dataFormatada, userProfile);
+                    break;
                 case 'requerimento-provas':
-                    return generateRequerimentoProvas(formData);
+                    content = createRequerimentoProvas(formData, dataFormatada, userProfile);
+                    break;
                 case 'porte-armas':
-                    return generatePorteArmas(formData);
+                    content = createPorteArmas(formData, dataFormatada, userProfile);
+                    break;
                 case 'limpeza-ficha':
-                    return generateLimpezaFicha(formData);
+                    content = createLimpezaFicha(formData, dataFormatada, userProfile);
+                    break;
                 case 'embargos-declaracao':
-                    return generateEmbargosDeclaracao(formData);
+                    content = createEmbargosDeclaracao(formData, dataFormatada, userProfile);
+                    break;
                 default:
-                    return generateGenericContent(formData, template);
+                    content = createPeticaoInicial(formData, dataFormatada, userProfile);
+                    break;
+            }
+                    break;
+                case 'contestacao':
+                    content = createContestacao(formData, dataFormatada, userProfile);
+                    break;
+                case 'liberdade-provisoria':
+                    content = createLiberdadeProvisoria(formData, dataFormatada, userProfile);
+                    break;
+                case 'peticao-fianca':
+                    content = createPeticaoFianca(formData, dataFormatada, userProfile);
+                    break;
+                case 'alegacoes-finais':
+                    content = createAlegacoesFinais(formData, dataFormatada, userProfile);
+                    break;
+                case 'requerimento-provas':
+                    content = createRequerimentoProvas(formData, dataFormatada, userProfile);
+                    break;
+                case 'porte-armas':
+                    content = createPorteArmas(formData, dataFormatada, userProfile);
+                    break;
+                case 'limpeza-ficha':
+                    content = createLimpezaFicha(formData, dataFormatada, userProfile);
+                    break;
+                case 'embargos-declaracao':
+                    content = createEmbargosDeclaracao(formData, dataFormatada, userProfile);
+                    break;
+                default:
+                    content = createDocumentoGenerico(formData, dataFormatada, userProfile, template.title);
+                    break;
+            }
+            
+            return createDocumentPage(content, template.title);
+        }
+
+        // Download direto como PDF
+        function downloadAsPDF(documentHTML, title) {
+            console.log('📥 Baixando como PDF:', title);
+            
+            // Criar janela temporária para renderizar o documento
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            
+            if (!printWindow) {
+                showNotification('❌ Popup bloqueado. Permita popups para baixar PDF', 'error');
+                return;
+            }
+
+            // Escrever HTML na janela
+            printWindow.document.write(documentHTML);
+            printWindow.document.close();
+            
+            // Aguardar carregamento e baixar automaticamente
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.print();
+                    
+                    // Fechar janela após impressão
+                    printWindow.onafterprint = function() {
+                        printWindow.close();
+                    };
+                    
+                    showNotification('✅ PDF gerado! Salve usando Ctrl+P → Salvar como PDF', 'success');
+                }, 500);
+            };
+        }
+
+        // Download como imagem
+        function downloadAsImage(documentHTML, title) {
+            console.log('🖼️ Baixando como imagem:', title);
+            
+            // Criar container temporário
+            const container = document.createElement('div');
+            container.style.cssText = `
+                position: absolute;
+                left: -9999px;
+                top: 0;
+                width: 794px;
+                min-height: 1123px;
+                background: white;
+                font-family: 'Times New Roman', serif;
+                font-size: 12pt;
+                padding: 60px;
+                box-sizing: border-box;
+            `;
+            
+            // Extrair apenas o body do HTML
+            const bodyMatch = documentHTML.match(/<body[^>]*>([\s\S]*)<\/body>/);
+            if (bodyMatch) {
+                container.innerHTML = bodyMatch[1];
+            } else {
+                container.innerHTML = documentHTML;
+            }
+            
+            document.body.appendChild(container);
+            
+            // Usar html2canvas para gerar imagem
+            if (typeof html2canvas !== 'undefined') {
+                html2canvas(container, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: false,
+                    backgroundColor: '#ffffff'
+                }).then(canvas => {
+                    // Download da imagem
+                    const link = document.createElement('a');
+                    link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    document.body.removeChild(container);
+                    showNotification('✅ Imagem baixada com sucesso!', 'success');
+                }).catch(error => {
+                    console.error('Erro html2canvas:', error);
+                    document.body.removeChild(container);
+                    showNotification('❌ Erro ao gerar imagem', 'error');
+                });
+            } else {
+                document.body.removeChild(container);
+                showNotification('❌ Biblioteca html2canvas não disponível', 'error');
+            }
+        }
+
+        // Criar página HTML formatada
+        function createDocumentPage(content, title) {
+            return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <style>
+        @page { size: A4; margin: 2cm; }
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #000;
+            margin: 0;
+            padding: 20px;
+            background: white;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #1e40af;
+            padding-bottom: 15px;
+        }
+        .cabecalho {
+            font-weight: bold;
+            font-size: 16pt;
+            text-align: center;
+            margin: 30px 0;
+            text-transform: uppercase;
+        }
+        .titulo-documento {
+            font-weight: bold;
+            font-size: 18pt;
+            text-align: center;
+            margin: 30px 0;
+            text-transform: uppercase;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        .secao {
+            font-weight: bold;
+            font-size: 14pt;
+            margin: 25px 0 15px 0;
+            text-transform: uppercase;
+        }
+        .paragrafo {
+            text-align: justify;
+            text-indent: 40px;
+            margin: 15px 0;
+        }
+        .assinatura {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .linha-assinatura {
+            border-top: 1px solid #000;
+            width: 300px;
+            margin: 0 auto 5px;
+        }
+        .data-local {
+            text-align: right;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+        strong { font-weight: bold; }
+        @media print {
+            body { margin: 0; padding: 1cm; }
+            .header { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="font-size: 14pt; font-weight: bold; color: #1e40af; margin-bottom: 5px;">
+            REPÚBLICA FEDERATIVA DE BRASILÂNDIA
+        </div>
+        <div style="font-size: 12pt; font-weight: bold; color: #1e40af;">
+            TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO
+        </div>
+    </div>
+    
+    ${content}
+</body>
+</html>`;
+        }
+
+        // ========================================
+        // FUNÇÕES DE GERAÇÃO ESPECÍFICAS - NOVAS
+        // ========================================
+
+        function createPeticaoInicial(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO DA 1ª VARA CÍVEL
+    </div>
+
+    <div class="titulo-documento">
+        PETIÇÃO INICIAL
+    </div>
+
+    <div class="paragrafo">
+        <strong>${formData.cliente || 'NOME DO CLIENTE'}</strong>, brasileiro, portador do RG nº ${formData.clienteRG || '00.000.000-0'}, residente e domiciliado nesta comarca, por meio de seu advogado que esta subscreve (OAB ${userProfile.oab || 'SP 000.000'}), com escritório situado à ${userProfile.address || 'endereço do escritório'}, vem, respeitosamente, perante Vossa Excelência, propor a presente
+    </div>
+
+    <div class="titulo-documento">
+        AÇÃO ${formData.tipoPeticao === 'civil' ? 'CIVIL' : 'CRIMINAL'}
+    </div>
+
+    <div class="paragrafo">
+        em face de <strong>${formData.outraParte || 'NOME DA OUTRA PARTE'}</strong>, ${formData.outraParteRG ? 'portador do RG nº ' + formData.outraParteRG + ',' : ''} residente e domiciliado nesta comarca, pelos fundamentos de fato e de direito a seguir expostos:
+    </div>
+
+    <div class="secao">I - DOS FATOS</div>
+    <div class="paragrafo">
+        ${formData.fatos || 'Relatar aqui os fatos que deram origem à presente demanda, observando a ordem cronológica dos acontecimentos e apresentando de forma clara e objetiva todas as circunstâncias relevantes para o caso.'}
+    </div>
+
+    <div class="secao">II - DO DIREITO</div>
+    <div class="paragrafo">
+        ${formData.fundamentacaoJuridica || 'Apresentar aqui a fundamentação jurídica aplicável ao caso, citando artigos de lei, jurisprudência dos tribunais superiores e doutrina pertinente que amparam os pedidos formulados.'}
+    </div>
+
+    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="paragrafo">
+        Diante do exposto, requer-se a Vossa Excelência que se digne a:
+    </div>
+    <div class="paragrafo">
+        ${formData.pedidos || 'a) Citar o requerido para contestar a presente ação; b) Julgar procedente o pedido; c) Condenar o requerido ao pagamento das custas processuais e honorários advocatícios.'}
+    </div>
+
+    ${formData.provas ? `
+    <div class="secao">IV - DAS PROVAS</div>
+    <div class="paragrafo">
+        ${formData.provas}
+    </div>
+    ` : ''}
+
+    ${formData.valorCausa ? `
+    <div class="secao">V - DO VALOR DA CAUSA</div>
+    <div class="paragrafo">
+        Para os devidos fins legais, atribui-se à presente causa o valor de R$ ${formData.valorCausa}.
+    </div>
+    ` : ''}
+
+    <div class="paragrafo" style="margin-top: 30px;">
+        <strong>Termos em que,<br>
+        Pede deferimento.</strong>
+    </div>
+
+    <div class="data-local">
+        São Paulo, ${data}
+`;
+        }
+
+        // ========================================
+        // FUNÇÕES NOVAS DE GERAÇÃO DE CONTEÚDO
+        // ========================================
+
+        function createRecursoApelacao(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DESEMBARGADOR RELATOR
+    </div>
+
+    <div class="titulo-documento">
+        RECURSO DE APELAÇÃO
+    </div>
+
+    <div class="paragrafo">
+        <strong>${formData.cliente || 'NOME DO CLIENTE'}</strong>, através de seu advogado, vem, respeitosamente, interpor <strong>RECURSO DE APELAÇÃO</strong> da decisão proferida pelo MM. Juiz nos autos do processo em epígrafe.
+    </div>
+
+    <div class="secao">I - DOS FUNDAMENTOS</div>
+    <div class="paragrafo">
+        ${formData.fundamentacao || 'A decisão recorrida merece reforma pelos seguintes fundamentos...'}
+    </div>
+
+    <div class="secao">II - DOS PEDIDOS</div>
+    <div class="paragrafo">
+        ${formData.pedidos || 'Requer-se a reforma da decisão recorrida...'}
+    </div>
+
+    <div class="data-local">
+        São Paulo, ${data}
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong><br>
+        <strong>OAB ${userProfile.oab || 'SP 000.000'}</strong>
+    </div>
+`;
+        }
+
+        function createHabeasCorpus(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO DA VARA CRIMINAL
+    </div>
+
+    <div class="titulo-documento">
+        HABEAS CORPUS
+    </div>
+
+    <div class="paragrafo">
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong>, advogado inscrito na OAB sob nº ${userProfile.oab || 'SP 000.000'}, vem, respeitosamente, impetrar o presente <strong>HABEAS CORPUS</strong> em favor de <strong>${formData.paciente || 'NOME DO PACIENTE'}</strong>.
+    </div>
+
+    <div class="secao">I - DOS FATOS</div>
+    <div class="paragrafo">
+        ${formData.fatos || 'Relatar os fatos que motivam a impetração do habeas corpus...'}
+    </div>
+
+    <div class="secao">II - DO CONSTRANGIMENTO ILEGAL</div>
+    <div class="paragrafo">
+        ${formData.constrangimento || 'Demonstrar o constrangimento ilegal sofrido pelo paciente...'}
+    </div>
+
+    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="paragrafo">
+        ${formData.pedidos || 'Requer-se a concessão da ordem para...'}
+    </div>
+
+    <div class="data-local">
+        São Paulo, ${data}
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong><br>
+        <strong>OAB ${userProfile.oab || 'SP 000.000'}</strong>
+    </div>
+`;
+        }
+
+        function createContestacao(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO
+    </div>
+
+    <div class="titulo-documento">
+        CONTESTAÇÃO
+    </div>
+
+    <div class="paragrafo">
+        <strong>${formData.cliente || 'NOME DO RÉU/CONTESTANTE'}</strong>, brasileiro, por meio de seu advogado, vem, tempestivamente, apresentar <strong>CONTESTAÇÃO</strong> à ação proposta por ${formData.autor || 'NOME DO AUTOR'}.
+    </div>
+
+    <div class="secao">I - PRELIMINARES</div>
+    <div class="paragrafo">
+        ${formData.preliminares || 'Das preliminares a serem alegadas...'}
+    </div>
+
+    <div class="secao">II - DO MÉRITO</div>
+    <div class="paragrafo">
+        ${formData.merito || 'Quanto ao mérito, a ação não merece prosperar pelos seguintes fundamentos...'}
+    </div>
+
+    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="paragrafo">
+        ${formData.pedidos || 'Requer-se a improcedência total da ação...'}
+    </div>
+
+    <div class="data-local">
+        São Paulo, ${data}
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong><br>
+        <strong>OAB ${userProfile.oab || 'SP 000.000'}</strong>
+    </div>
+`;
+        }
+
+        function createLiberdadeProvisoria(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO DA VARA CRIMINAL
+    </div>
+
+    <div class="titulo-documento">
+        PEDIDO DE LIBERDADE PROVISÓRIA
+    </div>
+
+    <div class="paragrafo">
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong>, advogado inscrito na OAB sob nº ${userProfile.oab || 'SP 000.000'}, vem requerer a <strong>LIBERDADE PROVISÓRIA</strong> de <strong>${formData.acusado || 'NOME DO ACUSADO'}</strong>.
+    </div>
+
+    <div class="secao">I - DOS FATOS</div>
+    <div class="paragrafo">
+        ${formData.fatos || 'Relatar a situação processual do acusado...'}
+    </div>
+
+    <div class="secao">II - DOS FUNDAMENTOS JURÍDICOS</div>
+    <div class="paragrafo">
+        ${formData.fundamentacao || 'A liberdade provisória deve ser concedida com base no artigo 310 do CPP...'}
+    </div>
+
+    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="paragrafo">
+        ${formData.pedidos || 'Requer-se a concessão da liberdade provisória...'}
+    </div>
+
+    <div class="data-local">
+        São Paulo, ${data}
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong><br>
+        <strong>OAB ${userProfile.oab || 'SP 000.000'}</strong>
+    </div>
+`;
+        }
+
+        function createPeticaoFianca(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO DA VARA CRIMINAL
+    </div>
+
+    <div class="titulo-documento">
+        PEDIDO DE FIANÇA
+    </div>
+
+    <div class="paragrafo">
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong>, advogado inscrito na OAB sob nº ${userProfile.oab || 'SP 000.000'}, vem requerer a <strong>CONCESSÃO DE FIANÇA</strong> para <strong>${formData.acusado || 'NOME DO ACUSADO'}</strong>.
+    </div>
+
+    <div class="secao">I - DOS FATOS</div>
+    <div class="paragrafo">
+        ${formData.fatos || 'Relatar a situação que enseja o pedido de fiança...'}
+    </div>
+
+    <div class="secao">II - DO DIREITO À FIANÇA</div>
+    <div class="paragrafo">
+        ${formData.fundamentacao || 'O direito à fiança está previsto no artigo 322 do CPP...'}
+    </div>
+
+    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="paragrafo">
+        ${formData.pedidos || 'Requer-se a fixação de fiança no valor de...'}
+    </div>
+
+    ${formData.valorFianca ? `
+    <div class="paragrafo">
+        <strong>VALOR DA FIANÇA PROPOSTO:</strong> R$ ${formData.valorFianca}
+    </div>
+    ` : ''}
+
+    <div class="data-local">
+        São Paulo, ${data}
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong><br>
+        <strong>OAB ${userProfile.oab || 'SP 000.000'}</strong>
+    </div>
+`;
+        }
+
+        function createAlegacoesFinais(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO
+    </div>
+
+    <div class="titulo-documento">
+        ALEGAÇÕES FINAIS
+    </div>
+
+    <div class="paragrafo">
+        <strong>${formData.cliente || 'NOME DO CLIENTE'}</strong>, por meio de seu advogado, vem apresentar suas <strong>ALEGAÇÕES FINAIS</strong> nos presentes autos.
+    </div>
+
+    <div class="secao">I - DOS FATOS PROVADOS</div>
+    <div class="paragrafo">
+        ${formData.fatosProvados || 'Durante a instrução processual, restaram demonstrados os seguintes fatos...'}
+    </div>
+
+    <div class="secao">II - DO DIREITO APLICÁVEL</div>
+    <div class="paragrafo">
+        ${formData.direitoAplicavel || 'Com base nas provas produzidas, aplica-se ao caso...'}
+    </div>
+
+    <div class="secao">III - DAS CONCLUSÕES</div>
+    <div class="paragrafo">
+        ${formData.conclusoes || 'Diante do exposto, requer-se a procedência dos pedidos...'}
+    </div>
+
+    <div class="data-local">
+        São Paulo, ${data}
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong><br>
+        <strong>OAB ${userProfile.oab || 'SP 000.000'}</strong>
+    </div>
+`;
+        }
+
+        function createRequerimentoProvas(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO
+    </div>
+
+    <div class="titulo-documento">
+        REQUERIMENTO DE PRODUÇÃO DE PROVAS
+    </div>
+
+    <div class="paragrafo">
+        <strong>${formData.cliente || 'NOME DO CLIENTE'}</strong>, por meio de seu advogado, vem requerer a produção das seguintes provas:
+    </div>
+
+    <div class="secao">I - PROVA TESTEMUNHAL</div>
+    <div class="paragrafo">
+        ${formData.provaTestemunhal || 'Requer-se a oitiva das seguintes testemunhas...'}
+    </div>
+
+    <div class="secao">II - PROVA PERICIAL</div>
+    <div class="paragrafo">
+        ${formData.provaPericial || 'Requer-se a realização de perícia para...'}
+    </div>
+
+    <div class="secao">III - PROVA DOCUMENTAL</div>
+    <div class="paragrafo">
+        ${formData.provaDocumental || 'Requer-se a juntada dos seguintes documentos...'}
+    </div>
+
+    <div class="data-local">
+        São Paulo, ${data}
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong><br>
+        <strong>OAB ${userProfile.oab || 'SP 000.000'}</strong>
+    </div>
+`;
+        }
+
+        function createPorteArmas(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DELEGADO DE POLÍCIA FEDERAL
+    </div>
+
+    <div class="titulo-documento">
+        REQUERIMENTO DE PORTE DE ARMA
+    </div>
+
+    <div class="paragrafo">
+        <strong>${formData.requerente || 'NOME DO REQUERENTE'}</strong>, brasileiro, portador do CPF nº ${formData.cpf || '000.000.000-00'}, vem requerer a concessão de porte de arma de fogo.
+    </div>
+
+    <div class="secao">I - DA NECESSIDADE</div>
+    <div class="paragrafo">
+        ${formData.necessidade || 'A necessidade do porte de arma justifica-se por...'}
+    </div>
+
+    <div class="secao">II - DOS REQUISITOS</div>
+    <div class="paragrafo">
+        ${formData.requisitos || 'O requerente preenche todos os requisitos legais...'}
+    </div>
+
+    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="paragrafo">
+        ${formData.pedidos || 'Requer-se a concessão do porte de arma...'}
+    </div>
+
+    <div class="data-local">
+        São Paulo, ${data}
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong><br>
+        <strong>OAB ${userProfile.oab || 'SP 000.000'}</strong>
+    </div>
+`;
+        }
+
+        function createLimpezaFicha(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO DA VARA DE EXECUÇÕES CRIMINAIS
+    </div>
+
+    <div class="titulo-documento">
+        PEDIDO DE REABILITAÇÃO CRIMINAL
+    </div>
+
+    <div class="paragrafo">
+        <strong>${formData.requerente || 'NOME DO REQUERENTE'}</strong>, por meio de seu advogado, vem requerer sua <strong>REABILITAÇÃO CRIMINAL</strong>.
+    </div>
+
+    <div class="secao">I - DOS FATOS</div>
+    <div class="paragrafo">
+        ${formData.fatos || 'O requerente foi condenado por...'}
+    </div>
+
+    <div class="secao">II - DOS REQUISITOS</div>
+    <div class="paragrafo">
+        ${formData.requisitos || 'Estão preenchidos todos os requisitos do art. 94 do CP...'}
+    </div>
+
+    <div class="secao">III - DOS PEDIDOS</div>
+    <div class="paragrafo">
+        ${formData.pedidos || 'Requer-se a concessão da reabilitação criminal...'}
+    </div>
+
+    <div class="data-local">
+        São Paulo, ${data}
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong><br>
+        <strong>OAB ${userProfile.oab || 'SP 000.000'}</strong>
+    </div>
+`;
+        }
+
+        function createEmbargosDeclaracao(formData, data, userProfile) {
+            return `
+    <div class="cabecalho">
+        EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO
+    </div>
+
+    <div class="titulo-documento">
+        EMBARGOS DE DECLARAÇÃO
+    </div>
+
+    <div class="paragrafo">
+        <strong>${formData.cliente || 'NOME DO CLIENTE'}</strong>, por meio de seu advogado, vem opor <strong>EMBARGOS DE DECLARAÇÃO</strong> contra a decisão proferida nos autos.
+    </div>
+
+    <div class="secao">I - DA OMISSÃO</div>
+    <div class="paragrafo">
+        ${formData.omissao || 'A decisão embargada é omissa quanto a...'}
+    </div>
+
+    <div class="secao">II - DA CONTRADIÇÃO</div>
+    <div class="paragrafo">
+        ${formData.contradicao || 'Verifica-se contradição na decisão...'}
+    </div>
+
+    <div class="secao">III - DA OBSCURIDADE</div>
+    <div class="paragrafo">
+        ${formData.obscuridade || 'A decisão é obscura no que se refere a...'}
+    </div>
+
+    <div class="secao">IV - DOS PEDIDOS</div>
+    <div class="paragrafo">
+        ${formData.pedidos || 'Requer-se o acolhimento dos embargos para...'}
+    </div>
+
+    <div class="data-local">
+        São Paulo, ${data}
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <strong>${userProfile.name || 'Nome do Advogado'}</strong><br>
+        <strong>OAB ${userProfile.oab || 'SP 000.000'}</strong>
+    </div>
+`;
+        }
+
+        // ========================================
+        // FUNÇÃO DE VISUALIZAÇÃO DO DOCUMENTO
+        // ========================================
+
+        function updateDocumentPreview() {
+            console.log('🔄 Atualizando preview do documento...');
+            
+            try {
+                const documentType = document.getElementById('documentType').value;
+                const template = documentTemplates[documentType];
+                
+                if (!template) {
+                    console.error('❌ Template não encontrado:', documentType);
+                    return;
+                }
+                
+                // Coletar dados do formulário
+                const formData = {};
+                template.fields.forEach(field => {
+                    const element = document.getElementById(field.id);
+                    if (element) {
+                        formData[field.id] = element.value || field.defaultValue || '';
+                    }
+                });
+                
+                // Gerar conteúdo formatado
+                const documentHTML = createProfessionalDocumentHTML(documentType, formData, template);
+                
+                // Extrair apenas o conteúdo do body
+                const bodyMatch = documentHTML.match(/<body[^>]*>([\s\S]*)<\/body>/);
+                const content = bodyMatch ? bodyMatch[1] : documentHTML;
+                
+                // Atualizar preview
+                const previewElement = document.getElementById('document-preview');
+                if (previewElement) {
+                    previewElement.innerHTML = content;
+                    
+                    // Atualizar título
+                    const titleElement = document.getElementById('preview-title');
+                    if (titleElement) {
+                        titleElement.textContent = template.title;
+                    }
+                    
+                    console.log('✅ Preview atualizado com sucesso');
+                } else {
+                    console.error('❌ Elemento de preview não encontrado');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao atualizar preview:', error);
+                showNotification('❌ Erro ao atualizar preview', 'error');
             }
         }
 
