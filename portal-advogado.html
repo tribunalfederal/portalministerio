@@ -3447,25 +3447,40 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 .replace(/$/, '</p>');
         }
 
-        // Download direto e simples das páginas
+        // Download direto e ROBUSTO das páginas - TODAS as páginas
         function downloadPagesDirectly(pages, documentTitle) {
             const totalPages = pages.length;
-            console.log(`📦 Iniciando download direto de ${totalPages} páginas...`);
+            console.log(`� === DOWNLOAD ROBUSTO INICIADO ===`);
+            console.log(`📦 Total de páginas para download: ${totalPages}`);
+            console.log(`📄 Verificando conteúdo das páginas:`, pages.map((p, i) => `Página ${i+1}: ${p.length} chars`));
+            
+            if (totalPages === 0) {
+                console.error('❌ ERRO: Nenhuma página foi gerada!');
+                showNotification('Erro: Nenhuma página gerada!', 'error');
+                return;
+            }
             
             showNotification(`Baixando ${totalPages} página(s)...`, 'info');
             
             let currentPage = 0;
+            let successCount = 0;
+            let errorCount = 0;
             
             function downloadNextPage() {
+                console.log(`📊 Status: Página atual ${currentPage + 1}/${totalPages}, Sucessos: ${successCount}, Erros: ${errorCount}`);
+                
                 if (currentPage >= totalPages) {
-                    console.log('🎉 Todas as páginas baixadas!');
-                    showNotification(`${totalPages} página(s) baixada(s) com sucesso!`, 'success');
+                    console.log('🎉 === DOWNLOAD COMPLETO ===');
+                    console.log(`✅ Páginas baixadas com sucesso: ${successCount}`);
+                    console.log(`❌ Páginas com erro: ${errorCount}`);
+                    showNotification(`${successCount}/${totalPages} página(s) baixada(s) com sucesso!`, successCount > 0 ? 'success' : 'error');
                     closeDocumentGenerator();
                     return;
                 }
                 
                 const pageIndex = currentPage + 1;
-                console.log(`📥 Baixando página ${pageIndex}...`);
+                console.log(`📥 === BAIXANDO PÁGINA ${pageIndex} ===`);
+                console.log(`📝 Conteúdo da página ${pageIndex}:`, pages[currentPage].substring(0, 200) + '...');
                 
                 // Criar elemento temporário
                 const pageElement = document.createElement('div');
@@ -3476,52 +3491,92 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     width: 794px;
                     height: 1123px;
                     background: white;
+                    font-family: 'Times New Roman', serif;
                 `;
-                pageElement.innerHTML = pages[currentPage];
-                document.body.appendChild(pageElement);
+                
+                try {
+                    pageElement.innerHTML = pages[currentPage];
+                    document.body.appendChild(pageElement);
+                    console.log(`🔧 Elemento criado e adicionado ao DOM para página ${pageIndex}`);
+                } catch (error) {
+                    console.error(`❌ Erro ao criar elemento da página ${pageIndex}:`, error);
+                    errorCount++;
+                    currentPage++;
+                    setTimeout(downloadNextPage, 500);
+                    return;
+                }
 
-                // Render e download
+                // Render e download com timeout de segurança
+                const renderTimeout = setTimeout(() => {
+                    console.error(`⏰ Timeout na renderização da página ${pageIndex}`);
+                    if (document.body.contains(pageElement)) {
+                        document.body.removeChild(pageElement);
+                    }
+                    errorCount++;
+                    currentPage++;
+                    downloadNextPage();
+                }, 10000); // 10s timeout
+
                 setTimeout(() => {
+                    console.log(`🎨 Iniciando html2canvas para página ${pageIndex}...`);
+                    
                     html2canvas(pageElement, {
                         backgroundColor: '#ffffff',
                         scale: 1.5,
                         width: 794,
                         height: 1123,
                         useCORS: true,
-                        allowTaint: true
+                        allowTaint: true,
+                        logging: false
                     }).then(canvas => {
+                        clearTimeout(renderTimeout);
+                        console.log(`✅ Canvas gerado para página ${pageIndex}: ${canvas.width}x${canvas.height}`);
+                        
                         // Download da imagem
                         canvas.toBlob(function(blob) {
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${documentTitle.replace(/\s+/g, '_')}_Pagina_${pageIndex.toString().padStart(2, '0')}.png`;
-                            a.style.display = 'none';
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            window.URL.revokeObjectURL(url);
-                            
-                            console.log(`✅ Página ${pageIndex} baixada!`);
+                            if (!blob) {
+                                console.error(`❌ Blob vazio para página ${pageIndex}`);
+                                errorCount++;
+                            } else {
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `${documentTitle.replace(/\s+/g, '_')}_Pagina_${pageIndex.toString().padStart(2, '0')}.png`;
+                                a.style.display = 'none';
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                window.URL.revokeObjectURL(url);
+                                
+                                console.log(`💾 ✅ Página ${pageIndex} baixada com sucesso!`);
+                                successCount++;
+                            }
                             
                             // Limpar e próxima página
-                            document.body.removeChild(pageElement);
+                            if (document.body.contains(pageElement)) {
+                                document.body.removeChild(pageElement);
+                            }
                             currentPage++;
                             
                             setTimeout(() => {
                                 downloadNextPage();
-                            }, 1000);
+                            }, 1500); // Delay maior para estabilidade
                             
                         }, 'image/png', 0.95);
                     }).catch(error => {
-                        console.error(`❌ Erro na página ${pageIndex}:`, error);
-                        document.body.removeChild(pageElement);
+                        clearTimeout(renderTimeout);
+                        console.error(`❌ Erro no html2canvas da página ${pageIndex}:`, error);
+                        if (document.body.contains(pageElement)) {
+                            document.body.removeChild(pageElement);
+                        }
+                        errorCount++;
                         currentPage++;
-                        downloadNextPage();
+                        setTimeout(downloadNextPage, 1000);
                     });
-                }, 300);
+                }, 500); // Delay para garantir renderização
             }
             
+            // Iniciar o processo
             downloadNextPage();
         }
 
