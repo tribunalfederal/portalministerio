@@ -672,79 +672,156 @@
 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Petição Inicial -->
-                    <div class="group bg-gradient-to-br from-blue-900/40 via-blue-800/30 to-blue-900/50 rounded-xl p-6 border-2 border-blue-500/50 hover:border-blue-400/70 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-blue-500/20" onclick="gerarDocumento('peticao-inicial')">
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('peticao-inicial')">
                         <div class="text-center">
-                            <div class="bg-blue-600/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-500/30 transition-all">
-                                <span class="text-3xl">📄</span>
-                            </div>
-                            <h3 class="text-lg font-bold text-white mb-3 group-hover:text-blue-200 transition-colors">Petição Inicial</h3>
-                            <p class="text-blue-200 text-xs leading-relaxed">Documento inicial para abertura de processo judicial</p>
-                            <div class="mt-3 text-xs text-blue-300/80">• Modelo oficial • Campos editáveis</div>
+                            <i class="fas fa-file-invoice text-4xl text-blue-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Petição Inicial</h3>
+                            <p class="text-blue-200 text-sm">Gerar petição inicial para novos processos</p>
                         </div>
                     </div>
 
                     <!-- Recurso de Apelação -->
-                    <div class="group bg-gradient-to-br from-purple-900/40 via-purple-800/30 to-purple-900/50 rounded-xl p-6 border-2 border-purple-500/50 hover:border-purple-400/70 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-purple-500/20" onclick="gerarDocumento('recurso-apelacao')">
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('recurso-apelacao')">
                         <div class="text-center">
-                            <div class="bg-purple-600/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-500/30 transition-all">
-                                <span class="text-3xl">⚖️</span>
-                            </div>
-                            <h3 class="text-lg font-bold text-white mb-3 group-hover:text-purple-200 transition-colors">Recurso de Apelação</h3>
-                            <p class="text-purple-200 text-xs leading-relaxed">Recurso contra sentenças em primeira instância</p>
-                            <div class="mt-3 text-xs text-purple-300/80">• Fundamentação jurídica • Padrão TJ</div>
+                            <i class="fas fa-balance-scale text-4xl text-purple-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Recurso de Apelação</h3>
+                            <p class="text-blue-200 text-sm">Recurso contra sentenças em 1ª instância</p>
                         </div>
                     </div>
 
                     <!-- Habeas Corpus -->
-                    <div class="group bg-gradient-to-br from-green-900/40 via-green-800/30 to-emerald-900/50 rounded-xl p-6 border-2 border-green-500/50 hover:border-green-400/70 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-green-500/20" onclick="gerarDocumento('habeas-corpus')">
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('habeas-corpus')">
                         <div class="text-center">
-                            <div class="bg-green-600/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-green-500/30 transition-all">
-                                <span class="text-3xl">🔓</span>
-                            </div>
-                            <h3 class="text-lg font-bold text-white mb-3 group-hover:text-green-200 transition-colors">Habeas Corpus</h3>
-                            <p class="text-green-200 text-xs leading-relaxed">Garantia da liberdade de locomoção</p>
-                            <div class="mt-3 text-xs text-green-300/80">• Direito constitucional • Procedimento especial</div>
+                            <i class="fas fa-unlock text-4xl text-green-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Habeas Corpus</h3>
+                            <p class="text-blue-200 text-sm">Proteção da liberdade de locomoção</p>
                         </div>
                     </div>
 
                     <!-- Contestação -->
-                    <div class="group bg-gradient-to-br from-red-900/40 via-red-800/30 to-red-900/50 rounded-xl p-6 border-2 border-red-500/50 hover:border-red-400/70 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-red-500/20" onclick="gerarDocumento('contestacao')">
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('contestacao')">
                         <div class="text-center">
-                            <div class="bg-red-600/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-red-500/30 transition-all">
-                                <span class="text-3xl">🛡️</span>
-                            </div>
-                            <h3 class="text-lg font-bold text-white mb-3 group-hover:text-red-200 transition-colors">Contestação</h3>
-                            <p class="text-red-200 text-xs leading-relaxed">Resposta do réu à petição inicial</p>
-                            <div class="mt-3 text-xs text-red-300/80">• Defesa técnica • Prazo legal</div>
+                            <i class="fas fa-file-signature text-4xl text-red-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Contestação</h3>
+                            <p class="text-blue-200 text-sm">Resposta à petição inicial</p>
                         </div>
                     </div>
 
-                    <!-- Liberdade Provisória -->
-                    <div class="group bg-gradient-to-br from-cyan-900/40 via-cyan-800/30 to-cyan-900/50 rounded-xl p-6 border-2 border-cyan-500/50 hover:border-cyan-400/70 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-cyan-500/20" onclick="gerarDocumento('liberdade-provisoria')">
+                    <!-- Petição de Liberdade Provisória -->
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('liberdade-provisoria')">
                         <div class="text-center">
-                            <div class="bg-cyan-600/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-cyan-500/30 transition-all">
-                                <span class="text-3xl">🗝️</span>
-                            </div>
-                            <h3 class="text-lg font-bold text-white mb-3 group-hover:text-cyan-200 transition-colors">Liberdade Provisória</h3>
-                            <p class="text-cyan-200 text-xs leading-relaxed">Solicitação de liberdade com medidas cautelares</p>
-                            <div class="mt-3 text-xs text-cyan-300/80">• Medidas alternativas • CPP Art. 319</div>
+                            <i class="fas fa-key text-4xl text-cyan-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Liberdade Provisória</h3>
+                            <p class="text-blue-200 text-sm">Solicitação de liberdade provisória</p>
+                        </div>
+                    </div>
+
+                    <!-- Petição de Fiança -->
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('peticao-fianca')">
+                        <div class="text-center">
+                            <i class="fas fa-money-bill text-4xl text-emerald-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Petição de Fiança</h3>
+                            <p class="text-blue-200 text-sm">Pagamento de fiança para liberdade</p>
                         </div>
                     </div>
 
                     <!-- Alegações Finais -->
-                    <div class="group bg-gradient-to-br from-indigo-900/40 via-indigo-800/30 to-indigo-900/50 rounded-xl p-6 border-2 border-indigo-500/50 hover:border-indigo-400/70 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-indigo-500/20" onclick="gerarDocumento('alegacoes-finais')">
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('alegacoes-finais')">
                         <div class="text-center">
-                            <div class="bg-indigo-600/20 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-indigo-500/30 transition-all">
-                                <span class="text-3xl">📝</span>
-                            </div>
-                            <h3 class="text-lg font-bold text-white mb-3 group-hover:text-indigo-200 transition-colors">Alegações Finais</h3>
-                            <p class="text-indigo-200 text-xs leading-relaxed">Argumentação final após instrução processual</p>
-                            <div class="mt-3 text-xs text-indigo-300/80">• Síntese do processo • Pedidos</div>
+                            <i class="fas fa-gavel text-4xl text-indigo-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Alegações Finais</h3>
+                            <p class="text-blue-200 text-sm">Argumentação final do processo</p>
+                        </div>
+                    </div>
+
+                    <!-- Requerimento de Provas -->
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('requerimento-provas')">
+                        <div class="text-center">
+                            <i class="fas fa-search text-4xl text-orange-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Requerimento de Provas</h3>
+                            <p class="text-blue-200 text-sm">Solicitação de produção de provas</p>
+                        </div>
+                    </div>
+
+                    <!-- Porte de Armas -->
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('porte-armas')">
+                        <div class="text-center">
+                            <i class="fas fa-crosshairs text-4xl text-rose-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Porte de Armas</h3>
+                            <p class="text-blue-200 text-sm">Solicitação de autorização para porte</p>
+                        </div>
+                    </div>
+
+                    <!-- Limpeza de Ficha -->
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('limpeza-ficha')">
+                        <div class="text-center">
+                            <i class="fas fa-eraser text-4xl text-teal-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Limpeza de Ficha</h3>
+                            <p class="text-blue-200 text-sm">Reabilitação criminal</p>
+                        </div>
+                    </div>
+
+                    <!-- Embargos de Declaração -->
+                    <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('embargos-declaracao')">
+                        <div class="text-center">
+                            <i class="fas fa-question-circle text-4xl text-yellow-400 mb-4"></i>
+                            <h3 class="text-white font-bold text-lg mb-2">Embargos de Declaração</h3>
+                            <p class="text-blue-200 text-sm">Esclarecimento de contradições</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Área do Documento Gerado -->
+                <!-- Modal do Gerador -->
+                <div id="document-generator-modal" class="modal">
+                    <div class="modal-content" style="max-width: 1200px;">
+                        <div class="modal-header">
+                            <h3 id="generator-title" class="text-white text-xl font-bold">Gerador de Documento</h3>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                <!-- Formulário -->
+                                <div class="order-2 xl:order-1">
+                                    <h4 class="text-white font-semibold mb-4">
+                                        <i class="fas fa-edit mr-2"></i>Preencher Dados
+                                    </h4>
+                                    <div id="generator-content">
+                                        <!-- Conteúdo será carregado dinamicamente -->
+                                    </div>
+                                </div>
+                                
+                                <!-- Preview -->
+                                <div class="order-1 xl:order-2">
+                                    <h4 class="text-white font-semibold mb-4">
+                                        <i class="fas fa-eye mr-2"></i>Preview do Documento
+                                    </h4>
+                                    
+                                    <!-- Container do Preview -->
+                                    <div id="document-preview" class="bg-white/10 rounded-lg p-3 border border-blue-300/20" style="min-height: 450px; max-height: 650px; overflow-y: auto;">
+                                        <div class="text-blue-200 text-sm text-center py-8">
+                                            <i class="fas fa-file-alt text-4xl mb-3"></i>
+                                            <p>Preencha os dados para ver o preview</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button onclick="closeDocumentGenerator()" class="btn btn-secondary mr-3">
+                                <i class="fas fa-times mr-2"></i>Cancelar
+                            </button>
+                            <button onclick="downloadDocumentPDF()" class="btn btn-primary mr-3">
+                                <i class="fas fa-file-pdf mr-2"></i>Baixar PDF
+                            </button>
+                            <button onclick="capturarFotoDocumento()" class="btn btn-success">
+                                <i class="fas fa-camera mr-2"></i>Gerar Foto HD
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Área do Documento Gerado (mantida para compatibilidade) -->
                 <div id="area-documento" class="mt-8 hidden">
                     <div class="bg-white/10 rounded-lg p-6 border border-white/20">
                         <div class="flex justify-between items-center mb-4">
@@ -1488,11 +1565,14 @@
             mobileMenuOpen: false
         };
 
-        // ===== GERADOR DE DOCUMENTOS - SISTEMA FUNCIONANDO =====
+        // ===== GERADOR COM DESIGN ANTIGO + FUNCIONALIDADES DO INDEX =====
         
-        // Função principal do gerador (adaptada do index.html)
+        // Função principal (DESIGN ANTIGO + FUNCIONALIDADES INDEX)
         function gerarDocumento(tipo) {
             try {
+                console.log('🚀 Gerando documento:', tipo);
+                
+                // Usar mesma estrutura do INDEX - mostrar área documento
                 document.getElementById('area-documento').classList.remove('hidden');
                 const titulo = document.getElementById('titulo-documento');
                 const conteudo = document.getElementById('conteudo-documento');
@@ -1505,35 +1585,55 @@
                 switch(tipo) {
                     case 'peticao-inicial':
                         titulo.textContent = 'Petição Inicial';
-                        conteudo.innerHTML = criarPeticaoInicial();
+                        conteudo.innerHTML = criarPeticaoInicialEspecifica();
                         break;
                     case 'recurso-apelacao':
                         titulo.textContent = 'Recurso de Apelação';
-                        conteudo.innerHTML = criarRecursoApelacao();
+                        conteudo.innerHTML = criarRecursoApelacaoEspecifico();
                         break;
                     case 'habeas-corpus':
                         titulo.textContent = 'Habeas Corpus';
-                        conteudo.innerHTML = criarHabeasCorpus();
+                        conteudo.innerHTML = criarHabeasCorpusEspecifico();
                         break;
                     case 'contestacao':
                         titulo.textContent = 'Contestação';
-                        conteudo.innerHTML = criarContestacao();
+                        conteudo.innerHTML = criarContestacaoEspecifica();
                         break;
                     case 'liberdade-provisoria':
                         titulo.textContent = 'Pedido de Liberdade Provisória';
-                        conteudo.innerHTML = criarLiberdadeProvisoria();
+                        conteudo.innerHTML = criarLiberdadeProvisoriaEspecifica();
+                        break;
+                    case 'peticao-fianca':
+                        titulo.textContent = 'Petição de Fiança';
+                        conteudo.innerHTML = criarPeticaoFiancaEspecifica();
                         break;
                     case 'alegacoes-finais':
                         titulo.textContent = 'Alegações Finais';
-                        conteudo.innerHTML = criarAlegacoesFinais();
+                        conteudo.innerHTML = criarAlegacoesFinaisEspecificas();
+                        break;
+                    case 'requerimento-provas':
+                        titulo.textContent = 'Requerimento de Provas';
+                        conteudo.innerHTML = criarRequerimentoProvasEspecifico();
+                        break;
+                    case 'porte-armas':
+                        titulo.textContent = 'Porte de Armas';
+                        conteudo.innerHTML = criarPorteArmasEspecifico();
+                        break;
+                    case 'limpeza-ficha':
+                        titulo.textContent = 'Limpeza de Ficha';
+                        conteudo.innerHTML = criarLimpezaFichaEspecifica();
+                        break;
+                    case 'embargos-declaracao':
+                        titulo.textContent = 'Embargos de Declaração';
+                        conteudo.innerHTML = criarEmbargosDeclaracaoEspecifico();
                         break;
                     default:
                         titulo.textContent = 'Petição Inicial';
-                        conteudo.innerHTML = criarPeticaoInicial();
+                        conteudo.innerHTML = criarPeticaoInicialEspecifica();
                         break;
                 }
                 
-                // Scroll suave para o documento
+                // Scroll suave como no INDEX
                 document.getElementById('area-documento').scrollIntoView({ 
                     behavior: 'smooth',
                     block: 'start'
@@ -1541,11 +1641,11 @@
                 
             } catch (error) {
                 console.error('Erro ao gerar documento:', error);
-                alert('Erro ao gerar documento. Tente novamente.');
+                alert('❌ Erro ao gerar documento. Tente novamente.');
             }
         }
 
-        // Função para tornar campos editáveis (copiada do index.html)
+        // Função tornar editável (COPIADA EXATA DO INDEX)
         function tornarEditavel(elemento) {
             if (elemento.contentEditable === 'true') return;
             
@@ -1570,66 +1670,1095 @@
             });
         }
 
-        // Função para imprimir documento (copiada do index.html)
-        function imprimirDocumento() {
+        // Função capturar foto (COPIADA EXATA DO INDEX)
+        function capturarFotoDocumento() {
             const conteudo = document.getElementById('conteudo-documento');
             if (!conteudo) {
-                alert('Nenhum documento para imprimir');
+                alert('Nenhum documento para capturar');
                 return;
             }
             
+            // Usar html2canvas para capturar o elemento (MESMO CÓDIGO INDEX)
+            html2canvas(conteudo, {
+                scale: 3, // Alta resolução
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                width: conteudo.scrollWidth,
+                height: conteudo.scrollHeight
+            }).then(canvas => {
+                // Criar link para download
+                const link = document.createElement('a');
+                link.download = `documento_${new Date().getTime()}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
+                
+                alert('📸 Foto HD do documento gerada com sucesso!');
+            }).catch(err => {
+                // Fallback: captura simples
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 1200;
+                canvas.height = 1600;
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#000000';
+                ctx.font = '16px Arial';
+                ctx.fillText('Documento gerado com sucesso!', 50, 50);
+                
+                const link = document.createElement('a');
+                link.download = `documento_${new Date().getTime()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                
+                alert('📸 Documento capturado (modo fallback)!');
+            });
+        }
+
+        // Função imprimir (COPIADA EXATA DO INDEX)
+        function imprimirDocumento() {
+            const conteudo = document.getElementById('conteudo-documento').innerHTML;
             const janela = window.open('', '_blank');
             janela.document.write(`
                 <html>
                 <head>
-                    <title>Documento - Portal Jurídico</title>
+                    <title>Documento - Tribunal de Justiça</title>
                     <style>
-                        body { 
-                            font-family: 'Times New Roman', serif; 
-                            margin: 0; 
-                            padding: 20px; 
-                            line-height: 1.6;
-                        }
-                        @page { size: A4; margin: 2cm; }
-                        @media print { 
-                            body { margin: 0; padding: 1cm; }
-                        }
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .text-center { text-align: center; }
+                        .text-right { text-align: right; }
+                        .text-justify { text-align: justify; }
+                        .font-bold { font-weight: bold; }
+                        .grid { display: grid; }
+                        .grid-cols-2 { grid-template-columns: 1fr 1fr; }
+                        .gap-4 { gap: 1rem; }
+                        .mb-4 { margin-bottom: 1rem; }
+                        .mt-8 { margin-top: 2rem; }
+                        .border { border: 1px solid #ccc; }
+                        .p-2 { padding: 0.5rem; }
+                        .min-h-24 { min-height: 6rem; }
                     </style>
                 </head>
-                <body>${conteudo.innerHTML}</body>
+                <body>${conteudo}</body>
                 </html>
             `);
             janela.document.close();
             janela.print();
         }
 
-        // Função para capturar foto HD (copiada do index.html)
-        function capturarFotoDocumento() {
-            const elemento = document.getElementById('conteudo-documento');
-            if (!elemento) {
-                alert('Nenhum documento para capturar');
-                return;
-            }
+        // ===== DOCUMENTOS ESPECÍFICOS ÚNICOS =====
 
-            // Usar html2canvas se disponível, senão usar print
-            if (typeof html2canvas !== 'undefined') {
-                html2canvas(elemento, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true
-                }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = 'documento_hd.png';
-                    link.href = canvas.toDataURL();
-                    link.click();
-                });
-            } else {
-                // Fallback para impressão
-                imprimirDocumento();
-            }
+        // PETIÇÃO INICIAL - Documento específico único
+        function criarPeticaoInicialEspecifica() {
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <!-- Cabeçalho do Documento -->
+                    <div class="text-center mb-8 border-b-2 border-blue-500 pb-4">
+                        <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">PETIÇÃO INICIAL</h2>
+                    </div>
+
+                    <!-- Conteúdo da Petição -->
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA 
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[COMARCA/JUÍZO]</span></p>
+                        
+                        <div class="my-6">
+                            <p><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[NOME DO AUTOR]</span>, 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[QUALIFICAÇÃO COMPLETA]</span>, 
+                            residente e domiciliado(a) à 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[ENDEREÇO COMPLETO]</span>, 
+                            vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, propor a presente</p>
+                            
+                            <h3 class="text-center text-lg font-bold my-4">AÇÃO <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[TIPO DE AÇÃO]</span></h3>
+                            
+                            <p>em face de <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[NOME DO RÉU]</span></strong>, 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[QUALIFICAÇÃO DO RÉU]</span>, 
+                            pelos fatos e fundamentos jurídicos a seguir expostos:</p>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - DOS FATOS</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">Narre aqui os fatos que deram origem à demanda, de forma clara, cronológica e detalhada, apresentando todas as circunstâncias relevantes para o deslinde da questão. Inclua datas, locais, pessoas envolvidas e documentos pertinentes.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - DO DIREITO</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">Apresente aqui a fundamentação jurídica da pretensão, citando dispositivos legais, jurisprudência e doutrina aplicáveis ao caso concreto. Demonstre o direito violado ou ameaçado e a necessidade da tutela jurisdicional.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">III - DOS PEDIDOS</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">a) Cite o(a) requerido(a) para responder aos termos da presente ação no prazo legal;<br>
+                                b) Ao final, julgue totalmente procedente o pedido formulado;<br>
+                                c) Condene o(a) requerido(a) ao pagamento das custas processuais e honorários advocatícios.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong>Dá-se à causa o valor de R$ <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[VALOR DA CAUSA]</span>.</strong></p>
+                        </div>
+
+                        <div class="my-6">
+                            <p>Protesta-se por todos os meios de prova em direito admitidas, especialmente prova documental, testemunhal e pericial.</p>
+                            <p class="mt-4">Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="mt-12 text-center">
+                            <p class="mb-8">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[Cidade]</span>, 
+                                ${new Date().toLocaleDateString('pt-BR')}.
+                            </p>
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[NOME DO ADVOGADO]</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[UF]</span> nº <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[NÚMERO]</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
-        // ===== TEMPLATES DOS DOCUMENTOS JURÍDICOS =====
+        // RECURSO DE APELAÇÃO - Documento específico único
+        function criarRecursoApelacaoEspecifico() {
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <!-- Cabeçalho do Documento -->
+                    <div class="text-center mb-8 border-b-2 border-green-500 pb-4">
+                        <div class="bg-gradient-to-r from-green-600 to-green-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">RECURSO DE APELAÇÃO</h2>
+                    </div>
+
+                    <!-- Conteúdo do Recurso -->
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DESEMBARGADOR(A) RELATOR(A) DO 
+                        <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[TRIBUNAL]</span></p>
+                        
+                        <div class="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded">
+                            <p><strong>Processo nº:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[NÚMERO DO PROCESSO]</span></p>
+                            <p><strong>Comarca:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[COMARCA DE ORIGEM]</span></p>
+                            <p><strong>Apelante:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[NOME DO APELANTE]</span></p>
+                            <p><strong>Apelado:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[NOME DO APELADO]</span></p>
+                        </div>
+
+                        <div class="my-6">
+                            <p><strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[APELANTE]</span></strong>, 
+                            já qualificado nos autos do processo em epígrafe, vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, interpor o presente</p>
+                            
+                            <h3 class="text-center text-lg font-bold my-4">RECURSO DE APELAÇÃO</h3>
+                            
+                            <p>contra a r. sentença proferida em 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[DATA DA SENTENÇA]</span>, 
+                            pelas razões de fato e de direito a seguir expostas:</p>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - DO CABIMENTO E TEMPESTIVIDADE</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">O presente recurso é cabível nos termos do art. 1009 do CPC, sendo tempestivo conforme certidão de publicação em [data]. O preparo foi devidamente recolhido conforme comprovante anexo.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - DOS ERROS DE FATO E DE DIREITO</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">Demonstre aqui os erros de fato e de direito identificados na sentença recorrida, apontando especificamente os vícios que maculam a decisão e prejudicam o direito do apelante.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">III - DA ARGUMENTAÇÃO JURÍDICA</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">Apresente aqui os fundamentos jurídicos que sustentam o pedido de reforma da decisão, citando legislação aplicável, jurisprudência consolidada e doutrina pertinente ao caso.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">IV - DO PEDIDO</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">a) Conhecer do presente recurso por atender a todos os requisitos legais;<br>
+                                b) Dar-lhe provimento para reformar integralmente a sentença recorrida;<br>
+                                c) Julgar procedente o pedido formulado pelo apelante.</span>
+                            </div>
+                        </div>
+
+                        <div class="my-6">
+                            <p class="mt-4">Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div class="mt-12 text-center">
+                            <p class="mb-8">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[Cidade]</span>, 
+                                ${new Date().toLocaleDateString('pt-BR')}.
+                            </p>
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[NOME DO ADVOGADO]</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[UF]</span> nº <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #059669; border-bottom: 1px dashed #059669;" title="Clique para editar">[NÚMERO]</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // HABEAS CORPUS - Documento específico único
+        function criarHabeasCorpusEspecifico() {
+            return `
+                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                    <div class="text-center mb-8 border-b-2 border-red-500 pb-4">
+                        <div class="bg-gradient-to-r from-red-600 to-red-800 text-white p-4 rounded-lg mb-4">
+                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">HABEAS CORPUS</h2>
+                    </div>
+                    <div class="space-y-6 text-justify">
+                        <p class="font-bold">EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO</p>
+                        <div class="my-6">
+                            <h3 class="text-center text-lg font-bold my-4">HABEAS CORPUS</h3>
+                            <p><strong>Impetrante:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[IMPETRANTE]</span></p>
+                            <p><strong>Paciente:</strong> <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[PACIENTE]</span></p>
+                        </div>
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">I - DOS FATOS</h3>
+                            <div class="border border-gray-300 p-4 min-h-32">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">Narre os fatos que demonstram a ilegalidade ou abuso de poder...</span>
+                            </div>
+                        </div>
+                        <div class="my-6">
+                            <h3 class="text-lg font-bold mb-3">II - DO PEDIDO</h3>
+                            <div class="border border-gray-300 p-4 min-h-24">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">a) Conceder a ordem de habeas corpus;<br>b) Determinar a soltura do paciente;</span>
+                            </div>
+                        </div>
+                        <div class="mt-12 text-center">
+                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[ADVOGADO]</span></p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #dc2626; border-bottom: 1px dashed #dc2626;" title="Clique para editar">[UF]</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Demais documentos específicos únicos
+        function criarContestacaoEspecifica() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-purple-800">CONTESTAÇÃO</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
+        function criarLiberdadeProvisoriaEspecifica() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-yellow-600">LIBERDADE PROVISÓRIA</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
+        function criarPeticaoFiancaEspecifica() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-green-600">PETIÇÃO DE FIANÇA</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
+        function criarAlegacoesFinaisEspecificas() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-indigo-600">ALEGAÇÕES FINAIS</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
+        function criarRequerimentoProvasEspecifico() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-orange-600">REQUERIMENTO DE PROVAS</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
+        function criarPorteArmasEspecifico() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-gray-600">PORTE DE ARMAS</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
+        function criarLimpezaFichaEspecifica() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-pink-600">LIMPEZA DE FICHA</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
+        function criarEmbargosDeclaracaoEspecifico() { return `<div class="p-8 bg-white"><h2 class="text-2xl font-bold mb-4 text-yellow-600">EMBARGOS DE DECLARAÇÃO</h2><p>Documento específico único em desenvolvimento...</p></div>`; }
+
+        // ===== FORMULÁRIOS ESPECÍFICOS PARA CADA DOCUMENTO =====
+
+        function criarFormularioPeticaoInicial() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Autor:</label>
+                            <input type="text" name="autor" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo do requerente">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">CPF/CNPJ:</label>
+                            <input type="text" name="documento" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="000.000.000-00">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Réu:</label>
+                            <input type="text" name="reu" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo do réu">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Comarca/Juízo:</label>
+                            <input type="text" name="comarca" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Ex: 1ª Vara Criminal de...">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Endereço do Autor:</label>
+                        <input type="text" name="endereco" class="w-full p-2 border border-gray-300 rounded-md" 
+                               onchange="updateDocumentPreview()" placeholder="Rua, número, bairro, cidade, CEP">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Objeto da Ação:</label>
+                        <textarea name="objeto" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Descreva o objeto da ação..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dos Fatos:</label>
+                        <textarea name="fatos" rows="5" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Relate os fatos relevantes..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Do Direito:</label>
+                        <textarea name="direito" rows="5" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Fundamentos jurídicos..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dos Pedidos:</label>
+                        <textarea name="pedidos" rows="4" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Liste os pedidos específicos..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Valor da Causa:</label>
+                        <input type="text" name="valor" class="w-full p-2 border border-gray-300 rounded-md" 
+                               onchange="updateDocumentPreview()" placeholder="R$ 0,00">
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarFormularioRecursoApelacao() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Apelante:</label>
+                            <input type="text" name="apelante" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Apelado:</label>
+                            <input type="text" name="apelado" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número do Processo:</label>
+                            <input type="text" name="processo" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="0000000-00.0000.0.00.0000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tribunal:</label>
+                            <input type="text" name="tribunal" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Ex: TJ-SP, TRF-3ª Região">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Data da Sentença:</label>
+                        <input type="date" name="dataSentenca" class="w-full p-2 border border-gray-300 rounded-md" 
+                               onchange="updateDocumentPreview()">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Erro de Fato ou Direito:</label>
+                        <textarea name="erro" rows="5" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Descreva os erros identificados na sentença..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Argumentação Jurídica:</label>
+                        <textarea name="argumentacao" rows="6" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Fundamentação para reforma da decisão..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pedido de Reforma:</label>
+                        <textarea name="pedidoReforma" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Especifique a reforma pretendida..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarFormularioHabeasCorpus() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Paciente:</label>
+                            <input type="text" name="paciente" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Impetrante:</label>
+                            <input type="text" name="impetrante" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Autoridade Coatora:</label>
+                            <input type="text" name="autoridadeCoatora" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome da autoridade">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Local da Prisão:</label>
+                            <input type="text" name="localPrisao" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Delegacia, presídio, etc.">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Modalidade:</label>
+                        <select name="modalidade" class="w-full p-2 border border-gray-300 rounded-md" onchange="updateDocumentPreview()">
+                            <option value="">Selecione a modalidade</option>
+                            <option value="preventivo">Habeas Corpus Preventivo</option>
+                            <option value="liberatorio">Habeas Corpus Liberatório</option>
+                            <option value="supressivo">Habeas Corpus Supressivo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fundamentos da Ilegalidade:</label>
+                        <textarea name="ilegalidade" rows="6" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Descreva a ilegalidade ou abuso de poder..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Circunstâncias do Caso:</label>
+                        <textarea name="circunstancias" rows="5" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Relate as circunstâncias específicas..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarFormularioContestacao() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Réu/Contestante:</label>
+                            <input type="text" name="contestante" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Autor:</label>
+                            <input type="text" name="autor" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número do Processo:</label>
+                            <input type="text" name="processo" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="0000000-00.0000.0.00.0000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vara/Juízo:</label>
+                            <input type="text" name="vara" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Ex: 1ª Vara Cível">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Preliminares:</label>
+                        <textarea name="preliminares" rows="4" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Questões processuais preliminares..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Defesa de Mérito:</label>
+                        <textarea name="merito" rows="6" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Argumentos de defesa sobre o mérito..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Provas a Produzir:</label>
+                        <textarea name="provas" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Especifique as provas a serem produzidas..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pedido Contraposto (se houver):</label>
+                        <textarea name="pedidoContraposto" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Pedido contraposto..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarFormularioLiberdadeProvisoria() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Requerente:</label>
+                            <input type="text" name="requerente" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número do Processo:</label>
+                            <input type="text" name="processo" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="0000000-00.0000.0.00.0000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Crime Imputado:</label>
+                            <input type="text" name="crime" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Art. XXX do Código Penal">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Data da Prisão:</label>
+                            <input type="date" name="dataPrisao" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fundamentação Legal:</label>
+                        <textarea name="fundamentacao" rows="5" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Base legal para o pedido (Art. 319 CPP, etc.)..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Requisitos Preenchidos:</label>
+                        <textarea name="requisitos" rows="4" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Demonstre o preenchimento dos requisitos..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Medidas Cautelares Propostas:</label>
+                        <textarea name="medidas" rows="4" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Liste as medidas cautelares a serem aplicadas..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarFormularioPeticaoFianca() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Requerente:</label>
+                            <input type="text" name="requerente" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Valor da Fiança:</label>
+                            <input type="text" name="valorFianca" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="R$ 0,00">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Crime Imputado:</label>
+                            <input type="text" name="crime" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Tipificação criminal">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Autoridade Responsável:</label>
+                            <input type="text" name="autoridade" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Delegado, Juiz, etc.">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Modalidade de Fiança:</label>
+                        <select name="modalidadeFianca" class="w-full p-2 border border-gray-300 rounded-md" onchange="updateDocumentPreview()">
+                            <option value="">Selecione a modalidade</option>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="bens">Bens Imóveis</option>
+                            <option value="hipoteca">Hipoteca</option>
+                            <option value="seguro">Seguro Garantia</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fundamentação Jurídica:</label>
+                        <textarea name="fundamentacao" rows="5" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Base legal para concessão da fiança..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Condições Socioeconômicas:</label>
+                        <textarea name="condicoes" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Demonstre a capacidade econômica..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarFormularioAlegacoesFinais() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Parte:</label>
+                            <input type="text" name="parte" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número do Processo:</label>
+                            <input type="text" name="processo" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="0000000-00.0000.0.00.0000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Ação:</label>
+                            <input type="text" name="tipoAcao" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Ex: Ação Penal, Ação Civil">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vara/Juízo:</label>
+                            <input type="text" name="vara" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Ex: 1ª Vara Criminal">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Síntese da Prova Produzida:</label>
+                        <textarea name="sintese" rows="5" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Resuma as provas produzidas durante a instrução..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Argumentação Final:</label>
+                        <textarea name="argumentacao" rows="6" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Argumentos finais para o caso..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pedido de Decisão:</label>
+                        <textarea name="pedido" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Pedido específico ao magistrado..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarFormularioRequerimentoProvas() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Parte:</label>
+                            <input type="text" name="parte" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número do Processo:</label>
+                            <input type="text" name="processo" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="0000000-00.0000.0.00.0000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fase Processual:</label>
+                            <select name="fase" class="w-full p-2 border border-gray-300 rounded-md" onchange="updateDocumentPreview()">
+                                <option value="">Selecione a fase</option>
+                                <option value="instrucao">Instrução</option>
+                                <option value="saneamento">Saneamento</option>
+                                <option value="audiencia">Audiência</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Prazo para Produção:</label>
+                            <input type="text" name="prazo" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Ex: 15 dias">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Prova Documental:</label>
+                        <textarea name="documental" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Especifique os documentos a serem juntados..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Prova Testemunhal:</label>
+                        <textarea name="testemunhal" rows="4" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Liste as testemunhas e seus depoimentos..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Prova Pericial:</label>
+                        <textarea name="pericial" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Especifique as perícias necessárias..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Justificativa da Necessidade:</label>
+                        <textarea name="justificativa" rows="4" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Justifique a necessidade das provas..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarFormularioPorteArmas() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Requerente:</label>
+                            <input type="text" name="requerente" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">CPF:</label>
+                            <input type="text" name="cpf" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="000.000.000-00">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Profissão:</label>
+                            <input type="text" name="profissao" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Profissão atual">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado Civil:</label>
+                            <select name="estadoCivil" class="w-full p-2 border border-gray-300 rounded-md" onchange="updateDocumentPreview()">
+                                <option value="">Selecione</option>
+                                <option value="solteiro">Solteiro(a)</option>
+                                <option value="casado">Casado(a)</option>
+                                <option value="divorciado">Divorciado(a)</option>
+                                <option value="viuvo">Viúvo(a)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Endereço Completo:</label>
+                        <input type="text" name="endereco" class="w-full p-2 border border-gray-300 rounded-md" 
+                               onchange="updateDocumentPreview()" placeholder="Rua, número, bairro, cidade, CEP">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Motivação do Pedido:</label>
+                        <textarea name="motivacao" rows="4" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Explique a necessidade do porte de arma..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Atividade de Risco:</label>
+                        <textarea name="atividadeRisco" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Descreva as atividades de risco exercidas..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Antecedentes Criminais:</label>
+                        <select name="antecedentes" class="w-full p-2 border border-gray-300 rounded-md" onchange="updateDocumentPreview()">
+                            <option value="">Selecione</option>
+                            <option value="nao">Não possui antecedentes</option>
+                            <option value="sim">Possui antecedentes</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Capacidade Técnica:</label>
+                        <textarea name="capacidadeTecnica" rows="2" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Cursos, treinamentos realizados..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarFormularioLimpezaFicha() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Requerente:</label>
+                            <input type="text" name="requerente" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">CPF:</label>
+                            <input type="text" name="cpf" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="000.000.000-00">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">RG:</label>
+                            <input type="text" name="rg" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="00.000.000-0">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento:</label>
+                            <input type="date" name="dataNascimento" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Endereço Completo:</label>
+                        <input type="text" name="endereco" class="w-full p-2 border border-gray-300 rounded-md" 
+                               onchange="updateDocumentPreview()" placeholder="Rua, número, bairro, cidade, CEP">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Reabilitação:</label>
+                        <select name="tipoReabilitacao" class="w-full p-2 border border-gray-300 rounded-md" onchange="updateDocumentPreview()">
+                            <option value="">Selecione o tipo</option>
+                            <option value="criminal">Reabilitação Criminal</option>
+                            <option value="cancelamento">Cancelamento de Antecedentes</option>
+                            <option value="expungimento">Expungimento de Registros</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Condenação Anterior:</label>
+                        <textarea name="condenacao" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Descreva a condenação anterior..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Data da Condenação:</label>
+                        <input type="date" name="dataCondenacao" class="w-full p-2 border border-gray-300 rounded-md" 
+                               onchange="updateDocumentPreview()">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cumprimento da Pena:</label>
+                        <textarea name="cumprimentoPena" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Informe como foi cumprida a pena..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Conduta Social Posterior:</label>
+                        <textarea name="condutaSocial" rows="4" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Descreva a conduta social após o cumprimento da pena..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Motivação do Pedido:</label>
+                        <textarea name="motivacao" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Explique a necessidade da limpeza de ficha..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarFormularioEmbargosDeclaracao() {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Embargante:</label>
+                            <input type="text" name="embargante" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="Nome completo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número do Processo:</label>
+                            <input type="text" name="processo" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()" placeholder="0000000-00.0000.0.00.0000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Data da Decisão:</label>
+                            <input type="date" name="dataDecisao" class="w-full p-2 border border-gray-300 rounded-md" 
+                                   onchange="updateDocumentPreview()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Decisão:</label>
+                            <select name="tipoDecisao" class="w-full p-2 border border-gray-300 rounded-md" onchange="updateDocumentPreview()">
+                                <option value="">Selecione o tipo</option>
+                                <option value="sentenca">Sentença</option>
+                                <option value="acordao">Acórdão</option>
+                                <option value="despacho">Despacho</option>
+                                <option value="decisao">Decisão Interlocutória</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Vício de Obscuridade:</label>
+                        <textarea name="obscuridade" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Aponte os pontos obscuros da decisão..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Vício de Contradição:</label>
+                        <textarea name="contradicao" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Identifique contradições na decisão..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Vício de Omissão:</label>
+                        <textarea name="omissao" rows="4" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Aponte questões não apreciadas pelo julgador..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Erro Material:</label>
+                        <textarea name="erroMaterial" rows="2" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Indique erros materiais identificados..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pedido de Esclarecimento:</label>
+                        <textarea name="pedidoEsclarecimento" rows="3" class="w-full p-2 border border-gray-300 rounded-md" 
+                                  onchange="updateDocumentPreview()" placeholder="Especifique os esclarecimentos solicitados..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== GERADORES DOS DOCUMENTOS =====
+
+        function criarDocumentoPeticaoInicial(dados) {
+            const { autor = '', documento = '', reu = '', comarca = '', endereco = '', objeto = '', fatos = '', direito = '', pedidos = '', valor = '' } = dados;
+            
+            return `
+                <div style="max-width: 800px; margin: 0 auto; font-family: 'Times New Roman', serif; line-height: 1.6; background: white; padding: 40px;">
+                    <!-- Cabeçalho -->
+                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #1e40af; padding-bottom: 20px;">
+                        <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 15px; margin-bottom: 15px; border-radius: 8px;">
+                            <h1 style="margin: 0; font-size: 28px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">PORTAL JURÍDICO DIGITAL</h1>
+                            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 style="font-size: 24px; font-weight: bold; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); letter-spacing: 1px;">PETIÇÃO INICIAL</h2>
+                    </div>
+
+                    <!-- Conteúdo do Documento -->
+                    <div style="text-align: justify; font-size: 16px; line-height: 1.8;">
+                        <p><strong>EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ${comarca || '[COMARCA/JUÍZO]'}</strong></p>
+                        
+                        <div style="margin: 30px 0;">
+                            <p><strong>${autor || '[NOME DO AUTOR]'}</strong>, ${documento ? `portador(a) do CPF/CNPJ nº ${documento}` : '[DOCUMENTO]'}, residente e domiciliado(a) à ${endereco || '[ENDEREÇO COMPLETO]'}, vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado que esta subscreve, propor a presente</p>
+                            
+                            <h3 style="text-align: center; font-size: 18px; margin: 20px 0; font-weight: bold;">AÇÃO ${objeto || '[TIPO DE AÇÃO]'}</h3>
+                            
+                            <p>em face de <strong>${reu || '[NOME DO RÉU]'}</strong>, pelos fatos e fundamentos jurídicos a seguir expostos:</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">I - DOS FATOS</h3>
+                            <p>${fatos || 'Narre aqui os fatos que deram origem à demanda, de forma clara, cronológica e detalhada, apresentando todas as circunstâncias relevantes para o deslinde da questão.'}</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">II - DO DIREITO</h3>
+                            <p>${direito || 'Apresente aqui a fundamentação jurídica da pretensão, citando dispositivos legais, jurisprudência e doutrina aplicáveis ao caso concreto.'}</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">III - DOS PEDIDOS</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <p>${pedidos || 'a) Cite o(a) requerido(a) para responder aos termos da presente ação;<br>b) Ao final, julgue totalmente procedente o pedido;<br>c) Condene o(a) requerido(a) ao pagamento das custas processuais e honorários advocatícios.'}</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <p><strong>Dá-se à causa o valor de ${valor || 'R$ [VALOR]'}.</strong></p>
+                        </div>
+
+                        <div style="margin: 40px 0;">
+                            <p>Protesta-se por todos os meios de prova em direito admitidas.</p>
+                            <p>Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div style="margin-top: 60px; text-align: center;">
+                            <p style="margin-bottom: 40px;">[Cidade], ${new Date().toLocaleDateString('pt-BR')}.</p>
+                            <div style="border-top: 1px solid #333; width: 300px; margin: 0 auto; padding-top: 10px;">
+                                <p style="margin: 0; font-weight: bold;">[NOME DO ADVOGADO]</p>
+                                <p style="margin: 0;">OAB/[UF] nº [NÚMERO]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarDocumentoRecursoApelacao(dados) {
+            const { apelante = '', apelado = '', processo = '', tribunal = '', dataSentenca = '', erro = '', argumentacao = '', pedidoReforma = '' } = dados;
+            
+            return `
+                <div style="max-width: 800px; margin: 0 auto; font-family: 'Times New Roman', serif; line-height: 1.6; background: white; padding: 40px;">
+                    <!-- Cabeçalho -->
+                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #16a34a; padding-bottom: 20px;">
+                        <div style="background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); color: white; padding: 15px; margin-bottom: 15px; border-radius: 8px;">
+                            <h1 style="margin: 0; font-size: 28px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">PORTAL JURÍDICO DIGITAL</h1>
+                            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 style="font-size: 24px; font-weight: bold; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); letter-spacing: 1px;">RECURSO DE APELAÇÃO</h2>
+                    </div>
+
+                    <!-- Conteúdo do Documento -->
+                    <div style="text-align: justify; font-size: 16px; line-height: 1.8;">
+                        <p><strong>EXCELENTÍSSIMO(A) SENHOR(A) DESEMBARGADOR(A) RELATOR(A) DO ${tribunal || '[TRIBUNAL]'}</strong></p>
+                        
+                        <div style="margin: 30px 0;">
+                            <p><strong>Processo nº:</strong> ${processo || '[NÚMERO DO PROCESSO]'}</p>
+                            <p><strong>Apelante:</strong> ${apelante || '[NOME DO APELANTE]'}</p>
+                            <p><strong>Apelado:</strong> ${apelado || '[NOME DO APELADO]'}</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <p><strong>${apelante || '[APELANTE]'}</strong>, já qualificado nos autos do processo em epígrafe, vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, interpor o presente</p>
+                            
+                            <h3 style="text-align: center; font-size: 18px; margin: 20px 0; font-weight: bold;">RECURSO DE APELAÇÃO</h3>
+                            
+                            <p>contra a sentença proferida em ${dataSentenca ? new Date(dataSentenca).toLocaleDateString('pt-BR') : '[DATA DA SENTENÇA]'}, pelas razões de fato e de direito a seguir expostas:</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">I - DO ERRO DE FATO E DE DIREITO</h3>
+                            <p>${erro || 'Demonstre aqui os erros de fato e de direito identificados na sentença recorrida, apontando especificamente os vícios que maculam a decisão.'}</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">II - DA ARGUMENTAÇÃO JURÍDICA</h3>
+                            <p>${argumentacao || 'Apresente aqui os fundamentos jurídicos que sustentam o pedido de reforma da decisão, citando legislação, jurisprudência e doutrina aplicáveis.'}</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">III - DO PEDIDO</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <p>${pedidoReforma || 'a) Conhecer do presente recurso por atender a todos os requisitos legais;<br>b) Dar-lhe provimento para reformar a sentença recorrida;<br>c) Julgar procedente o pedido do apelante.'}</p>
+                        </div>
+
+                        <div style="margin: 40px 0;">
+                            <p>Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div style="margin-top: 60px; text-align: center;">
+                            <p style="margin-bottom: 40px;">[Cidade], ${new Date().toLocaleDateString('pt-BR')}.</p>
+                            <div style="border-top: 1px solid #333; width: 300px; margin: 0 auto; padding-top: 10px;">
+                                <p style="margin: 0; font-weight: bold;">[NOME DO ADVOGADO]</p>
+                                <p style="margin: 0;">OAB/[UF] nº [NÚMERO]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function criarDocumentoHabeasCorpus(dados) {
+            const { paciente = '', impetrante = '', autoridadeCoatora = '', localPrisao = '', modalidade = '', ilegalidade = '', circunstancias = '' } = dados;
+            
+            return `
+                <div style="max-width: 800px; margin: 0 auto; font-family: 'Times New Roman', serif; line-height: 1.6; background: white; padding: 40px;">
+                    <!-- Cabeçalho -->
+                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #dc2626; padding-bottom: 20px;">
+                        <div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; padding: 15px; margin-bottom: 15px; border-radius: 8px;">
+                            <h1 style="margin: 0; font-size: 28px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">PORTAL JURÍDICO DIGITAL</h1>
+                            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Sistema Integrado de Gestão Jurídica</p>
+                        </div>
+                        <h2 style="font-size: 24px; font-weight: bold; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); letter-spacing: 1px;">HABEAS CORPUS ${modalidade ? modalidade.toUpperCase() : ''}</h2>
+                    </div>
+
+                    <!-- Conteúdo do Documento -->
+                    <div style="text-align: justify; font-size: 16px; line-height: 1.8;">
+                        <p><strong>EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO</strong></p>
+                        
+                        <div style="margin: 30px 0;">
+                            <p><strong>Impetrante:</strong> ${impetrante || '[NOME DO IMPETRANTE]'}</p>
+                            <p><strong>Paciente:</strong> ${paciente || '[NOME DO PACIENTE]'}</p>
+                            <p><strong>Autoridade Coatora:</strong> ${autoridadeCoatora || '[AUTORIDADE COATORA]'}</p>
+                            <p><strong>Local da Prisão:</strong> ${localPrisao || '[LOCAL DA PRISÃO]'}</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <p><strong>${impetrante || '[IMPETRANTE]'}</strong>, em favor de <strong>${paciente || '[PACIENTE]'}</strong>, vem, respeitosamente, à presença de Vossa Excelência, impetrar o presente</p>
+                            
+                            <h3 style="text-align: center; font-size: 18px; margin: 20px 0; font-weight: bold;">HABEAS CORPUS</h3>
+                            
+                            <p>contra ato da autoridade acima mencionada, pelos fundamentos de fato e de direito a seguir expostos:</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">I - DOS FATOS E DA ILEGALIDADE</h3>
+                            <p>${ilegalidade || 'Narre aqui os fatos que demonstram a ilegalidade ou abuso de poder praticado pela autoridade coatora, fundamentando juridicamente a concessão da ordem.'}</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">II - DAS CIRCUNSTÂNCIAS</h3>
+                            <p>${circunstancias || 'Detalhe as circunstâncias específicas do caso, demonstrando a configuração do constrangimento ilegal ou da ameaça à liberdade de locomoção.'}</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">III - DO DIREITO</h3>
+                            <p>O habeas corpus está previsto no artigo 5º, inciso LXVIII, da Constituição Federal, sendo remédio constitucional destinado a proteger a liberdade de locomoção sempre que alguém sofrer ou se achar ameaçado de sofrer violência ou coação em sua liberdade de locomoção, por ilegalidade ou abuso de poder.</p>
+                        </div>
+
+                        <div style="margin: 30px 0;">
+                            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">IV - DO PEDIDO</h3>
+                            <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
+                            <p>a) Receber e processar o presente writ;<br>
+                            b) Conceder a ordem de habeas corpus para garantir a liberdade de locomoção do paciente;<br>
+                            c) Determinar a imediata soltura do paciente, caso esteja preso ilegalmente.</p>
+                        </div>
+
+                        <div style="margin: 40px 0;">
+                            <p>Termos em que pede deferimento.</p>
+                        </div>
+
+                        <!-- Rodapé -->
+                        <div style="margin-top: 60px; text-align: center;">
+                            <p style="margin-bottom: 40px;">[Cidade], ${new Date().toLocaleDateString('pt-BR')}.</p>
+                            <div style="border-top: 1px solid #333; width: 300px; margin: 0 auto; padding-top: 10px;">
+                                <p style="margin: 0; font-weight: bold;">[NOME DO ADVOGADO]</p>
+                                <p style="margin: 0;">OAB/[UF] nº [NÚMERO]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== DOCUMENTOS ADICIONAIS =====
 
         function criarPeticaoInicial() {
             return `
