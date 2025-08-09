@@ -528,7 +528,7 @@
                         
                         <!-- Casos Ativos -->
                         <div class="flex items-center gap-2 text-blue-200">
-                            <i class="fas fa-folder-open text-purple-400"></i>
+                            <i class="fas fa-folder-open text-slate-400"></i>
                             <span class="text-sm"><span id="active-cases">12</span> casos ativos</span>
                         </div>
                         
@@ -547,7 +547,7 @@
                         </button>
                         
                         <!-- Hierarquia Jurídica -->
-                        <button onclick="showJudicialHierarchy()" class="btn bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2">
+                        <button onclick="showJudicialHierarchy()" class="btn bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-2">
                             <i class="fas fa-sitemap mr-2"></i>Hierarquia
                         </button>
                         
@@ -597,7 +597,7 @@
                 
                 <!-- Card Casos -->
                 <div class="card p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
                         <i class="fas fa-folder text-white text-2xl"></i>
                     </div>
                     <h3 class="text-white font-bold text-lg mb-2">Casos</h3>
@@ -609,7 +609,7 @@
                 
                 <!-- Card Agenda -->
                 <div class="card p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
                         <i class="fas fa-calendar text-white text-2xl"></i>
                     </div>
                     <h3 class="text-white font-bold text-lg mb-2">Agenda</h3>
@@ -631,7 +631,7 @@
                     <div class="text-blue-200 text-sm">Documentos</div>
                 </div>
                 <div class="card p-4 text-center">
-                    <div class="text-3xl font-bold text-purple-400 mb-1" id="processos-dashboard">0</div>
+                    <div class="text-3xl font-bold text-slate-400 mb-1" id="processos-dashboard">0</div>
                     <div class="text-blue-200 text-sm">Processos</div>
                 </div>
                 <div class="card p-4 text-center">
@@ -683,7 +683,7 @@
                     <!-- Recurso de Apelação -->
                     <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('recurso-apelacao')">
                         <div class="text-center">
-                            <i class="fas fa-balance-scale text-4xl text-purple-400 mb-4"></i>
+                            <i class="fas fa-balance-scale text-4xl text-blue-400 mb-4"></i>
                             <h3 class="text-white font-bold text-lg mb-2">Recurso de Apelação</h3>
                             <p class="text-blue-200 text-sm">Recurso contra sentenças em 1ª instância</p>
                         </div>
@@ -746,7 +746,7 @@
                     <!-- Porte de Armas -->
                     <div class="card p-6 hover:shadow-lg transition-all cursor-pointer" onclick="gerarDocumento('porte-armas')">
                         <div class="text-center">
-                            <i class="fas fa-crosshairs text-4xl text-rose-400 mb-4"></i>
+                            <i class="fas fa-crosshairs text-4xl text-red-400 mb-4"></i>
                             <h3 class="text-white font-bold text-lg mb-2">Porte de Armas</h3>
                             <p class="text-blue-200 text-sm">Solicitação de autorização para porte</p>
                         </div>
@@ -827,7 +827,7 @@
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-xl font-bold text-white" id="titulo-documento">Documento</h3>
                             <div class="space-x-2">
-                                <button onclick="capturarFotoDocumento()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-all">
+                                <button onclick="capturarFotoDocumento()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg transition-all">
                                     📸 Gerar Foto HD
                                 </button>
                                 <button onclick="imprimirDocumento()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition-all">
@@ -1079,7 +1079,7 @@
                     <!-- Resumo Rápido -->
                     <div class="card p-6">
                         <h3 class="text-white text-xl font-bold mb-4">
-                            <i class="fas fa-chart-bar mr-2 text-purple-400"></i>
+                            <i class="fas fa-chart-bar mr-2 text-blue-400"></i>
                             Resumo Rápido
                         </h3>
                         
@@ -1141,11 +1141,11 @@
         <section id="casos" class="section">
             <div class="space-y-6">
                 <!-- Header da Seção -->
-                <div class="card p-6 bg-gradient-to-r from-purple-900/40 to-blue-900/40">
+                <div class="card p-6 bg-gradient-to-r from-slate-900/40 to-blue-900/40">
                     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                         <div>
                             <h2 class="text-white text-3xl font-bold mb-2 flex items-center gap-3">
-                                <i class="fas fa-folder-open text-purple-400"></i>
+                                <i class="fas fa-folder-open text-slate-400"></i>
                                 Sistema de Abertura de Processos
                             </h2>
                             <p class="text-blue-200">Gerencie e abra novos processos jurídicos</p>
@@ -1176,7 +1176,7 @@
                         <div class="text-blue-200 text-sm">Aguardando Análise</div>
                     </div>
                     <div class="card p-4 text-center">
-                        <div class="text-2xl font-bold text-purple-400 mb-1" id="processos-finalizados">0</div>
+                        <div class="text-2xl font-bold text-green-400 mb-1" id="processos-finalizados">0</div>
                         <div class="text-blue-200 text-sm">Finalizados</div>
                     </div>
                 </div>
@@ -1717,6 +1717,92 @@
             });
         }
 
+        // Função para baixar documento como PDF
+        function downloadDocumentPDF() {
+            const conteudo = document.getElementById('conteudo-documento');
+            if (!conteudo) {
+                showNotification('❌ Nenhum documento para converter', 'error');
+                return;
+            }
+
+            // Verificar se jsPDF está disponível
+            if (typeof window.jsPDF === 'undefined') {
+                showNotification('❌ Biblioteca jsPDF não encontrada', 'error');
+                return;
+            }
+
+            showNotification('📄 Gerando PDF do documento...', 'info');
+
+            try {
+                // Criar clone do conteúdo para ajustar estilos
+                const clone = conteudo.cloneNode(true);
+                clone.style.cssText = `
+                    position: fixed;
+                    left: -9999px;
+                    top: 0;
+                    width: 800px;
+                    background: white;
+                    color: black;
+                    font-family: Arial, sans-serif;
+                    padding: 20px;
+                    box-sizing: border-box;
+                `;
+                
+                document.body.appendChild(clone);
+
+                // Usar html2canvas para converter em imagem
+                html2canvas(clone, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    width: 800,
+                    height: clone.scrollHeight
+                }).then(canvas => {
+                    // Remover clone do DOM
+                    document.body.removeChild(clone);
+
+                    // Criar PDF
+                    const { jsPDF } = window.jsPDF;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    
+                    const imgWidth = 190; // Largura em mm (A4 com margem)
+                    const pageHeight = 277; // Altura da página A4 em mm
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    let heightLeft = imgHeight;
+                    let position = 10; // Margem superior
+                    
+                    // Adicionar primeira página
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    // Adicionar páginas adicionais se necessário
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight + 10;
+                        pdf.addPage();
+                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    // Download do PDF
+                    const filename = `documento_${new Date().getTime()}.pdf`;
+                    pdf.save(filename);
+                    
+                    showNotification('✅ PDF gerado com sucesso!', 'success');
+                    
+                }).catch(error => {
+                    console.error('Erro ao gerar PDF:', error);
+                    document.body.removeChild(clone);
+                    showNotification('❌ Erro ao gerar PDF. Tente novamente.', 'error');
+                });
+
+            } catch (error) {
+                console.error('Erro ao preparar PDF:', error);
+                showNotification('❌ Erro ao preparar documento para PDF', 'error');
+            }
+        }
+
         // Função imprimir (COPIADA EXATA DO INDEX)
         function imprimirDocumento() {
             const conteudo = document.getElementById('conteudo-documento').innerHTML;
@@ -1983,8 +2069,8 @@
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
                     <!-- Cabeçalho do Documento -->
-                    <div class="text-center mb-8 border-b-2 border-purple-500 pb-4">
-                        <div class="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-4 rounded-lg mb-4">
+                    <div class="text-center mb-8 border-b-2 border-blue-700 pb-4">
+                        <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white p-4 rounded-lg mb-4">
                             <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
                             <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
                         </div>
@@ -2249,8 +2335,8 @@
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
                     <!-- Cabeçalho do Documento -->
-                    <div class="text-center mb-8 border-b-2 border-indigo-500 pb-4">
-                        <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 rounded-lg mb-4">
+                    <div class="text-center mb-8 border-b-2 border-blue-700 pb-4">
+                        <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white p-4 rounded-lg mb-4">
                             <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
                             <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
                         </div>
@@ -2548,8 +2634,8 @@
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
                     <!-- Cabeçalho do Documento -->
-                    <div class="text-center mb-8 border-b-2 border-pink-500 pb-4">
-                        <div class="bg-gradient-to-r from-pink-600 to-pink-800 text-white p-4 rounded-lg mb-4">
+                    <div class="text-center mb-8 border-b-2 border-slate-600 pb-4">
+                        <div class="bg-gradient-to-r from-slate-600 to-slate-800 text-white p-4 rounded-lg mb-4">
                             <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
                             <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
                         </div>
@@ -4052,6 +4138,7 @@
                 initializeCalculator();
                 loadUserData();
                 initializeHierarchy();
+                initializeTheme(); // Inicializar sistema de tema
                 console.log('✅ Portal carregado com sucesso!');
             } catch (error) {
                 console.warn('⚠️ Alguns recursos podem não funcionar:', error);
@@ -4752,9 +4839,82 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Salvar configurações
         function saveSettings() {
-            // Aqui normalmente salvaríamos as configurações no backend
+            // Salvar estado do tema
+            const darkThemeEnabled = document.getElementById('darkThemeToggle').checked;
+            localStorage.setItem('darkTheme', darkThemeEnabled.toString());
+            
             closeModal('settingsModal');
             showNotification('Configurações salvas com sucesso!', 'success');
+        }
+
+        // Função para alternar tema claro/escuro
+        function toggleTheme() {
+            const darkThemeToggle = document.getElementById('darkThemeToggle');
+            const isDarkMode = darkThemeToggle.checked;
+            
+            // Aplicar tema imediatamente
+            applyTheme(isDarkMode);
+            
+            // Salvar preferência no localStorage
+            localStorage.setItem('darkTheme', isDarkMode.toString());
+            
+            showNotification(
+                isDarkMode ? '🌙 Tema escuro ativado' : '☀️ Tema claro ativado', 
+                'info'
+            );
+        }
+
+        // Função para aplicar o tema
+        function applyTheme(isDarkMode) {
+            const body = document.body;
+            
+            if (isDarkMode) {
+                // Aplicar tema escuro (padrão atual)
+                body.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%)';
+                body.classList.add('dark-theme');
+                body.classList.remove('light-theme');
+            } else {
+                // Aplicar tema claro
+                body.style.background = 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 50%, #d1d5db 100%)';
+                body.classList.add('light-theme');
+                body.classList.remove('dark-theme');
+                
+                // Ajustar cores dos elementos para tema claro
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    if (isDarkMode) {
+                        card.style.backgroundColor = '';
+                        card.style.color = '';
+                    } else {
+                        card.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                        card.style.color = '#1f2937';
+                        card.style.border = '1px solid #e5e7eb';
+                    }
+                });
+                
+                // Ajustar textos
+                const textElements = document.querySelectorAll('.text-white');
+                textElements.forEach(element => {
+                    if (!isDarkMode && !element.closest('.bg-gradient-to-r')) {
+                        element.style.color = '#1f2937';
+                    } else if (isDarkMode) {
+                        element.style.color = '';
+                    }
+                });
+            }
+        }
+
+        // Inicializar tema baseado na preferência salva
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('darkTheme');
+            const isDarkMode = savedTheme === null ? true : savedTheme === 'true'; // Padrão escuro
+            
+            const darkThemeToggle = document.getElementById('darkThemeToggle');
+            if (darkThemeToggle) {
+                darkThemeToggle.checked = isDarkMode;
+            }
+            
+            applyTheme(isDarkMode);
         }
 
         // Função de logout
@@ -8585,7 +8745,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                                     <strong>Data:</strong><br>
                                     ${new Date(processo.dataAberto).toLocaleDateString('pt-BR')}
                                 </div>
-                                <div class="text-purple-200">
+                                <div class="text-slate-200">
                                     <i class="fas fa-hashtag mr-2"></i>
                                     <strong>Protocolo:</strong><br>
                                     ${processo.protocolo || 'Não protocolado'}
@@ -8628,31 +8788,31 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 const totalSize = processo.anexos.reduce((sum, anexo) => sum + (anexo.size || 0), 0);
                 
                 html += `
-                    <div class="bg-indigo-900/20 rounded-lg p-6 border border-indigo-400/30">
-                        <h5 class="text-indigo-300 font-semibold mb-4 flex items-center gap-2">
-                            <i class="fas fa-paperclip text-indigo-400"></i>
+                    <div class="bg-gray-900/20 rounded-lg p-6 border border-gray-400/30">
+                        <h5 class="text-gray-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-paperclip text-gray-400"></i>
                             Documentos Anexados (${processo.anexos.length} arquivo${processo.anexos.length > 1 ? 's' : ''})
                         </h5>
                         
                         <div class="space-y-3">
                             ${processo.anexos.map((anexo, index) => `
-                                <div class="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg border border-indigo-300/20">
+                                <div class="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg border border-gray-300/20">
                                     <div class="flex items-center gap-3">
-                                        <i class="${getFileIcon(anexo.name)} text-indigo-400 text-lg"></i>
+                                        <i class="${getFileIcon(anexo.name)} text-gray-400 text-lg"></i>
                                         <div>
                                             <div class="text-white font-medium">${anexo.name}</div>
-                                            <div class="text-indigo-300 text-sm">${formatFileSize(anexo.size)} • ${getFileTypeLabel(anexo.name)}</div>
+                                            <div class="text-gray-300 text-sm">${formatFileSize(anexo.size)} • ${getFileTypeLabel(anexo.name)}</div>
                                         </div>
                                     </div>
-                                    <div class="text-indigo-300 text-sm">
+                                    <div class="text-gray-300 text-sm">
                                         ${anexo.lastModified ? new Date(anexo.lastModified).toLocaleDateString('pt-BR') : ''}
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
                         
-                        <div class="mt-4 pt-4 border-t border-indigo-400/20">
-                            <div class="flex justify-between text-sm text-indigo-200">
+                        <div class="mt-4 pt-4 border-t border-gray-400/20">
+                            <div class="flex justify-between text-sm text-gray-200">
                                 <span>Total de documentos: <strong class="text-white">${processo.anexos.length}</strong></span>
                                 <span>Tamanho total: <strong class="text-white">${formatFileSize(totalSize)}</strong></span>
                             </div>
@@ -8664,9 +8824,9 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             // Anexo do sistema antigo (retrocompatibilidade)
             if (processo.peticaoFile) {
                 html += `
-                    <div class="bg-indigo-900/20 rounded-lg p-6 border border-indigo-400/30">
-                        <h5 class="text-indigo-300 font-semibold mb-4 flex items-center gap-2">
-                            <i class="fas fa-file-image text-indigo-400"></i>
+                    <div class="bg-gray-900/20 rounded-lg p-6 border border-gray-400/30">
+                        <h5 class="text-gray-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-file-image text-gray-400"></i>
                             Petição Inicial (Sistema Antigo)
                         </h5>
                         <div class="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-indigo-300/20">
@@ -8717,9 +8877,9 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                     </div>
 
                     <!-- Tipo de Petição -->
-                    <div class="bg-purple-900/20 rounded-lg p-6 border border-purple-400/30">
-                        <h5 class="text-purple-300 font-semibold mb-4 flex items-center gap-2">
-                            <i class="fas fa-gavel text-purple-400"></i>
+                    <div class="bg-slate-900/20 rounded-lg p-6 border border-slate-400/30">
+                        <h5 class="text-slate-300 font-semibold mb-4 flex items-center gap-2">
+                            <i class="fas fa-gavel text-slate-400"></i>
                             Tipo de Petição: ${processo.tipoPeticao === 'civil' ? 'Civil (Autor vs Réu)' : 'Criminal (Defesa do Réu)'}
                         </h5>
                         
@@ -9174,7 +9334,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                                 <div class="text-blue-200 text-sm">Documentos</div>
                             </div>
                             <div class="bg-slate-800/30 p-3 rounded text-center">
-                                <div class="text-purple-400 text-2xl font-bold" id="total-processos-profile">0</div>
+                                <div class="text-slate-400 text-2xl font-bold" id="total-processos-profile">0</div>
                                 <div class="text-blue-200 text-sm">Processos</div>
                             </div>
                         </div>
@@ -9199,7 +9359,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             <div class="card bg-slate-900/95 border border-blue-300/20 max-w-4xl w-full p-6 my-auto">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-white text-xl font-bold flex items-center gap-2">
-                        <i class="fas fa-sitemap text-purple-400"></i>
+                        <i class="fas fa-sitemap text-slate-400"></i>
                         Hierarquia do Sistema Jurídico - BRASILÂNDIA
                     </h3>
                     <button onclick="closeModal('hierarchyModal')" class="text-gray-400 hover:text-white">
@@ -9262,20 +9422,20 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
                     <!-- Nível 3 - Alta Cúpula -->
                     <div class="hierarchy-level">
-                        <div class="level-header bg-gradient-to-r from-purple-600/30 to-purple-500/30 p-3 rounded-lg border border-purple-400/30">
-                            <h4 class="text-purple-300 font-bold text-sm flex items-center gap-2">
-                                <i class="fas fa-balance-scale text-purple-400"></i>
+                        <div class="level-header bg-gradient-to-r from-slate-600/30 to-slate-500/30 p-3 rounded-lg border border-slate-400/30">
+                            <h4 class="text-slate-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-balance-scale text-slate-400"></i>
                                 NÍVEL 3 - ALTA CÚPULA
                             </h4>
                         </div>
                         <div class="ml-4 mt-2 space-y-2">
-                            <div class="position-card bg-gradient-to-r from-purple-600/20 to-purple-500/20 p-3 rounded border border-purple-400/20">
+                            <div class="position-card bg-gradient-to-r from-slate-600/20 to-slate-500/20 p-3 rounded border border-slate-400/20">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
-                                        <i class="fas fa-landmark text-purple-400"></i>
+                                        <i class="fas fa-landmark text-slate-400"></i>
                                         <div>
                                             <div class="text-white font-semibold text-sm">3º Juiz Federal</div>
-                                            <div class="text-purple-200 text-xs">Membro da alta cúpula federal</div>
+                                            <div class="text-slate-200 text-xs">Membro da alta cúpula federal</div>
                                         </div>
                                     </div>
                                     <div class="status-indicator" data-position="juiz-federal-3">
@@ -9468,26 +9628,26 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
                     <!-- Nível 8 - Promotores Auxiliares e Oficiais Sênior -->
                     <div class="hierarchy-level">
-                        <div class="level-header bg-gradient-to-r from-indigo-600/30 to-indigo-500/30 p-3 rounded-lg border border-indigo-400/30">
-                            <h4 class="text-indigo-300 font-bold text-sm flex items-center gap-2">
-                                <i class="fas fa-user-friends text-indigo-400"></i>
+                        <div class="level-header bg-gradient-to-r from-gray-600/30 to-gray-500/30 p-3 rounded-lg border border-gray-400/30">
+                            <h4 class="text-gray-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-user-friends text-gray-400"></i>
                                 NÍVEL 8 - PROMOTORES AUXILIARES E OFICIAIS SÊNIOR
                             </h4>
                         </div>
                         <div class="ml-4 mt-2 space-y-2">
                             <div class="position-group">
-                                <div class="text-indigo-200 text-xs mb-2 font-medium">Promotores de 1ª Instância (2º ao 6º)</div>
+                                <div class="text-gray-200 text-xs mb-2 font-medium">Promotores de 1ª Instância (2º ao 6º)</div>
                                 <div class="grid grid-cols-1 gap-2" id="promotores-base">
                                     <!-- Promotores 2-6 serão inseridos dinamicamente -->
                                 </div>
                             </div>
-                            <div class="position-card bg-gradient-to-r from-indigo-600/20 to-indigo-500/20 p-3 rounded border border-indigo-400/20">
+                            <div class="position-card bg-gradient-to-r from-gray-600/20 to-gray-500/20 p-3 rounded border border-gray-400/20">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
-                                        <i class="fas fa-file-alt text-indigo-400"></i>
+                                        <i class="fas fa-file-alt text-gray-400"></i>
                                         <div>
                                             <div class="text-white font-semibold text-sm">1º Oficial de Justiça - 2ª Instância</div>
-                                            <div class="text-indigo-200 text-xs">Oficial sênior de segunda instância</div>
+                                            <div class="text-gray-200 text-xs">Oficial sênior de segunda instância</div>
                                         </div>
                                     </div>
                                     <div class="status-indicator" data-position="oficial-2instancia">
@@ -9588,7 +9748,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
                                 <label class="text-blue-200">Tema Escuro</label>
-                                <input type="checkbox" checked class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                <input type="checkbox" id="darkThemeToggle" checked onchange="toggleTheme()" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                             </div>
                             <div class="flex items-center justify-between">
                                 <label class="text-blue-200">Notificações</label>
