@@ -3228,10 +3228,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Gerar imagem do documento com formatação profissional e PDF intermediário
         function generateDocumentImage(documentTitle) {
-            const documentElement = document.getElementById('document-for-image');
-            
-            if (!documentElement) {
-                showNotification('Erro: preview não encontrado. Preencha os dados primeiro.', 'error');
+            // Verificar se há páginas no preview
+            if (!previewPages || previewPages.length === 0) {
+                showNotification('Erro: Nenhuma página encontrada. Preencha os dados primeiro.', 'error');
                 return;
             }
 
@@ -3239,23 +3238,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const PAGE_WIDTH = 794; // A4 width
             const PAGE_HEIGHT = 1123; // A4 height
             const MARGIN = 60;
-            const CONTENT_HEIGHT = PAGE_HEIGHT - (MARGIN * 2);
 
-            // Obter dados do formulário atual
-            const template = documentTemplates[currentDocumentType];
-            const formData = {};
-            template.fields.forEach(field => {
-                const element = document.getElementById(`field-${field.name}`);
-                if (element) {
-                    formData[field.name] = element.value.trim();
-                }
-            });
-
-            // Gerar páginas formatadas profissionalmente
-            const pages = generateProfessionalPages(formData, documentTitle, PAGE_WIDTH, PAGE_HEIGHT, MARGIN);
-            
-            // Gerar imagens das páginas
-            generatePagesAsImages(pages, documentTitle, PAGE_WIDTH, PAGE_HEIGHT, MARGIN);
+            // Usar as páginas já geradas no preview
+            generatePagesAsImages(previewPages, documentTitle, PAGE_WIDTH, PAGE_HEIGHT, MARGIN);
         }
 
         // Gerar páginas com formatação profissional
@@ -3410,40 +3395,100 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const totalPages = pages.length;
 
             if (totalPages > 1) {
-                // Perguntar ao usuário quais páginas baixar
-                const userChoice = confirm(
-                    `O documento tem ${totalPages} páginas.\n\n` +
-                    `Clique OK para baixar TODAS as páginas\n` +
-                    `Clique CANCELAR para escolher páginas específicas`
-                );
-
-                if (!userChoice) {
-                    // Deixar usuário escolher páginas específicas
-                    const pagesInput = prompt(
-                        `Digite os números das páginas que deseja baixar:\n` +
-                        `Exemplos:\n` +
-                        `• "1,3,5" para páginas 1, 3 e 5\n` +
-                        `• "1-3" para páginas 1 a 3\n` +
-                        `• "all" para todas as páginas\n\n` +
-                        `Páginas disponíveis: 1 a ${totalPages}`,
-                        "all"
-                    );
-
-                    if (pagesInput === null) return; // Usuário cancelou
-
-                    const selectedPages = parsePageSelection(pagesInput, totalPages);
-                    if (selectedPages.length === 0) {
-                        showNotification('Seleção de páginas inválida', 'error');
-                        return;
-                    }
-
-                    downloadSelectedPages(pages, selectedPages, documentTitle, width, height);
-                    return;
-                }
+                // Mostrar modal de seleção de páginas
+                showPageSelectionModal(pages, documentTitle, width, height, totalPages);
+            } else {
+                // Baixar página única diretamente
+                downloadAllPages(pages, documentTitle, width, height);
             }
+        }
 
-            // Baixar todas as páginas
+        // Mostrar modal de seleção de páginas
+        function showPageSelectionModal(pages, documentTitle, width, height, totalPages) {
+            const modalHTML = `
+                <div id="pageSelectionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <div class="bg-slate-900/95 border border-blue-300/20 rounded-lg p-6 max-w-md w-full mx-4">
+                        <h3 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                            <i class="fas fa-download text-blue-400"></i>
+                            Selecionar Páginas
+                        </h3>
+                        
+                        <div class="text-blue-200 mb-6">
+                            <p class="mb-2">O documento tem <strong class="text-white">${totalPages} páginas</strong>.</p>
+                            <p class="text-sm">Escolha quais páginas deseja baixar:</p>
+                        </div>
+                        
+                        <div class="space-y-4 mb-6">
+                            <button onclick="downloadAllPagesFromModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <i class="fas fa-download"></i>
+                                Baixar TODAS as ${totalPages} páginas
+                            </button>
+                            
+                            <div class="border-t border-gray-600 pt-4">
+                                <label class="text-blue-200 text-sm block mb-2">Páginas específicas:</label>
+                                <input type="text" id="pageSelectionInput" placeholder="Ex: 1,3,5 ou 1-3" 
+                                       class="w-full p-3 rounded bg-slate-800 border border-gray-600 text-white focus:border-blue-400 focus:outline-none">
+                                <div class="text-xs text-gray-400 mt-2">
+                                    • Use vírgula para páginas específicas: 1,3,5<br>
+                                    • Use hífen para intervalos: 1-3<br>
+                                    • Digite "all" para todas as páginas
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <button onclick="closePageSelectionModal()" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white p-3 rounded-lg transition-colors">
+                                Cancelar
+                            </button>
+                            <button onclick="downloadSelectedPagesFromModal()" class="flex-1 bg-green-600 hover:bg-green-500 text-white p-3 rounded-lg transition-colors">
+                                Baixar Selecionadas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Adicionar modal ao body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Salvar dados para uso nas funções do modal
+            window.modalData = { pages, documentTitle, width, height, totalPages };
+        }
+
+        // Fechar modal de seleção
+        function closePageSelectionModal() {
+            const modal = document.getElementById('pageSelectionModal');
+            if (modal) {
+                modal.remove();
+                delete window.modalData;
+            }
+        }
+
+        // Baixar todas as páginas a partir do modal
+        function downloadAllPagesFromModal() {
+            const { pages, documentTitle, width, height } = window.modalData;
+            closePageSelectionModal();
             downloadAllPages(pages, documentTitle, width, height);
+        }
+
+        // Baixar páginas selecionadas a partir do modal
+        function downloadSelectedPagesFromModal() {
+            const input = document.getElementById('pageSelectionInput').value.trim();
+            const { pages, documentTitle, width, height, totalPages } = window.modalData;
+            
+            if (!input) {
+                showNotification('Digite as páginas que deseja baixar', 'warning');
+                return;
+            }
+            
+            const selectedPages = parsePageSelection(input, totalPages);
+            if (selectedPages.length === 0) {
+                showNotification('Seleção de páginas inválida. Tente novamente.', 'error');
+                return;
+            }
+            
+            closePageSelectionModal();
+            downloadSelectedPages(pages, selectedPages, documentTitle, width, height);
         }
 
         // Interpretar seleção de páginas do usuário
@@ -3754,9 +3799,13 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Atualizar preview do documento em tempo real com navegação por páginas
         function updateDocumentPreview() {
+            console.log('🔄 Atualizando preview...');
             const template = documentTemplates[currentDocumentType];
             
-            if (!template) return;
+            if (!template) {
+                console.log('❌ Template não encontrado:', currentDocumentType);
+                return;
+            }
 
             // Coletar dados do formulário
             const formData = {};
@@ -3767,25 +3816,37 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 }
             });
 
+            console.log('📋 Dados coletados:', formData);
+
             // Verificar se há dados para mostrar
             const hasData = Object.values(formData).some(value => value.length > 0);
             
             if (!hasData) {
+                console.log('⚠️ Nenhum dado encontrado, mostrando preview vazio');
                 showEmptyPreview();
                 return;
             }
 
-            // Gerar conteúdo e páginas
-            const content = generateDocumentContent(currentDocumentType, formData);
-            const documentTitle = template.title;
-            
-            // Gerar páginas profissionais
-            previewPages = generateProfessionalPages(formData, documentTitle, 700, 900, 40);
-            currentPreviewPage = 0;
-            
-            // Mostrar controles e primeira página
-            showPreviewControls();
-            displayPreviewPage(currentPreviewPage);
+            try {
+                // Gerar conteúdo e páginas com tamanho otimizado para preview
+                const content = generateDocumentContent(currentDocumentType, formData);
+                const documentTitle = template.title;
+                
+                console.log('📄 Gerando páginas...', { title: documentTitle, contentLength: content.length });
+                
+                // Gerar páginas profissionais com tamanho menor para preview
+                previewPages = generateProfessionalPages(formData, documentTitle, 500, 700, 30);
+                currentPreviewPage = 0;
+                
+                console.log('✅ Páginas geradas:', previewPages.length);
+                
+                // Mostrar controles e primeira página
+                showPreviewControls();
+                displayPreviewPage(currentPreviewPage);
+            } catch (error) {
+                console.error('❌ Erro ao gerar preview:', error);
+                showNotification('Erro ao gerar preview: ' + error.message, 'error');
+            }
         }
 
         // Mostrar preview vazio
@@ -3855,8 +3916,26 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             
             const pageHTML = previewPages[pageIndex];
             document.getElementById('document-preview').innerHTML = `
-                <div style="transform: scale(0.8); transform-origin: top left; width: 125%; height: 125%;">
-                    ${pageHTML}
+                <div style="
+                    width: 100%; 
+                    height: 600px; 
+                    overflow: hidden; 
+                    display: flex; 
+                    justify-content: center; 
+                    align-items: flex-start;
+                    background: #f8fafc;
+                    border-radius: 8px;
+                    padding: 10px;
+                ">
+                    <div style="
+                        transform: scale(0.65); 
+                        transform-origin: top center; 
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                        border-radius: 8px;
+                        overflow: hidden;
+                    ">
+                        ${pageHTML}
+                    </div>
                 </div>
             `;
             
@@ -3866,17 +3945,25 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Navegação - Página anterior
         function previousPage() {
+            console.log('⬅️ Tentando ir para página anterior. Atual:', currentPreviewPage);
             if (currentPreviewPage > 0) {
                 currentPreviewPage--;
+                console.log('✅ Indo para página:', currentPreviewPage);
                 displayPreviewPage(currentPreviewPage);
+            } else {
+                console.log('⚠️ Já está na primeira página');
             }
         }
 
         // Navegação - Próxima página
         function nextPage() {
+            console.log('➡️ Tentando ir para próxima página. Atual:', currentPreviewPage, 'Total:', previewPages.length);
             if (currentPreviewPage < previewPages.length - 1) {
                 currentPreviewPage++;
+                console.log('✅ Indo para página:', currentPreviewPage);
                 displayPreviewPage(currentPreviewPage);
+            } else {
+                console.log('⚠️ Já está na última página');
             }
         }
 
