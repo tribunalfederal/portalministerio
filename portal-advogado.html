@@ -3196,7 +3196,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             generateDocumentImage(template.title);
         }
 
-        // Gerar imagem do documento
+        // Gerar imagem do documento com paginação automática
         function generateDocumentImage(documentTitle) {
             const documentElement = document.getElementById('document-for-image');
             
@@ -3205,37 +3205,222 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 return;
             }
 
-            // Configurações para melhor qualidade da imagem
-            const options = {
-                backgroundColor: '#ffffff',
-                scale: 2, // Aumenta a resolução
-                useCORS: true,
-                allowTaint: true,
-                width: 800,
-                height: Math.max(1000, documentElement.scrollHeight + 100),
-                scrollX: 0,
-                scrollY: 0
-            };
+            // Configurações de página A4 em pixels (300 DPI)
+            const PAGE_WIDTH = 794; // A4 width em pixels (210mm)
+            const PAGE_HEIGHT = 1123; // A4 height em pixels (297mm)
+            const MARGIN = 60; // Margem
+            const CONTENT_HEIGHT = PAGE_HEIGHT - (MARGIN * 2);
 
-            html2canvas(documentElement, options).then(canvas => {
-                // Converter canvas para blob
-                canvas.toBlob(function(blob) {
-                    // Criar URL para download
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${documentTitle.replace(/\s+/g, '_')}_${Date.now()}.png`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
+            // Preparar elemento para medição
+            const tempContainer = document.createElement('div');
+            tempContainer.style.cssText = `
+                position: absolute;
+                left: -9999px;
+                top: 0;
+                width: ${PAGE_WIDTH}px;
+                background: white;
+                font-family: 'Times New Roman', serif;
+                font-size: 14px;
+                line-height: 1.6;
+                padding: ${MARGIN}px;
+                box-sizing: border-box;
+            `;
+            tempContainer.innerHTML = documentElement.innerHTML;
+            document.body.appendChild(tempContainer);
+
+            // Dividir conteúdo em páginas
+            const pages = paginateContent(tempContainer, CONTENT_HEIGHT);
+            document.body.removeChild(tempContainer);
+
+            // Gerar imagens para cada página
+            generatePagesAsImages(pages, documentTitle, PAGE_WIDTH, PAGE_HEIGHT, MARGIN);
+        }
+
+        // Função para paginar conteúdo automaticamente
+        function paginateContent(container, maxHeight) {
+            const pages = [];
+            const elements = Array.from(container.children);
+            let currentPage = document.createElement('div');
+            let currentHeight = 0;
+
+            // Configurar estilo da página
+            const pageStyle = `
+                width: 794px;
+                background: white;
+                font-family: 'Times New Roman', serif;
+                font-size: 14px;
+                line-height: 1.6;
+                padding: 60px;
+                box-sizing: border-box;
+                page-break-inside: avoid;
+            `;
+
+            currentPage.style.cssText = pageStyle;
+
+            elements.forEach(element => {
+                // Criar clone do elemento
+                const clone = element.cloneNode(true);
+                currentPage.appendChild(clone);
+
+                // Medir altura temporariamente
+                document.body.appendChild(currentPage);
+                const pageHeight = currentPage.offsetHeight - 120; // descontar padding
+                document.body.removeChild(currentPage);
+
+                // Se exceder altura da página, criar nova página
+                if (pageHeight > maxHeight && currentPage.children.length > 1) {
+                    // Remover último elemento que causou overflow
+                    currentPage.removeChild(clone);
                     
-                    showNotification('Documento gerado como imagem com sucesso!', 'success');
-                    closeDocumentGenerator();
-                }, 'image/png', 1.0); // Qualidade máxima
-            }).catch(error => {
-                console.error('Erro ao gerar imagem:', error);
-                showNotification('Erro ao gerar imagem do documento', 'error');
+                    // Adicionar página atual ao array
+                    pages.push(currentPage.outerHTML);
+                    
+                    // Criar nova página com o elemento que causou overflow
+                    currentPage = document.createElement('div');
+                    currentPage.style.cssText = pageStyle;
+                    currentPage.appendChild(clone);
+                } else if (pageHeight > maxHeight) {
+                    // Se é um elemento muito grande, quebrar o texto
+                    const brokenElements = breakLargeElement(clone, maxHeight, pageStyle);
+                    currentPage.removeChild(clone);
+                    
+                    brokenElements.forEach((brokenElement, index) => {
+                        if (index > 0) {
+                            pages.push(currentPage.outerHTML);
+                            currentPage = document.createElement('div');
+                            currentPage.style.cssText = pageStyle;
+                        }
+                        currentPage.appendChild(brokenElement);
+                    });
+                }
+            });
+
+            // Adicionar última página se não estiver vazia
+            if (currentPage.children.length > 0) {
+                pages.push(currentPage.outerHTML);
+            }
+
+            return pages;
+        }
+
+        // Quebrar elementos muito grandes em múltiplas partes
+        function breakLargeElement(element, maxHeight, pageStyle) {
+            if (element.tagName === 'P' || element.tagName === 'DIV') {
+                const text = element.textContent;
+                const words = text.split(' ');
+                const parts = [];
+                let currentPart = element.cloneNode(false);
+                let currentText = '';
+
+                words.forEach(word => {
+                    const testText = currentText + (currentText ? ' ' : '') + word;
+                    currentPart.textContent = testText;
+                    
+                    // Criar container temporário para medir
+                    const tempPage = document.createElement('div');
+                    tempPage.style.cssText = pageStyle;
+                    tempPage.appendChild(currentPart.cloneNode(true));
+                    document.body.appendChild(tempPage);
+                    const height = tempPage.offsetHeight - 120;
+                    document.body.removeChild(tempPage);
+
+                    if (height > maxHeight && currentText) {
+                        // Adicionar parte atual e começar nova
+                        parts.push(currentPart);
+                        currentPart = element.cloneNode(false);
+                        currentText = word;
+                        currentPart.textContent = currentText;
+                    } else {
+                        currentText = testText;
+                    }
+                });
+
+                if (currentText) {
+                    currentPart.textContent = currentText;
+                    parts.push(currentPart);
+                }
+
+                return parts.length > 0 ? parts : [element];
+            }
+
+            return [element];
+        }
+
+        // Gerar imagens PNG para cada página
+        function generatePagesAsImages(pages, documentTitle, width, height, margin) {
+            let processedPages = 0;
+            const totalPages = pages.length;
+
+            showNotification(`Gerando documento com ${totalPages} página(s)...`, 'info');
+
+            pages.forEach((pageHTML, index) => {
+                // Criar elemento temporário para a página
+                const pageElement = document.createElement('div');
+                pageElement.style.cssText = `
+                    position: absolute;
+                    left: -9999px;
+                    top: 0;
+                    width: ${width}px;
+                    height: ${height}px;
+                    background: white;
+                    box-sizing: border-box;
+                `;
+                pageElement.innerHTML = pageHTML;
+                document.body.appendChild(pageElement);
+
+                // Configurações do html2canvas
+                const options = {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    width: width,
+                    height: height,
+                    scrollX: 0,
+                    scrollY: 0
+                };
+
+                // Gerar imagem da página
+                html2canvas(pageElement, options).then(canvas => {
+                    canvas.toBlob(function(blob) {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        
+                        // Nome do arquivo com número da página
+                        const pageNumber = (index + 1).toString().padStart(2, '0');
+                        const fileName = totalPages > 1 
+                            ? `${documentTitle.replace(/\s+/g, '_')}_Pagina_${pageNumber}_${Date.now()}.png`
+                            : `${documentTitle.replace(/\s+/g, '_')}_${Date.now()}.png`;
+                        
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                        
+                        processedPages++;
+                        
+                        // Notificar quando todas as páginas estiverem prontas
+                        if (processedPages === totalPages) {
+                            showNotification(
+                                `Documento gerado com sucesso! ${totalPages} página(s) baixada(s).`, 
+                                'success'
+                            );
+                            closeDocumentGenerator();
+                        }
+                    }, 'image/png', 1.0);
+
+                    // Remover elemento temporário
+                    document.body.removeChild(pageElement);
+                }).catch(error => {
+                    console.error('Erro ao gerar página:', error);
+                    document.body.removeChild(pageElement);
+                    
+                    if (processedPages === 0) {
+                        showNotification('Erro ao gerar documento', 'error');
+                    }
+                });
             });
         }
 
