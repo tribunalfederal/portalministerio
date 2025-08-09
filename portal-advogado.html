@@ -4043,82 +4043,65 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
         // === FUNÇÕES AUXILIARES DO NOVO SISTEMA ===
 
-        // Função auxiliar para converter texto puro de volta para HTML formatado
+        // Função auxiliar para converter texto puro para HTML formatado PROFISSIONAL
         function convertTextToFormattedHTML(text) {
-            console.log('🎨 Aplicando formatação HTML ao texto...');
+            console.log('🎨 Aplicando formatação HTML PROFISSIONAL ao texto...');
             
             return text
-                // === FORMATAÇÕES PRINCIPAIS ===
+                // === LIMPEZA INICIAL ===
+                .trim()
                 
-                // EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO - NEGRITO, FONTE MAIOR, ALINHADO À ESQUERDA
-                .replace(/(EXCELENTÍSSIMO\(A\)\s+SENHOR\(A\)\s+DOUTOR\(A\)\s+JUIZ\(A\)\s+DE\s+DIREITO)/gmi, 
-                         '<div style="font-weight: bold; font-size: 18px; margin: 25px 0 20px 0; text-align: left; color: #000; text-indent: 0; line-height: 1.4;"><strong>$1</strong></div>')
+                // === CABEÇALHOS JUDICIAIS - FORMATAÇÃO ESPECIAL ===
+                .replace(/(EXCELENTÍSSIMO\(A\)\s+SENHOR\(A\)\s+DOUTOR\(A\).*?(?=\n\n|\*\*|\n\w))/gims, 
+                         '<div style="font-weight: bold; font-size: 16px; margin: 30px 0 25px 0; text-align: center; color: #000; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3;">$1</div>')
                 
-                // EXCELENTÍSSIMO SENHOR DOUTOR JUIZ (versão sem parênteses) - MESMA FORMATAÇÃO
-                .replace(/(EXCELENTÍSSIMO\s+SENHOR\s+DOUTOR?\s+JUIZ[^:\n]*)/gmi, 
-                         '<div style="font-weight: bold; font-size: 18px; margin: 25px 0 20px 0; text-align: left; color: #000; text-indent: 0; line-height: 1.4;"><strong>$1</strong></div>')
+                .replace(/(ILMO\.\s+SR\.\s+DELEGADO-CHEFE.*?(?=\n\n|\*\*|\n\w))/gims,
+                         '<div style="font-weight: bold; font-size: 16px; margin: 30px 0 25px 0; text-align: center; color: #000; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3;">$1</div>')
                 
-                // === SEÇÕES PRINCIPAIS EM NEGRITO FORTE ===
-                .replace(/\b(DOS FATOS|DA FUNDAMENTAÇÃO JURÍDICA|DOS PEDIDOS|DAS PROVAS|DO VALOR DA CAUSA|DA DEFESA|ALEGAÇÕES FINAIS|RECURSO|CONTESTAÇÃO|DA DECISÃO EMBARGADA|DA OMISSÃO|DA CONTRADIÇÃO|DA OBSCURIDADE|DO VÍCIO ENCONTRADO):\s*/gmi, 
-                         '<div style="font-weight: bold; font-size: 16px; margin: 30px 0 15px 0; text-transform: uppercase; color: #000; text-align: left; text-indent: 0;"><strong>$1:</strong></div>')
+                // === TÍTULOS DE DOCUMENTOS EM NEGRITO E CENTRALIZADO ===
+                .replace(/\*\*(AÇÃO [^*]+|RECURSO [^*]+|HABEAS CORPUS|CONTESTAÇÃO|LIBERDADE PROVISÓRIA|ARBITRAMENTO [^*]+|ALEGAÇÕES FINAIS|PRODUÇÃO DE PROVAS|AUTORIZAÇÃO [^*]+|REABILITAÇÃO [^*]+|EMBARGOS DE DECLARAÇÃO)\*\*/gmi,
+                         '<div style="font-weight: bold; font-size: 18px; margin: 30px 0; text-align: center; color: #000; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #000; padding-bottom: 10px;">$1</div>')
                 
-                // === NOMES DAS PARTES EM NEGRITO ===
-                .replace(/\b(AUTOR|RÉU|PACIENTE\/RÉU|EMBARGANTE|APELANTE|REQUERENTE|IMPETRANTE):\s*([^\n]+)/gmi, 
-                         '<div style="margin: 20px 0; text-align: left; text-indent: 0;"><strong>$1:</strong> <strong>$2</strong></div>')
+                // === SEÇÕES PRINCIPAIS - FORMATAÇÃO JURÍDICA ===
+                .replace(/\*\*(I\s*-\s*[^*]+)\*\*/gmi, '<div style="font-weight: bold; font-size: 15px; margin: 25px 0 15px 0; color: #000; text-transform: uppercase;">$1</div>')
+                .replace(/\*\*(II\s*-\s*[^*]+)\*\*/gmi, '<div style="font-weight: bold; font-size: 15px; margin: 25px 0 15px 0; color: #000; text-transform: uppercase;">$1</div>')
+                .replace(/\*\*(III\s*-\s*[^*]+)\*\*/gmi, '<div style="font-weight: bold; font-size: 15px; margin: 25px 0 15px 0; color: #000; text-transform: uppercase;">$1</div>')
+                .replace(/\*\*(IV\s*-\s*[^*]+)\*\*/gmi, '<div style="font-weight: bold; font-size: 15px; margin: 25px 0 15px 0; color: #000; text-transform: uppercase;">$1</div>')
+                .replace(/\*\*(V\s*-\s*[^*]+)\*\*/gmi, '<div style="font-weight: bold; font-size: 15px; margin: 25px 0 15px 0; color: #000; text-transform: uppercase;">$1</div>')
+                .replace(/\*\*(VI\s*-\s*[^*]+)\*\*/gmi, '<div style="font-weight: bold; font-size: 15px; margin: 25px 0 15px 0; color: #000; text-transform: uppercase;">$1</div>')
                 
-                // === DADOS PROCESSUAIS EM NEGRITO ===
-                .replace(/\b(PROCESSO\s+N[ºº°]?|AUTORIDADE COATORA|AUTORIDADE IMPETRADA|PROFISSÃO|ENDEREÇO|TEMPO DECORRIDO|VALOR DA FIANÇA):\s*([^\n]+)/gmi, 
-                         '<div style="margin: 15px 0; text-align: left; text-indent: 0;"><strong>$1:</strong> <strong>$2</strong></div>')
+                // === NOMES DAS PARTES E DADOS IMPORTANTES ===
+                .replace(/\*\*([^*]{1,100})\*\*/g, '<strong style="font-weight: bold; color: #000;">$1</strong>')
                 
-                // === ARTIGOS DE LEI EM NEGRITO ===
-                .replace(/\b(art\.|artigo)\s*(\d+[º°]?)/gi, '<strong>$1 $2</strong>')
-                
-                // === LEIS E CÓDIGOS EM NEGRITO ===
-                .replace(/\b(lei|código|decreto|portaria|resolução)\s*n[ºº°]?\s*[\d\.\/\-]+/gi, '<strong>$&</strong>')
-                
-                // === DATAS EM NEGRITO ===
-                .replace(/\b(\d{1,2}\/\d{1,2}\/\d{2,4})\b/g, '<strong>$1</strong>')
-                
-                // === VALORES MONETÁRIOS EM NEGRITO ===
-                .replace(/\bR\$\s*[\d\.,]+/g, '<strong>$&</strong>')
-                
-                // === OAB EM NEGRITO ===
-                .replace(/\b(OAB\s*[A-Z]{2}?\s*[\d\.,]+)/gi, '<strong>$1</strong>')
-                
-                // === ASSINATURA EM NEGRITO ===
-                .replace(/(Pede deferimento\.)/g, '<strong>$1</strong>')
-                .replace(/(Termos em que,)/g, '<strong>$1</strong>')
-                
-                // === QUEBRAS DE LINHA E PARÁGRAFOS ===
-                
-                // Quebras de linha duplas viram fechamento/abertura de parágrafos
-                .replace(/\n\n+/g, '</p><p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
-                
-                // Quebras simples viram <br>
+                // === QUEBRAS DE LINHA E ESTRUTURA ===
+                .replace(/\n\n+/g, '||PARAGRAPH_BREAK||')
                 .replace(/\n/g, '<br>')
+                .replace(/\|\|PARAGRAPH_BREAK\|\|/g, '</p><p style="margin: 20px 0; text-indent: 40px; text-align: justify; line-height: 1.8; color: #000;">')
                 
-                // === PARÁGRAFO INICIAL E FINAL ===
+                // === PARÁGRAFOS ESPECIAIS SEM INDENTAÇÃO ===
+                .replace(/<p[^>]*>(\s*<div[^>]*>.*?<\/div>\s*)<\/p>/g, '$1')
+                .replace(/<p[^>]*>(\s*<strong[^>]*>.*?<\/strong>\s*)<\/p>/g, '<div style="margin: 15px 0; text-align: justify; line-height: 1.6;">$1</div>')
                 
-                // Envolver em parágrafo inicial
-                .replace(/^/, '<p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
+                // === FORMATAÇÕES ESPECÍFICAS ===
+                .replace(/([a-z])\s*\)/g, '$1)') // Corrigir espaços antes de parênteses em listas
+                .replace(/(Termos em que,|Pede e espera deferimento\.|Nestes termos,|Pede deferimento\.)/g, '<div style="margin: 30px 0 20px 0; text-align: left; font-weight: bold;">$1</div>')
                 
-                // Fechar último parágrafo
-                .replace(/$/, '</p>')
+                // === ASSINATURA E DATA ===
+                .replace(/(_+\s*\n.*?OAB.*?\d+)/gms, '<div style="margin: 40px 0 20px 0; text-align: center; font-weight: bold; border-top: 1px solid #000; padding-top: 10px; width: 300px; margin-left: auto; margin-right: auto;">$1</div>')
+                
+                // === DADOS FINAIS (CIDADE, DATA) ===
+                .replace(/([A-Z][a-z]+,\s*\d{1,2}\s*de\s*[a-z]+\s*de\s*\d{4})/gi, '<div style="margin: 30px 0; text-align: right; font-weight: bold;">$1</div>')
+                
+                // === ENVOLVER EM PARÁGRAFO INICIAL ===
+                .replace(/^(?!<div|<p)/, '<p style="margin: 20px 0; text-indent: 40px; text-align: justify; line-height: 1.8; color: #000;">')
+                .replace(/(?<!<\/div>|<\/p>)$/, '</p>')
                 
                 // === LIMPEZA FINAL ===
+                .replace(/<p[^>]*>\s*<\/p>/g, '') // Remover parágrafos vazios
+                .replace(/\s+/g, ' ') // Normalizar espaços
+                .replace(/>\s+</g, '><'); // Remover espaços entre tags
                 
-                // Limpar espaços extras e caracteres especiais
-                .replace(/&nbsp;/g, ' ')
-                .replace(/\s+/g, ' ')
-                .replace(/\s*<\/p>\s*<p[^>]*>\s*/g, '</p><p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
-                
-                // Corrigir parágrafos vazios
-                .replace(/<p[^>]*>\s*<\/p>/g, '')
-                
-                // Corrigir divs dentro de parágrafos
-                .replace(/<p[^>]*>(\s*<div[^>]*>.*?<\/div>\s*)<\/p>/g, '$1')
-                
-                console.log('✅ Formatação HTML aplicada com sucesso');
+            console.log('✅ Formatação HTML PROFISSIONAL aplicada com sucesso');
         }
 
         // Função auxiliar para criar página com novo layout
@@ -6282,38 +6265,47 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             console.log('📄 Convertendo páginas HTML para PDF real...');
             
             try {
-                // Verificar se jsPDF está disponível
-                if (typeof window.jsPDF === 'undefined') {
-                    console.log('jsPDF não disponível, usando método alternativo...');
+                // Verificar se jsPDF está disponível (corrigido)
+                if (typeof window.jsPDF === 'undefined' && typeof jsPDF === 'undefined') {
+                    console.log('⚠️ jsPDF não disponível, usando método alternativo...');
                     generatePDFAlternative(pages, title);
                     return;
                 }
 
-                const { jsPDF } = window.jsPDF;
-                const pdf = new jsPDF('p', 'mm', 'a4');
+                // Usar jsPDF global ou window.jsPDF
+                const PDF = window.jsPDF || jsPDF;
+                const pdf = new PDF('p', 'mm', 'a4');
                 
+                console.log(`📄 Processando ${pages.length} páginas para PDF...`);
                 let pageProcessed = 0;
                 
                 function processNextPage() {
                     if (pageProcessed >= pages.length) {
                         // Finalizar PDF
-                        const pdfBlob = pdf.output('blob');
-                        const url = URL.createObjectURL(pdfBlob);
-                        
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(url);
-                        
-                        showNotification(`PDF (${pages.length} páginas) gerado com sucesso!`, 'success');
+                        try {
+                            const pdfBlob = pdf.output('blob');
+                            const url = URL.createObjectURL(pdfBlob);
+                            
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(url);
+                            
+                            showNotification(`✅ PDF REAL (${pages.length} páginas) gerado com sucesso!`, 'success');
+                        } catch (pdfError) {
+                            console.error('Erro ao finalizar PDF:', pdfError);
+                            showNotification('Erro ao finalizar PDF, gerando imagem...', 'warning');
+                            generatePDFAlternative(pages, title);
+                        }
                         return;
                     }
                     
                     // Processar página atual
                     const pageContent = pages[pageProcessed];
+                    console.log(`📄 Processando página ${pageProcessed + 1}/${pages.length}`);
                     
                     // Criar container temporário para a página
                     const pageContainer = document.createElement('div');
@@ -6344,15 +6336,22 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                         width: 210 * 3.779527559, // 210mm em pixels (96 DPI)
                         height: 297 * 3.779527559  // 297mm em pixels (96 DPI)
                     }).then(canvas => {
-                        const imgData = canvas.toDataURL('image/png');
-                        
-                        // Adicionar nova página se não for a primeira
-                        if (pageProcessed > 0) {
-                            pdf.addPage();
+                        try {
+                            const imgData = canvas.toDataURL('image/png');
+                            
+                            // Adicionar nova página se não for a primeira
+                            if (pageProcessed > 0) {
+                                pdf.addPage();
+                            }
+                            
+                            // Adicionar imagem ao PDF (A4: 210x297mm)
+                            pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+                            
+                            console.log(`✅ Página ${pageProcessed + 1} adicionada ao PDF`);
+                            
+                        } catch (pageError) {
+                            console.error(`Erro na página ${pageProcessed + 1}:`, pageError);
                         }
-                        
-                        // Adicionar imagem ao PDF (A4: 210x297mm)
-                        pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
                         
                         // Remover container temporário
                         document.body.removeChild(pageContainer);
@@ -6363,7 +6362,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                         setTimeout(processNextPage, 100);
                         
                     }).catch(error => {
-                        console.error('Erro ao processar página:', error);
+                        console.error(`Erro ao processar página ${pageProcessed + 1}:`, error);
                         document.body.removeChild(pageContainer);
                         pageProcessed++;
                         setTimeout(processNextPage, 100);
@@ -6374,74 +6373,143 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 processNextPage();
                 
             } catch (error) {
-                console.error('Erro na geração do PDF:', error);
+                console.error('Erro crítico na geração do PDF:', error);
+                showNotification('Erro na geração de PDF, usando alternativo...', 'warning');
                 generatePDFAlternative(pages, title);
             }
         }
 
-        // Método alternativo para PDF (usando html2canvas apenas)
+        // Método alternativo para PDF usando print CSS
         function generatePDFAlternative(pages, title) {
-            console.log('📄 Gerando PDF alternativo usando imagens...');
+            console.log('📄 Gerando PDF alternativo usando CSS Print...');
             
-            // Criar container temporário para todas as páginas
-            const pdfContainer = document.createElement('div');
-            pdfContainer.style.cssText = `
-                position: absolute;
-                left: -9999px;
-                top: 0;
-                width: 210mm;
-                background: white;
-                font-family: 'Times New Roman', serif;
-            `;
-            
-            // Adicionar todas as páginas ao container
-            pages.forEach((pageContent, index) => {
-                const pageDiv = document.createElement('div');
-                pageDiv.style.cssText = `
+            try {
+                // Criar nova janela para impressão
+                const printWindow = window.open('', '_blank');
+                
+                // HTML para PDF com CSS print
+                const printHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${title}</title>
+                    <style>
+                        @page {
+                            size: A4;
+                            margin: 20mm;
+                        }
+                        
+                        body {
+                            font-family: 'Times New Roman', serif;
+                            font-size: 12pt;
+                            line-height: 1.6;
+                            color: black;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        
+                        .page {
+                            page-break-after: always;
+                            width: 100%;
+                            min-height: 257mm; /* A4 height - margins */
+                        }
+                        
+                        .page:last-child {
+                            page-break-after: auto;
+                        }
+                        
+                        @media print {
+                            body { margin: 0; }
+                            .page { page-break-after: always; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${pages.map((pageContent, index) => 
+                        `<div class="page">${pageContent}</div>`
+                    ).join('')}
+                </body>
+                </html>`;
+                
+                printWindow.document.write(printHTML);
+                printWindow.document.close();
+                
+                // Aguardar carregamento e imprimir
+                printWindow.onload = function() {
+                    setTimeout(() => {
+                        printWindow.print();
+                        showNotification('📄 Janela de impressão aberta! Salve como PDF.', 'info');
+                        
+                        // Fechar janela após impressão (opcional)
+                        printWindow.onafterprint = function() {
+                            printWindow.close();
+                        };
+                    }, 500);
+                };
+                
+            } catch (error) {
+                console.error('Erro no método alternativo:', error);
+                
+                // Fallback final: gerar imagem de alta qualidade
+                console.log('📄 Usando fallback final: imagem de alta qualidade...');
+                
+                const pdfContainer = document.createElement('div');
+                pdfContainer.style.cssText = `
+                    position: absolute;
+                    left: -9999px;
+                    top: 0;
                     width: 210mm;
-                    min-height: 297mm;
                     background: white;
-                    padding: 20mm;
-                    box-sizing: border-box;
-                    page-break-after: always;
-                    font-size: 12pt;
-                    line-height: 1.6;
-                    color: black;
-                    margin-bottom: 20px;
+                    font-family: 'Times New Roman', serif;
                 `;
-                pageDiv.innerHTML = pageContent;
-                pdfContainer.appendChild(pageDiv);
-            });
-            
-            document.body.appendChild(pdfContainer);
-            
-            // Usar html2canvas para capturar todas as páginas
-            html2canvas(pdfContainer, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: false,
-                backgroundColor: '#ffffff',
-                width: pdfContainer.offsetWidth,
-                height: pdfContainer.offsetHeight
-            }).then(canvas => {
-                // Salvar como imagem PNG de alta resolução
-                const link = document.createElement('a');
-                link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}_PDF.png`;
-                link.href = canvas.toDataURL('image/png');
                 
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                document.body.removeChild(pdfContainer);
+                pages.forEach((pageContent, index) => {
+                    const pageDiv = document.createElement('div');
+                    pageDiv.style.cssText = `
+                        width: 210mm;
+                        min-height: 297mm;
+                        background: white;
+                        padding: 20mm;
+                        box-sizing: border-box;
+                        page-break-after: always;
+                        font-size: 12pt;
+                        line-height: 1.6;
+                        color: black;
+                        margin-bottom: 20px;
+                    `;
+                    pageDiv.innerHTML = pageContent;
+                    pdfContainer.appendChild(pageDiv);
+                });
                 
-                showNotification(`PDF (${pages.length} páginas) gerado como imagem de alta resolução!`, 'success');
-            }).catch(error => {
-                console.error('Erro na geração do PDF alternativo:', error);
-                showNotification('Erro ao gerar PDF', 'error');
-                if (pdfContainer.parentNode) {
+                document.body.appendChild(pdfContainer);
+                
+                html2canvas(pdfContainer, {
+                    scale: 3, // Alta qualidade
+                    useCORS: true,
+                    allowTaint: false,
+                    backgroundColor: '#ffffff',
+                    width: pdfContainer.offsetWidth,
+                    height: pdfContainer.offsetHeight
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}_PRINT.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                     document.body.removeChild(pdfContainer);
-                }
-            });
+                    
+                    showNotification('⚠️ PDF gerado como imagem de alta qualidade!', 'warning');
+                }).catch(finalError => {
+                    console.error('Erro no fallback final:', finalError);
+                    showNotification('❌ Erro crítico na geração de PDF', 'error');
+                    if (pdfContainer.parentNode) {
+                        document.body.removeChild(pdfContainer);
+                    }
+                });
+            }
         }
     </script>
 </body>
