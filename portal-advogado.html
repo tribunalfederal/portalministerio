@@ -808,8 +808,11 @@
                         <button onclick="closeDocumentGenerator()" class="btn btn-secondary mr-3">
                             <i class="fas fa-times mr-2"></i>Cancelar
                         </button>
-                        <button onclick="generateDocument()" class="btn btn-primary">
-                            <i class="fas fa-image mr-2"></i>Gerar Imagem (PNG)
+                        <button onclick="generateDocument('image')" class="btn bg-green-600 hover:bg-green-700 text-white mr-3">
+                            <i class="fas fa-image mr-2"></i>Gerar Imagem
+                        </button>
+                        <button onclick="generateDocument('pdf')" class="btn btn-primary">
+                            <i class="fas fa-file-pdf mr-2"></i>Baixar PDF
                         </button>
                     </div>
                 </div>
@@ -3214,8 +3217,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             }
         }
 
-        // Gerar documento
-        function generateDocument() {
+        // Sistema de Geração Profissional de Documentos
+        function generateDocument(outputType = 'image') {
             const template = documentTemplates[currentDocumentType];
             
             if (!template) {
@@ -3223,7 +3226,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 return;
             }
 
-            // Validar campos obrigatórios
+            // Validar campos obrigatórios e coletar dados
             let isValid = true;
             const formData = {};
 
@@ -3245,8 +3248,622 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 return;
             }
 
-            // Gerar imagem do documento
-            generateDocumentImage(template.title);
+            // Gerar documento profissional
+            generateProfessionalDocument(formData, template, outputType);
+        }
+
+        // Função principal de geração profissional
+        function generateProfessionalDocument(formData, template, outputType) {
+            try {
+                showNotification('Gerando documento profissional...', 'info');
+                
+                // Gerar conteúdo específico baseado no tipo de documento
+                const documentContent = generateSpecificContent(currentDocumentType, formData, template);
+                
+                // Criar container de visualização
+                const previewContainer = createProfessionalPreview(documentContent, template.title);
+                
+                // Processar saída conforme tipo solicitado
+                if (outputType === 'pdf') {
+                    generatePDFOutput(previewContainer, template.title);
+                } else {
+                    generateImageOutput(previewContainer, template.title);
+                }
+                
+            } catch (error) {
+                console.error('Erro na geração do documento:', error);
+                showNotification('Erro ao gerar documento. Tente novamente.', 'error');
+            }
+        }
+
+        // Geração de conteúdo específico por tipo de documento
+        function generateSpecificContent(documentType, formData, template) {
+            switch (documentType) {
+                case 'peticao-inicial':
+                    return generatePeticaoInicial(formData);
+                case 'recurso-apelacao':
+                    return generateRecursoApelacao(formData);
+                case 'habeas-corpus':
+                    return generateHabeasCorpus(formData);
+                case 'contestacao':
+                    return generateContestacao(formData);
+                case 'liberdade-provisoria':
+                    return generateLiberdadeProvisoria(formData);
+                case 'peticao-fianca':
+                    return generatePeticaoFianca(formData);
+                case 'alegacoes-finais':
+                    return generateAlegacoesFinais(formData);
+                case 'requerimento-provas':
+                    return generateRequerimentoProvas(formData);
+                case 'porte-armas':
+                    return generatePorteArmas(formData);
+                case 'limpeza-ficha':
+                    return generateLimpezaFicha(formData);
+                case 'embargos-declaracao':
+                    return generateEmbargosDeclaracao(formData);
+                default:
+                    return generateGenericContent(formData, template);
+            }
+        }
+
+        // === FUNÇÕES ESPECÍFICAS DE GERAÇÃO DE CONTEÚDO ===
+
+        // Petição Inicial
+        function generatePeticaoInicial(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ${formData.vara || 'VARA'} VARA ${formData.tipoJustica || 'CÍVEL'} DA COMARCA DE ${formData.comarca || 'CIDADE'}**
+
+**${formData.autorNome || 'AUTOR'}**, ${formData.autorQualificacao || 'qualificação'}, residente e domiciliado(a) à ${formData.autorEndereco || 'endereço'}, ${formData.autorCidade || 'cidade'} - ${formData.autorEstado || 'UF'}, CEP ${formData.autorCEP || '00000-000'}, ${formData.autorDocumento ? 'portador(a) do ' + formData.autorDocumento : 'devidamente qualificado(a)'}, por meio de seu advogado que esta subscreve (OAB ${formData.advogadoOAB || 'nº'}), com escritório situado à ${formData.advogadoEndereco || 'endereço'}, vem, respeitosamente, perante Vossa Excelência, propor a presente
+
+**AÇÃO ${(formData.tipoAcao || 'TIPO DE AÇÃO').toUpperCase()}**
+
+em face de **${formData.reuNome || 'RÉU'}**, ${formData.reuQualificacao || 'qualificação'}, residente e domiciliado(a) à ${formData.reuEndereco || 'endereço'}, pelos fundamentos de fato e de direito a seguir expostos:
+
+**I - DOS FATOS**
+
+${formData.relatoFatos || 'Narração dos fatos que deram origem à demanda...'}
+
+**II - DO DIREITO**
+
+${formData.fundamentacaoJuridica || 'Fundamentação jurídica aplicável ao caso...'}
+
+**III - DOS PEDIDOS**
+
+Diante do exposto, requer-se:
+
+${formData.pedidos || 'a) Pedido principal;\\nb) Pedidos alternativos ou subsidiários;'}
+
+**IV - DO VALOR DA CAUSA**
+
+Para os devidos fins legais, atribui-se à presente causa o valor de R$ ${formData.valorCausa || '0,00'} (valor por extenso).
+
+**V - DAS PROVAS**
+
+${formData.provas || 'Protesta-se pela produção de todas as provas em direito admitidas, especialmente prova documental, testemunhal e pericial.'}
+
+Termos em que,
+Pede e espera deferimento.
+
+${formData.autorCidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.advogadoNome || 'Nome do Advogado'}
+OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+        }
+
+        // Recurso de Apelação
+        function generateRecursoApelacao(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**EXCELENTÍSSIMO(A) SENHOR(A) DESEMBARGADOR(A) RELATOR(A) DO TRIBUNAL DE JUSTIÇA DO ESTADO DE ${formData.estado || 'ESTADO'}**
+
+**${formData.apelanteNome || 'APELANTE'}**, já qualificado(a) nos autos da ação que tramita perante ${formData.varaOrigem || 'Vara de origem'}, processo nº ${formData.numeroProcesso || '0000000-00.0000.0.00.0000'}, por meio de seu advogado que esta subscreve, vem, respeitosamente, interpor
+
+**RECURSO DE APELAÇÃO**
+
+contra a r. sentença de fls. ${formData.folhasSentenca || '000'}, pelos fundamentos que passa a expor:
+
+**I - DA TEMPESTIVIDADE**
+
+O presente recurso é tempestivo, tendo em vista que a intimação da r. sentença ocorreu em ${formData.dataIntimacao || 'data'}, conforme certidão de fls. ${formData.folhasIntimacao || '000'}.
+
+**II - DO PREPARO**
+
+O preparo recursal foi devidamente recolhido, conforme comprovante anexo.
+
+**III - DOS FATOS**
+
+${formData.relatoFatos || 'Breve resumo dos fatos que levaram à prolação da sentença recorrida...'}
+
+**IV - DO DIREITO - DAS RAZÕES RECURSAIS**
+
+${formData.razoes || 'Fundamentação das razões do recurso, demonstrando os equívocos da sentença...'}
+
+**V - DOS PEDIDOS**
+
+Diante do exposto, requer-se:
+
+a) O conhecimento e provimento do presente recurso;
+b) ${formData.pedidoPrincipal || 'Reforma/anulação da sentença'};
+c) ${formData.pedidosAlternativos || 'Pedidos alternativos'}.
+
+Termos em que,
+Pede e espera deferimento.
+
+${formData.cidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.advogadoNome || 'Nome do Advogado'}
+OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+        }
+
+        // Habeas Corpus
+        function generateHabeasCorpus(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) ${formData.autoridade || 'AUTORIDADE JUDICIÁRIA COMPETENTE'}**
+
+**${formData.impetrante || 'IMPETRANTE'}**, ${formData.qualificacaoImpetrante || 'qualificação'}, por meio de seu advogado que esta subscreve, vem, respeitosamente, impetrar
+
+**HABEAS CORPUS**
+
+em favor de **${formData.paciente || 'PACIENTE'}**, ${formData.qualificacaoPaciente || 'qualificação'}, ${formData.situacaoPrisao || 'atualmente preso/coagido'}, pelos fundamentos que passa a expor:
+
+**I - DA COMPETÊNCIA**
+
+${formData.competencia || 'Fundamentação da competência da autoridade judiciária...'}
+
+**II - DA COAÇÃO ILEGAL**
+
+${formData.coacao || 'Descrição detalhada da coação ilegal sofrida pelo paciente...'}
+
+**III - DO DIREITO DE LOCOMOÇÃO**
+
+${formData.direitoLocomocao || 'Fundamentação do direito de ir e vir e da ilegalidade da coação...'}
+
+**IV - DA URGÊNCIA**
+
+${formData.urgencia || 'Demonstração da urgência da medida em face da situação do paciente...'}
+
+**V - DOS PEDIDOS**
+
+Diante do exposto, requer-se:
+
+a) A concessão da ordem de Habeas Corpus;
+b) ${formData.pedidoPrincipal || 'Liberdade imediata do paciente'};
+c) ${formData.pedidosAlternativos || 'Pedidos alternativos'}.
+
+**VI - DO PEDIDO LIMINAR**
+
+${formData.liminar || 'Requer-se a concessão de liminar para imediata soltura do paciente.'}
+
+Termos em que,
+Pede e espera deferimento.
+
+${formData.cidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.advogadoNome || 'Nome do Advogado'}
+OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+        }
+
+        // Contestação
+        function generateContestacao(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ${formData.vara || 'VARA'}**
+
+**${formData.reuNome || 'RÉU'}**, já qualificado(a) nos autos da ação proposta por ${formData.autorNome || 'AUTOR'}, processo nº ${formData.numeroProcesso || '0000000-00.0000.0.00.0000'}, por meio de seu advogado que esta subscreve, vem, respeitosamente, apresentar
+
+**CONTESTAÇÃO**
+
+tempestiva aos termos da inicial, pelos fundamentos que passa a expor:
+
+**I - PRELIMINARES**
+
+${formData.preliminares || 'Eventuais preliminares processuais (ilegitimidade, incompetência, etc.)...'}
+
+**II - DO MÉRITO**
+
+${formData.merito || 'Contestação point by point dos fundamentos da inicial...'}
+
+**III - DOS FATOS CONTROVERTIDOS**
+
+${formData.fatosControvertidos || 'Impugnação específica dos fatos alegados pelo autor...'}
+
+**IV - DO DIREITO APLICÁVEL**
+
+${formData.direitoAplicavel || 'Fundamentação jurídica da defesa...'}
+
+**V - DAS PROVAS**
+
+${formData.provas || 'Especificação das provas que pretende produzir...'}
+
+**VI - DOS PEDIDOS**
+
+Diante do exposto, requer-se:
+
+a) O acolhimento das preliminares suscitadas;
+b) No mérito, a total improcedência dos pedidos;
+c) ${formData.pedidosAlternativos || 'Pedidos alternativos'};
+d) A condenação do autor ao pagamento das custas e honorários advocatícios.
+
+Termos em que,
+Pede e espera deferimento.
+
+${formData.cidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.advogadoNome || 'Nome do Advogado'}
+OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+        }
+
+        // Liberdade Provisória
+        function generateLiberdadeProvisoria(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO**
+
+**${formData.requerenteNome || 'REQUERENTE'}**, por meio de seu advogado que esta subscreve, vem, respeitosamente, requerer
+
+**LIBERDADE PROVISÓRIA**
+
+em favor de **${formData.acusadoNome || 'ACUSADO'}**, ${formData.qualificacao || 'qualificação'}, atualmente ${formData.situacaoAtual || 'custodiado'}, pelos fundamentos que passa a expor:
+
+**I - DOS FATOS**
+
+${formData.relatoFatos || 'Narração dos fatos que ensejaram a prisão...'}
+
+**II - DA AUSÊNCIA DOS REQUISITOS DA PRISÃO PREVENTIVA**
+
+${formData.ausenciaRequisitos || 'Demonstração de que não estão presentes os requisitos do art. 312 do CPP...'}
+
+**III - DA PRESENÇA DOS REQUISITOS PARA LIBERDADE PROVISÓRIA**
+
+${formData.presencaRequisitos || 'Demonstração dos requisitos para concessão da liberdade provisória...'}
+
+**IV - DAS MEDIDAS CAUTELARES ALTERNATIVAS**
+
+${formData.medidasAlternativas || 'Proposição de medidas cautelares diversas da prisão...'}
+
+**V - DOS PEDIDOS**
+
+Diante do exposto, requer-se:
+
+a) A concessão da liberdade provisória;
+b) ${formData.medidaAlternativa || 'Aplicação de medida cautelar diversa da prisão'};
+c) ${formData.pedidosAlternativos || 'Pedidos alternativos'}.
+
+**VI - DA URGÊNCIA**
+
+${formData.urgencia || 'Fundamentação da urgência da medida...'}
+
+Termos em que,
+Pede e espera deferimento.
+
+${formData.cidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.advogadoNome || 'Nome do Advogado'}
+OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+        }
+
+        // Petição de Fiança
+        function generatePeticaoFianca(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) DELEGADO(A) DE POLÍCIA / JUIZ(A) DE DIREITO**
+
+**${formData.requerenteNome || 'REQUERENTE'}**, por meio de seu advogado que esta subscreve, vem, respeitosamente, requerer
+
+**ARBITRAMENTO E PAGAMENTO DE FIANÇA**
+
+em favor de **${formData.investigadoNome || 'INVESTIGADO/ACUSADO'}**, ${formData.qualificacao || 'qualificação'}, pelos fundamentos que passa a expor:
+
+**I - DOS FATOS**
+
+${formData.relatoFatos || 'Breve relato dos fatos objeto da investigação/acusação...'}
+
+**II - DO DIREITO À FIANÇA**
+
+${formData.direitoFianca || 'Fundamentação do direito à fiança conforme arts. 321 e seguintes do CPP...'}
+
+**III - DA CAPACIDADE ECONÔMICA**
+
+${formData.capacidadeEconomica || 'Demonstração da situação econômica do interessado...'}
+
+**IV - DO VALOR PROPOSTO**
+
+${formData.valorProposto || 'Proposta de valor da fiança compatível com a situação econômica...'}
+
+**V - DOS PEDIDOS**
+
+Diante do exposto, requer-se:
+
+a) O arbitramento da fiança no valor de R$ ${formData.valorFianca || '0,00'};
+b) ${formData.formaPagamento || 'Autorização para pagamento da fiança'};
+c) A expedição do competente alvará de soltura;
+d) ${formData.pedidosAlternativos || 'Pedidos alternativos'}.
+
+Termos em que,
+Pede e espera deferimento.
+
+${formData.cidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.advogadoNome || 'Nome do Advogado'}
+OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+        }
+
+        // Alegações Finais
+        function generateAlegacoesFinais(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO**
+
+**${formData.parteNome || 'PARTE'}**, nos autos da ação em referência, por meio de seu advogado que esta subscreve, vem, respeitosamente, apresentar
+
+**ALEGAÇÕES FINAIS**
+
+nos termos do art. 364 do Código de Processo Civil, pelos fundamentos que passa a expor:
+
+**I - DOS FATOS PROVADOS**
+
+${formData.fatosProvados || 'Síntese dos fatos que restaram comprovados durante a instrução...'}
+
+**II - DAS PROVAS PRODUZIDAS**
+
+${formData.provasApresentadas || 'Análise das provas produzidas e sua valoração...'}
+
+**III - DO DIREITO APLICÁVEL**
+
+${formData.direitoAplicavel || 'Aplicação do direito aos fatos comprovados...'}
+
+**IV - DA JURISPRUDÊNCIA**
+
+${formData.jurisprudencia || 'Citação de precedentes jurisprudenciais aplicáveis...'}
+
+**V - DAS CONCLUSÕES**
+
+${formData.conclusoes || 'Conclusões finais com base nas provas e no direito...'}
+
+**VI - DOS PEDIDOS**
+
+Diante de todo o exposto e das provas carreadas aos autos, requer-se:
+
+a) ${formData.pedidoPrincipal || 'Pedido principal'};
+b) ${formData.pedidosAlternativos || 'Pedidos alternativos'};
+c) A condenação da parte contrária ao pagamento das custas e honorários advocatícios.
+
+Termos em que,
+Pede e espera deferimento.
+
+${formData.cidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.advogadoNome || 'Nome do Advogado'}
+OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+        }
+
+        // Requerimento de Provas
+        function generateRequerimentoProvas(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO**
+
+**${formData.requerenteNome || 'REQUERENTE'}**, nos autos da ação em referência, por meio de seu advogado que esta subscreve, vem, respeitosamente, requerer
+
+**PRODUÇÃO DE PROVAS**
+
+pelos fundamentos que passa a expor:
+
+**I - DA NECESSIDADE DAS PROVAS**
+
+${formData.necessidadeProvas || 'Demonstração da necessidade e relevância das provas requeridas...'}
+
+**II - DA PROVA TESTEMUNHAL**
+
+${formData.provaTestemunhal || 'Rol de testemunhas e justificativa para sua oitiva...'}
+
+**III - DA PROVA PERICIAL**
+
+${formData.provaPericial || 'Necessidade de prova pericial e quesitos propostos...'}
+
+**IV - DA PROVA DOCUMENTAL**
+
+${formData.provaDocumental || 'Documentos a serem juntados ou requisitados...'}
+
+**V - DE OUTRAS PROVAS**
+
+${formData.outrasProvas || 'Eventuais outras provas necessárias...'}
+
+**VI - DOS PEDIDOS**
+
+Diante do exposto, requer-se:
+
+a) A designação de audiência de instrução e julgamento;
+b) A oitiva das testemunhas arroladas;
+c) ${formData.pedidoPericial || 'A realização de perícia'};
+d) ${formData.outrosPedidos || 'Outros pedidos probatórios'}.
+
+Termos em que,
+Pede e espera deferimento.
+
+${formData.cidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.advogadoNome || 'Nome do Advogado'}
+OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+        }
+
+        // Pedido de Porte de Armas
+        function generatePorteArmas(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**ILMO. SR. DELEGADO-CHEFE DA DIVISÃO DE CONTROLE DE PRODUTOS CONTROLADOS**
+**POLÍCIA FEDERAL - SUPERINTENDÊNCIA DE ${formData.estado || 'ESTADO'}**
+
+**${formData.requerenteNome || 'REQUERENTE'}**, ${formData.qualificacao || 'qualificação completa'}, ${formData.profissao || 'profissão'}, residente e domiciliado(a) à ${formData.endereco || 'endereço completo'}, vem, respeitosamente, requerer
+
+**AUTORIZAÇÃO PARA PORTE DE ARMA DE FOGO**
+
+com base na Lei nº 10.826/2003 e Decreto nº 9.847/2019, pelos fundamentos que passa a expor:
+
+**I - DA QUALIFICAÇÃO E IDONEIDADE**
+
+${formData.idoneidade || 'Demonstração da idoneidade moral e social do requerente...'}
+
+**II - DA NECESSIDADE DO PORTE**
+
+${formData.necessidade || 'Fundamentação da efetiva necessidade do porte de arma...'}
+
+**III - DA CAPACIDADE TÉCNICA**
+
+${formData.capacidadeTecnica || 'Comprovação da capacidade técnica para manuseio de arma de fogo...'}
+
+**IV - DA OCUPAÇÃO LÍCITA**
+
+${formData.ocupacaoLicita || 'Demonstração de ocupação lícita e renda compatível...'}
+
+**V - DA RESIDÊNCIA FIXA**
+
+${formData.residenciaFixa || 'Comprovação de residência fixa em território nacional...'}
+
+**VI - DOS PEDIDOS**
+
+Diante do exposto e dos documentos acostados, requer-se:
+
+a) A concessão da autorização para porte de arma de fogo;
+b) ${formData.tipoCalibre || 'Especificação do tipo e calibre'};
+c) ${formData.validadeDesejada || 'Prazo de validade desejado'};
+d) ${formData.outrosPedidos || 'Outros pedidos'}.
+
+Nestes termos,
+Pede deferimento.
+
+${formData.cidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.requerenteNome || 'Nome Completo'}
+CPF: ${formData.cpf || '000.000.000-00'}`;
+        }
+
+        // Pedido de Limpeza de Ficha
+        function generateLimpezaFicha(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA VARA DE EXECUÇÕES CRIMINAIS**
+
+**${formData.requerenteNome || 'REQUERENTE'}**, ${formData.qualificacao || 'qualificação'}, por meio de seu advogado que esta subscreve, vem, respeitosamente, requerer
+
+**REABILITAÇÃO CRIMINAL / CANCELAMENTO DE ANTECEDENTES**
+
+com base no art. 93 do Código Penal, pelos fundamentos que passa a expor:
+
+**I - DOS FATOS**
+
+${formData.relatoFatos || 'Histórico da condenação e cumprimento da pena...'}
+
+**II - DO CUMPRIMENTO DA PENA**
+
+${formData.cumprimentoPena || 'Demonstração do integral cumprimento da pena...'}
+
+**III - DO LAPSO TEMPORAL**
+
+${formData.lapsoTemporal || 'Comprovação do decurso do prazo legal para reabilitação...'}
+
+**IV - DA BOA CONDUTA**
+
+${formData.boaConduta || 'Demonstração de bom comportamento e ressocialização...'}
+
+**V - DA REPARAÇÃO DO DANO**
+
+${formData.reparacaoDano || 'Comprovação da reparação do dano, quando aplicável...'}
+
+**VI - DOS PEDIDOS**
+
+Diante do exposto, requer-se:
+
+a) A concessão da reabilitação criminal;
+b) O cancelamento dos antecedentes criminais;
+c) ${formData.outrosPedidos || 'Outros pedidos'};
+d) A expedição de certidão de reabilitação.
+
+Termos em que,
+Pede e espera deferimento.
+
+${formData.cidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.advogadoNome || 'Nome do Advogado'}
+OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+        }
+
+        // Embargos de Declaração
+        function generateEmbargosDeclaracao(formData) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            return `
+**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO / DESEMBARGADOR(A) RELATOR(A)**
+
+**${formData.embargante || 'EMBARGANTE'}**, nos autos da ação em referência, por meio de seu advogado que esta subscreve, vem, respeitosamente, opor
+
+**EMBARGOS DE DECLARAÇÃO**
+
+contra a r. decisão/acórdão de fls. ${formData.folhasDecisao || '000'}, pelos fundamentos que passa a expor:
+
+**I - DA TEMPESTIVIDADE**
+
+Os presentes embargos são tempestivos, tendo em vista que a intimação da decisão embargada ocorreu em ${formData.dataIntimacao || 'data'}.
+
+**II - DA OMISSÃO**
+
+${formData.omissao || 'Demonstração de pontos omitidos na decisão que deveriam ter sido apreciados...'}
+
+**III - DA CONTRADIÇÃO**
+
+${formData.contradicao || 'Apontamento de contradições internas na decisão...'}
+
+**IV - DA OBSCURIDADE**
+
+${formData.obscuridade || 'Indicação de trechos obscuros que prejudicam a compreensão...'}
+
+**V - DOS PEDIDOS**
+
+Diante do exposto, requer-se:
+
+a) O conhecimento dos presentes embargos;
+b) ${formData.pedidoEsclarecimento || 'Esclarecimento dos pontos omissos/contraditórios/obscuros'};
+c) ${formData.pedidoAlteracao || 'Eventual modificação da decisão'};
+d) ${formData.outrosPedidos || 'Outros pedidos'}.
+
+Termos em que,
+Pede e espera deferimento.
+
+${formData.cidade || 'Cidade'}, ${data}.
+
+_________________________________
+${formData.advogadoNome || 'Nome do Advogado'}
+OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+        }
+
+        // Função genérica para documentos não especificados
+        function generateGenericContent(formData, template) {
+            const data = new Date().toLocaleDateString('pt-BR');
+            let content = `**${template.title.toUpperCase()}**\n\n`;
+            
+            template.fields.forEach(field => {
+                if (formData[field.name]) {
+                    content += `**${field.label}:** ${formData[field.name]}\n\n`;
+                }
+            });
+            
+            content += `Data: ${data}\n\n`;
+            content += `_________________________________\n`;
+            content += `${formData.advogadoNome || 'Nome do Advogado'}\n`;
+            content += `OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+            
+            return content;
         }
 
         // Gerar imagem do documento com formatação profissional e PDF intermediário
@@ -5534,6 +6151,85 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             </div>
         </div>
     </div>
+
+    <script>
+        // === FUNÇÕES DE SAÍDA PROFISSIONAL ===
+
+        // Criar container de visualização profissional
+        function createProfessionalPreview(documentContent, title) {
+            const container = document.createElement('div');
+            container.style.cssText = `
+                position: absolute;
+                left: -9999px;
+                top: 0;
+                width: 210mm;
+                min-height: 297mm;
+                background: white;
+                padding: 20mm;
+                font-family: 'Times New Roman', serif;
+                font-size: 12pt;
+                line-height: 1.6;
+                color: black;
+                box-sizing: border-box;
+            `;
+            
+            // Aplicar formatação HTML ao conteúdo
+            const formattedContent = convertTextToFormattedHTML(documentContent);
+            container.innerHTML = formattedContent;
+            
+            document.body.appendChild(container);
+            return container;
+        }
+
+        // Gerar saída em PDF
+        function generatePDFOutput(container, title) {
+            showNotification('Funcionalidade PDF em desenvolvimento...', 'info');
+            // TODO: Implementar geração de PDF real
+            // Por enquanto, usar a geração de imagem
+            generateImageOutput(container, title);
+        }
+
+        // Gerar saída em imagem
+        function generateImageOutput(container, title) {
+            try {
+                html2canvas(container, {
+                    scale: 3,
+                    useCORS: true,
+                    allowTaint: false,
+                    backgroundColor: '#ffffff',
+                    width: container.offsetWidth,
+                    height: container.offsetHeight
+                }).then(canvas => {
+                    // Criar link de download
+                    const link = document.createElement('a');
+                    link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    
+                    // Fazer download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Remover container temporário
+                    document.body.removeChild(container);
+                    
+                    showNotification('Documento gerado com sucesso!', 'success');
+                }).catch(error => {
+                    console.error('Erro na geração da imagem:', error);
+                    showNotification('Erro ao gerar imagem do documento', 'error');
+                    if (container.parentNode) {
+                        document.body.removeChild(container);
+                    }
+                });
+            } catch (error) {
+                console.error('Erro na captura de tela:', error);
+                showNotification('Erro ao processar documento', 'error');
+                if (container.parentNode) {
+                    document.body.removeChild(container);
+                }
+            }
+        }
+    </script>
 </body>
 </html>
 
