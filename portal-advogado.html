@@ -793,8 +793,8 @@
                                     </button>
                                 </div>
                                 
-                                <!-- Container do Preview -->
-                                <div id="document-preview" class="bg-white/10 rounded-lg p-4 border border-blue-300/20" style="min-height: 600px; max-height: 800px; overflow: hidden;">
+                                <!-- Container do Preview - MELHORADO -->
+                                <div id="document-preview" class="bg-white/10 rounded-lg p-3 border border-blue-300/20" style="min-height: 450px; max-height: 650px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
                                     <div class="text-blue-200 text-sm text-center py-8">
                                         <i class="fas fa-file-alt text-4xl mb-3"></i>
                                         <p>Preencha os dados para ver o preview</p>
@@ -3401,28 +3401,16 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 </div>
             ` : '';
 
+            // Rodapé simples apenas com número da página (SEM assinatura duplicada)
             const footerHTML = !isFirstPage ? `
                 <div style="position: absolute; bottom: ${margin}px; left: ${margin}px; right: ${margin}px; text-align: center; font-size: 11px; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
-                    <div style="margin-bottom: 5px;">
-                        <strong>${userProfile.name || 'Dr(a). Advogado(a)'}</strong> - OAB/SP ${userProfile.oab || 'XXXXX'}
-                    </div>
                     <div style="font-size: 10px;">
-                        ${userProfile.email || 'email@exemplo.com'} | Tel: ${userProfile.phone || '(11) 9999-9999'} | Página ${pageNumber}
+                        Página ${pageNumber}
                     </div>
                 </div>
             ` : '';
 
-            // Adicionar assinatura na última página
-            const signatureHTML = !isFirstPage ? `
-                <div style="margin-top: 50px; text-align: center;">
-                    <div style="margin: 40px 0 20px 0;">
-                        <div style="border-top: 1px solid #000; width: 300px; margin: 0 auto; padding-top: 10px;">
-                            <strong>${userProfile.name || 'Dr(a). Advogado(a)'}</strong><br>
-                            OAB/SP ${userProfile.oab || 'XXXXX'}
-                        </div>
-                    </div>
-                </div>
-            ` : '';
+            // REMOVIDO: signatureHTML duplicada - a assinatura já está no conteúdo do documento
 
             return `
                 <div style="
@@ -3439,9 +3427,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     overflow: hidden;
                 ">
                     ${headerHTML}
-                    <div style="text-align: justify; margin-bottom: ${!isFirstPage ? '100px' : '40px'}; min-height: ${height - (margin * 2) - 200}px;">
+                    <div style="text-align: justify; margin-bottom: ${!isFirstPage ? '50px' : '40px'}; min-height: ${height - (margin * 2) - 150}px;">
                         ${content}
-                        ${signatureHTML}
                     </div>
                     ${footerHTML}
                 </div>
@@ -3451,9 +3438,9 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Formatar conteúdo com HTML para negritos e formatação profissional
         function formatDocumentContentHTML(content) {
             return content
-                // Excelentíssimo em negrito e alinhado à esquerda
+                // EXCELENTÍSSIMO em NEGRITO, FONTE MAIOR e ALINHADO À ESQUERDA (como AUTOR/BRASILÂNDIA)
                 .replace(/(EXCELENTÍSSIMO\s+SENHOR\s+DOUTOR?\s+JUIZ[^:\n]*)/gmi, 
-                         '<div style="font-weight: bold; font-size: 14px; margin: 20px 0 15px 0; text-align: left; color: #000;"><strong>$1</strong></div>')
+                         '<div style="font-weight: bold; font-size: 18px; margin: 25px 0 20px 0; text-align: left; color: #000; text-indent: 0; line-height: 1.4;"><strong>$1</strong></div>')
                 
                 // Seções principais em negrito e maiúsculo
                 .replace(/^(DOS FATOS|DA FUNDAMENTAÇÃO JURÍDICA|DOS PEDIDOS|DAS PROVAS|DO VALOR DA CAUSA|DA DEFESA|ALEGAÇÕES FINAIS|RECURSO|CONTESTAÇÃO|AUTOR|RÉU|PACIENTE\/RÉU):/gm, 
@@ -3906,7 +3893,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             }
         }
 
-        // Exibir página específica do preview
+        // Exibir página específica do preview - MELHORADO
         function displayPreviewPage(pageIndex) {
             console.log('👁️ Exibindo página', pageIndex + 1, 'de', previewPages.length);
             
@@ -3921,21 +3908,25 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             document.getElementById('document-preview').innerHTML = `
                 <div style="
                     width: 100%; 
-                    height: 600px; 
-                    overflow: hidden; 
+                    height: 100%; 
                     display: flex; 
                     justify-content: center; 
-                    align-items: flex-start;
+                    align-items: center;
                     background: #f8fafc;
                     border-radius: 8px;
-                    padding: 10px;
+                    padding: 15px;
+                    box-sizing: border-box;
                 ">
                     <div style="
-                        transform: scale(0.65); 
-                        transform-origin: top center; 
-                        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                        transform: scale(0.5); 
+                        transform-origin: center center; 
+                        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
                         border-radius: 8px;
                         overflow: hidden;
+                        border: 1px solid #e2e8f0;
+                        background: white;
+                        width: 794px;
+                        height: 1123px;
                     ">
                         ${pageHTML}
                     </div>
