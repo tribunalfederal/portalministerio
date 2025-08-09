@@ -1717,6 +1717,92 @@
             });
         }
 
+        // Função para baixar documento como PDF
+        function downloadDocumentPDF() {
+            const conteudo = document.getElementById('conteudo-documento');
+            if (!conteudo) {
+                showNotification('❌ Nenhum documento para converter', 'error');
+                return;
+            }
+
+            // Verificar se jsPDF está disponível
+            if (typeof window.jsPDF === 'undefined') {
+                showNotification('❌ Biblioteca jsPDF não encontrada', 'error');
+                return;
+            }
+
+            showNotification('📄 Gerando PDF do documento...', 'info');
+
+            try {
+                // Criar clone do conteúdo para ajustar estilos
+                const clone = conteudo.cloneNode(true);
+                clone.style.cssText = `
+                    position: fixed;
+                    left: -9999px;
+                    top: 0;
+                    width: 800px;
+                    background: white;
+                    color: black;
+                    font-family: Arial, sans-serif;
+                    padding: 20px;
+                    box-sizing: border-box;
+                `;
+                
+                document.body.appendChild(clone);
+
+                // Usar html2canvas para converter em imagem
+                html2canvas(clone, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    width: 800,
+                    height: clone.scrollHeight
+                }).then(canvas => {
+                    // Remover clone do DOM
+                    document.body.removeChild(clone);
+
+                    // Criar PDF
+                    const { jsPDF } = window.jsPDF;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    
+                    const imgWidth = 190; // Largura em mm (A4 com margem)
+                    const pageHeight = 277; // Altura da página A4 em mm
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    let heightLeft = imgHeight;
+                    let position = 10; // Margem superior
+                    
+                    // Adicionar primeira página
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    // Adicionar páginas adicionais se necessário
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight + 10;
+                        pdf.addPage();
+                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    // Download do PDF
+                    const filename = `documento_${new Date().getTime()}.pdf`;
+                    pdf.save(filename);
+                    
+                    showNotification('✅ PDF gerado com sucesso!', 'success');
+                    
+                }).catch(error => {
+                    console.error('Erro ao gerar PDF:', error);
+                    document.body.removeChild(clone);
+                    showNotification('❌ Erro ao gerar PDF. Tente novamente.', 'error');
+                });
+
+            } catch (error) {
+                console.error('Erro ao preparar PDF:', error);
+                showNotification('❌ Erro ao preparar documento para PDF', 'error');
+            }
+        }
+
         // Função imprimir (COPIADA EXATA DO INDEX)
         function imprimirDocumento() {
             const conteudo = document.getElementById('conteudo-documento').innerHTML;
@@ -1983,8 +2069,8 @@
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
                     <!-- Cabeçalho do Documento -->
-                    <div class="text-center mb-8 border-b-2 border-purple-500 pb-4">
-                        <div class="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-4 rounded-lg mb-4">
+                    <div class="text-center mb-8 border-b-2 border-blue-700 pb-4">
+                        <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white p-4 rounded-lg mb-4">
                             <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
                             <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
                         </div>
@@ -2249,8 +2335,8 @@
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
                     <!-- Cabeçalho do Documento -->
-                    <div class="text-center mb-8 border-b-2 border-indigo-500 pb-4">
-                        <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 rounded-lg mb-4">
+                    <div class="text-center mb-8 border-b-2 border-blue-700 pb-4">
+                        <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white p-4 rounded-lg mb-4">
                             <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
                             <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
                         </div>
@@ -2548,8 +2634,8 @@
             return `
                 <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
                     <!-- Cabeçalho do Documento -->
-                    <div class="text-center mb-8 border-b-2 border-pink-500 pb-4">
-                        <div class="bg-gradient-to-r from-pink-600 to-pink-800 text-white p-4 rounded-lg mb-4">
+                    <div class="text-center mb-8 border-b-2 border-slate-600 pb-4">
+                        <div class="bg-gradient-to-r from-slate-600 to-slate-800 text-white p-4 rounded-lg mb-4">
                             <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
                             <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
                         </div>
@@ -4052,6 +4138,7 @@
                 initializeCalculator();
                 loadUserData();
                 initializeHierarchy();
+                initializeTheme(); // Inicializar sistema de tema
                 console.log('✅ Portal carregado com sucesso!');
             } catch (error) {
                 console.warn('⚠️ Alguns recursos podem não funcionar:', error);
@@ -4752,9 +4839,82 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Salvar configurações
         function saveSettings() {
-            // Aqui normalmente salvaríamos as configurações no backend
+            // Salvar estado do tema
+            const darkThemeEnabled = document.getElementById('darkThemeToggle').checked;
+            localStorage.setItem('darkTheme', darkThemeEnabled.toString());
+            
             closeModal('settingsModal');
             showNotification('Configurações salvas com sucesso!', 'success');
+        }
+
+        // Função para alternar tema claro/escuro
+        function toggleTheme() {
+            const darkThemeToggle = document.getElementById('darkThemeToggle');
+            const isDarkMode = darkThemeToggle.checked;
+            
+            // Aplicar tema imediatamente
+            applyTheme(isDarkMode);
+            
+            // Salvar preferência no localStorage
+            localStorage.setItem('darkTheme', isDarkMode.toString());
+            
+            showNotification(
+                isDarkMode ? '🌙 Tema escuro ativado' : '☀️ Tema claro ativado', 
+                'info'
+            );
+        }
+
+        // Função para aplicar o tema
+        function applyTheme(isDarkMode) {
+            const body = document.body;
+            
+            if (isDarkMode) {
+                // Aplicar tema escuro (padrão atual)
+                body.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%)';
+                body.classList.add('dark-theme');
+                body.classList.remove('light-theme');
+            } else {
+                // Aplicar tema claro
+                body.style.background = 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 50%, #d1d5db 100%)';
+                body.classList.add('light-theme');
+                body.classList.remove('dark-theme');
+                
+                // Ajustar cores dos elementos para tema claro
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    if (isDarkMode) {
+                        card.style.backgroundColor = '';
+                        card.style.color = '';
+                    } else {
+                        card.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                        card.style.color = '#1f2937';
+                        card.style.border = '1px solid #e5e7eb';
+                    }
+                });
+                
+                // Ajustar textos
+                const textElements = document.querySelectorAll('.text-white');
+                textElements.forEach(element => {
+                    if (!isDarkMode && !element.closest('.bg-gradient-to-r')) {
+                        element.style.color = '#1f2937';
+                    } else if (isDarkMode) {
+                        element.style.color = '';
+                    }
+                });
+            }
+        }
+
+        // Inicializar tema baseado na preferência salva
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('darkTheme');
+            const isDarkMode = savedTheme === null ? true : savedTheme === 'true'; // Padrão escuro
+            
+            const darkThemeToggle = document.getElementById('darkThemeToggle');
+            if (darkThemeToggle) {
+                darkThemeToggle.checked = isDarkMode;
+            }
+            
+            applyTheme(isDarkMode);
         }
 
         // Função de logout
@@ -9500,17 +9660,17 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
                     <!-- Nível 9 - Oficiais de Primeira Instância -->
                     <div class="hierarchy-level">
-                        <div class="level-header bg-gradient-to-r from-gray-600/30 to-gray-500/30 p-3 rounded-lg border border-gray-400/30">
-                            <h4 class="text-gray-300 font-bold text-sm flex items-center gap-2">
-                                <i class="fas fa-clipboard-check text-gray-400"></i>
+                        <div class="level-header bg-gradient-to-r from-teal-600/30 to-teal-500/30 p-3 rounded-lg border border-teal-400/30">
+                            <h4 class="text-teal-300 font-bold text-sm flex items-center gap-2">
+                                <i class="fas fa-clipboard-check text-teal-400"></i>
                                 NÍVEL 9 - OFICIAIS DE PRIMEIRA INSTÂNCIA
                             </h4>
                         </div>
                         <div class="ml-4 mt-2 space-y-2">
-                            <div class="position-card bg-gradient-to-r from-gray-600/20 to-gray-500/20 p-3 rounded border border-gray-400/20">
+                            <div class="position-card bg-gradient-to-r from-teal-600/20 to-teal-500/20 p-3 rounded border border-teal-400/20">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
-                                        <i class="fas fa-file-alt text-gray-400"></i>
+                                        <i class="fas fa-file-alt text-teal-400"></i>
                                         <div>
                                             <div class="text-white font-semibold text-sm">1º Oficial de Justiça - 1ª Instância</div>
                                             <div class="text-gray-200 text-xs">Oficial de primeira instância</div>
@@ -9588,7 +9748,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
                                 <label class="text-blue-200">Tema Escuro</label>
-                                <input type="checkbox" checked class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                <input type="checkbox" id="darkThemeToggle" checked onchange="toggleTheme()" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
                             </div>
                             <div class="flex items-center justify-between">
                                 <label class="text-blue-200">Notificações</label>
