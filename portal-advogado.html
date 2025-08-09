@@ -7,7 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -83,12 +84,12 @@
         }
         
         .btn-danger {
-            background: linear-gradient(135deg, var(--accent-red) 0%, #b91c1c 100%);
+            background: #dc2626;
             color: white;
         }
         
         .btn-danger:hover {
-            background: linear-gradient(135deg, #ef4444 0%, var(--accent-red) 100%);
+            background: #b91c1c;
             transform: translateY(-1px);
         }
         
@@ -306,9 +307,9 @@
         }
 
         .crime-category-tab.active {
-            background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+            background: #3b82f6;
             color: white;
-            border-color: var(--secondary-blue);
+            border-color: #3b82f6;
         }
 
         /* Crime Cards */
@@ -628,7 +629,7 @@
                     <div class="text-blue-200 text-sm">Casos Ativos</div>
                 </div>
                 <div class="card p-4 text-center">
-                    <div class="text-3xl font-bold text-yellow-400 mb-1">156</div>
+                    <div class="text-3xl font-bold text-purple-400 mb-1">156</div>
                     <div class="text-blue-200 text-sm">Documentos</div>
                 </div>
                 <div class="card p-4 text-center">
@@ -1729,42 +1730,147 @@
                 return;
             }
 
-            // Verificar se jsPDF está disponível
-            if (typeof window.jsPDF === 'undefined') {
-                showNotification('❌ Biblioteca jsPDF não encontrada', 'error');
+        // Função universal de PDF que sempre funciona
+        function downloadDocumentPDF() {
+            console.log('🔥 Iniciando geração de PDF...');
+            
+            // Buscar conteúdo do preview ou documento
+            let conteudo = document.getElementById('document-preview');
+            if (!conteudo || !conteudo.innerHTML.trim()) {
+                conteudo = document.getElementById('conteudo-documento');
+            }
+            
+            if (!conteudo || !conteudo.innerHTML.trim()) {
+                showNotification('❌ Nenhum documento encontrado para gerar PDF', 'error');
                 return;
             }
 
-            showNotification('📄 Gerando PDF do documento...', 'info');
+            // Verificar bibliotecas necessárias
+            if (typeof html2canvas === 'undefined' || typeof window.jsPDF === 'undefined') {
+                showNotification('❌ Bibliotecas necessárias não encontradas. Usando método alternativo...', 'warning');
+                downloadDocumentFallback();
+                return;
+            }
+
+            showNotification('📄 Gerando PDF profissional...', 'info');
 
             try {
-                // Criar clone do conteúdo para ajustar estilos
-                const clone = conteudo.cloneNode(true);
-                clone.style.cssText = `
+                // Criar container temporário com estilos profissionais
+                const tempContainer = document.createElement('div');
+                tempContainer.style.cssText = `
                     position: fixed;
                     left: -9999px;
                     top: 0;
-                    width: 800px;
+                    width: 210mm;
+                    min-height: 297mm;
                     background: white;
+                    padding: 20mm;
+                    font-family: 'Times New Roman', serif;
+                    font-size: 12pt;
+                    line-height: 1.6;
                     color: black;
-                    font-family: Arial, sans-serif;
-                    padding: 20px;
                     box-sizing: border-box;
+                    transform: scale(1);
                 `;
                 
-                document.body.appendChild(clone);
+                // Limpar e formatar conteúdo
+                const cleanContent = conteudo.innerHTML
+                    .replace(/<div[^>]*class="text-blue-200[^"]*"[^>]*>.*?<\/div>/gi, '')
+                    .replace(/class="[^"]*"/gi, '')
+                    .replace(/style="[^"]*"/gi, '')
+                    .replace(/<button[^>]*>.*?<\/button>/gi, '')
+                    .replace(/<i[^>]*>.*?<\/i>/gi, '');
+                
+                tempContainer.innerHTML = cleanContent;
+                document.body.appendChild(tempContainer);
 
-                // Usar html2canvas para converter em imagem
-                html2canvas(clone, {
+                // Gerar imagem do conteúdo
+                html2canvas(tempContainer, {
                     scale: 2,
                     useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    width: 800,
-                    height: clone.scrollHeight
+                    backgroundColor: 'white',
+                    width: 794,
+                    height: 1123
                 }).then(canvas => {
-                    // Remover clone do DOM
-                    document.body.removeChild(clone);
+                    document.body.removeChild(tempContainer);
+                    
+                    // Criar PDF
+                    const { jsPDF } = window.jsPDF;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    
+                    const imgData = canvas.toDataURL('image/png');
+                    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+                    
+                    const fileName = `Documento_${new Date().toISOString().split('T')[0]}.pdf`;
+                    pdf.save(fileName);
+                    
+                    showNotification('✅ PDF gerado com sucesso!', 'success');
+                }).catch(error => {
+                    document.body.removeChild(tempContainer);
+                    console.error('Erro html2canvas:', error);
+                    downloadDocumentFallback();
+                });
+
+            } catch (error) {
+                console.error('Erro na geração do PDF:', error);
+                downloadDocumentFallback();
+            }
+        }
+
+        // Método alternativo para download
+        function downloadDocumentFallback() {
+            console.log('📄 Usando método alternativo de download...');
+            
+            let conteudo = document.getElementById('document-preview');
+            if (!conteudo || !conteudo.innerHTML.trim()) {
+                conteudo = document.getElementById('conteudo-documento');
+            }
+            
+            if (!conteudo) {
+                showNotification('❌ Nenhum conteúdo encontrado', 'error');
+                return;
+            }
+
+            // Criar HTML limpo para download
+            const cleanHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Documento Jurídico</title>
+                    <style>
+                        body { 
+                            font-family: 'Times New Roman', serif; 
+                            font-size: 12pt; 
+                            line-height: 1.6; 
+                            margin: 20mm; 
+                            color: black; 
+                            background: white; 
+                        }
+                        h1, h2, h3 { color: black; margin: 10px 0; }
+                        p { margin: 8px 0; }
+                        .editable { border: none; background: transparent; }
+                    </style>
+                </head>
+                <body>
+                    ${conteudo.innerHTML.replace(/<button[^>]*>.*?<\/button>/gi, '').replace(/class="[^"]*"/gi, '')}
+                </body>
+                </html>
+            `;
+
+            // Download como arquivo HTML
+            const blob = new Blob([cleanHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Documento_${new Date().toISOString().split('T')[0]}.html`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showNotification('📄 Documento baixado como HTML (abra no navegador e use Ctrl+P para imprimir em PDF)', 'info');
+        }
 
                     // Criar PDF
                     const { jsPDF } = window.jsPDF;
