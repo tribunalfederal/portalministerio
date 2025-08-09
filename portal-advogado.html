@@ -1207,27 +1207,23 @@
                                     <span id="cliente-titulo">Dados do Cliente</span>
                                 </h4>
                                 
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div class="grid grid-cols-1 gap-6">
                                     <div>
                                         <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-user mr-2"></i><span id="cliente-label">Nome do Cliente *</span>
+                                            <i class="fas fa-user mr-2"></i><span id="cliente-label">Nome do Cliente ou RG/CPF *</span>
                                         </label>
-                                        <input type="text" id="requerente-nome" required 
-                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                               placeholder="Nome completo do cliente">
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-id-card mr-2"></i><span id="documento-label">RG ou Passaporte *</span>
-                                        </label>
-                                        <input type="text" id="requerente-documento" required maxlength="10"
-                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                               placeholder="Ex: 123456 ou 12345678"
-                                               oninput="formatDocumentInput(this)">
-                                        <p class="text-blue-300/70 text-xs mt-1">
+                                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                            <input type="text" id="requerente-nome" required 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                                   placeholder="Nome completo do cliente">
+                                            <input type="text" id="requerente-documento" required maxlength="15"
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                                   placeholder="RG, CPF ou Passaporte"
+                                                   oninput="formatDocumentInput(this)">
+                                        </div>
+                                        <p class="text-blue-300/70 text-xs mt-2">
                                             <i class="fas fa-info-circle mr-1"></i>
-                                            <span id="documento-hint">RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)</span>
+                                            <span id="documento-hint">Preencha o nome completo e o documento (RG, CPF ou Passaporte)</span>
                                         </p>
                                     </div>
                                 </div>
@@ -1238,22 +1234,19 @@
                                         <i class="fas fa-scales text-blue-400"></i>
                                         Informações do Processo Civil
                                     </h5>
-                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 gap-4">
                                         <div>
                                             <label class="block text-blue-300 font-semibold mb-2">
-                                                <i class="fas fa-user-times mr-2"></i>Nome do Réu (opcional)
+                                                <i class="fas fa-user-times mr-2"></i>Nome do Réu ou RG/CPF (opcional)
                                             </label>
-                                            <input type="text" id="reu-nome" 
-                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                                   placeholder="Nome da pessoa/empresa processada">
-                                        </div>
-                                        <div>
-                                            <label class="block text-blue-300 font-semibold mb-2">
-                                                <i class="fas fa-id-card mr-2"></i>CPF/CNPJ do Réu (opcional)
-                                            </label>
-                                            <input type="text" id="reu-documento" 
-                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                                   placeholder="CPF ou CNPJ do réu">
+                                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                                <input type="text" id="reu-nome" 
+                                                       class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                                       placeholder="Nome da pessoa/empresa processada">
+                                                <input type="text" id="reu-documento" 
+                                                       class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                                       placeholder="RG, CPF ou CNPJ do réu">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2827,9 +2820,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 
                 // Configurar para processo civil
                 clienteTitulo.textContent = 'Dados do Cliente (Autor da Ação)';
-                clienteLabel.textContent = 'Nome do Autor/Cliente *';
-                documentoLabel.textContent = 'RG ou Passaporte do Autor *';
-                documentoHint.textContent = 'RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)';
+                clienteLabel.textContent = 'Nome do Autor/Cliente ou RG/CPF *';
+                documentoHint.textContent = 'Preencha o nome completo e o documento (RG, CPF ou Passaporte)';
                 infoCivil.style.display = 'block';
 
                 // Atualizar opções de tipo de processo para civil
@@ -2865,9 +2857,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 
                 // Configurar para processo criminal
                 clienteTitulo.textContent = 'Dados do Cliente (Réu/Acusado)';
-                clienteLabel.textContent = 'Nome do Réu/Acusado *';
-                documentoLabel.textContent = 'RG ou Passaporte do Réu *';
-                documentoHint.textContent = 'RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)';
+                clienteLabel.textContent = 'Nome do Réu/Acusado ou RG/CPF *';
+                documentoHint.textContent = 'Preencha o nome completo e o documento (RG, CPF ou Passaporte)';
                 infoCriminal.style.display = 'block';
 
                 // Atualizar opções de tipo de processo para criminal
@@ -2895,9 +2886,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 dadosClienteSection.style.display = 'none';
                 
                 clienteTitulo.textContent = 'Dados do Cliente';
-                clienteLabel.textContent = 'Nome do Cliente *';
-                documentoLabel.textContent = 'RG ou Passaporte *';
-                documentoHint.textContent = 'RG ou Passaporte de BRASILÂNDIA (5-10 dígitos)';
+                clienteLabel.textContent = 'Nome do Cliente ou RG/CPF *';
+                documentoHint.textContent = 'Preencha o nome completo e o documento (RG, CPF ou Passaporte)';
 
                 // Resetar opções de tipo de processo
                 tipoProcessoSelect.innerHTML = `
@@ -3156,15 +3146,15 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 const outraParteLabel = document.querySelector('label[for="field-outraParte"]');
                 
                 if (tipoPeticao === 'civil') {
-                    if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente (Autor) <span class="text-red-400">*</span>';
+                    if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente (Autor) ou RG/CPF <span class="text-red-400">*</span>';
                     if (outraParteField) outraParteField.placeholder = 'Nome do Réu';
                     if (outraParteLabel) outraParteLabel.textContent = 'Nome do Réu';
                 } else if (tipoPeticao === 'criminal') {
-                    if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente (Réu/Acusado) <span class="text-red-400">*</span>';
+                    if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente (Réu/Acusado) ou RG/CPF <span class="text-red-400">*</span>';
                     if (outraParteField) outraParteField.placeholder = 'Ministério Público';
                     if (outraParteLabel) outraParteLabel.textContent = 'Autor da Ação';
                 } else {
-                    if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente <span class="text-red-400">*</span>';
+                    if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente ou RG/CPF <span class="text-red-400">*</span>';
                     if (outraParteField) outraParteField.placeholder = 'Nome da outra parte';
                     if (outraParteLabel) outraParteLabel.textContent = 'Nome da Outra Parte';
                 }
