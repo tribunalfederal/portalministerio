@@ -774,7 +774,27 @@
                                 <h4 class="text-white font-semibold mb-4">
                                     <i class="fas fa-eye mr-2"></i>Preview do Documento
                                 </h4>
-                                <div id="document-preview" class="bg-white/10 rounded-lg p-4 border border-blue-300/20">
+                                
+                                <!-- Controles de Navegação -->
+                                <div id="preview-controls" class="flex justify-between items-center mb-4 bg-white/10 rounded-lg p-3 border border-blue-300/20 hidden">
+                                    <button onclick="previousPage()" id="prev-btn" class="btn bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    
+                                    <div class="text-white text-center">
+                                        <span id="page-indicator" class="font-semibold">Página 1 de 1</span>
+                                        <div class="text-xs text-blue-200 mt-1">
+                                            <span id="total-pages-info">Navegue entre as páginas</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button onclick="nextPage()" id="next-btn" class="btn bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Container do Preview -->
+                                <div id="document-preview" class="bg-white/10 rounded-lg p-4 border border-blue-300/20" style="min-height: 600px; max-height: 800px; overflow: hidden;">
                                     <div class="text-blue-200 text-sm text-center py-8">
                                         <i class="fas fa-file-alt text-4xl mb-3"></i>
                                         <p>Preencha os dados para ver o preview</p>
@@ -3357,13 +3377,13 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Formatar conteúdo com HTML para negritos e formatação profissional
         function formatDocumentContentHTML(content) {
             return content
-                // Excelentíssimo em negrito e alinhado à esquerda
-                .replace(/^(EXCELENTÍSSIMO\s+SENHOR\s+DOUTOR?\s+JUIZ[A-Z\s]*)/gmi, 
-                         '<div style="font-weight: bold; font-size: 14px; margin: 20px 0 25px 0; text-align: left; color: #000;">$1</div>')
+                // Excelentíssimo em negrito e alinhado à esquerda (como AUTOR)
+                .replace(/(EXCELENTÍSSIMO\s+SENHOR\s+DOUTOR?\s+JUIZ[^:\n]*)/gmi, 
+                         '<div style="font-weight: bold; font-size: 14px; margin: 20px 0 15px 0; text-align: left; color: #000; text-indent: 0;">$1</div>')
                 
                 // Seções principais em negrito e maiúsculo - COR PRETA
                 .replace(/^(DOS FATOS|DA FUNDAMENTAÇÃO JURÍDICA|DOS PEDIDOS|DAS PROVAS|DO VALOR DA CAUSA|DA DEFESA|ALEGAÇÕES FINAIS|RECURSO|CONTESTAÇÃO|AUTOR|RÉU|PACIENTE\/RÉU):/gm, 
-                         '<div style="font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; text-transform: uppercase; color: #000;">$1:</div>')
+                         '<div style="font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; text-transform: uppercase; color: #000; text-indent: 0;">$1:</div>')
                 
                 // Artigos de lei em negrito
                 .replace(/\b(art\.|artigo)\s*(\d+)/gi, '<strong>$1 $2</strong>')
@@ -3371,8 +3391,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 // Leis e códigos em negrito
                 .replace(/\b(lei|código|decreto|portaria)\s*n[ºº°]?\s*[\d\.\/\-]+/gi, '<strong>$&</strong>')
                 
-                // Nomes das partes em negrito
-                .replace(/^(AUTOR|RÉU|PACIENTE\/RÉU):\s*([^\n]+)/gm, '<div style="margin: 15px 0;"><strong>$1:</strong> $2</div>')
+                // Nomes das partes em negrito (alinhados à esquerda como AUTOR)
+                .replace(/^(AUTOR|RÉU|PACIENTE\/RÉU):\s*([^\n]+)/gm, '<div style="margin: 15px 0; text-indent: 0;"><strong>$1:</strong> $2</div>')
                 
                 // Quebras de linha duplas para parágrafos
                 .replace(/\n\n/g, '</p><p style="margin: 15px 0; text-indent: 40px;">')
@@ -3387,51 +3407,170 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Gerar imagens PNG para cada página
         function generatePagesAsImages(pages, documentTitle, width, height, margin) {
-            let processedPages = 0;
             const totalPages = pages.length;
 
-            showNotification(`Gerando documento com ${totalPages} página(s)...`, 'info');
+            if (totalPages > 1) {
+                // Perguntar ao usuário quais páginas baixar
+                const userChoice = confirm(
+                    `O documento tem ${totalPages} páginas.\n\n` +
+                    `Clique OK para baixar TODAS as páginas\n` +
+                    `Clique CANCELAR para escolher páginas específicas`
+                );
 
-            // Função para processar uma página por vez com delay
-            function processPage(index) {
-                if (index >= pages.length) {
-                    showNotification(
-                        `Documento gerado com sucesso! ${totalPages} página(s) baixada(s).`, 
-                        'success'
+                if (!userChoice) {
+                    // Deixar usuário escolher páginas específicas
+                    const pagesInput = prompt(
+                        `Digite os números das páginas que deseja baixar:\n` +
+                        `Exemplos:\n` +
+                        `• "1,3,5" para páginas 1, 3 e 5\n` +
+                        `• "1-3" para páginas 1 a 3\n` +
+                        `• "all" para todas as páginas\n\n` +
+                        `Páginas disponíveis: 1 a ${totalPages}`,
+                        "all"
                     );
+
+                    if (pagesInput === null) return; // Usuário cancelou
+
+                    const selectedPages = parsePageSelection(pagesInput, totalPages);
+                    if (selectedPages.length === 0) {
+                        showNotification('Seleção de páginas inválida', 'error');
+                        return;
+                    }
+
+                    downloadSelectedPages(pages, selectedPages, documentTitle, width, height);
+                    return;
+                }
+            }
+
+            // Baixar todas as páginas
+            downloadAllPages(pages, documentTitle, width, height);
+        }
+
+        // Interpretar seleção de páginas do usuário
+        function parsePageSelection(input, totalPages) {
+            const selected = [];
+            
+            if (input.toLowerCase() === 'all') {
+                for (let i = 0; i < totalPages; i++) {
+                    selected.push(i);
+                }
+                return selected;
+            }
+
+            const parts = input.split(',');
+            for (const part of parts) {
+                const trimmed = part.trim();
+                
+                if (trimmed.includes('-')) {
+                    // Range de páginas (ex: 1-3)
+                    const [start, end] = trimmed.split('-').map(n => parseInt(n.trim()));
+                    if (start >= 1 && end <= totalPages && start <= end) {
+                        for (let i = start - 1; i < end; i++) {
+                            if (!selected.includes(i)) selected.push(i);
+                        }
+                    }
+                } else {
+                    // Página única
+                    const pageNum = parseInt(trimmed);
+                    if (pageNum >= 1 && pageNum <= totalPages) {
+                        const index = pageNum - 1;
+                        if (!selected.includes(index)) selected.push(index);
+                    }
+                }
+            }
+
+            return selected.sort((a, b) => a - b);
+        }
+
+        // Baixar páginas selecionadas
+        function downloadSelectedPages(pages, selectedIndexes, documentTitle, width, height) {
+            const totalSelected = selectedIndexes.length;
+            let processed = 0;
+
+            showNotification(`Baixando ${totalSelected} página(s) selecionada(s)...`, 'info');
+
+            function processNext(currentIndex) {
+                if (currentIndex >= selectedIndexes.length) {
+                    showNotification(`${totalSelected} página(s) baixada(s) com sucesso!`, 'success');
                     closeDocumentGenerator();
                     return;
                 }
 
-                const pageHTML = pages[index];
+                const pageIndex = selectedIndexes[currentIndex];
+                const pageNumber = pageIndex + 1;
                 
-                // Criar elemento temporário para a página
-                const pageElement = document.createElement('div');
-                pageElement.style.cssText = `
-                    position: absolute;
-                    left: -9999px;
-                    top: 0;
-                    width: ${width}px;
-                    height: ${height}px;
-                    background: white;
-                    box-sizing: border-box;
-                `;
-                pageElement.innerHTML = pageHTML;
-                document.body.appendChild(pageElement);
+                downloadSinglePage(pages[pageIndex], pageNumber, documentTitle, width, height, () => {
+                    processed++;
+                    console.log(`Página ${pageNumber} baixada (${processed}/${totalSelected})`);
+                    
+                    // Processar próxima página após delay
+                    setTimeout(() => {
+                        processNext(currentIndex + 1);
+                    }, 1000); // Delay maior para estabilidade
+                });
+            }
 
-                // Configurações do html2canvas
-                const options = {
-                    backgroundColor: '#ffffff',
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    width: width,
-                    height: height,
-                    scrollX: 0,
-                    scrollY: 0
-                };
+            processNext(0);
+        }
 
-                // Gerar imagem da página
+        // Baixar todas as páginas
+        function downloadAllPages(pages, documentTitle, width, height) {
+            const totalPages = pages.length;
+            let processed = 0;
+
+            showNotification(`Gerando documento com ${totalPages} página(s)...`, 'info');
+
+            function processPage(index) {
+                if (index >= pages.length) {
+                    showNotification(`Documento gerado com sucesso! ${totalPages} página(s) baixada(s).`, 'success');
+                    closeDocumentGenerator();
+                    return;
+                }
+
+                downloadSinglePage(pages[index], index + 1, documentTitle, width, height, () => {
+                    processed++;
+                    console.log(`Página ${index + 1} de ${totalPages} processada`);
+                    
+                    // Processar próxima página após delay
+                    setTimeout(() => {
+                        processPage(index + 1);
+                    }, 1000); // Delay maior para maior estabilidade
+                });
+            }
+
+            processPage(0);
+        }
+
+        // Baixar uma única página
+        function downloadSinglePage(pageHTML, pageNumber, documentTitle, width, height, callback) {
+            // Criar elemento temporário para a página
+            const pageElement = document.createElement('div');
+            pageElement.style.cssText = `
+                position: absolute;
+                left: -9999px;
+                top: 0;
+                width: ${width}px;
+                height: ${height}px;
+                background: white;
+                box-sizing: border-box;
+            `;
+            pageElement.innerHTML = pageHTML;
+            document.body.appendChild(pageElement);
+
+            // Configurações do html2canvas
+            const options = {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                width: width,
+                height: height,
+                scrollX: 0,
+                scrollY: 0
+            };
+
+            // Aguardar um pouco para renderização
+            setTimeout(() => {
                 html2canvas(pageElement, options).then(canvas => {
                     canvas.toBlob(function(blob) {
                         const url = window.URL.createObjectURL(blob);
@@ -3439,10 +3578,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         a.href = url;
                         
                         // Nome do arquivo com número da página
-                        const pageNumber = (index + 1).toString().padStart(2, '0');
-                        const fileName = totalPages > 1 
-                            ? `${documentTitle.replace(/\s+/g, '_')}_Pagina_${pageNumber}_${Date.now()}.png`
-                            : `${documentTitle.replace(/\s+/g, '_')}_${Date.now()}.png`;
+                        const pageNumberFormatted = pageNumber.toString().padStart(2, '0');
+                        const fileName = `${documentTitle.replace(/\s+/g, '_')}_Pagina_${pageNumberFormatted}.png`;
                         
                         a.download = fileName;
                         document.body.appendChild(a);
@@ -3450,32 +3587,20 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         document.body.removeChild(a);
                         window.URL.revokeObjectURL(url);
                         
-                        processedPages++;
+                        // Remover elemento temporário
+                        document.body.removeChild(pageElement);
                         
-                        console.log(`Página ${index + 1} de ${totalPages} processada`);
-                        
-                        // Processar próxima página após delay
-                        setTimeout(() => {
-                            processPage(index + 1);
-                        }, 500); // Delay de 500ms entre downloads
+                        if (callback) callback();
                         
                     }, 'image/png', 1.0);
-
-                    // Remover elemento temporário
-                    document.body.removeChild(pageElement);
                 }).catch(error => {
                     console.error('Erro ao gerar página:', error);
                     document.body.removeChild(pageElement);
                     
-                    // Tentar próxima página mesmo com erro
-                    setTimeout(() => {
-                        processPage(index + 1);
-                    }, 500);
+                    showNotification(`Erro ao processar página ${pageNumber}`, 'error');
+                    if (callback) callback();
                 });
-            }
-
-            // Iniciar processamento da primeira página
-            processPage(0);
+            }, 200); // Aguardar renderização
         }
 
         // Gerar conteúdo do documento
@@ -3623,7 +3748,11 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             window.URL.revokeObjectURL(url);
         }
 
-        // Atualizar preview do documento em tempo real
+        // Variáveis globais para controle de páginas do preview
+        let previewPages = [];
+        let currentPreviewPage = 0;
+
+        // Atualizar preview do documento em tempo real com navegação por páginas
         function updateDocumentPreview() {
             const template = documentTemplates[currentDocumentType];
             
@@ -3642,44 +3771,129 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const hasData = Object.values(formData).some(value => value.length > 0);
             
             if (!hasData) {
-                document.getElementById('document-preview').innerHTML = `
-                    <div id="document-for-image" class="bg-white text-black" style="min-height: 800px; font-family: 'Times New Roman', serif; line-height: 1.8; padding: 40px; border: 2px solid #1e40af;">
-                        <div style="text-align: center; margin-bottom: 40px; border-bottom: 2px solid #1e40af; padding-bottom: 20px;">
-                            <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: ${TRIBUNAL_LOGO.width}; height: ${TRIBUNAL_LOGO.height}; margin: 0 auto 15px; display: block;">
-                            <div style="font-size: 16px; font-weight: bold; color: #1e40af; letter-spacing: 1px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
-                            <div style="font-size: 16px; font-weight: bold; color: #1e40af; margin: 10px 0;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
-                            <div style="font-size: 16px; font-weight: bold; color: #000; text-decoration: underline; margin-top: 20px;">DOCUMENTO</div>
-                        </div>
-                        <div style="text-align: center; margin-top: 100px;">
-                            <div style="color: #94a3b8; font-size: 16px;">
-                                <i class="fas fa-file-alt" style="font-size: 60px; margin-bottom: 20px;"></i>
-                                <p><strong>Preencha os dados para ver o preview</strong></p>
-                                <p style="font-size: 14px; margin-top: 10px;">Documento será gerado como <strong>imagem PNG profissional</strong></p>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                showEmptyPreview();
                 return;
             }
 
-            // Gerar preview
+            // Gerar conteúdo e páginas
             const content = generateDocumentContent(currentDocumentType, formData);
+            const documentTitle = template.title;
             
-            // Mostrar preview formatado para conversão em imagem
+            // Gerar páginas profissionais
+            previewPages = generateProfessionalPages(formData, documentTitle, 700, 900, 40);
+            currentPreviewPage = 0;
+            
+            // Mostrar controles e primeira página
+            showPreviewControls();
+            displayPreviewPage(currentPreviewPage);
+        }
+
+        // Mostrar preview vazio
+        function showEmptyPreview() {
+            previewPages = [];
+            currentPreviewPage = 0;
+            
+            document.getElementById('preview-controls').classList.add('hidden');
             document.getElementById('document-preview').innerHTML = `
-                <div id="document-for-image" class="bg-white text-black" style="min-height: 800px; font-family: 'Times New Roman', serif; line-height: 1.8; padding: 40px; border: 2px solid #1e40af;">
-                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #1e40af; padding-bottom: 25px;">
-                        <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 80px; height: 80px; margin: 0 auto 15px; display: block;">
-                        <div style="font-size: 18px; font-weight: bold; color: #1e40af; letter-spacing: 2px; margin-bottom: 8px;">REPÚBLICA FEDERATIVA DE BRASILÂNDIA</div>
-                        <div style="font-size: 16px; font-weight: bold; color: #1e40af; margin-bottom: 15px;">TRIBUNAL DE JUSTIÇA • COMARCA DE SÃO PAULO</div>
-                        <div style="font-size: 16px; font-weight: bold; color: #000; text-decoration: underline; margin-top: 20px;">${documentTemplates[currentDocumentType].title.toUpperCase()}</div>
-                    </div>
-                    <div style="text-align: justify; font-size: 14px; line-height: 1.8;">
-                        ${formatDocumentContentHTML(content)}
-                    </div>
+                <div class="text-blue-200 text-sm text-center py-8">
+                    <i class="fas fa-file-alt text-4xl mb-3"></i>
+                    <p>Preencha os dados para ver o preview</p>
+                    <p class="text-xs mt-2">O documento será dividido em páginas automaticamente</p>
                 </div>
             `;
         }
+
+        // Mostrar controles de navegação
+        function showPreviewControls() {
+            const controlsDiv = document.getElementById('preview-controls');
+            const totalPages = previewPages.length;
+            
+            if (totalPages > 1) {
+                controlsDiv.classList.remove('hidden');
+                updatePageIndicator();
+                updateNavigationButtons();
+            } else {
+                controlsDiv.classList.add('hidden');
+            }
+        }
+
+        // Atualizar indicador de página
+        function updatePageIndicator() {
+            const totalPages = previewPages.length;
+            const pageNum = currentPreviewPage + 1;
+            
+            document.getElementById('page-indicator').textContent = `Página ${pageNum} de ${totalPages}`;
+            document.getElementById('total-pages-info').textContent = 
+                totalPages > 1 ? `${totalPages} páginas serão geradas` : 'Página única';
+        }
+
+        // Atualizar botões de navegação
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const totalPages = previewPages.length;
+            
+            prevBtn.disabled = currentPreviewPage === 0;
+            nextBtn.disabled = currentPreviewPage === totalPages - 1;
+            
+            if (prevBtn.disabled) {
+                prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            
+            if (nextBtn.disabled) {
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Exibir página específica do preview
+        function displayPreviewPage(pageIndex) {
+            if (pageIndex < 0 || pageIndex >= previewPages.length) return;
+            
+            const pageHTML = previewPages[pageIndex];
+            document.getElementById('document-preview').innerHTML = `
+                <div style="transform: scale(0.8); transform-origin: top left; width: 125%; height: 125%;">
+                    ${pageHTML}
+                </div>
+            `;
+            
+            updatePageIndicator();
+            updateNavigationButtons();
+        }
+
+        // Navegação - Página anterior
+        function previousPage() {
+            if (currentPreviewPage > 0) {
+                currentPreviewPage--;
+                displayPreviewPage(currentPreviewPage);
+            }
+        }
+
+        // Navegação - Próxima página
+        function nextPage() {
+            if (currentPreviewPage < previewPages.length - 1) {
+                currentPreviewPage++;
+                displayPreviewPage(currentPreviewPage);
+            }
+        }
+
+        // Atalhos de teclado para navegação
+        document.addEventListener('keydown', function(e) {
+            // Verificar se está no modal de documentos
+            const documentModal = document.getElementById('documentModal');
+            if (!documentModal || documentModal.classList.contains('hidden')) return;
+            
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousPage();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextPage();
+            }
+        });
 
         // Formatar conteúdo do documento com negritos e formatação profissional
         function formatDocumentContent(content) {
