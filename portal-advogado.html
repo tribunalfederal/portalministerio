@@ -1145,18 +1145,21 @@
         <section id="casos" class="section">
             <div class="space-y-6">
                 <!-- Header da Seção -->
-                <div class="card p-6 bg-gradient-to-r from-slate-900/40 to-blue-900/40">
+                <div class="card p-6 bg-gradient-to-r from-slate-900/40 to-purple-900/40">
                     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                         <div>
                             <h2 class="text-white text-3xl font-bold mb-2 flex items-center gap-3">
-                                <i class="fas fa-folder-open text-slate-400"></i>
-                                Sistema de Abertura de Processos
+                                <i class="fas fa-folder-open text-purple-400"></i>
+                                Sistema de Gestão de Casos
                             </h2>
-                            <p class="text-blue-200">Gerencie e abra novos processos jurídicos</p>
+                            <p class="text-blue-200">Gerencie processos ativos, audiências e documentos</p>
                         </div>
                         <div class="flex gap-3">
-                            <button onclick="showNewProcessForm()" class="btn bg-green-600 hover:bg-green-700 text-white">
-                                <i class="fas fa-plus mr-2"></i>Novo Processo
+                            <button onclick="showNewCaseForm()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                <i class="fas fa-plus mr-2"></i>Novo Caso
+                            </button>
+                            <button onclick="exportCasesReport()" class="btn bg-blue-600 hover:bg-blue-700 text-white">
+                                <i class="fas fa-file-export mr-2"></i>Relatório
                             </button>
                             <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white">
                                 <i class="fas fa-arrow-left mr-2"></i>Dashboard
@@ -1165,39 +1168,311 @@
                     </div>
                 </div>
 
-                <!-- Estatísticas Rápidas -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                    <div class="card p-4 text-center">
-                        <div class="text-2xl font-bold text-green-400 mb-1" id="total-processos">0</div>
-                        <div class="text-blue-200 text-sm">Total de Processos</div>
+                <!-- Estatísticas Avançadas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="card p-4 text-center bg-gradient-to-br from-green-600/20 to-green-500/20 border border-green-400/30">
+                        <div class="text-3xl font-bold text-green-400 mb-1" id="total-casos">24</div>
+                        <div class="text-green-200 text-sm">Total de Casos</div>
+                        <div class="text-xs text-green-300 mt-1">+3 este mês</div>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-2xl font-bold text-yellow-400 mb-1" id="processos-andamento">0</div>
-                        <div class="text-blue-200 text-sm">Em Andamento</div>
+                    <div class="card p-4 text-center bg-gradient-to-br from-yellow-600/20 to-yellow-500/20 border border-yellow-400/30">
+                        <div class="text-3xl font-bold text-yellow-400 mb-1" id="casos-andamento">12</div>
+                        <div class="text-yellow-200 text-sm">Em Andamento</div>
+                        <div class="text-xs text-yellow-300 mt-1">6 com prazo hoje</div>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-2xl font-bold text-blue-400 mb-1" id="processos-pendentes">0</div>
-                        <div class="text-blue-200 text-sm">Aguardando Análise</div>
+                    <div class="card p-4 text-center bg-gradient-to-br from-blue-600/20 to-blue-500/20 border border-blue-400/30">
+                        <div class="text-3xl font-bold text-blue-400 mb-1" id="casos-pendentes">5</div>
+                        <div class="text-blue-200 text-sm">Pendentes</div>
+                        <div class="text-xs text-blue-300 mt-1">2 aguardando docs</div>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-2xl font-bold text-green-400 mb-1" id="processos-finalizados">0</div>
-                        <div class="text-blue-200 text-sm">Finalizados</div>
+                    <div class="card p-4 text-center bg-gradient-to-br from-purple-600/20 to-purple-500/20 border border-purple-400/30">
+                        <div class="text-3xl font-bold text-purple-400 mb-1" id="proximas-audiencias">7</div>
+                        <div class="text-purple-200 text-sm">Próximas Audiências</div>
+                        <div class="text-xs text-purple-300 mt-1">Esta semana</div>
                     </div>
                 </div>
 
-                <!-- Formulário de Novo Processo (Inicialmente Oculto) -->
-                <div id="novo-processo-form" class="hidden">
-                    <div class="card p-8">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-white text-2xl font-bold flex items-center gap-2">
-                                <i class="fas fa-file-plus text-green-400"></i>
-                                Abertura de Novo Processo
-                            </h3>
-                            <div class="flex gap-3">
-                                <button type="button" onclick="hideNewProcessForm()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
-                                    <i class="fas fa-arrow-left mr-2"></i>Voltar para Lista
-                                </button>
+                <!-- Filtros e Busca Avançada -->
+                <div class="card p-6">
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <div class="flex-1">
+                            <div class="relative">
+                                <input type="text" id="case-search" placeholder="Buscar por número, cliente ou tipo de caso..." 
+                                       class="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white placeholder-blue-300/50 focus:border-blue-400 focus:outline-none">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"></i>
                             </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <select id="filter-status" class="px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white">
+                                <option value="">Todos os Status</option>
+                                <option value="ativo">Ativos</option>
+                                <option value="pendente">Pendentes</option>
+                                <option value="audiencia">Com Audiência</option>
+                                <option value="finalizado">Finalizados</option>
+                            </select>
+                            <select id="filter-type" class="px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white">
+                                <option value="">Todos os Tipos</option>
+                                <option value="criminal">Criminal</option>
+                                <option value="civil">Cível</option>
+                                <option value="trabalhista">Trabalhista</option>
+                                <option value="administrativo">Administrativo</option>
+                            </select>
+                            <button onclick="resetFilters()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                                <i class="fas fa-undo mr-2"></i>Limpar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Casos com Timeline -->
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                            <i class="fas fa-list text-purple-400"></i>
+                            Casos Ativos
+                        </h3>
+                        <div class="flex gap-2">
+                            <button onclick="toggleView('grid')" id="view-grid" class="p-2 rounded bg-slate-700 text-gray-300 hover:bg-slate-600 hover:text-white">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button onclick="toggleView('list')" id="view-list" class="p-2 rounded bg-blue-600 text-white">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="cases-container" class="space-y-4">
+                        <!-- Os casos serão carregados dinamicamente aqui -->
+                    </div>
+                </div>
+
+                <!-- Modal Novo Caso -->
+                <div id="new-case-modal" class="modal">
+                    <div class="modal-content max-w-4xl">
+                        <div class="modal-header">
+                            <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                                <i class="fas fa-file-plus text-green-400"></i>
+                                Novo Caso
+                            </h3>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <form id="new-case-form" class="space-y-6">
+                                <!-- Informações Básicas -->
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Número do Processo *</label>
+                                        <input type="text" id="case-number" placeholder="Ex: 1234567-89.2024.8.26.0001" 
+                                               class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Tipo de Caso *</label>
+                                        <select id="case-type" class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white" required>
+                                            <option value="">Selecione o tipo</option>
+                                            <option value="criminal">Criminal</option>
+                                            <option value="civil">Cível</option>
+                                            <option value="trabalhista">Trabalhista</option>
+                                            <option value="administrativo">Administrativo</option>
+                                            <option value="previdenciario">Previdenciário</option>
+                                            <option value="tributario">Tributário</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Cliente e Parte Adversa -->
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Nome do Cliente *</label>
+                                        <input type="text" id="client-name" placeholder="Nome completo do cliente" 
+                                               class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Parte Adversa</label>
+                                        <input type="text" id="adverse-party" placeholder="Nome da parte adversa" 
+                                               class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white">
+                                    </div>
+                                </div>
+
+                                <!-- Descrição e Valor -->
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Descrição do Caso *</label>
+                                        <textarea id="case-description" rows="4" placeholder="Breve descrição do caso..." 
+                                                  class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white" required></textarea>
+                                    </div>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-blue-200 text-sm font-medium mb-2">Valor da Causa</label>
+                                            <input type="number" id="case-value" placeholder="0.00" step="0.01" 
+                                                   class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white">
+                                        </div>
+                                        <div>
+                                            <label class="block text-blue-200 text-sm font-medium mb-2">Prioridade</label>
+                                            <select id="case-priority" class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white">
+                                                <option value="baixa">Baixa</option>
+                                                <option value="media" selected>Média</option>
+                                                <option value="alta">Alta</option>
+                                                <option value="urgente">Urgente</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Datas Importantes -->
+                                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Data de Abertura</label>
+                                        <input type="date" id="case-open-date" 
+                                               class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Próxima Audiência</label>
+                                        <input type="datetime-local" id="next-hearing" 
+                                               class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Prazo Final</label>
+                                        <input type="date" id="case-deadline" 
+                                               class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button onclick="closeNewCaseModal()" class="btn btn-secondary mr-3">
+                                <i class="fas fa-times mr-2"></i>Cancelar
+                            </button>
+                            <button onclick="saveCaseForm()" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>Salvar Caso
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Detalhes do Caso -->
+                <div id="case-details-modal" class="modal">
+                    <div class="modal-content max-w-6xl">
+                        <div class="modal-header">
+                            <h3 id="case-details-title" class="text-white text-xl font-bold flex items-center gap-2">
+                                <i class="fas fa-folder-open text-purple-400"></i>
+                                Detalhes do Caso
+                            </h3>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <!-- Informações Principais -->
+                                <div class="lg:col-span-2 space-y-6">
+                                    <!-- Dados Básicos -->
+                                    <div class="card p-4">
+                                        <h4 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                                            <i class="fas fa-info-circle"></i>
+                                            Informações Básicas
+                                        </h4>
+                                        <div id="case-basic-info" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                            <!-- Será preenchido dinamicamente -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Timeline do Caso -->
+                                    <div class="card p-4">
+                                        <h4 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                                            <i class="fas fa-timeline"></i>
+                                            Timeline do Processo
+                                        </h4>
+                                        <div id="case-timeline" class="space-y-3">
+                                            <!-- Timeline será carregada dinamicamente -->
+                                        </div>
+                                        <button onclick="addTimelineEvent()" class="btn bg-green-600 hover:bg-green-700 text-white text-sm mt-3">
+                                            <i class="fas fa-plus mr-1"></i>Adicionar Evento
+                                        </button>
+                                    </div>
+
+                                    <!-- Documentos -->
+                                    <div class="card p-4">
+                                        <h4 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                                            <i class="fas fa-file-alt"></i>
+                                            Documentos do Caso
+                                        </h4>
+                                        <div id="case-documents" class="space-y-2">
+                                            <!-- Documentos serão carregados aqui -->
+                                        </div>
+                                        <button onclick="uploadDocument()" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm mt-3">
+                                            <i class="fas fa-upload mr-1"></i>Upload Documento
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Sidebar com Ações -->
+                                <div class="space-y-4">
+                                    <!-- Status e Prioridade -->
+                                    <div class="card p-4">
+                                        <h4 class="text-blue-300 font-semibold mb-3">Status & Prioridade</h4>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-blue-200 text-sm mb-1">Status</label>
+                                                <select id="edit-case-status" class="w-full p-2 bg-slate-800/50 border border-blue-300/30 rounded text-white text-sm">
+                                                    <option value="ativo">Ativo</option>
+                                                    <option value="pendente">Pendente</option>
+                                                    <option value="audiencia">Aguard. Audiência</option>
+                                                    <option value="finalizado">Finalizado</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-blue-200 text-sm mb-1">Prioridade</label>
+                                                <select id="edit-case-priority" class="w-full p-2 bg-slate-800/50 border border-blue-300/30 rounded text-white text-sm">
+                                                    <option value="baixa">Baixa</option>
+                                                    <option value="media">Média</option>
+                                                    <option value="alta">Alta</option>
+                                                    <option value="urgente">Urgente</option>
+                                                </select>
+                                            </div>
+                                            <button onclick="updateCaseStatus()" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm w-full">
+                                                <i class="fas fa-save mr-1"></i>Atualizar
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Ações Rápidas -->
+                                    <div class="card p-4">
+                                        <h4 class="text-blue-300 font-semibold mb-3">Ações Rápidas</h4>
+                                        <div class="space-y-2">
+                                            <button onclick="scheduleHearing()" class="btn bg-green-600 hover:bg-green-700 text-white text-sm w-full">
+                                                <i class="fas fa-calendar-plus mr-1"></i>Agendar Audiência
+                                            </button>
+                                            <button onclick="generateCaseReport()" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm w-full">
+                                                <i class="fas fa-file-pdf mr-1"></i>Relatório PDF
+                                            </button>
+                                            <button onclick="notifyClient()" class="btn bg-yellow-600 hover:bg-yellow-700 text-white text-sm w-full">
+                                                <i class="fas fa-bell mr-1"></i>Notificar Cliente
+                                            </button>
+                                            <button onclick="archiveCase()" class="btn bg-gray-600 hover:bg-gray-700 text-white text-sm w-full">
+                                                <i class="fas fa-archive mr-1"></i>Arquivar Caso
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Próximas Ações -->
+                                    <div class="card p-4">
+                                        <h4 class="text-blue-300 font-semibold mb-3">Próximas Ações</h4>
+                                        <div id="case-next-actions" class="space-y-2 text-sm">
+                                            <!-- Próximas ações serão carregadas aqui -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button onclick="closeCaseDetailsModal()" class="btn btn-secondary">
+                                <i class="fas fa-times mr-2"></i>Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
                         </div>
 
                         <form id="processForm" class="space-y-6">
@@ -1548,15 +1823,237 @@
         
         <!-- Agenda Section -->
         <section id="agenda" class="section">
-            <div class="card p-8">
-                <h2 class="text-white text-2xl font-bold mb-6">
-                    <i class="fas fa-calendar mr-3 text-indigo-400"></i>
-                    Agenda e Compromissos
-                </h2>
-                <p class="text-blue-200 mb-6">Em desenvolvimento...</p>
-                <button onclick="showSection('dashboard')" class="btn btn-primary">
-                    <i class="fas fa-arrow-left mr-2"></i>Voltar ao Dashboard
-                </button>
+            <div class="space-y-6">
+                <!-- Header da Seção -->
+                <div class="card p-6 bg-gradient-to-r from-blue-900/40 to-indigo-900/40">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-white text-3xl font-bold mb-2 flex items-center gap-3">
+                                <i class="fas fa-calendar text-blue-400"></i>
+                                Agenda Profissional
+                            </h2>
+                            <p class="text-blue-200">Gerencie audiências, compromissos e prazos processuais</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="showNewEventForm()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                <i class="fas fa-plus mr-2"></i>Novo Compromisso
+                            </button>
+                            <button onclick="syncProcessDeadlines()" class="btn bg-purple-600 hover:bg-purple-700 text-white">
+                                <i class="fas fa-sync mr-2"></i>Sync Prazos
+                            </button>
+                            <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                                <i class="fas fa-arrow-left mr-2"></i>Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumo da Agenda -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="card p-4 text-center bg-gradient-to-br from-red-600/20 to-red-500/20 border border-red-400/30">
+                        <div class="text-3xl font-bold text-red-400 mb-1" id="agenda-hoje">3</div>
+                        <div class="text-red-200 text-sm">Compromissos Hoje</div>
+                        <div class="text-xs text-red-300 mt-1">1 audiência</div>
+                    </div>
+                    <div class="card p-4 text-center bg-gradient-to-br from-yellow-600/20 to-yellow-500/20 border border-yellow-400/30">
+                        <div class="text-3xl font-bold text-yellow-400 mb-1" id="agenda-semana">12</div>
+                        <div class="text-yellow-200 text-sm">Esta Semana</div>
+                        <div class="text-xs text-yellow-300 mt-1">4 audiências</div>
+                    </div>
+                    <div class="card p-4 text-center bg-gradient-to-br from-orange-600/20 to-orange-500/20 border border-orange-400/30">
+                        <div class="text-3xl font-bold text-orange-400 mb-1" id="prazos-vencendo">5</div>
+                        <div class="text-orange-200 text-sm">Prazos Vencendo</div>
+                        <div class="text-xs text-orange-300 mt-1">Próximos 7 dias</div>
+                    </div>
+                    <div class="card p-4 text-center bg-gradient-to-br from-green-600/20 to-green-500/20 border border-green-400/30">
+                        <div class="text-3xl font-bold text-green-400 mb-1" id="lembretes-ativos">8</div>
+                        <div class="text-green-200 text-sm">Lembretes Ativos</div>
+                        <div class="text-xs text-green-300 mt-1">Configurados</div>
+                    </div>
+                </div>
+
+                <!-- Visualização da Agenda -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Calendário -->
+                    <div class="lg:col-span-2">
+                        <div class="card p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                                    <i class="fas fa-calendar-alt text-blue-400"></i>
+                                    Calendário
+                                </h3>
+                                <div class="flex gap-2">
+                                    <button onclick="previousMonth()" class="p-2 rounded bg-slate-700 text-gray-300 hover:bg-slate-600 hover:text-white">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <span id="current-month" class="px-4 py-2 text-white font-medium">Janeiro 2025</span>
+                                    <button onclick="nextMonth()" class="p-2 rounded bg-slate-700 text-gray-300 hover:bg-slate-600 hover:text-white">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Calendário -->
+                            <div class="calendar-grid">
+                                <!-- Cabeçalho dos dias -->
+                                <div class="grid grid-cols-7 gap-1 mb-2">
+                                    <div class="p-2 text-center text-blue-300 text-sm font-medium">Dom</div>
+                                    <div class="p-2 text-center text-blue-300 text-sm font-medium">Seg</div>
+                                    <div class="p-2 text-center text-blue-300 text-sm font-medium">Ter</div>
+                                    <div class="p-2 text-center text-blue-300 text-sm font-medium">Qua</div>
+                                    <div class="p-2 text-center text-blue-300 text-sm font-medium">Qui</div>
+                                    <div class="p-2 text-center text-blue-300 text-sm font-medium">Sex</div>
+                                    <div class="p-2 text-center text-blue-300 text-sm font-medium">Sáb</div>
+                                </div>
+                                
+                                <!-- Dias do mês -->
+                                <div id="calendar-days" class="grid grid-cols-7 gap-1">
+                                    <!-- Dias serão inseridos dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar com eventos do dia -->
+                    <div class="space-y-4">
+                        <!-- Compromissos de Hoje -->
+                        <div class="card p-4">
+                            <h4 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
+                                <i class="fas fa-clock text-blue-400"></i>
+                                Hoje - <span id="today-date">9 de Agosto</span>
+                            </h4>
+                            <div id="today-events" class="space-y-2">
+                                <!-- Eventos do dia serão carregados aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Próximos Prazos -->
+                        <div class="card p-4">
+                            <h4 class="text-orange-300 font-semibold mb-3 flex items-center gap-2">
+                                <i class="fas fa-exclamation-triangle text-orange-400"></i>
+                                Prazos Urgentes
+                            </h4>
+                            <div id="urgent-deadlines" class="space-y-2">
+                                <!-- Prazos urgentes serão carregados aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Lembretes -->
+                        <div class="card p-4">
+                            <h4 class="text-green-300 font-semibold mb-3 flex items-center gap-2">
+                                <i class="fas fa-bell text-green-400"></i>
+                                Lembretes
+                            </h4>
+                            <div id="active-reminders" class="space-y-2">
+                                <!-- Lembretes ativos serão carregados aqui -->
+                            </div>
+                            <button onclick="createReminder()" class="btn bg-green-600 hover:bg-green-700 text-white text-sm w-full mt-3">
+                                <i class="fas fa-plus mr-1"></i>Novo Lembrete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Novo Evento -->
+                <div id="new-event-modal" class="modal">
+                    <div class="modal-content max-w-2xl">
+                        <div class="modal-header">
+                            <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                                <i class="fas fa-calendar-plus text-green-400"></i>
+                                Novo Compromisso
+                            </h3>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <form id="new-event-form" class="space-y-6">
+                                <!-- Tipo de evento -->
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Tipo de Compromisso *</label>
+                                    <select id="event-type" class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white" required>
+                                        <option value="">Selecione o tipo</option>
+                                        <option value="audiencia">Audiência</option>
+                                        <option value="reuniao">Reunião com Cliente</option>
+                                        <option value="prazo">Prazo Processual</option>
+                                        <option value="tribunal">Comparecimento ao Tribunal</option>
+                                        <option value="estudo">Estudo de Caso</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+
+                                <!-- Título e Descrição -->
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Título *</label>
+                                    <input type="text" id="event-title" placeholder="Ex: Audiência - Caso Silva vs Estado" 
+                                           class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white" required>
+                                </div>
+
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Descrição</label>
+                                    <textarea id="event-description" rows="3" placeholder="Detalhes adicionais..." 
+                                              class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white"></textarea>
+                                </div>
+
+                                <!-- Data e Horário -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Data *</label>
+                                        <input type="date" id="event-date" 
+                                               class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Horário *</label>
+                                        <input type="time" id="event-time" 
+                                               class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white" required>
+                                    </div>
+                                </div>
+
+                                <!-- Local e Caso Relacionado -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Local</label>
+                                        <input type="text" id="event-location" placeholder="Ex: Fórum Central - Sala 205" 
+                                               class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-blue-200 text-sm font-medium mb-2">Caso Relacionado</label>
+                                        <select id="related-case" class="w-full p-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white">
+                                            <option value="">Selecione um caso</option>
+                                            <!-- Casos serão carregados dinamicamente -->
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Lembretes -->
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Lembretes</label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center space-x-3">
+                                            <input type="checkbox" id="reminder-15min" class="rounded">
+                                            <span class="text-blue-200">15 minutos antes</span>
+                                        </label>
+                                        <label class="flex items-center space-x-3">
+                                            <input type="checkbox" id="reminder-1hour" class="rounded">
+                                            <span class="text-blue-200">1 hora antes</span>
+                                        </label>
+                                        <label class="flex items-center space-x-3">
+                                            <input type="checkbox" id="reminder-1day" class="rounded">
+                                            <span class="text-blue-200">1 dia antes</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button onclick="closeNewEventModal()" class="btn btn-secondary mr-3">
+                                <i class="fas fa-times mr-2"></i>Cancelar
+                            </button>
+                            <button onclick="saveEventForm()" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>Salvar Evento
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -11233,6 +11730,694 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             }, duration);
         }
 
+        // ============= SISTEMA DE AGENDA =============
+        
+        // Calendário atual
+        let currentDate = new Date();
+        
+        // Função para mostrar modal de novo evento
+        function showNewEventForm() {
+            // Carregar casos para seleção
+            loadCasesForEvent();
+            
+            // Definir data padrão como hoje
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('event-date').value = today;
+            
+            document.getElementById('new-event-modal').classList.remove('hidden');
+        }
+        
+        // Função para fechar modal de novo evento
+        function closeNewEventModal() {
+            document.getElementById('new-event-modal').classList.add('hidden');
+            document.getElementById('new-event-form').reset();
+        }
+        
+        // Carregar casos para seleção no evento
+        function loadCasesForEvent() {
+            const relatedCaseSelect = document.getElementById('related-case');
+            const cases = AppState.cases || [];
+            
+            relatedCaseSelect.innerHTML = '<option value="">Selecione um caso</option>';
+            
+            cases.forEach(caso => {
+                const option = document.createElement('option');
+                option.value = caso.id;
+                option.textContent = `${caso.numero} - ${caso.cliente}`;
+                relatedCaseSelect.appendChild(option);
+            });
+        }
+        
+        // Salvar novo evento
+        function saveEventForm() {
+            const form = document.getElementById('new-event-form');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const eventData = {
+                id: generateId(),
+                type: document.getElementById('event-type').value,
+                title: document.getElementById('event-title').value,
+                description: document.getElementById('event-description').value,
+                date: document.getElementById('event-date').value,
+                time: document.getElementById('event-time').value,
+                location: document.getElementById('event-location').value,
+                relatedCase: document.getElementById('related-case').value,
+                reminders: {
+                    min15: document.getElementById('reminder-15min').checked,
+                    hour1: document.getElementById('reminder-1hour').checked,
+                    day1: document.getElementById('reminder-1day').checked
+                },
+                status: 'ativo',
+                createdAt: new Date().toISOString()
+            };
+            
+            if (!AppState.events) AppState.events = [];
+            AppState.events.push(eventData);
+            
+            saveData();
+            closeNewEventModal();
+            updateAgendaView();
+            showNotification('✅ Evento criado com sucesso!', 'success');
+        }
+        
+        // Atualizar visualização da agenda
+        function updateAgendaView() {
+            updateAgendaStats();
+            updateCalendar();
+            loadTodayEvents();
+            loadUrgentDeadlines();
+            loadActiveReminders();
+        }
+        
+        // Atualizar estatísticas da agenda
+        function updateAgendaStats() {
+            const events = AppState.events || [];
+            const today = new Date().toISOString().split('T')[0];
+            const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            
+            // Eventos hoje
+            const todayEvents = events.filter(event => event.date === today && event.status === 'ativo');
+            document.getElementById('agenda-hoje').textContent = todayEvents.length;
+            
+            // Eventos esta semana
+            const weekEvents = events.filter(event => 
+                event.date >= today && 
+                event.date <= nextWeek && 
+                event.status === 'ativo'
+            );
+            document.getElementById('agenda-semana').textContent = weekEvents.length;
+            
+            // Prazos vencendo
+            const urgentDeadlines = events.filter(event => 
+                event.type === 'prazo' && 
+                event.date >= today && 
+                event.date <= nextWeek && 
+                event.status === 'ativo'
+            );
+            document.getElementById('prazos-vencendo').textContent = urgentDeadlines.length;
+            
+            // Lembretes ativos
+            const activeReminders = events.filter(event => 
+                event.status === 'ativo' &&
+                (event.reminders.min15 || event.reminders.hour1 || event.reminders.day1)
+            );
+            document.getElementById('lembretes-ativos').textContent = activeReminders.length;
+        }
+        
+        // Navegar no calendário
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateCalendar();
+        }
+        
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateCalendar();
+        }
+        
+        // Atualizar calendário
+        function updateCalendar() {
+            const monthNames = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            
+            // Atualizar cabeçalho do mês
+            document.getElementById('current-month').textContent = 
+                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            
+            // Gerar dias do calendário
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            const calendarDays = document.getElementById('calendar-days');
+            calendarDays.innerHTML = '';
+            
+            const events = AppState.events || [];
+            
+            for (let i = 0; i < 42; i++) {
+                const day = new Date(startDate);
+                day.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day p-2 text-center text-sm cursor-pointer rounded hover:bg-slate-700/50';
+                
+                const dayNumber = document.createElement('div');
+                dayNumber.textContent = day.getDate();
+                
+                // Estilo para dias do mês atual
+                if (day.getMonth() === currentDate.getMonth()) {
+                    dayElement.classList.add('text-white');
+                } else {
+                    dayElement.classList.add('text-gray-500');
+                }
+                
+                // Destacar dia atual
+                const today = new Date();
+                if (day.toDateString() === today.toDateString()) {
+                    dayElement.classList.add('bg-blue-600', 'text-white', 'font-bold');
+                }
+                
+                // Adicionar indicadores de eventos
+                const dayEvents = events.filter(event => 
+                    event.date === day.toISOString().split('T')[0] && event.status === 'ativo'
+                );
+                
+                if (dayEvents.length > 0) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'w-2 h-2 bg-green-400 rounded-full mx-auto mt-1';
+                    dayElement.appendChild(indicator);
+                }
+                
+                dayElement.appendChild(dayNumber);
+                dayElement.onclick = () => showDayEvents(day);
+                calendarDays.appendChild(dayElement);
+            }
+        }
+        
+        // Carregar eventos de hoje
+        function loadTodayEvents() {
+            const today = new Date().toISOString().split('T')[0];
+            const events = AppState.events || [];
+            const todayEvents = events.filter(event => 
+                event.date === today && event.status === 'ativo'
+            ).sort((a, b) => a.time.localeCompare(b.time));
+            
+            // Atualizar data de hoje
+            const todayDate = new Date().toLocaleDateString('pt-BR', { 
+                day: 'numeric', 
+                month: 'long' 
+            });
+            document.getElementById('today-date').textContent = todayDate;
+            
+            const container = document.getElementById('today-events');
+            
+            if (todayEvents.length === 0) {
+                container.innerHTML = '<div class="text-gray-400 text-sm italic">Nenhum compromisso hoje</div>';
+                return;
+            }
+            
+            container.innerHTML = todayEvents.map(event => `
+                <div class="bg-slate-700/50 p-3 rounded border-l-4 border-${getEventColor(event.type)}-400">
+                    <div class="flex items-center justify-between">
+                        <div class="font-medium text-white">${event.title}</div>
+                        <div class="text-xs text-gray-300">${event.time}</div>
+                    </div>
+                    <div class="text-xs text-gray-400 mt-1">${event.type}</div>
+                    ${event.location ? `<div class="text-xs text-blue-300 mt-1"><i class="fas fa-map-marker-alt mr-1"></i>${event.location}</div>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Carregar prazos urgentes
+        function loadUrgentDeadlines() {
+            const today = new Date().toISOString().split('T')[0];
+            const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            const events = AppState.events || [];
+            
+            const urgentDeadlines = events.filter(event => 
+                event.type === 'prazo' && 
+                event.date >= today && 
+                event.date <= nextWeek && 
+                event.status === 'ativo'
+            ).sort((a, b) => a.date.localeCompare(b.date));
+            
+            const container = document.getElementById('urgent-deadlines');
+            
+            if (urgentDeadlines.length === 0) {
+                container.innerHTML = '<div class="text-gray-400 text-sm italic">Nenhum prazo urgente</div>';
+                return;
+            }
+            
+            container.innerHTML = urgentDeadlines.map(deadline => {
+                const daysUntil = Math.ceil((new Date(deadline.date) - new Date()) / (1000 * 60 * 60 * 24));
+                return `
+                    <div class="bg-orange-900/30 p-3 rounded border-l-4 border-orange-400">
+                        <div class="font-medium text-orange-200">${deadline.title}</div>
+                        <div class="text-xs text-orange-300 mt-1">
+                            ${daysUntil === 0 ? 'Hoje' : `${daysUntil} dias`}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Carregar lembretes ativos
+        function loadActiveReminders() {
+            const events = AppState.events || [];
+            const activeReminders = events.filter(event => 
+                event.status === 'ativo' &&
+                (event.reminders.min15 || event.reminders.hour1 || event.reminders.day1)
+            );
+            
+            const container = document.getElementById('active-reminders');
+            
+            if (activeReminders.length === 0) {
+                container.innerHTML = '<div class="text-gray-400 text-sm italic">Nenhum lembrete ativo</div>';
+                return;
+            }
+            
+            container.innerHTML = activeReminders.slice(0, 3).map(reminder => `
+                <div class="bg-green-900/30 p-2 rounded text-sm">
+                    <div class="text-green-200">${reminder.title}</div>
+                    <div class="text-xs text-green-300">${formatDate(reminder.date)} às ${reminder.time}</div>
+                </div>
+            `).join('');
+        }
+        
+        // Sincronizar prazos processuais
+        function syncProcessDeadlines() {
+            const cases = AppState.cases || [];
+            const events = AppState.events || [];
+            let newDeadlines = 0;
+            
+            cases.forEach(caso => {
+                if (caso.proximaAudiencia) {
+                    // Verificar se já existe evento para esta audiência
+                    const existingEvent = events.find(event => 
+                        event.relatedCase === caso.id && 
+                        event.type === 'audiencia' &&
+                        event.date === caso.proximaAudiencia
+                    );
+                    
+                    if (!existingEvent) {
+                        const newEvent = {
+                            id: generateId(),
+                            type: 'audiencia',
+                            title: `Audiência - ${caso.cliente}`,
+                            description: `Processo: ${caso.numero}`,
+                            date: caso.proximaAudiencia,
+                            time: '09:00',
+                            location: caso.tribunal || '',
+                            relatedCase: caso.id,
+                            reminders: { min15: true, hour1: true, day1: true },
+                            status: 'ativo',
+                            createdAt: new Date().toISOString()
+                        };
+                        
+                        events.push(newEvent);
+                        newDeadlines++;
+                    }
+                }
+            });
+            
+            if (newDeadlines > 0) {
+                AppState.events = events;
+                saveData();
+                updateAgendaView();
+                showNotification(`✅ ${newDeadlines} audiências sincronizadas!`, 'success');
+            } else {
+                showNotification('ℹ️ Nenhuma nova audiência para sincronizar', 'info');
+            }
+        }
+        
+        // Criar lembrete
+        function createReminder() {
+            const title = prompt('Título do lembrete:');
+            if (!title) return;
+            
+            const date = prompt('Data (YYYY-MM-DD):');
+            if (!date) return;
+            
+            const time = prompt('Horário (HH:MM):');
+            if (!time) return;
+            
+            const newReminder = {
+                id: generateId(),
+                type: 'lembrete',
+                title: title,
+                description: '',
+                date: date,
+                time: time,
+                location: '',
+                relatedCase: '',
+                reminders: { min15: true, hour1: false, day1: false },
+                status: 'ativo',
+                createdAt: new Date().toISOString()
+            };
+            
+            if (!AppState.events) AppState.events = [];
+            AppState.events.push(newReminder);
+            
+            saveData();
+            updateAgendaView();
+            showNotification('✅ Lembrete criado!', 'success');
+        }
+        
+        // Mostrar eventos de um dia específico
+        function showDayEvents(date) {
+            const dateStr = date.toISOString().split('T')[0];
+            const events = AppState.events || [];
+            const dayEvents = events.filter(event => 
+                event.date === dateStr && event.status === 'ativo'
+            );
+            
+            alert(`Eventos em ${formatDate(dateStr)}:\n\n${
+                dayEvents.length > 0 
+                    ? dayEvents.map(e => `${e.time} - ${e.title}`).join('\n')
+                    : 'Nenhum evento neste dia'
+            }`);
+        }
+        
+        // ============= INTEGRAÇÃO INTER-SISTEMAS =============
+        
+        // Dashboard unificado com dados consolidados
+        function updateUnifiedDashboard() {
+            const cases = AppState.cases || [];
+            const events = AppState.events || [];
+            const documents = AppState.documents || [];
+            
+            // Atualizar estatísticas do dashboard
+            document.getElementById('casos-ativos').textContent = cases.filter(c => c.status === 'ativo').length;
+            document.getElementById('audiencias-mes').textContent = getThisMonthHearings().length;
+            document.getElementById('documentos-total').textContent = documents.length;
+            document.getElementById('tarefas-pendentes').textContent = getPendingTasks().length;
+            
+            // Atualizar timeline integrada
+            updateIntegratedTimeline();
+            
+            // Atualizar relatórios consolidados
+            updateConsolidatedReports();
+        }
+        
+        // Timeline integrada de atividades
+        function updateIntegratedTimeline() {
+            const timeline = [];
+            const cases = AppState.cases || [];
+            const events = AppState.events || [];
+            const documents = AppState.documents || [];
+            
+            // Adicionar eventos de casos
+            cases.forEach(caso => {
+                timeline.push({
+                    type: 'case',
+                    date: caso.dataAbertura,
+                    title: `Caso aberto: ${caso.cliente}`,
+                    description: `Processo ${caso.numero}`,
+                    icon: 'fas fa-folder-open',
+                    color: 'blue',
+                    data: caso
+                });
+            });
+            
+            // Adicionar eventos da agenda
+            events.forEach(event => {
+                timeline.push({
+                    type: 'event',
+                    date: event.date,
+                    title: event.title,
+                    description: event.description,
+                    icon: getEventIcon(event.type),
+                    color: getEventColor(event.type),
+                    data: event
+                });
+            });
+            
+            // Adicionar documentos
+            documents.forEach(doc => {
+                timeline.push({
+                    type: 'document',
+                    date: doc.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+                    title: `Documento: ${doc.title}`,
+                    description: doc.description,
+                    icon: 'fas fa-file-alt',
+                    color: 'green',
+                    data: doc
+                });
+            });
+            
+            // Ordenar por data (mais recente primeiro)
+            timeline.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Renderizar timeline (apenas os 10 mais recentes)
+            renderTimelineWidget(timeline.slice(0, 10));
+        }
+        
+        // Renderizar widget de timeline
+        function renderTimelineWidget(timelineItems) {
+            const container = document.querySelector('.recent-activities ul');
+            if (!container) return;
+            
+            container.innerHTML = timelineItems.map(item => `
+                <li class="flex items-start space-x-3 p-3 rounded-lg hover:bg-slate-700/30 transition-colors cursor-pointer"
+                    onclick="showTimelineDetail('${item.type}', '${item.data.id}')">
+                    <div class="flex-shrink-0 w-8 h-8 bg-${item.color}-600/20 rounded-full flex items-center justify-center">
+                        <i class="${item.icon} text-${item.color}-400 text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-white text-sm font-medium">${item.title}</div>
+                        <div class="text-gray-400 text-xs">${item.description}</div>
+                        <div class="text-gray-500 text-xs mt-1">${formatDate(item.date)}</div>
+                    </div>
+                </li>
+            `).join('');
+        }
+        
+        // Mostrar detalhes do item da timeline
+        function showTimelineDetail(type, id) {
+            switch(type) {
+                case 'case':
+                    showCaseDetails(id);
+                    break;
+                case 'event':
+                    showEventDetails(id);
+                    break;
+                case 'document':
+                    showDocumentDetails(id);
+                    break;
+            }
+        }
+        
+        // Vincular caso a documento
+        function linkCaseToDocument(caseId, documentId) {
+            const documents = AppState.documents || [];
+            const docIndex = documents.findIndex(doc => doc.id === documentId);
+            
+            if (docIndex !== -1) {
+                if (!documents[docIndex].linkedCases) {
+                    documents[docIndex].linkedCases = [];
+                }
+                
+                if (!documents[docIndex].linkedCases.includes(caseId)) {
+                    documents[docIndex].linkedCases.push(caseId);
+                    saveData();
+                    showNotification('📎 Documento vinculado ao caso!', 'success');
+                }
+            }
+        }
+        
+        // Vincular caso a evento da agenda
+        function linkCaseToEvent(caseId, eventId) {
+            const events = AppState.events || [];
+            const eventIndex = events.findIndex(event => event.id === eventId);
+            
+            if (eventIndex !== -1) {
+                events[eventIndex].relatedCase = caseId;
+                saveData();
+                showNotification('📅 Evento vinculado ao caso!', 'success');
+            }
+        }
+        
+        // Busca inteligente global
+        function performGlobalSearch(query) {
+            if (!query.trim()) return [];
+            
+            const results = [];
+            const searchTerm = query.toLowerCase();
+            
+            // Buscar em casos
+            const cases = AppState.cases || [];
+            cases.forEach(caso => {
+                if (caso.cliente.toLowerCase().includes(searchTerm) ||
+                    caso.numero.toLowerCase().includes(searchTerm) ||
+                    caso.assunto.toLowerCase().includes(searchTerm)) {
+                    results.push({
+                        type: 'case',
+                        title: `Caso: ${caso.cliente}`,
+                        subtitle: `${caso.numero} - ${caso.assunto}`,
+                        icon: 'fas fa-folder-open',
+                        data: caso,
+                        action: () => showCaseDetails(caso.id)
+                    });
+                }
+            });
+            
+            // Buscar em eventos
+            const events = AppState.events || [];
+            events.forEach(event => {
+                if (event.title.toLowerCase().includes(searchTerm) ||
+                    event.description.toLowerCase().includes(searchTerm)) {
+                    results.push({
+                        type: 'event',
+                        title: `Evento: ${event.title}`,
+                        subtitle: `${formatDate(event.date)} às ${event.time}`,
+                        icon: getEventIcon(event.type),
+                        data: event,
+                        action: () => showEventDetails(event.id)
+                    });
+                }
+            });
+            
+            // Buscar em documentos
+            const documents = AppState.documents || [];
+            documents.forEach(doc => {
+                if (doc.title.toLowerCase().includes(searchTerm) ||
+                    doc.description.toLowerCase().includes(searchTerm)) {
+                    results.push({
+                        type: 'document',
+                        title: `Documento: ${doc.title}`,
+                        subtitle: doc.description,
+                        icon: 'fas fa-file-alt',
+                        data: doc,
+                        action: () => showDocumentDetails(doc.id)
+                    });
+                }
+            });
+            
+            return results;
+        }
+        
+        // Obter audiências do mês
+        function getThisMonthHearings() {
+            const events = AppState.events || [];
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            
+            return events.filter(event => 
+                event.type === 'audiencia' &&
+                event.date >= firstDay.toISOString().split('T')[0] &&
+                event.date <= lastDay.toISOString().split('T')[0]
+            );
+        }
+        
+        // Obter tarefas pendentes
+        function getPendingTasks() {
+            const events = AppState.events || [];
+            const today = new Date().toISOString().split('T')[0];
+            
+            return events.filter(event => 
+                event.date <= today && 
+                event.status === 'ativo' &&
+                (event.type === 'prazo' || event.type === 'lembrete')
+            );
+        }
+        
+        // Gerar relatórios consolidados
+        function updateConsolidatedReports() {
+            const cases = AppState.cases || [];
+            const events = AppState.events || [];
+            
+            // Relatório de produtividade
+            const productivity = {
+                casesThisMonth: cases.filter(c => isThisMonth(c.dataAbertura)).length,
+                hearingsThisMonth: getThisMonthHearings().length,
+                completedTasks: events.filter(e => e.status === 'concluido').length,
+                pendingDeadlines: getPendingTasks().length
+            };
+            
+            // Atualizar widgets de relatório se existirem
+            updateProductivityWidget(productivity);
+        }
+        
+        // Atualizar widget de produtividade
+        function updateProductivityWidget(data) {
+            // Esta função pode ser expandida conforme necessário
+            console.log('📊 Relatório de Produtividade:', data);
+        }
+        
+        // Verificar se data é do mês atual
+        function isThisMonth(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            return date.getMonth() === now.getMonth() && 
+                   date.getFullYear() === now.getFullYear();
+        }
+        
+        // Backup automático integrado
+        function createIntegratedBackup() {
+            const backupData = {
+                timestamp: new Date().toISOString(),
+                version: '2.0',
+                cases: AppState.cases || [],
+                events: AppState.events || [],
+                documents: AppState.documents || [],
+                profile: JSON.parse(localStorage.getItem('userProfile') || '{}'),
+                preferences: JSON.parse(localStorage.getItem('userPreferences') || '{}')
+            };
+            
+            // Salvar no localStorage com timestamp
+            const backupKey = `backup_${Date.now()}`;
+            localStorage.setItem(backupKey, JSON.stringify(backupData));
+            
+            // Manter apenas os 10 backups mais recentes
+            const allBackups = Object.keys(localStorage)
+                .filter(key => key.startsWith('backup_'))
+                .sort()
+                .reverse();
+            
+            if (allBackups.length > 10) {
+                allBackups.slice(10).forEach(key => localStorage.removeItem(key));
+            }
+            
+            console.log('💾 Backup integrado criado:', backupKey);
+            return backupKey;
+        }
+        
+        // Obter ícone do evento
+        function getEventIcon(type) {
+            const icons = {
+                'audiencia': 'fas fa-gavel',
+                'reuniao': 'fas fa-users',
+                'prazo': 'fas fa-clock',
+                'tribunal': 'fas fa-university',
+                'estudo': 'fas fa-book',
+                'lembrete': 'fas fa-bell',
+                'outro': 'fas fa-calendar'
+            };
+            return icons[type] || 'fas fa-calendar';
+        }
+
+        // Obter cor do evento por tipo
+        function getEventColor(type) {
+            const colors = {
+                'audiencia': 'red',
+                'reuniao': 'blue',
+                'prazo': 'orange',
+                'tribunal': 'purple',
+                'estudo': 'green',
+                'lembrete': 'yellow',
+                'outro': 'gray'
+            };
+            return colors[type] || 'gray';
+        }
+
         // === INICIALIZAÇÃO DO SISTEMA ===
         
         // Função de inicialização quando a página carrega
@@ -11250,6 +12435,21 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             
             // Configurar eventos globais
             setupGlobalEvents();
+            
+            // Configurar busca global
+            setupGlobalSearch();
+            
+            // Configurar assinatura digital
+            setupDigitalSignature();
+            
+            // Configurar integração com tribunais
+            setupTribunalIntegration();
+            
+            // Inicializar agenda
+            updateAgendaView();
+            
+            // Atualizar dashboard unificado
+            updateUnifiedDashboard();
             
             // Mostrar dashboard por padrão
             showSection('dashboard');
@@ -11271,6 +12471,445 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 if (nameElement) nameElement.textContent = profileData.name;
                 if (oabElement) oabElement.textContent = profileData.oab.split(' ')[1];
             }
+        }
+
+        // ============= FUNCIONALIDADES AVANÇADAS =============
+        
+        // Sistema de busca inteligente global
+        function setupGlobalSearch() {
+            // Criar barra de busca global
+            const searchBar = document.createElement('div');
+            searchBar.id = 'global-search-bar';
+            searchBar.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 hidden';
+            searchBar.innerHTML = `
+                <div class="bg-slate-800 border border-blue-300/30 rounded-lg shadow-xl p-4 w-96">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fas fa-search text-blue-400"></i>
+                        <input type="text" id="global-search-input" 
+                               placeholder="Buscar casos, eventos, documentos..." 
+                               class="flex-1 bg-transparent text-white border-0 outline-0">
+                        <button onclick="closeGlobalSearch()" class="text-gray-400 hover:text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div id="search-results" class="max-h-64 overflow-y-auto"></div>
+                </div>
+            `;
+            document.body.appendChild(searchBar);
+            
+            // Configurar atalho Ctrl+K
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'k') {
+                    e.preventDefault();
+                    showGlobalSearch();
+                }
+            });
+            
+            // Configurar busca em tempo real
+            document.addEventListener('input', function(e) {
+                if (e.target.id === 'global-search-input') {
+                    handleGlobalSearch(e.target.value);
+                }
+            });
+        }
+        
+        // Mostrar busca global
+        function showGlobalSearch() {
+            const searchBar = document.getElementById('global-search-bar');
+            const input = document.getElementById('global-search-input');
+            
+            searchBar.classList.remove('hidden');
+            input.focus();
+        }
+        
+        // Fechar busca global
+        function closeGlobalSearch() {
+            const searchBar = document.getElementById('global-search-bar');
+            searchBar.classList.add('hidden');
+            document.getElementById('global-search-input').value = '';
+            document.getElementById('search-results').innerHTML = '';
+        }
+        
+        // Processar busca global
+        function handleGlobalSearch(query) {
+            const resultsContainer = document.getElementById('search-results');
+            
+            if (!query.trim()) {
+                resultsContainer.innerHTML = '';
+                return;
+            }
+            
+            const results = performGlobalSearch(query);
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<div class="text-gray-400 text-sm p-2">Nenhum resultado encontrado</div>';
+                return;
+            }
+            
+            resultsContainer.innerHTML = results.map(result => `
+                <div class="search-result-item p-3 hover:bg-slate-700/50 cursor-pointer rounded border-b border-slate-700/50"
+                     onclick="executeSearchAction('${result.type}', '${result.data.id}')">
+                    <div class="flex items-center gap-3">
+                        <i class="${result.icon} text-blue-400"></i>
+                        <div class="flex-1">
+                            <div class="text-white text-sm font-medium">${result.title}</div>
+                            <div class="text-gray-400 text-xs">${result.subtitle}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Executar ação do resultado da busca
+        function executeSearchAction(type, id) {
+            closeGlobalSearch();
+            
+            switch(type) {
+                case 'case':
+                    showSection('casos');
+                    setTimeout(() => showCaseDetails(id), 100);
+                    break;
+                case 'event':
+                    showSection('agenda');
+                    setTimeout(() => showEventDetails(id), 100);
+                    break;
+                case 'document':
+                    showSection('documentos');
+                    setTimeout(() => showDocumentDetails(id), 100);
+                    break;
+            }
+        }
+        
+        // Geração de relatórios em PDF automáticos
+        function generateAutomaticPDFReport(type = 'monthly') {
+            const cases = AppState.cases || [];
+            const events = AppState.events || [];
+            
+            let reportData = {};
+            let title = '';
+            
+            switch(type) {
+                case 'monthly':
+                    title = 'Relatório Mensal de Atividades';
+                    reportData = generateMonthlyReport(cases, events);
+                    break;
+                case 'cases':
+                    title = 'Relatório de Casos';
+                    reportData = generateCasesReport(cases);
+                    break;
+                case 'productivity':
+                    title = 'Relatório de Produtividade';
+                    reportData = generateProductivityReport(cases, events);
+                    break;
+            }
+            
+            generatePDFReport(title, reportData);
+        }
+        
+        // Gerar relatório mensal
+        function generateMonthlyReport(cases, events) {
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            
+            const monthCases = cases.filter(c => 
+                new Date(c.dataAbertura) >= firstDay && 
+                new Date(c.dataAbertura) <= lastDay
+            );
+            
+            const monthEvents = events.filter(e => 
+                new Date(e.date) >= firstDay && 
+                new Date(e.date) <= lastDay
+            );
+            
+            return {
+                period: `${firstDay.toLocaleDateString()} - ${lastDay.toLocaleDateString()}`,
+                totalCases: monthCases.length,
+                totalEvents: monthEvents.length,
+                hearings: monthEvents.filter(e => e.type === 'audiencia').length,
+                deadlines: monthEvents.filter(e => e.type === 'prazo').length,
+                cases: monthCases,
+                events: monthEvents
+            };
+        }
+        
+        // Gerar relatório de casos
+        function generateCasesReport(cases) {
+            const activeCases = cases.filter(c => c.status === 'ativo');
+            const closedCases = cases.filter(c => c.status === 'finalizado');
+            
+            return {
+                totalCases: cases.length,
+                activeCases: activeCases.length,
+                closedCases: closedCases.length,
+                byArea: groupCasesByArea(cases),
+                byStatus: groupCasesByStatus(cases),
+                details: cases
+            };
+        }
+        
+        // Gerar relatório de produtividade
+        function generateProductivityReport(cases, events) {
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            
+            const recentCases = cases.filter(c => new Date(c.dataAbertura) >= lastMonth);
+            const recentEvents = events.filter(e => new Date(e.date) >= lastMonth);
+            
+            return {
+                period: `Últimos 30 dias`,
+                newCases: recentCases.length,
+                completedEvents: recentEvents.filter(e => e.status === 'concluido').length,
+                avgCasesPerDay: (recentCases.length / 30).toFixed(1),
+                avgEventsPerDay: (recentEvents.length / 30).toFixed(1),
+                productivity: calculateProductivityScore(recentCases, recentEvents)
+            };
+        }
+        
+        // Agrupar casos por área
+        function groupCasesByArea(cases) {
+            const grouped = {};
+            cases.forEach(caso => {
+                const area = caso.area || 'Não especificada';
+                grouped[area] = (grouped[area] || 0) + 1;
+            });
+            return grouped;
+        }
+        
+        // Agrupar casos por status
+        function groupCasesByStatus(cases) {
+            const grouped = {};
+            cases.forEach(caso => {
+                grouped[caso.status] = (grouped[caso.status] || 0) + 1;
+            });
+            return grouped;
+        }
+        
+        // Calcular score de produtividade
+        function calculateProductivityScore(cases, events) {
+            const caseScore = cases.length * 10;
+            const eventScore = events.length * 5;
+            const completionRate = events.length > 0 ? 
+                (events.filter(e => e.status === 'concluido').length / events.length) * 100 : 0;
+            
+            return Math.min(100, (caseScore + eventScore + completionRate) / 3).toFixed(1);
+        }
+        
+        // Gerar PDF do relatório
+        function generatePDFReport(title, data) {
+            const reportContent = `
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h1 style="color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px;">
+                        ${title}
+                    </h1>
+                    <p style="color: #666; margin-bottom: 20px;">
+                        Gerado em: ${new Date().toLocaleString('pt-BR')}
+                    </p>
+                    
+                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h2 style="color: #1e3a8a; margin-top: 0;">Resumo Executivo</h2>
+                        ${generateReportSummary(data)}
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h2 style="color: #1e3a8a;">Detalhes</h2>
+                        ${generateReportDetails(data)}
+                    </div>
+                    
+                    <div style="margin-top: 40px; text-align: center; color: #666; font-size: 12px;">
+                        <p>Portal do Advogado - Sistema Integrado de Gestão Jurídica</p>
+                    </div>
+                </div>
+            `;
+            
+            // Usar a função existente de geração de PDF
+            const element = document.createElement('div');
+            element.innerHTML = reportContent;
+            document.body.appendChild(element);
+            
+            html2canvas(element).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF();
+                const imgWidth = 210;
+                const pageHeight = 295;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                pdf.save(`${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+                document.body.removeChild(element);
+                
+                showNotification('📄 Relatório PDF gerado com sucesso!', 'success');
+            });
+        }
+        
+        // Gerar resumo do relatório
+        function generateReportSummary(data) {
+            let summary = '';
+            
+            if (data.totalCases !== undefined) {
+                summary += `<p><strong>Total de Casos:</strong> ${data.totalCases}</p>`;
+            }
+            if (data.totalEvents !== undefined) {
+                summary += `<p><strong>Total de Eventos:</strong> ${data.totalEvents}</p>`;
+            }
+            if (data.period) {
+                summary += `<p><strong>Período:</strong> ${data.period}</p>`;
+            }
+            if (data.productivity) {
+                summary += `<p><strong>Score de Produtividade:</strong> ${data.productivity}%</p>`;
+            }
+            
+            return summary;
+        }
+        
+        // Gerar detalhes do relatório
+        function generateReportDetails(data) {
+            let details = '';
+            
+            if (data.byArea) {
+                details += '<h3>Casos por Área:</h3><ul>';
+                Object.entries(data.byArea).forEach(([area, count]) => {
+                    details += `<li>${area}: ${count} casos</li>`;
+                });
+                details += '</ul>';
+            }
+            
+            if (data.hearings !== undefined) {
+                details += `<p><strong>Audiências:</strong> ${data.hearings}</p>`;
+            }
+            
+            if (data.deadlines !== undefined) {
+                details += `<p><strong>Prazos:</strong> ${data.deadlines}</p>`;
+            }
+            
+            return details;
+        }
+        
+        // Sistema de assinatura digital (simulado)
+        function setupDigitalSignature() {
+            // Esta é uma implementação simulada
+            // Em produção, seria integrada com certificados digitais reais
+            
+            console.log('🔐 Sistema de Assinatura Digital inicializado');
+        }
+        
+        // Simular assinatura de documento
+        function signDocument(documentId) {
+            const documents = AppState.documents || [];
+            const docIndex = documents.findIndex(doc => doc.id === documentId);
+            
+            if (docIndex !== -1) {
+                if (!documents[docIndex].signatures) {
+                    documents[docIndex].signatures = [];
+                }
+                
+                const signature = {
+                    id: generateId(),
+                    signerName: 'Dr. Advogado', // Em produção, viria do certificado
+                    timestamp: new Date().toISOString(),
+                    type: 'digital',
+                    hash: generateSignatureHash(documentId),
+                    valid: true
+                };
+                
+                documents[docIndex].signatures.push(signature);
+                documents[docIndex].signed = true;
+                
+                saveData();
+                showNotification('✍️ Documento assinado digitalmente!', 'success');
+                
+                return signature;
+            }
+            
+            return null;
+        }
+        
+        // Gerar hash da assinatura (simulado)
+        function generateSignatureHash(documentId) {
+            // Em produção, seria um hash criptográfico real
+            return `HASH_${documentId}_${Date.now()}`;
+        }
+        
+        // Verificar assinatura digital
+        function verifySignature(signatureId) {
+            // Implementação simulada de verificação
+            const isValid = Math.random() > 0.1; // 90% de chance de ser válida
+            
+            showNotification(
+                isValid ? '✅ Assinatura válida!' : '❌ Assinatura inválida!',
+                isValid ? 'success' : 'error'
+            );
+            
+            return isValid;
+        }
+        
+        // Integração com tribunais (simulada)
+        function setupTribunalIntegration() {
+            console.log('🏛️ Integração com Tribunais inicializada');
+            
+            // Simular dados de tribunais
+            AppState.tribunals = [
+                { id: 1, name: 'Tribunal de Justiça - SP', code: 'TJSP', api: 'active' },
+                { id: 2, name: 'Tribunal Regional Federal 3ª Região', code: 'TRF3', api: 'active' },
+                { id: 3, name: 'Superior Tribunal de Justiça', code: 'STJ', api: 'limited' }
+            ];
+        }
+        
+        // Consultar andamento processual
+        function consultProcessStatus(processNumber) {
+            // Implementação simulada
+            const mockData = {
+                numero: processNumber,
+                status: 'Em andamento',
+                ultimaMovimentacao: new Date().toISOString().split('T')[0],
+                proximaAudiencia: '2025-02-15',
+                movimentacoes: [
+                    { data: '2025-01-20', descricao: 'Juntada de petição' },
+                    { data: '2025-01-18', descricao: 'Intimação para audiência' },
+                    { data: '2025-01-15', descricao: 'Despacho do juiz' }
+                ]
+            };
+            
+            showNotification('📋 Dados processuais atualizados!', 'info');
+            return mockData;
+        }
+        
+        // Mostrar detalhes de um evento
+        function showEventDetails(eventId) {
+            const events = AppState.events || [];
+            const event = events.find(e => e.id === eventId);
+            
+            if (!event) {
+                showNotification('❌ Evento não encontrado!', 'error');
+                return;
+            }
+            
+            alert(`Detalhes do Evento:\n\nTítulo: ${event.title}\nData: ${formatDate(event.date)}\nHorário: ${event.time}\nTipo: ${event.type}\nDescrição: ${event.description || 'Não informada'}\nLocal: ${event.location || 'Não informado'}`);
+        }
+        
+        // Mostrar detalhes de um documento
+        function showDocumentDetails(documentId) {
+            const documents = AppState.documents || [];
+            const document = documents.find(d => d.id === documentId);
+            
+            if (!document) {
+                showNotification('❌ Documento não encontrado!', 'error');
+                return;
+            }
+            
+            alert(`Detalhes do Documento:\n\nTítulo: ${document.title}\nDescrição: ${document.description || 'Não informada'}\nTipo: ${document.type || 'Documento'}\nAssinado: ${document.signed ? 'Sim' : 'Não'}`);
         }
 
         // Configurar eventos globais
@@ -11298,8 +12937,8 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         // Inicializar quando DOM carregar
         document.addEventListener('DOMContentLoaded', initializeSystem);
 
-        // Criar backup a cada hora
-        setInterval(createBackup, 60 * 60 * 1000);
+        // Criar backup integrado a cada hora
+        setInterval(createIntegratedBackup, 60 * 60 * 1000);
     </script>
 </body>
 </html>
