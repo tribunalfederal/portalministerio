@@ -3464,22 +3464,26 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Formatar conteúdo com HTML para negritos e formatação profissional
         function formatDocumentContentHTML(content) {
             return content
-                // EXCELENTÍSSIMO em NEGRITO, FONTE MAIOR e ALINHADO À ESQUERDA (como AUTOR/BRASILÂNDIA)
+                // EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO - NEGRITO, FONTE MAIOR, ALINHADO À ESQUERDA
+                .replace(/(EXCELENTÍSSIMO\(A\)\s+SENHOR\(A\)\s+DOUTOR\(A\)\s+JUIZ\(A\)\s+DE\s+DIREITO)/gmi, 
+                         '<div style="font-weight: bold; font-size: 18px; margin: 25px 0 20px 0; text-align: left; color: #000; text-indent: 0; line-height: 1.4;"><strong>$1</strong></div>')
+                
+                // EXCELENTÍSSIMO SENHOR DOUTOR JUIZ (versão sem parênteses) - MESMA FORMATAÇÃO
                 .replace(/(EXCELENTÍSSIMO\s+SENHOR\s+DOUTOR?\s+JUIZ[^:\n]*)/gmi, 
                          '<div style="font-weight: bold; font-size: 18px; margin: 25px 0 20px 0; text-align: left; color: #000; text-indent: 0; line-height: 1.4;"><strong>$1</strong></div>')
                 
-                // Seções principais em negrito e maiúsculo
+                // Seções principais em NEGRITO FORTE, maiúsculo e ALINHADAS À ESQUERDA
                 .replace(/^(DOS FATOS|DA FUNDAMENTAÇÃO JURÍDICA|DOS PEDIDOS|DAS PROVAS|DO VALOR DA CAUSA|DA DEFESA|ALEGAÇÕES FINAIS|RECURSO|CONTESTAÇÃO|AUTOR|RÉU|PACIENTE\/RÉU):/gm, 
-                         '<div style="font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; text-transform: uppercase; color: #000;"><strong>$1:</strong></div>')
+                         '<div style="font-weight: bold; font-size: 16px; margin: 30px 0 15px 0; text-transform: uppercase; color: #000; text-align: left; text-indent: 0;"><strong>$1:</strong></div>')
                 
-                // Artigos de lei em negrito
+                // Nomes das partes em NEGRITO FORTE e ALINHADOS À ESQUERDA
+                .replace(/^(AUTOR|RÉU|PACIENTE\/RÉU):\s*([^\n]+)/gm, '<div style="margin: 20px 0; text-align: left; text-indent: 0;"><strong>$1:</strong> <strong>$2</strong></div>')
+                
+                // Artigos de lei em NEGRITO FORTE
                 .replace(/\b(art\.|artigo)\s*(\d+)/gi, '<strong>$1 $2</strong>')
                 
-                // Leis e códigos em negrito
+                // Leis e códigos em NEGRITO FORTE
                 .replace(/\b(lei|código|decreto|portaria)\s*n[ºº°]?\s*[\d\.\/\-]+/gi, '<strong>$&</strong>')
-                
-                // Nomes das partes em negrito
-                .replace(/^(AUTOR|RÉU|PACIENTE\/RÉU):\s*([^\n]+)/gm, '<div style="margin: 15px 0;"><strong>$1:</strong> $2</div>')
                 
                 // Quebras de linha duplas para parágrafos
                 .replace(/\n\n/g, '</p><p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
