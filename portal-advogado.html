@@ -3399,46 +3399,51 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
         // Petição Inicial
         function generatePeticaoInicial(formData) {
-            const data = new Date().toLocaleDateString('pt-BR');
+            const data = new Date().toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long', 
+                year: 'numeric'
+            });
+            
             return `
-**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO DA ${formData.vara || '1ª VARA'} ${formData.tipoJustica || 'CÍVEL'} DA COMARCA DE ${formData.comarca || 'CIDADE'}**
+**EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO DA ${formData.vara || '1ª VARA CÍVEL'}**
 
-**${formData.autorNome || 'AUTOR'}**, ${formData.autorQualificacao || 'qualificação'}, residente e domiciliado(a) à ${formData.autorEndereco || 'endereço'}, ${formData.autorCidade || 'cidade'} - ${formData.autorEstado || 'UF'}, CEP ${formData.autorCEP || '00000-000'}, ${formData.autorDocumento ? 'portador(a) do ' + formData.autorDocumento : 'devidamente qualificado(a)'}, por meio de seu advogado que esta subscreve (OAB ${formData.advogadoOAB || 'nº'}), com escritório situado à ${formData.advogadoEndereco || 'endereço'}, vem, respeitosamente, perante Vossa Excelência, propor a presente
+**${formData.requerente || 'NOME DO REQUERENTE'}**, ${formData.qualificacao || 'brasileiro, solteiro, comerciante'}, portador do RG nº ${formData.requerenteDocumento || '00.000.000-0'}, residente e domiciliado à ${formData.endereco || 'Rua/Av., nº, Bairro'}, ${formData.cidade || 'Cidade'} - ${formData.estado || 'UF'}, CEP ${formData.cep || '00000-000'}, por meio de seu advogado que esta subscreve (OAB ${formData.oabAdvogado || 'SP 000.000'}), com escritório situado à ${formData.enderecoAdvogado || 'endereço do escritório'}, vem, respeitosamente, perante Vossa Excelência, propor a presente
 
-**AÇÃO ${(formData.tipoAcao || 'TIPO DE AÇÃO').toUpperCase()}**
+**${formData.tipoAcao || 'AÇÃO DE COBRANÇA'}**
 
-em face de **${formData.reuNome || 'RÉU'}**, ${formData.reuQualificacao || 'qualificação'}, residente e domiciliado(a) à ${formData.reuEndereco || 'endereço'}, pelos fundamentos de fato e de direito a seguir expostos:
+em face de **${formData.reuNome || 'NOME DO RÉU'}**, ${formData.qualificacaoReu || 'qualificação do réu'}, residente e domiciliado à ${formData.enderecoReu || 'endereço do réu'}, pelos fundamentos de fato e de direito a seguir expostos:
 
 **I - DOS FATOS**
 
-${formData.relatoFatos || 'Narração dos fatos que deram origem à demanda...'}
+${formData.relatoFatos || 'Relatar aqui os fatos que deram origem à presente demanda, de forma clara e objetiva, observando a ordem cronológica dos acontecimentos...'}
 
 **II - DO DIREITO**
 
-${formData.fundamentacaoJuridica || 'Fundamentação jurídica aplicável ao caso...'}
+${formData.fundamentacaoJuridica || 'Apresentar aqui a fundamentação jurídica aplicável ao caso, citando artigos de lei, jurisprudência e doutrina pertinentes...'}
 
 **III - DOS PEDIDOS**
 
 Diante do exposto, requer-se:
 
-${formData.pedidos || 'a) Pedido principal;\\nb) Pedidos alternativos ou subsidiários;'}
+a) ${formData.pedidoPrincipal || 'O pedido principal da ação'};
 
-**IV - DO VALOR DA CAUSA**
+b) ${formData.pedidoSecundario || 'Pedidos secundários, se houver'};
 
-Para os devidos fins legais, atribui-se à presente causa o valor de R$ ${formData.valorCausa || '0,00'} (valor por extenso).
+c) A condenação da parte requerida ao pagamento das custas processuais e honorários advocatícios;
 
-**V - DAS PROVAS**
+d) A produção de todas as provas em direito admitidas, especialmente documental, testemunhal e pericial, se necessário.
 
-${formData.provas || 'Protesta-se pela produção de todas as provas em direito admitidas, especialmente prova documental, testemunhal e pericial.'}
+**Termos em que,**
 
-Termos em que,
-Pede e espera deferimento.
+**Pede deferimento.**
 
-${formData.autorCidade || 'Cidade'}, ${data}.
+${data}
 
-_________________________________
-${formData.advogadoNome || 'Nome do Advogado'}
-OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`;
+
+__________________________________
+**${formData.advogadoResponsavel || 'Nome do Advogado'}**
+**OAB ${formData.oabAdvogado || 'SP 000.000'}**`;
         }
 
         // Recurso de Apelação
@@ -6558,136 +6563,182 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             }
         }
 
-        // Método alternativo para PDF usando print CSS
+        // Método alternativo para PDF usando html2canvas + jsPDF básico
         function generatePDFAlternative(pages, title) {
-            console.log('📄 Gerando PDF alternativo usando CSS Print...');
+            console.log('📄 Gerando PDF alternativo com download automático...');
             
             try {
-                // Criar nova janela para impressão
-                const printWindow = window.open('', '_blank');
-                
-                // HTML para PDF com CSS print
-                const printHTML = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>${title}</title>
-                    <style>
-                        @page {
-                            size: A4;
-                            margin: 20mm;
+                // Verificar se pelo menos html2canvas está disponível
+                if (typeof html2canvas === 'undefined') {
+                    showNotification('⚠️ Biblioteca html2canvas não disponível. Verifique a conexão com a internet.', 'error');
+                    return;
+                }
+
+                // Criar PDF simples com jsPDF básico
+                if (typeof window.jsPDF !== 'undefined' || typeof jsPDF !== 'undefined') {
+                    const PDF = window.jsPDF || jsPDF;
+                    const pdf = new PDF('p', 'mm', 'a4');
+                    
+                    // Processar primeira página
+                    const firstPageHTML = pages[0] || '<p>Conteúdo do documento não disponível</p>';
+                    
+                    // Criar container para renderizar
+                    const container = document.createElement('div');
+                    container.style.cssText = `
+                        position: absolute;
+                        left: -9999px;
+                        top: 0;
+                        width: 794px;
+                        min-height: 1123px;
+                        background: white;
+                        padding: 60px;
+                        box-sizing: border-box;
+                        font-family: 'Times New Roman', serif;
+                        font-size: 14px;
+                        line-height: 1.6;
+                        color: black;
+                    `;
+                    container.innerHTML = firstPageHTML;
+                    document.body.appendChild(container);
+                    
+                    // Converter para imagem e criar PDF
+                    html2canvas(container, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: false,
+                        backgroundColor: '#ffffff'
+                    }).then(canvas => {
+                        try {
+                            const imgData = canvas.toDataURL('image/png');
+                            pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+                            
+                            // Download automático
+                            const pdfBlob = pdf.output('blob');
+                            const url = URL.createObjectURL(pdfBlob);
+                            
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                            link.style.display = 'none';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(url);
+                            
+                            showNotification(`✅ PDF baixado automaticamente: ${link.download}`, 'success');
+                            
+                        } catch (error) {
+                            console.error('Erro ao gerar PDF alternativo:', error);
+                            showNotification('❌ Erro ao gerar PDF', 'error');
+                        } finally {
+                            document.body.removeChild(container);
                         }
-                        
-                        body {
-                            font-family: 'Times New Roman', serif;
-                            font-size: 12pt;
-                            line-height: 1.6;
-                            color: black;
-                            margin: 0;
-                            padding: 0;
-                        }
-                        
-                        .page {
-                            page-break-after: always;
-                            width: 100%;
-                            min-height: 257mm; /* A4 height - margins */
-                        }
-                        
-                        .page:last-child {
-                            page-break-after: auto;
-                        }
-                        
-                        @media print {
-                            body { margin: 0; }
-                            .page { page-break-after: always; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${pages.map((pageContent, index) => 
-                        `<div class="page">${pageContent}</div>`
-                    ).join('')}
-                </body>
-                </html>`;
-                
-                printWindow.document.write(printHTML);
-                printWindow.document.close();
-                
-                // Aguardar carregamento e imprimir
-                printWindow.onload = function() {
-                    setTimeout(() => {
-                        printWindow.print();
-                        showNotification('📄 Janela de impressão aberta! Salve como PDF.', 'info');
-                        
-                        // Fechar janela após impressão (opcional)
-                        printWindow.onafterprint = function() {
-                            printWindow.close();
-                        };
-                    }, 500);
-                };
+                    }).catch(error => {
+                        console.error('Erro no html2canvas:', error);
+                        document.body.removeChild(container);
+                        showNotification('❌ Erro na conversão para PDF', 'error');
+                    });
+                    
+                } else {
+                    // Fallback: baixar como HTML
+                    const htmlContent = pages.join('<div style="page-break-after: always;"></div>');
+                    const blob = new Blob([`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <title>${title}</title>
+                            <style>
+                                body { font-family: 'Times New Roman', serif; margin: 2cm; line-height: 1.6; }
+                                @media print { body { margin: 1cm; } }
+                            </style>
+                        </head>
+                        <body>${htmlContent}</body>
+                        </html>
+                    `], { type: 'text/html' });
+                    
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.html`;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    showNotification(`📄 Documento HTML baixado: ${link.download}`, 'info');
+                }
                 
             } catch (error) {
-                console.error('Erro no método alternativo:', error);
+                console.error('Erro crítico no PDF alternativo:', error);
+                showNotification('❌ Erro crítico na geração do documento', 'error');
+            }
+        }
+
+        // Gerar imagens usando sistema simples
+        function generateImageSimple(title) {
+            console.log('�️ Gerando imagem simples para download...');
+            
+            try {
+                // Obter dados do formulário atual
+                const template = documentTemplates[currentDocumentType];
+                const formData = {};
+                template.fields.forEach(field => {
+                    const element = document.getElementById(`field-${field.name}`);
+                    if (element) {
+                        formData[field.name] = element.value.trim();
+                    }
+                });
+
+                // Gerar conteúdo específico
+                const documentContent = generateSpecificContent(currentDocumentType, formData, template);
+                const formattedContent = convertTextToFormattedHTML(documentContent);
                 
-                // Fallback final: gerar imagem de alta qualidade
-                console.log('📄 Usando fallback final: imagem de alta qualidade...');
-                
-                const pdfContainer = document.createElement('div');
-                pdfContainer.style.cssText = `
+                // Criar container para imagem
+                const imageContainer = document.createElement('div');
+                imageContainer.style.cssText = `
                     position: absolute;
                     left: -9999px;
                     top: 0;
-                    width: 210mm;
+                    width: 794px;
                     background: white;
+                    padding: 60px;
+                    box-sizing: border-box;
                     font-family: 'Times New Roman', serif;
+                    font-size: 14px;
+                    line-height: 1.6;
+                    color: black;
                 `;
+                imageContainer.innerHTML = formattedContent;
+                document.body.appendChild(imageContainer);
                 
-                pages.forEach((pageContent, index) => {
-                    const pageDiv = document.createElement('div');
-                    pageDiv.style.cssText = `
-                        width: 210mm;
-                        min-height: 297mm;
-                        background: white;
-                        padding: 20mm;
-                        box-sizing: border-box;
-                        page-break-after: always;
-                        font-size: 12pt;
-                        line-height: 1.6;
-                        color: black;
-                        margin-bottom: 20px;
-                    `;
-                    pageDiv.innerHTML = pageContent;
-                    pdfContainer.appendChild(pageDiv);
-                });
-                
-                document.body.appendChild(pdfContainer);
-                
-                html2canvas(pdfContainer, {
-                    scale: 3, // Alta qualidade
+                // Converter para imagem
+                html2canvas(imageContainer, {
+                    scale: 2,
                     useCORS: true,
                     allowTaint: false,
-                    backgroundColor: '#ffffff',
-                    width: pdfContainer.offsetWidth,
-                    height: pdfContainer.offsetHeight
+                    backgroundColor: '#ffffff'
                 }).then(canvas => {
                     const link = document.createElement('a');
-                    link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}_PRINT.png`;
+                    link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.png`;
                     link.href = canvas.toDataURL('image/png');
                     
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    document.body.removeChild(pdfContainer);
+                    document.body.removeChild(imageContainer);
                     
-                    showNotification('⚠️ PDF gerado como imagem de alta qualidade!', 'warning');
-                }).catch(finalError => {
-                    console.error('Erro no fallback final:', finalError);
-                    showNotification('❌ Erro crítico na geração de PDF', 'error');
-                    if (pdfContainer.parentNode) {
-                        document.body.removeChild(pdfContainer);
-                    }
+                    showNotification(`✅ Imagem baixada: ${link.download}`, 'success');
+                }).catch(error => {
+                    console.error('Erro ao gerar imagem:', error);
+                    document.body.removeChild(imageContainer);
+                    showNotification('❌ Erro ao gerar imagem', 'error');
                 });
+                
+            } catch (error) {
+                console.error('Erro na geração de imagem:', error);
+                showNotification('❌ Erro na geração de imagem', 'error');
             }
         }
     </script>
