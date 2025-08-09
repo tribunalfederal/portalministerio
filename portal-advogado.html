@@ -3270,38 +3270,90 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             downloadPagesDirectly(downloadPages, documentTitle);
         }
 
-        // SISTEMA SIMPLIFICADO - Gerar páginas com formatação profissional
+        // SISTEMA INTELIGENTE - Gerar páginas preservando TODO o conteúdo
         function generateProfessionalPages(data, title, pageWidth, pageHeight, margin) {
-            console.log('📄 Sistema SIMPLIFICADO - Gerando páginas...');
+            console.log('� === DEBUG INÍCIO ===');
+            console.log('�📄 Sistema INTELIGENTE - Gerando páginas...');
+            console.log('📋 Dados recebidos:', data);
+            console.log('📋 Título:', title);
+            
             const pages = [];
             const userProfile = JSON.parse(localStorage.getItem('advogado-profile')) || {};
             
             // Gerar conteúdo formatado
             const content = generateDocumentContent(currentDocumentType, data);
+            console.log('📝 CONTEÚDO ORIGINAL COMPLETO:');
+            console.log('📝 Tamanho:', content.length, 'caracteres');
+            console.log('📝 Conteúdo:', content.substring(0, 500) + '...');
+            
             const formattedContent = formatDocumentContentHTML(content);
+            console.log('📝 CONTEÚDO FORMATADO:');
+            console.log('📝 Tamanho formatado:', formattedContent.length, 'caracteres');
+            console.log('📝 Início formatado:', formattedContent.substring(0, 300) + '...');
             
-            console.log('📝 Conteúdo gerado:', formattedContent.length, 'caracteres');
+            // Dividir conteúdo por seções para preservar formatação
+            const sections = formattedContent.split('</div>').filter(section => section.trim());
+            console.log('📋 Seções encontradas:', sections.length);
             
-            // FORÇAR SEMPRE 2 PÁGINAS para teste
-            const allText = formattedContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-            const midPoint = Math.floor(allText.length / 2);
+            // Se não há seções div, dividir por parágrafos
+            let contentParts = sections;
+            if (sections.length <= 1) {
+                contentParts = formattedContent.split('</p>').filter(part => part.trim());
+                console.log('📋 Usando divisão por parágrafos:', contentParts.length, 'partes');
+            }
             
-            // Primeira página - primeira metade do conteúdo
-            const firstHalfHTML = formattedContent.substring(0, midPoint + 200);
-            const page1 = createSimplePage(firstHalfHTML, 1, pageWidth, pageHeight, margin, title, userProfile, true);
-            pages.push(page1);
+            // Calcular altura disponível por página (mais conservador)
+            const headerHeight = 150;
+            const footerHeight = 100;
+            const availableHeight = pageHeight - (margin * 2) - headerHeight - footerHeight;
+            const charsPerPage = Math.floor(availableHeight / 20 * 60); // Mais conservador
             
-            // Segunda página - segunda metade do conteúdo + assinatura
-            const secondHalfHTML = formattedContent.substring(midPoint + 200);
-            const page2 = createSimplePage(secondHalfHTML, 2, pageWidth, pageHeight, margin, title, userProfile, false);
-            pages.push(page2);
+            console.log('📏 Altura disponível:', availableHeight, 'px');
+            console.log('📏 Caracteres por página (estimativa):', charsPerPage);
             
-            console.log(`✅ ${pages.length} páginas criadas (sistema simplificado)`);
+            let currentPageContent = '';
+            let currentPageText = '';
+            let pageNumber = 1;
+            
+            // Processar cada parte do conteúdo
+            for (let i = 0; i < contentParts.length; i++) {
+                const part = contentParts[i] + (sections.length > 1 ? '</div>' : '</p>');
+                const partText = part.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                
+                console.log(`📝 Processando parte ${i + 1}/${contentParts.length}:`, partText.substring(0, 100) + '...');
+                
+                // Se adicionar esta parte ultrapassar o limite E já há conteúdo na página
+                if (currentPageText.length + partText.length > charsPerPage && currentPageContent.length > 0) {
+                    // Criar página atual
+                    console.log(`📄 Criando página ${pageNumber} com ${currentPageText.length} caracteres`);
+                    const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
+                    pages.push(page);
+                    
+                    // Iniciar nova página
+                    pageNumber++;
+                    currentPageContent = part;
+                    currentPageText = partText;
+                } else {
+                    // Adicionar parte à página atual
+                    currentPageContent += part;
+                    currentPageText += ' ' + partText;
+                }
+            }
+            
+            // Adicionar última página se houver conteúdo
+            if (currentPageContent.length > 0) {
+                console.log(`📄 Criando página final ${pageNumber} com ${currentPageText.length} caracteres`);
+                const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
+                pages.push(page);
+            }
+            
+            console.log(`✅ ${pages.length} páginas criadas (sistema inteligente)`);
+            console.log('🔍 === DEBUG FIM ===');
             return pages;
         }
 
-        // Criar página simples e funcional
-        function createSimplePage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
+        // Criar página inteligente preservando todo o conteúdo
+        function createIntelligentPage(content, pageNumber, width, height, margin, title, userProfile, isFirstPage) {
             const headerHTML = isFirstPage ? `
                 <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1e40af; padding-bottom: 20px;">
                     <img src="${TRIBUNAL_LOGO.url}" alt="${TRIBUNAL_LOGO.alt}" style="width: 80px; height: 80px; margin: 0 auto 15px; display: block;">
@@ -3363,13 +3415,13 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         // Formatar conteúdo com HTML para negritos e formatação profissional
         function formatDocumentContentHTML(content) {
             return content
-                // Excelentíssimo em negrito e alinhado à esquerda (como AUTOR)
+                // Excelentíssimo em negrito e alinhado à esquerda
                 .replace(/(EXCELENTÍSSIMO\s+SENHOR\s+DOUTOR?\s+JUIZ[^:\n]*)/gmi, 
-                         '<div style="font-weight: bold; font-size: 14px; margin: 20px 0 15px 0; text-align: left; color: #000; text-indent: 0;">$1</div>')
+                         '<div style="font-weight: bold; font-size: 14px; margin: 20px 0 15px 0; text-align: left; color: #000;"><strong>$1</strong></div>')
                 
-                // Seções principais em negrito e maiúsculo - COR PRETA
+                // Seções principais em negrito e maiúsculo
                 .replace(/^(DOS FATOS|DA FUNDAMENTAÇÃO JURÍDICA|DOS PEDIDOS|DAS PROVAS|DO VALOR DA CAUSA|DA DEFESA|ALEGAÇÕES FINAIS|RECURSO|CONTESTAÇÃO|AUTOR|RÉU|PACIENTE\/RÉU):/gm, 
-                         '<div style="font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; text-transform: uppercase; color: #000; text-indent: 0;">$1:</div>')
+                         '<div style="font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; text-transform: uppercase; color: #000;"><strong>$1:</strong></div>')
                 
                 // Artigos de lei em negrito
                 .replace(/\b(art\.|artigo)\s*(\d+)/gi, '<strong>$1 $2</strong>')
@@ -3377,21 +3429,24 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 // Leis e códigos em negrito
                 .replace(/\b(lei|código|decreto|portaria)\s*n[ºº°]?\s*[\d\.\/\-]+/gi, '<strong>$&</strong>')
                 
-                // Nomes das partes em negrito (alinhados à esquerda como AUTOR)
-                .replace(/^(AUTOR|RÉU|PACIENTE\/RÉU):\s*([^\n]+)/gm, '<div style="margin: 15px 0; text-indent: 0;"><strong>$1:</strong> $2</div>')
+                // Nomes das partes em negrito
+                .replace(/^(AUTOR|RÉU|PACIENTE\/RÉU):\s*([^\n]+)/gm, '<div style="margin: 15px 0;"><strong>$1:</strong> $2</div>')
                 
                 // Quebras de linha duplas para parágrafos
-                .replace(/\n\n/g, '</p><p style="margin: 15px 0; text-indent: 40px;">')
+                .replace(/\n\n/g, '</p><p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
                 
                 // Quebras simples
                 .replace(/\n/g, '<br>')
                 
+                // Limpar espaços extras e caracteres especiais
+                .replace(/&nbsp;/g, ' ')
+                .replace(/\s+/g, ' ')
+                
                 // Envolver em parágrafo inicial
-                .replace(/^/, '<p style="margin: 15px 0; text-indent: 40px;">')
+                .replace(/^/, '<p style="margin: 15px 0; text-indent: 40px; text-align: justify;">')
                 .replace(/$/, '</p>');
         }
 
-        // Gerar imagens PNG para cada página
         // Download direto e simples das páginas
         function downloadPagesDirectly(pages, documentTitle) {
             const totalPages = pages.length;
