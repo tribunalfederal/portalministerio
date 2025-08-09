@@ -2929,6 +2929,8 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     { name: 'clienteRG', label: 'RG do Cliente', type: 'text', required: true },
                     { name: 'outraParte', label: 'Nome da Outra Parte', type: 'text', required: false, 
                       hint: 'Civil: Nome do Réu | Criminal: Ministério Público' },
+                    { name: 'outraParteRG', label: 'RG da Outra Parte', type: 'text', required: false, 
+                      hint: 'Civil: RG/CPF do Réu | Criminal: Não se aplica' },
                     { name: 'fatos', label: 'Narrativa dos Fatos', type: 'textarea', required: true },
                     { name: 'fundamentacaoJuridica', label: 'Fundamentação Jurídica', type: 'textarea', required: true },
                     { name: 'pedidos', label: 'Pedidos', type: 'textarea', required: true },
@@ -3144,19 +3146,27 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 const clienteLabel = document.querySelector('label[for="field-cliente"]');
                 const outraParteField = document.getElementById('field-outraParte');
                 const outraParteLabel = document.querySelector('label[for="field-outraParte"]');
+                const outraParteRGField = document.getElementById('field-outraParteRG');
+                const outraParteRGLabel = document.querySelector('label[for="field-outraParteRG"]');
                 
                 if (tipoPeticao === 'civil') {
                     if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente (Autor) ou RG/CPF <span class="text-red-400">*</span>';
                     if (outraParteField) outraParteField.placeholder = 'Nome do Réu';
                     if (outraParteLabel) outraParteLabel.textContent = 'Nome do Réu';
+                    if (outraParteRGField) outraParteRGField.placeholder = 'RG/CPF do Réu';
+                    if (outraParteRGLabel) outraParteRGLabel.textContent = 'RG/CPF do Réu';
                 } else if (tipoPeticao === 'criminal') {
                     if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente (Réu/Acusado) ou RG/CPF <span class="text-red-400">*</span>';
                     if (outraParteField) outraParteField.placeholder = 'Ministério Público';
                     if (outraParteLabel) outraParteLabel.textContent = 'Autor da Ação';
+                    if (outraParteRGField) outraParteRGField.placeholder = 'Não se aplica para MP';
+                    if (outraParteRGLabel) outraParteRGLabel.textContent = 'RG da Outra Parte (N/A)';
                 } else {
                     if (clienteLabel) clienteLabel.innerHTML = 'Nome do Cliente ou RG/CPF <span class="text-red-400">*</span>';
                     if (outraParteField) outraParteField.placeholder = 'Nome da outra parte';
                     if (outraParteLabel) outraParteLabel.textContent = 'Nome da Outra Parte';
+                    if (outraParteRGField) outraParteRGField.placeholder = 'RG/CPF da outra parte';
+                    if (outraParteRGLabel) outraParteRGLabel.textContent = 'RG da Outra Parte';
                 }
             }
         }
@@ -3241,7 +3251,6 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             const pages = [];
             const elements = Array.from(container.children);
             let currentPage = document.createElement('div');
-            let currentHeight = 0;
 
             // Configurar estilo da página
             const pageStyle = `
@@ -3257,18 +3266,21 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
 
             currentPage.style.cssText = pageStyle;
 
-            elements.forEach(element => {
-                // Criar clone do elemento
+            // Adicionar elementos até atingir altura máxima
+            for (let i = 0; i < elements.length; i++) {
+                const element = elements[i];
                 const clone = element.cloneNode(true);
+                
+                // Testar se cabe na página atual
                 currentPage.appendChild(clone);
-
+                
                 // Medir altura temporariamente
                 document.body.appendChild(currentPage);
                 const pageHeight = currentPage.offsetHeight - 120; // descontar padding
                 document.body.removeChild(currentPage);
 
-                // Se exceder altura da página, criar nova página
-                if (pageHeight > maxHeight && currentPage.children.length > 1) {
+                // Se exceder altura E já tiver conteúdo suficiente, criar nova página
+                if (pageHeight > maxHeight && currentPage.children.length > 2) {
                     // Remover último elemento que causou overflow
                     currentPage.removeChild(clone);
                     
@@ -3279,21 +3291,27 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     currentPage = document.createElement('div');
                     currentPage.style.cssText = pageStyle;
                     currentPage.appendChild(clone);
-                } else if (pageHeight > maxHeight) {
-                    // Se é um elemento muito grande, quebrar o texto
-                    const brokenElements = breakLargeElement(clone, maxHeight, pageStyle);
-                    currentPage.removeChild(clone);
                     
-                    brokenElements.forEach((brokenElement, index) => {
-                        if (index > 0) {
-                            pages.push(currentPage.outerHTML);
-                            currentPage = document.createElement('div');
-                            currentPage.style.cssText = pageStyle;
-                        }
-                        currentPage.appendChild(brokenElement);
-                    });
+                } else if (pageHeight > maxHeight && currentPage.children.length <= 2) {
+                    // Se é um dos primeiros elementos e é muito grande, tentar quebrar
+                    const isLargeTextElement = clone.tagName === 'P' || clone.tagName === 'DIV';
+                    
+                    if (isLargeTextElement && clone.textContent.length > 500) {
+                        currentPage.removeChild(clone);
+                        const brokenElements = breakLargeElement(clone, maxHeight, pageStyle);
+                        
+                        brokenElements.forEach((brokenElement, index) => {
+                            if (index > 0 && currentPage.children.length > 0) {
+                                pages.push(currentPage.outerHTML);
+                                currentPage = document.createElement('div');
+                                currentPage.style.cssText = pageStyle;
+                            }
+                            currentPage.appendChild(brokenElement);
+                        });
+                    }
+                    // Se não conseguir quebrar, manter na página mesmo que exceda um pouco
                 }
-            });
+            }
 
             // Adicionar última página se não estiver vazia
             if (currentPage.children.length > 0) {
@@ -3460,7 +3478,11 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         // Petição Inicial Civil
                         content += `AUTOR: ${safeData('cliente')} - RG: ${safeData('clienteRG')}\n`;
                         if (data.outraParte && data.outraParte.trim()) {
-                            content += `RÉU: ${safeData('outraParte')}\n`;
+                            content += `RÉU: ${safeData('outraParte')}`;
+                            if (data.outraParteRG && data.outraParteRG.trim()) {
+                                content += ` - RG: ${safeData('outraParteRG')}`;
+                            }
+                            content += `\n`;
                         }
                         content += `\n`;
                         content += `DOS FATOS:\n${safeData('fatos')}\n\n`;
