@@ -3302,6 +3302,15 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 console.log('📋 Usando divisão por parágrafos:', contentParts.length, 'partes');
             }
             
+            // DEBUG DETALHADO: Mostrar cada parte do conteúdo
+            console.log('🔍 === DEBUG DETALHADO DAS PARTES ===');
+            for (let i = 0; i < Math.min(contentParts.length, 5); i++) {
+                const partText = contentParts[i].replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                console.log(`📝 Parte ${i + 1}/${contentParts.length}:`, partText.substring(0, 150) + '...');
+                console.log(`📏 Parte ${i + 1} tamanho:`, partText.length, 'caracteres');
+            }
+            console.log('🔍 === FIM DEBUG DETALHADO ===');
+            
             // Calcular altura disponível por página (mais agressivo para forçar páginas)
             const headerHeight = 150;
             const footerHeight = 100;
@@ -3332,7 +3341,11 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                     // FORÇAR quebra de página com limite MUITO menor
                     if (currentPageText.length + partText.length > forcedCharsPerPage && currentPageContent.length > 0) {
                         // Criar página atual
-                        console.log(`📄 Criando página ${pageNumber} com ${currentPageText.length} caracteres (SUPER FORÇADO)`);
+                        console.log(`📄 === CRIANDO PÁGINA ${pageNumber} ===`);
+                        console.log(`📏 Conteúdo atual: ${currentPageText.length} caracteres`);
+                        console.log(`📝 Texto atual: "${currentPageText.substring(0, 200)}..."`);
+                        console.log(`📄 HTML atual: "${currentPageContent.substring(0, 300)}..."`);
+                        
                         const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
                         pages.push(page);
                         
@@ -3340,8 +3353,12 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                         pageNumber++;
                         currentPageContent = part;
                         currentPageText = partText;
+                        
+                        console.log(`🔄 Iniciando nova página ${pageNumber} com nova parte`);
+                        console.log(`📝 Nova parte: "${partText.substring(0, 100)}..."`);
                     } else {
                         // Adicionar parte à página atual
+                        console.log(`➕ Adicionando parte ${i + 1} à página ${pageNumber} (${partText.length} chars)`);
                         currentPageContent += part;
                         currentPageText += ' ' + partText;
                     }
@@ -3349,36 +3366,38 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
                 
                 // Adicionar última página se houver conteúdo
                 if (currentPageContent.length > 0) {
-                    console.log(`📄 Criando página final ${pageNumber} com ${currentPageText.length} caracteres (SUPER FORÇADO)`);
+                    console.log(`📄 === CRIANDO PÁGINA FINAL ${pageNumber} ===`);
+                    console.log(`📏 Conteúdo final: ${currentPageText.length} caracteres`);
+                    console.log(`📝 Texto final: "${currentPageText.substring(0, 200)}..."`);
+                    console.log(`📄 HTML final: "${currentPageContent.substring(0, 300)}..."`);
+                    
                     const page = createIntelligentPage(currentPageContent, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
                     pages.push(page);
                 }
                 
-                // Se ainda temos poucas páginas, forçar divisão por caracteres
-                if (pages.length < 3 && formattedContent.length > 2000) {
-                    console.log('🔪 FORÇANDO DIVISÃO POR CARACTERES - Conteúdo muito denso!');
-                    pages.length = 0; // Limpar páginas
-                    
-                    const textContent = formattedContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-                    const charLimit = 600; // Limite MUITO baixo por página
-                    let currentIndex = 0;
-                    pageNumber = 1;
-                    
-                    while (currentIndex < textContent.length) {
-                        const endIndex = Math.min(currentIndex + charLimit, textContent.length);
-                        const pageText = textContent.substring(currentIndex, endIndex);
+                // REMOVER divisão por caracteres problemática - manter apenas divisão inteligente
+                console.log(`✅ ${pages.length} páginas criadas com algoritmo inteligente - MANTENDO TODAS!`);
+                
+                // Debug: verificar se o conteúdo foi distribuído corretamente
+                console.log('🔍 === VERIFICAÇÃO FINAL DO CONTEÚDO DAS PÁGINAS ===');
+                for (let i = 0; i < pages.length; i++) {
+                    // Extrair apenas o conteúdo principal da página (sem header/footer)
+                    const pageHtml = pages[i];
+                    const contentMatch = pageHtml.match(/<div style="text-align: justify[^>]*">(.*?)<\/div>/s);
+                    if (contentMatch) {
+                        const pageContent = contentMatch[1];
+                        const pageText = pageContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                        console.log(`📄 Página ${i + 1} CONTEÚDO (${pageText.length} chars): "${pageText.substring(0, 200)}..."`);
                         
-                        // Converter texto de volta para HTML básico
-                        const pageHTML = `<p style="margin: 15px 0; text-indent: 40px; text-align: justify;">${pageText}</p>`;
-                        
-                        console.log(`📄 Criando página ${pageNumber} por caracteres: ${pageText.length} chars`);
-                        const page = createIntelligentPage(pageHTML, pageNumber, pageWidth, pageHeight, margin, title, userProfile, pageNumber === 1);
-                        pages.push(page);
-                        
-                        currentIndex = endIndex;
-                        pageNumber++;
+                        if (pageText.length < 50) {
+                            console.log(`⚠️  ATENÇÃO: Página ${i + 1} tem muito pouco conteúdo!`);
+                            console.log(`📄 HTML completo da página ${i + 1}:`, pageContent.substring(0, 500));
+                        }
+                    } else {
+                        console.log(`❌ Página ${i + 1}: Não foi possível extrair conteúdo!`);
                     }
                 }
+                console.log('🔍 === FIM VERIFICAÇÃO FINAL ===');
             } else {
                 console.log('📄 CONTEÚDO PEQUENO - Usando algoritmo padrão...');
                 
