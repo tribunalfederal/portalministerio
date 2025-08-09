@@ -29,7 +29,7 @@
         
         body { 
             font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 50%, #1e3a8a 100%) fixed;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%) fixed;
             min-height: 100vh;
             line-height: 1.6;
         }
@@ -43,17 +43,17 @@
         
         /* Cards Modernos */
         .card {
-            background: var(--card-bg);
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.25) 0%, rgba(59, 130, 246, 0.15) 100%);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(147, 197, 253, 0.3);
             border-radius: 1rem;
             transition: all 0.3s ease;
         }
         
         .card:hover {
-            background: var(--hover-bg);
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.35) 0%, rgba(59, 130, 246, 0.25) 100%);
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
         }
         
         /* Botões */
@@ -71,14 +71,15 @@
         }
         
         .btn-primary {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
         
         .btn-primary:hover {
-            background: #2563eb;
+            background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 50%, #3b82f6 100%);
             transform: translateY(-1px);
-            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
         }
         
         .btn-danger {
@@ -597,7 +598,7 @@
                 
                 <!-- Card Casos -->
                 <div class="card p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-slate-500 to-slate-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
                         <i class="fas fa-folder text-white text-2xl"></i>
                     </div>
                     <h3 class="text-white font-bold text-lg mb-2">Casos</h3>
@@ -609,7 +610,7 @@
                 
                 <!-- Card Agenda -->
                 <div class="card p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
                         <i class="fas fa-calendar text-white text-2xl"></i>
                     </div>
                     <h3 class="text-white font-bold text-lg mb-2">Agenda</h3>
