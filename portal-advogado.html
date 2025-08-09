@@ -4628,32 +4628,6 @@
             `;
         }
 
-        // Função para mostrar seções
-        function showSection(sectionName) {
-            // Esconder todas as seções
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Mostrar seção solicitada
-            const targetSection = document.getElementById(sectionName);
-            if (targetSection) {
-                targetSection.classList.add('active');
-                AppState.currentSection = sectionName;
-                
-                // Carregar dados específicos da seção
-                if (sectionName === 'casos') {
-                    loadProcessesSection();
-                }
-                
-                // Adicionar animação
-                targetSection.classList.add('fade-in');
-                setTimeout(() => {
-                    targetSection.classList.remove('fade-in');
-                }, 500);
-            }
-        }
-
         // Toggle menu mobile
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
@@ -4686,9 +4660,6 @@
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Portal do Advogado iniciando...');
-            
-            // Mostrar dashboard por padrão
-            showSection('dashboard');
             
             // Inicializar sistemas básicos
             try {
@@ -11036,35 +11007,6 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
         // ===== SISTEMA DE NAVEGAÇÃO E FUNCIONALIDADES FALTANTES =====
 
-        // Função para mostrar seções
-        function showSection(sectionName) {
-            console.log(`📱 Navegando para seção: ${sectionName}`);
-            
-            // Ocultar todas as seções
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                section.classList.remove('active');
-                section.style.display = 'none';
-            });
-
-            // Mostrar seção solicitada
-            const targetSection = document.getElementById(sectionName);
-            if (targetSection) {
-                targetSection.classList.add('active');
-                targetSection.style.display = 'block';
-                
-                // Atualizar navegação
-                updateNavigation(sectionName);
-                
-                // Carregar dados específicos da seção
-                loadSectionData(sectionName);
-                
-                showNotification(`📱 Seção ${sectionName} carregada`, 'info');
-            } else {
-                showNotification(`❌ Seção ${sectionName} não encontrada`, 'error');
-            }
-        }
-
         // Função para atualizar navegação ativa
         function updateNavigation(activeSection) {
             const navItems = document.querySelectorAll('[data-section]');
@@ -11431,9 +11373,6 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 // Configurar sincronização automática
                 setupAutoSync();
                 
-                // Mostrar dashboard por padrão
-                showSection('dashboard');
-                
                 showNotification('🚀 Portal inicializado com sucesso!', 'success');
                 
             } catch (error) {
@@ -11525,14 +11464,18 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             
             // Esconder todas as seções
             const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
+            console.log('📋 Total de seções encontradas:', sections.length);
+            
+            sections.forEach((section, index) => {
                 section.classList.remove('active');
+                console.log(`Seção ${index}: ${section.id} - removendo active`);
             });
             
             // Mostrar seção específica
             const targetSection = document.getElementById(sectionName);
             if (targetSection) {
                 targetSection.classList.add('active');
+                console.log(`✅ Seção ${sectionName} ativada`);
                 
                 // Atualizar navegação ativa
                 document.querySelectorAll('.nav-item').forEach(item => {
@@ -11546,6 +11489,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 
                 showNotification(`📋 Seção ${sectionName} carregada`, 'info');
             } else {
+                console.error(`❌ Seção ${sectionName} não encontrada`);
                 showNotification(`❌ Seção ${sectionName} não encontrada`, 'error');
             }
         }
