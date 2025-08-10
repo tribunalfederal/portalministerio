@@ -1468,24 +1468,15 @@
                                     Informações Básicas do Processo
                                 </h4>
                                 
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div class="md:col-span-2">
-                                        <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-hashtag mr-2"></i>Número do Processo *
-                                        </label>
-                                        <input type="text" id="numero-processo-novo" required 
-                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                               placeholder="Ex: 0001234-56.2024.4.01.3800">
-                                        <p class="text-blue-300/70 text-xs mt-1">Número oficial do processo no sistema judiciário</p>
+                                <div class="bg-yellow-900/20 border border-yellow-500/20 rounded-lg p-4 mb-6">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fas fa-info-circle text-yellow-400"></i>
+                                        <span class="text-yellow-300 font-semibold">Geração Automática</span>
                                     </div>
-                                    
-                                    <div>
-                                        <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-calendar mr-2"></i>Data de Distribuição *
-                                        </label>
-                                        <input type="date" id="data-distribuicao-novo" required 
-                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
-                                    </div>
+                                    <p class="text-yellow-200 text-sm">
+                                        O <strong>número do processo</strong> será gerado automaticamente pelo sistema de distribuição. 
+                                        A <strong>data de distribuição</strong> será registrada como a data de abertura do caso.
+                                    </p>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -1523,7 +1514,7 @@
                                     Dados do Cliente
                                 </h4>
                                 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div>
                                         <label class="block text-blue-300 font-semibold mb-2">
                                             <i class="fas fa-user mr-2"></i>Nome Completo do Cliente *
@@ -1535,31 +1526,26 @@
                                     
                                     <div>
                                         <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-id-card mr-2"></i>CPF/CNPJ *
+                                            <i class="fas fa-id-card mr-2"></i>RG *
                                         </label>
-                                        <input type="text" id="documento-cliente-novo" required 
+                                        <input type="text" id="rg-cliente-novo" required 
                                                class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                               placeholder="000.000.000-00 ou 00.000.000/0001-00">
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                                    <div>
-                                        <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-phone mr-2"></i>Telefone de Contato
-                                        </label>
-                                        <input type="tel" id="telefone-cliente-novo" 
-                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                               placeholder="(00) 00000-0000">
+                                               placeholder="Ex: 12.345.678-9"
+                                               pattern="[0-9]{2}\.[0-9]{3}\.[0-9]{3}-[0-9]"
+                                               title="Formato: 12.345.678-9">
+                                        <p class="text-blue-300/70 text-xs mt-1">RG com 2 a 10 números + órgão expedidor</p>
                                     </div>
                                     
                                     <div>
                                         <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-envelope mr-2"></i>E-mail
+                                            <i class="fas fa-phone mr-2"></i>Telefone de Contato *
                                         </label>
-                                        <input type="email" id="email-cliente-novo" 
+                                        <input type="tel" id="telefone-cliente-novo" required 
                                                class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                               placeholder="cliente@email.com">
+                                               placeholder="(66) 12345-6789"
+                                               pattern="\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}"
+                                               title="Formato: (66) 12345-6789">
+                                        <p class="text-blue-300/70 text-xs mt-1">Telefone com DDD (6 a 8 números)</p>
                                     </div>
                                 </div>
                             </div>
@@ -1583,11 +1569,11 @@
                                     
                                     <div>
                                         <label class="block text-red-300 font-semibold mb-2">
-                                            <i class="fas fa-id-card mr-2"></i>CPF/CNPJ da Parte Contrária
+                                            <i class="fas fa-id-card mr-2"></i>RG da Parte Contrária
                                         </label>
-                                        <input type="text" id="documento-contrario-novo" 
+                                        <input type="text" id="rg-contrario-novo" 
                                                class="w-full px-4 py-3 bg-slate-800/50 border border-red-300/30 rounded-lg text-white focus:border-red-400 focus:outline-none"
-                                               placeholder="000.000.000-00 ou 00.000.000/0001-00">
+                                               placeholder="Ex: 12.345.678-9">
                                     </div>
                                 </div>
                             </div>
@@ -1610,7 +1596,7 @@
                                         <p class="text-blue-300/70 text-xs mt-1">Este resumo ajudará na identificação rápida do processo</p>
                                     </div>
 
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
                                             <label class="block text-blue-300 font-semibold mb-2">
                                                 <i class="fas fa-flag mr-2"></i>Prioridade *
@@ -1631,20 +1617,18 @@
                                                    class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
                                                    placeholder="0,00">
                                         </div>
-                                        
-                                        <div>
-                                            <label class="block text-blue-300 font-semibold mb-2">
-                                                <i class="fas fa-user-tie mr-2"></i>Juiz Atual
-                                            </label>
-                                            <select id="juiz-caso-novo" 
-                                                    class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
-                                                <option value="">Ainda não assumido</option>
-                                                <option value="juiz-silva">Dr. João Silva</option>
-                                                <option value="juiz-santos">Dra. Maria Santos</option>
-                                                <option value="juiz-oliveira">Dr. Carlos Oliveira</option>
-                                                <option value="juiz-costa">Dra. Ana Costa</option>
-                                            </select>
+                                    </div>
+
+                                    <!-- Informações sobre Designação do Juiz -->
+                                    <div class="bg-blue-900/20 border border-blue-500/20 rounded-lg p-4 mt-6">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <i class="fas fa-gavel text-blue-400"></i>
+                                            <span class="text-blue-300 font-semibold">Designação de Juiz</span>
                                         </div>
+                                        <p class="text-blue-200 text-sm">
+                                            O <strong>juiz responsável</strong> será designado automaticamente pelo sistema após o envio do processo para a vara correspondente. 
+                                            A designação seguirá a ordem de distribuição da comarca.
+                                        </p>
                                     </div>
 
                                     <div>
@@ -1667,19 +1651,34 @@
                                 
                                 <div class="border-2 border-dashed border-blue-300/30 rounded-lg p-6 bg-slate-800/30 text-center">
                                     <i class="fas fa-cloud-upload-alt text-4xl text-blue-400 mb-4"></i>
-                                    <h5 class="text-white font-semibold mb-2">Anexar Documentos</h5>
-                                    <p class="text-blue-200 text-sm mb-4">PDF, DOC, DOCX, PNG, JPG - Máximo 10MB por arquivo</p>
+                                    <h5 class="text-white font-semibold mb-2">Anexar Múltiplos Documentos</h5>
+                                    <p class="text-blue-200 text-sm mb-4">PDF, DOC, DOCX, PNG, JPG - Máximo 30MB por arquivo | Múltiplos arquivos permitidos</p>
                                     
                                     <input type="file" id="documentos-caso-novo" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" 
                                            class="hidden" multiple onchange="handleDocumentosUpload(event)">
                                     
                                     <button type="button" onclick="document.getElementById('documentos-caso-novo').click()" 
                                             class="btn bg-blue-600 hover:bg-blue-700 text-white mb-4">
-                                        <i class="fas fa-upload mr-2"></i>Selecionar Arquivos
+                                        <i class="fas fa-upload mr-2"></i>Selecionar Múltiplos Arquivos
                                     </button>
+                                    
+                                    <div class="text-blue-300/70 text-xs mb-4">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Você pode selecionar vários arquivos de uma vez ou adicionar mais arquivos posteriormente
+                                    </div>
                                     
                                     <div id="lista-documentos-novo" class="space-y-2 text-left">
                                         <!-- Arquivos serão listados aqui -->
+                                    </div>
+                                    
+                                    <!-- Contador de Arquivos -->
+                                    <div class="mt-4 flex justify-center">
+                                        <div class="bg-blue-900/30 border border-blue-500/30 rounded-lg px-4 py-2">
+                                            <span class="text-blue-300 text-sm">
+                                                <i class="fas fa-file-alt mr-2"></i>
+                                                Arquivos selecionados: <span id="contador-arquivos" class="font-semibold">0</span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2632,56 +2631,84 @@
                     min-height: 1123px;
                     background: white;
                     padding: 60px;
-                    font-family: 'Times New Roman', serif;
+                    font-family: 'Times New Roman', serif !important;
                     font-size: 14px;
                     line-height: 1.6;
                     color: black;
                     box-sizing: border-box;
                 `;
                 
-                // Limpar conteúdo de elementos de UI e inserir HTML
+                // Limpar conteúdo de elementos de UI e inserir HTML - MELHORADO
                 const cleanHTML = htmlContent
+                    .replace(/<div[^>]*class="[^"]*bg-gradient[^"]*"[^>]*>.*?<\/div>/gi, '') // Remove header gradients
                     .replace(/<div[^>]*class="[^"]*text-blue[^"]*"[^>]*>.*?<\/div>/gi, '')
                     .replace(/<button[^>]*>.*?<\/button>/gi, '')
                     .replace(/<i class="fas[^"]*"[^>]*><\/i>/gi, '')
-                    .replace(/style="[^"]*cursor[^"]*"/gi, '')
+                    .replace(/style="[^"]*cursor[^"]*[^"]*"/gi, '')
                     .replace(/onclick="[^"]*"/gi, '')
-                    .replace(/title="[^"]*"/gi, '');
+                    .replace(/title="[^"]*"/gi, '')
+                    .replace(/border-bottom: 1px dashed[^"]*;/gi, '')  // Remove linhas pontilhadas
+                    .replace(/class="[^"]*bg-gradient[^"]*"/gi, '')     // Remove classes de gradiente
+                    .replace(/from-\w+-\d+/gi, '')                     // Remove classes Tailwind
+                    .replace(/to-\w+-\d+/gi, '');                      // Remove classes Tailwind
 
                 tempContainer.innerHTML = cleanHTML;
+                
+                // Aplicar estilos específicos para PDF
+                const allElements = tempContainer.querySelectorAll('*');
+                allElements.forEach(el => {
+                    el.style.fontFamily = "'Times New Roman', serif";
+                    if (el.classList.contains('font-bold') || el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3') {
+                        el.style.fontWeight = 'bold';
+                    }
+                    if (el.classList.contains('text-center')) {
+                        el.style.textAlign = 'center';
+                    }
+                    if (el.classList.contains('text-justify')) {
+                        el.style.textAlign = 'justify';
+                    }
+                });
+
                 document.body.appendChild(tempContainer);
 
-                // Gerar imagem do conteúdo
+                // Gerar imagem do conteúdo - CONFIGURAÇÕES MELHORADAS
                 html2canvas(tempContainer, {
-                    scale: 2,
+                    scale: 3,  // Aumentado para melhor qualidade
                     useCORS: true,
-                    backgroundColor: 'white',
+                    backgroundColor: '#ffffff',
                     width: 794,
                     height: tempContainer.scrollHeight,
-                    logging: false
+                    logging: false,
+                    allowTaint: false,
+                    foreignObjectRendering: true
                 }).then(canvas => {
                     document.body.removeChild(tempContainer);
                     
-                    // Criar PDF
+                    // Criar PDF com configurações melhoradas
                     const { jsPDF } = window.jsPDF;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pdf = new jsPDF({
+                        orientation: 'p',
+                        unit: 'mm',
+                        format: 'a4',
+                        compress: true
+                    });
                     
-                    const imgData = canvas.toDataURL('image/png', 1.0);
-                    const imgWidth = 210;
-                    const pageHeight = 295;
+                    const imgData = canvas.toDataURL('image/jpeg', 0.98); // JPEG com alta qualidade
+                    const imgWidth = 210;  // A4 width in mm
+                    const pageHeight = 297; // A4 height in mm
                     const imgHeight = (canvas.height * imgWidth) / canvas.width;
                     let heightLeft = imgHeight;
                     let position = 0;
 
                     // Adicionar primeira página
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, '', 'FAST');
                     heightLeft -= pageHeight;
 
                     // Adicionar páginas extras se necessário
                     while (heightLeft >= 0) {
                         position = heightLeft - imgHeight;
                         pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, '', 'FAST');
                         heightLeft -= pageHeight;
                     }
                     
@@ -2692,11 +2719,13 @@
                 }).catch(error => {
                     document.body.removeChild(tempContainer);
                     console.error('Erro html2canvas:', error);
+                    showNotification('⚠️ Erro ao gerar PDF. Tentando método alternativo...', 'warning');
                     downloadAsHTML(htmlContent, documentTitle);
                 });
 
             } catch (error) {
                 console.error('Erro na geração do PDF:', error);
+                showNotification('⚠️ Erro ao gerar PDF. Usando método alternativo...', 'warning');
                 downloadAsHTML(htmlContent, documentTitle);
             }
         }
@@ -2837,34 +2866,44 @@
                     return;
             }
 
-            // PASSO 4: Preparar conteúdo para Word
+            // PASSO 4: Preparar conteúdo limpo para Word - MELHORADO
             const cleanContent = documentoCompleto
+                .replace(/<div[^>]*class="[^"]*bg-gradient[^"]*"[^>]*>.*?<\/div>/gi, '') // Remove gradientes
                 .replace(/<div[^>]*class="[^"]*text-blue[^"]*"[^>]*>.*?<\/div>/gi, '')
                 .replace(/<button[^>]*>.*?<\/button>/gi, '')
                 .replace(/<i class="fas[^"]*"[^>]*><\/i>/gi, '')
-                .replace(/style="[^"]*cursor[^"]*"/gi, '')
+                .replace(/style="[^"]*cursor[^"]*[^"]*"/gi, '')
                 .replace(/onclick="[^"]*"/gi, '')
                 .replace(/title="[^"]*"/gi, '')
-                .replace(/<span[^>]*class="editable"[^>]*>/gi, '')
-                .replace(/<\/span>/gi, '')
-                .replace(/<br\s*\/?>/gi, '\n')
-                .replace(/<p[^>]*>/gi, '\n')
-                .replace(/<\/p>/gi, '\n')
-                .replace(/<[^>]*>/gi, '')
-                .replace(/\n\s*\n/gi, '\n\n')
-                .trim();
+                .replace(/border-bottom: 1px dashed[^"]*;/gi, '')  // Remove linhas pontilhadas
+                .replace(/class="[^"]*bg-gradient[^"]*"/gi, '')     // Remove classes de gradiente
+                .replace(/from-\w+-\d+/gi, '')                     // Remove classes Tailwind
+                .replace(/to-\w+-\d+/gi, '')                       // Remove classes Tailwind
+                .replace(/<span[^>]*class="editable"[^>]*>/gi, '<span>')
+                .replace(/class="[^"]*editable[^"]*"/gi, '');
 
-            // Criar conteúdo HTML compatível com Word
+            // Criar documento Word compatível - FORMATO CORRETO
             const wordContent = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                      xmlns:w="urn:schemas-microsoft-com:office:word" 
+                      xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
                     <meta charset="utf-8">
+                    <meta name="progid" content="Word.Document">
+                    <meta name="generator" content="Microsoft Word 15">
+                    <meta name="originator" content="Microsoft Word 15">
                     <title>${documentTitle}</title>
                     <!--[if gte mso 9]>
                     <xml>
+                        <o:DocumentProperties>
+                            <o:Title>${documentTitle}</o:Title>
+                            <o:Author>Portal Jurídico Digital</o:Author>
+                            <o:Company>Tribunal de Justiça</o:Company>
+                            <o:Version>16.00</o:Version>
+                        </o:DocumentProperties>
                         <w:WordDocument>
                             <w:View>Print</w:View>
-                            <w:Zoom>90</w:Zoom>
+                            <w:Zoom>100</w:Zoom>
                             <w:DoNotPromptForConvert/>
                             <w:DoNotShowRevisions/>
                             <w:DoNotPrintRevisions/>
@@ -2872,9 +2911,6 @@
                             <w:DoNotShowComments/>
                             <w:DoNotShowInsertionsAndDeletions/>
                             <w:DoNotShowPropertyChanges/>
-                            <w:DisplayHorizontalDrawingGridEvery>0</w:DisplayHorizontalDrawingGridEvery>
-                            <w:DisplayVerticalDrawingGridEvery>2</w:DisplayVerticalDrawingGridEvery>
-                            <w:UseMarginsForDrawingGridOrigin/>
                             <w:ValidateAgainstSchemas/>
                             <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
                             <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
@@ -2885,59 +2921,121 @@
                                 <w:WrapTextWithPunct/>
                                 <w:UseAsianBreakRules/>
                                 <w:DontGrowAutofit/>
+                                <w:SplitPgBreakAndParaMark/>
+                                <w:DontVertAlignCellWithSp/>
+                                <w:DontBreakConstrainedForcedTables/>
+                                <w:DontVertAlignInTxbx/>
+                                <w:Word11KerningPairs/>
+                                <w:CachedColBalance/>
                             </w:Compatibility>
                         </w:WordDocument>
                     </xml>
                     <![endif]-->
                     <style>
-                        @page { 
-                            size: 8.5in 11in; 
-                            margin: 1in; 
+                        @page Section1 {
+                            size: 8.5in 11in;
+                            margin: 1.0in 1.0in 1.0in 1.0in;
+                            mso-header-margin: .5in;
+                            mso-footer-margin: .5in;
+                            mso-paper-source: 0;
                         }
-                        body { 
-                            font-family: 'Times New Roman', serif; 
-                            font-size: 12pt; 
-                            line-height: 1.5; 
-                            margin: 0; 
+                        div.Section1 { page: Section1; }
+                        body {
+                            font-family: "Times New Roman", serif;
+                            font-size: 12.0pt;
+                            line-height: 1.5;
+                            margin: 0;
                             padding: 0;
+                            mso-line-height-rule: exactly;
                         }
-                        p { 
-                            margin: 0 0 12pt 0; 
+                        p {
+                            margin: 0cm 0cm 6pt 0cm;
                             text-align: justify;
+                            text-justify: inter-word;
+                            mso-pagination: widow-orphan;
+                            font-family: "Times New Roman", serif;
+                            font-size: 12.0pt;
                         }
-                        .center { text-align: center; }
-                        .right { text-align: right; }
-                        .bold { font-weight: bold; }
-                        .underline { text-decoration: underline; }
-                        h1, h2, h3 { 
-                            margin: 12pt 0; 
+                        .MsoNormal {
+                            margin: 0cm 0cm 6pt 0cm;
+                            text-align: justify;
+                            font-family: "Times New Roman", serif;
+                            font-size: 12.0pt;
+                        }
+                        .center { 
+                            text-align: center; 
+                            mso-element: para-border-div;
+                        }
+                        .right { 
+                            text-align: right; 
+                        }
+                        .font-bold, .bold, strong, b { 
                             font-weight: bold; 
+                            mso-bidi-font-weight: bold;
                         }
-                        h1 { font-size: 16pt; }
-                        h2 { font-size: 14pt; }
-                        h3 { font-size: 12pt; }
+                        .underline, u { 
+                            text-decoration: underline; 
+                        }
+                        h1, h2, h3, h4 {
+                            margin: 12pt 0;
+                            font-weight: bold;
+                            font-family: "Times New Roman", serif;
+                            mso-font-kerning: 1.0pt;
+                        }
+                        h1 { 
+                            font-size: 16pt; 
+                            text-align: center;
+                        }
+                        h2 { 
+                            font-size: 14pt; 
+                            text-align: center;
+                        }
+                        h3 { 
+                            font-size: 12pt; 
+                            font-weight: bold;
+                        }
+                        .text-center { text-align: center; }
+                        .text-justify { text-align: justify; }
+                        .space-y-6 > * + * { margin-top: 6pt; }
+                        .my-6 { margin: 6pt 0; }
+                        .mt-8 { margin-top: 8pt; }
+                        .mb-8 { margin-bottom: 8pt; }
+                        .border { border: 1pt solid windowtext; }
+                        .p-4 { padding: 4pt; }
+                        .min-h-32 { min-height: 32pt; }
+                        .min-h-24 { min-height: 24pt; }
+                        .grid { display: table; width: 100%; }
+                        .grid-cols-2 { }
+                        .grid-cols-2 > * { display: table-cell; width: 50%; padding: 2pt; }
                     </style>
                 </head>
                 <body>
-                    ${documentoCompleto}
+                    <div class="Section1">
+                        ${cleanContent}
+                    </div>
                 </body>
                 </html>
             `;
 
-            // Download como arquivo Word
-            const blob = new Blob([wordContent], { 
-                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
-            });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${documentTitle.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.docx`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
+            // PASSO 5: Download como arquivo Word compatível - MELHORADO
+            try {
+                const blob = new Blob(['\ufeff', wordContent], { 
+                    type: 'application/msword'
+                });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${documentTitle.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.doc`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
 
-            showNotification('📝 Documento Word gerado com sucesso!', 'success');
+                showNotification('📝 Documento Word gerado com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao gerar Word:', error);
+                showNotification('❌ Erro ao gerar documento Word', 'error');
+            }
         }
 
         // === TEMPLATES DE DOCUMENTOS ===
@@ -2996,7 +3094,7 @@
             const dadosAdvogado = obterDadosAdvogado();
             
             return `
-                <div class="max-w-4xl mx-auto bg-white text-black p-8 shadow-lg" style="font-family: 'Times New Roman', serif; line-height: 1.6;">
+                <div class="max-w-4xl mx-auto bg-white text-black p-8 shadow-lg">
                     <!-- Cabeçalho do Documento -->
                     <div class="text-center mb-8 border-b-2 border-blue-500 pb-4">
                         <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg mb-4">
@@ -6509,7 +6607,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         let processosData = JSON.parse(localStorage.getItem('processosAdvogado')) || [];
         // Sistema de Anexos Múltiplos
         let selectedFiles = [];
-        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB
         const ALLOWED_TYPES = ['.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg'];
 
         // Mostrar formulário de novo processo
@@ -6549,7 +6647,7 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             files.forEach(file => {
                 // Verificar tamanho
                 if (file.size > MAX_FILE_SIZE) {
-                    showNotification(`Arquivo "${file.name}" muito grande! Máximo 10MB`, 'error');
+                    showNotification(`Arquivo "${file.name}" muito grande! Máximo 30MB`, 'error');
                     return;
                 }
 
@@ -12552,6 +12650,471 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
         // Criar backup a cada hora
         setInterval(createBackup, 60 * 60 * 1000);
+
+        // ===== FUNÇÕES ESPECÍFICAS DO FORMULÁRIO DE CASOS =====
+        
+        // Sistema de upload específico para casos
+        let documentosCaso = [];
+        const MAX_FILE_SIZE_CASO = 30 * 1024 * 1024; // 30MB
+
+        function handleDocumentosUpload(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+
+            files.forEach(file => {
+                // Verificar tamanho
+                if (file.size > MAX_FILE_SIZE_CASO) {
+                    showNotification(`Arquivo "${file.name}" muito grande! Máximo 30MB`, 'error');
+                    return;
+                }
+
+                // Verificar tipo
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                if (!ALLOWED_TYPES.includes(fileExtension)) {
+                    showNotification(`Tipo de arquivo "${file.name}" não permitido!`, 'error');
+                    return;
+                }
+
+                // Verificar duplicatas
+                if (documentosCaso.some(f => f.name === file.name && f.size === file.size)) {
+                    showNotification(`Arquivo "${file.name}" já foi anexado`, 'warning');
+                    return;
+                }
+
+                documentosCaso.push(file);
+            });
+
+            atualizarListaDocumentosCaso();
+            atualizarContadorArquivos();
+            
+            // Limpar input
+            event.target.value = '';
+        }
+
+        function atualizarListaDocumentosCaso() {
+            const container = document.getElementById('lista-documentos-novo');
+            
+            if (documentosCaso.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = documentosCaso.map((file, index) => {
+                return `
+                    <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg border border-blue-400/30">
+                        <div class="flex items-center gap-3">
+                            <i class="${getFileIcon(file.name)} text-blue-400"></i>
+                            <div>
+                                <div class="text-white font-medium">${file.name}</div>
+                                <div class="text-blue-300 text-sm">${formatFileSize(file.size)} • ${getFileTypeLabel(file.name)}</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="removerDocumentoCaso(${index})" 
+                                class="text-red-400 hover:text-red-300 p-1">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removerDocumentoCaso(index) {
+            documentosCaso.splice(index, 1);
+            atualizarListaDocumentosCaso();
+            atualizarContadorArquivos();
+        }
+
+        function atualizarContadorArquivos() {
+            const contador = document.getElementById('contador-arquivos');
+            if (contador) {
+                contador.textContent = documentosCaso.length;
+            }
+        }
+
+        // Validação de RG (2 a 10 números)
+        function validarRG(rg) {
+            // Remove caracteres não numéricos
+            const numeros = rg.replace(/\D/g, '');
+            return numeros.length >= 2 && numeros.length <= 10;
+        }
+
+        // Validação de telefone (formato brasileiro com DDD)
+        function validarTelefone(telefone) {
+            // Remove caracteres não numéricos
+            const numeros = telefone.replace(/\D/g, '');
+            // Aceita 10 ou 11 dígitos (com DDD)
+            return numeros.length === 10 || numeros.length === 11;
+        }
+
+        // Função para salvar novo caso (atualizada)
+        function salvarNovoCaso(event) {
+            if (event) event.preventDefault();
+
+            // Validar campos obrigatórios
+            const tipoProcesso = document.getElementById('tipo-processo-novo').value;
+            const comarca = document.getElementById('comarca-novo').value;
+            const nomeCliente = document.getElementById('nome-cliente-novo').value;
+            const rgCliente = document.getElementById('rg-cliente-novo').value;
+            const telefoneCliente = document.getElementById('telefone-cliente-novo').value;
+            const resumoCaso = document.getElementById('resumo-caso-novo').value;
+            const prioridade = document.getElementById('prioridade-caso-novo').value;
+
+            if (!tipoProcesso || !comarca || !nomeCliente || !rgCliente || !telefoneCliente || !resumoCaso || !prioridade) {
+                showNotification('❌ Preencha todos os campos obrigatórios', 'error');
+                return;
+            }
+
+            // Validar RG
+            if (!validarRG(rgCliente)) {
+                showNotification('❌ RG deve conter entre 2 e 10 números', 'error');
+                return;
+            }
+
+            // Validar telefone
+            if (!validarTelefone(telefoneCliente)) {
+                showNotification('❌ Telefone deve conter 10 ou 11 dígitos incluindo DDD', 'error');
+                return;
+            }
+
+            // Gerar número do processo automaticamente
+            const numeroProcesso = gerarNumeroProcesso();
+            const dataDistribuicao = new Date().toISOString().split('T')[0];
+
+            // Criar objeto do caso
+            const novoCaso = {
+                id: 'caso_' + Date.now(),
+                numeroProcesso: numeroProcesso,
+                dataDistribuicao: dataDistribuicao,
+                tipoProcesso: tipoProcesso,
+                comarca: comarca,
+                cliente: {
+                    nome: nomeCliente,
+                    rg: rgCliente,
+                    telefone: telefoneCliente
+                },
+                resumo: resumoCaso,
+                prioridade: prioridade,
+                valorCausa: document.getElementById('valor-causa-novo').value || '0',
+                observacoes: document.getElementById('observacoes-caso-novo').value || '',
+                documentos: documentosCaso.map(file => ({
+                    nome: file.name,
+                    tamanho: file.size,
+                    tipo: file.type
+                })),
+                status: 'ativo',
+                dataCriacao: new Date().toISOString(),
+                juizDesignado: null, // Será designado automaticamente pelo sistema
+                movimentacoes: [{
+                    data: new Date().toISOString(),
+                    tipo: 'abertura',
+                    descricao: 'Caso criado e processo aberto'
+                }]
+            };
+
+            // Salvar no localStorage
+            let casos = JSON.parse(localStorage.getItem('casos') || '[]');
+            casos.push(novoCaso);
+            localStorage.setItem('casos', JSON.stringify(casos));
+
+            // Feedback e limpeza
+            showNotification(`✅ Caso criado com sucesso! Processo nº ${numeroProcesso}`, 'success');
+            fecharModalNovoCaso();
+            
+            // Atualizar interface se estivermos na seção de casos
+            if (typeof carregarCasos === 'function') {
+                carregarCasos();
+                atualizarEstatisticasCasos();
+            }
+        }
+
+        // Gerar número de processo automaticamente
+        function gerarNumeroProcesso() {
+            const ano = new Date().getFullYear();
+            const sequencial = String(Math.floor(Math.random() * 999999) + 1).padStart(6, '0');
+            const comarca = '3800'; // Código da comarca de Brasilândia
+            const tribunal = '4.01'; // Tribunal Regional Federal 1ª Região
+            
+            return `${sequencial}-56.${ano}.${tribunal}.${comarca}`;
+        }
+
+        // Fechar modal de novo caso
+        function fecharModalNovoCaso() {
+            document.getElementById('modal-novo-caso').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Limpar formulário
+            document.getElementById('form-novo-caso').reset();
+            documentosCaso = [];
+            atualizarListaDocumentosCaso();
+            atualizarContadorArquivos();
+        }
+
+        // Salvar rascunho do caso
+        function salvarRascunhoCaso() {
+            const dados = {
+                tipoProcesso: document.getElementById('tipo-processo-novo').value,
+                comarca: document.getElementById('comarca-novo').value,
+                nomeCliente: document.getElementById('nome-cliente-novo').value,
+                rgCliente: document.getElementById('rg-cliente-novo').value,
+                telefoneCliente: document.getElementById('telefone-cliente-novo').value,
+                resumoCaso: document.getElementById('resumo-caso-novo').value,
+                prioridade: document.getElementById('prioridade-caso-novo').value,
+                valorCausa: document.getElementById('valor-causa-novo').value,
+                observacoes: document.getElementById('observacoes-caso-novo').value
+            };
+
+            localStorage.setItem('rascunho_caso', JSON.stringify(dados));
+            showNotification('💾 Rascunho salvo com sucesso!', 'success');
+        }
+
+        // ===== FUNÇÕES PARA O CALENDÁRIO DA AGENDA =====
+        
+        let dataAtual = new Date();
+        let eventosSelecionados = [];
+
+        function inicializarCalendario() {
+            atualizarCalendario();
+            atualizarMesAno();
+        }
+
+        function atualizarCalendario() {
+            const diasContainer = document.getElementById('dias-calendario');
+            if (!diasContainer) return;
+
+            const primeiroDia = new Date(dataAtual.getFullYear(), dataAtual.getMonth(), 1);
+            const ultimoDia = new Date(dataAtual.getFullYear(), dataAtual.getMonth() + 1, 0);
+            const diasNoMes = ultimoDia.getDate();
+            const diaDaSemana = primeiroDia.getDay();
+
+            let html = '';
+
+            // Dias vazios no início
+            for (let i = 0; i < diaDaSemana; i++) {
+                html += '<div class="p-2"></div>';
+            }
+
+            // Dias do mês
+            for (let dia = 1; dia <= diasNoMes; dia++) {
+                const hoje = new Date();
+                const isHoje = dataAtual.getFullYear() === hoje.getFullYear() && 
+                             dataAtual.getMonth() === hoje.getMonth() && 
+                             dia === hoje.getDate();
+
+                const eventos = obterEventosDoDia(dia);
+                const hasEventos = eventos.length > 0;
+
+                html += `
+                    <div class="p-2 border border-slate-600/30 rounded cursor-pointer hover:bg-slate-700/50 ${isHoje ? 'bg-blue-600/30 border-blue-400' : ''}" 
+                         onclick="selecionarDiaCalendario(${dia})">
+                        <div class="text-white font-semibold text-center">${dia}</div>
+                        ${hasEventos ? `<div class="flex justify-center mt-1"><div class="w-2 h-2 bg-green-400 rounded-full"></div></div>` : ''}
+                    </div>
+                `;
+            }
+
+            diasContainer.innerHTML = html;
+        }
+
+        function atualizarMesAno() {
+            const mesAnoElement = document.getElementById('mes-ano-atual');
+            if (!mesAnoElement) return;
+
+            const meses = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+
+            mesAnoElement.textContent = `${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;
+        }
+
+        function mesAnterior() {
+            dataAtual.setMonth(dataAtual.getMonth() - 1);
+            atualizarCalendario();
+            atualizarMesAno();
+        }
+
+        function proximoMes() {
+            dataAtual.setMonth(dataAtual.getMonth() + 1);
+            atualizarCalendario();
+            atualizarMesAno();
+        }
+
+        function selecionarDiaCalendario(dia) {
+            const eventos = obterEventosDoDia(dia);
+            showNotification(`Dia ${dia}: ${eventos.length} evento(s)`, 'info');
+        }
+
+        function obterEventosDoDia(dia) {
+            // Implementar lógica para buscar eventos do dia
+            return [];
+        }
+
+        // Inicializar calendário quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarCalendario();
+        });
+
+        // ===== FUNÇÕES DOS MODAIS DA AGENDA =====
+        
+        function abrirModalNovoEvento() {
+            document.getElementById('modal-novo-evento').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharModalNovoEvento() {
+            document.getElementById('modal-novo-evento').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('form-novo-evento').reset();
+        }
+
+        function salvarNovoEvento(event) {
+            if (event) event.preventDefault();
+
+            const tipoEvento = document.getElementById('tipo-evento-novo').value;
+            const tituloEvento = document.getElementById('titulo-evento-novo').value;
+            const dataEvento = document.getElementById('data-evento-novo').value;
+            const horarioEvento = document.getElementById('horario-evento-novo').value;
+
+            if (!tipoEvento || !tituloEvento || !dataEvento || !horarioEvento) {
+                showNotification('❌ Preencha todos os campos obrigatórios', 'error');
+                return;
+            }
+
+            const novoEvento = {
+                id: 'evento_' + Date.now(),
+                tipo: tipoEvento,
+                titulo: tituloEvento,
+                data: dataEvento,
+                horario: horarioEvento,
+                duracao: document.getElementById('duracao-evento-novo').value || 60,
+                local: document.getElementById('local-evento-novo').value || '',
+                prioridade: document.getElementById('prioridade-evento-novo').value || 'normal',
+                descricao: document.getElementById('descricao-evento-novo').value || '',
+                casoRelacionado: document.getElementById('caso-relacionado-evento').value || '',
+                lembrete: document.getElementById('lembrete-evento').checked,
+                sincronizar: document.getElementById('sincronizar-evento').checked,
+                notificarCliente: document.getElementById('notificar-cliente').checked,
+                dataCriacao: new Date().toISOString()
+            };
+
+            let eventos = JSON.parse(localStorage.getItem('eventos') || '[]');
+            eventos.push(novoEvento);
+            localStorage.setItem('eventos', JSON.stringify(eventos));
+
+            showNotification('✅ Evento criado com sucesso!', 'success');
+            fecharModalNovoEvento();
+            
+            // Atualizar interface se necessário
+            atualizarCalendario();
+        }
+
+        function fecharModalVisualizarEvento() {
+            document.getElementById('modal-visualizar-evento').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function salvarRascunhoEvento() {
+            const dados = {
+                tipo: document.getElementById('tipo-evento-novo').value,
+                titulo: document.getElementById('titulo-evento-novo').value,
+                data: document.getElementById('data-evento-novo').value,
+                horario: document.getElementById('horario-evento-novo').value,
+                local: document.getElementById('local-evento-novo').value,
+                descricao: document.getElementById('descricao-evento-novo').value
+            };
+
+            localStorage.setItem('rascunho_evento', JSON.stringify(dados));
+            showNotification('💾 Rascunho do evento salvo!', 'success');
+        }
+
+        function atualizarCamposEvento() {
+            const tipo = document.getElementById('tipo-evento-novo').value;
+            const tituloInput = document.getElementById('titulo-evento-novo');
+            
+            // Pré-preenchimento baseado no tipo
+            switch(tipo) {
+                case 'audiencia':
+                    tituloInput.placeholder = 'Ex: Audiência de Instrução - Caso Silva';
+                    break;
+                case 'prazo':
+                    tituloInput.placeholder = 'Ex: Prazo para Contestação - Processo 123456';
+                    break;
+                case 'reuniao':
+                    tituloInput.placeholder = 'Ex: Reunião com Cliente - Discussão de Estratégia';
+                    break;
+                default:
+                    tituloInput.placeholder = 'Ex: Evento personalizado';
+            }
+        }
+
+        function carregarDadosCaso() {
+            const casoSelecionado = document.getElementById('caso-relacionado-evento').value;
+            const infoDiv = document.getElementById('info-caso-selecionado');
+            
+            if (!casoSelecionado) {
+                infoDiv.style.display = 'none';
+                return;
+            }
+
+            // Buscar dados do caso selecionado
+            const casos = JSON.parse(localStorage.getItem('casos') || '[]');
+            const caso = casos.find(c => c.id === casoSelecionado);
+            
+            if (caso) {
+                document.getElementById('caso-cliente').textContent = caso.cliente || 'Não informado';
+                document.getElementById('caso-processo').textContent = caso.numeroProcesso || 'Não informado';
+                document.getElementById('caso-juiz').textContent = caso.juizDesignado || 'Não designado';
+                infoDiv.style.display = 'block';
+            }
+        }
+
+        function sincronizarAgenda() {
+            showNotification('🔄 Sincronizando agenda...', 'info');
+            
+            setTimeout(() => {
+                showNotification('✅ Agenda sincronizada com sucesso!', 'success');
+                atualizarCalendario();
+            }, 2000);
+        }
+
+        function exportarAgenda() {
+            const eventos = JSON.parse(localStorage.getItem('eventos') || '[]');
+            const dataExport = {
+                exportDate: new Date().toISOString(),
+                eventos: eventos
+            };
+            
+            const blob = new Blob([JSON.stringify(dataExport, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `agenda_export_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('📄 Agenda exportada com sucesso!', 'success');
+        }
+
+        function imprimirAgenda() {
+            window.print();
+        }
+
+        // ===== OUTRAS FUNÇÕES AUXILIARES =====
+        
+        function aplicarFiltrosAgenda() {
+            // Implementar filtros da agenda
+            showNotification('🔍 Aplicando filtros...', 'info');
+        }
+
+        function limparFiltrosAgenda() {
+            document.getElementById('busca-eventos').value = '';
+            document.getElementById('filtro-tipo-evento').value = '';
+            document.getElementById('filtro-periodo-agenda').value = 'todos';
+            document.getElementById('filtro-caso-agenda').value = '';
+            showNotification('🧹 Filtros limpos!', 'success');
+        }
+        
+        
         
     </script>
 </body>
