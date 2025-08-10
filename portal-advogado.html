@@ -11490,20 +11490,27 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 console.log(`Seção ${index}: ${section.id} - removendo active e forçando hide`);
             });
             
-            // FORÇAR esconder elementos específicos problemáticos
-            const problematicElements = [
+            // CONTROLAR elementos específicos de casos
+            const casosElements = [
                 'lista-casos',
                 'casos-container', 
                 'sem-casos',
                 'novo-caso-form'
             ];
             
-            problematicElements.forEach(id => {
+            casosElements.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
-                    if (sectionName !== 'casos') {
+                    if (sectionName === 'casos') {
+                        // SE estou na seção casos, MOSTRAR os elementos
+                        element.style.display = '';
+                        element.style.visibility = 'visible';
+                        console.log(`✅ Mostrando elemento de casos: ${id}`);
+                    } else {
+                        // SE NÃO estou na seção casos, ESCONDER os elementos
                         element.style.display = 'none';
-                        console.log(`🚫 Escondendo elemento problemático: ${id}`);
+                        element.style.visibility = 'hidden';
+                        console.log(`🚫 Escondendo elemento de casos: ${id}`);
                     }
                 }
             });
@@ -11515,9 +11522,25 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 targetSection.style.display = 'block'; // FORÇAR show via CSS inline
                 console.log(`✅ Seção ${sectionName} ativada e forçada a aparecer`);
                 
+                // Se for a seção casos, garantir que todos os elementos internos estejam visíveis
+                if (sectionName === 'casos') {
+                    // Forçar visibilidade de todos os elementos dentro da seção casos
+                    const casosSection = document.getElementById('casos');
+                    if (casosSection) {
+                        const allCasosElements = casosSection.querySelectorAll('*');
+                        allCasosElements.forEach(el => {
+                            if (el.style.display === 'none') {
+                                el.style.display = '';
+                            }
+                        });
+                        console.log('🎯 Todos elementos da seção casos foram forçados a aparecer');
+                    }
+                }
+                
                 // Atualizar navegação ativa
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.classList.remove('active');
+                });
                 });
                 
                 const navItem = document.querySelector(`[data-section="${sectionName}"]`);
@@ -12432,6 +12455,17 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             
             // Atualizar dashboard unificado
             updateUnifiedDashboard();
+            
+            // LIMPAR elementos de casos na inicialização
+            const casosElements = ['lista-casos', 'casos-container', 'sem-casos', 'novo-caso-form'];
+            casosElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = 'none';
+                    element.style.visibility = 'hidden';
+                    console.log(`🧹 Limpeza inicial: escondendo ${id}`);
+                }
+            });
             
             // Mostrar dashboard por padrão
             showSection('dashboard');
