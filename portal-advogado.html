@@ -2569,15 +2569,18 @@
                             <p class="mt-4">Termos em que pede deferimento.</p>
                         </div>
 
-                        <!-- Rodapé -->
-                        <div class="mt-12 text-center">
-                            <p class="mb-8">
-                                ${dados.comarca}, ${new Date().toLocaleDateString('pt-BR')}.
+                        <div class="mt-8 text-center">
+                            <p>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Brasilândia</span>, 
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">${new Date().toLocaleDateString('pt-BR')}</span>.
                             </p>
-                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
-                                <p class="font-bold">${dadosAdvogado.nome}</p>
-                                <p>OAB/${dadosAdvogado.oab}</p>
+                            
+                            <div class="mt-8">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>Advogado</p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -9315,25 +9318,23 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             container.innerHTML = processosHtml;
         }
 
-        // Atualizar estatísticas
+        // Atualizar estatísticas (TEMPORARIAMENTE DESABILITADA)
         function updateProcessStats() {
-            const total = processosData.length;
-            const andamento = processosData.filter(p => p.status === 'em-andamento').length;
-            const pendentes = processosData.filter(p => p.status === 'protocolado').length;
-            const finalizados = processosData.filter(p => p.status === 'finalizado').length;
-            
-            // Atualizar estatísticas da seção de processos
-            document.getElementById('total-processos').textContent = total;
-            document.getElementById('processos-andamento').textContent = andamento;
-            document.getElementById('processos-pendentes').textContent = pendentes;
-            document.getElementById('processos-finalizados').textContent = finalizados;
-            
-            // Atualizar estatísticas do dashboard principal
-            const processosDiv = document.getElementById('processos-dashboard');
-            if (processosDiv) processosDiv.textContent = total;
-            
-            const profileDiv = document.getElementById('total-processos-profile');
-            if (profileDiv) profileDiv.textContent = total;
+            // Função desabilitada até reimplementação das seções Casos/Agenda
+            try {
+                const total = processosData.length || 0;
+                
+                // Atualizar apenas elementos que existem
+                const processosDiv = document.getElementById('processos-dashboard');
+                if (processosDiv) processosDiv.textContent = total;
+                
+                const profileDiv = document.getElementById('total-processos-profile');
+                if (profileDiv) profileDiv.textContent = total;
+                
+                console.log('📊 Estatísticas atualizadas: ' + total + ' processos');
+            } catch (error) {
+                console.log('⚠️ Erro nas estatísticas (ignorado):', error.message);
+            }
         }
 
         // Funções auxiliares
@@ -11437,42 +11438,53 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         function carregarCasos() {
             const listaCasos = document.getElementById('lista-casos');
             
-            if (casos.length === 0) {
-                listaCasos.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fas fa-folder-open text-4xl text-blue-400 mb-4"></i>
-                        <p class="text-blue-200">Nenhum caso encontrado. Clique em "Novo Caso" para começar.</p>
-                    </div>
-                `;
+            // Verificar se casos está definido
+            if (!casos || casos.length === 0) {
+                if (listaCasos) {
+                    listaCasos.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-folder-open text-4xl text-blue-400 mb-4"></i>
+                            <p class="text-blue-200">Nenhum caso encontrado. Clique em "Novo Caso" para começar.</p>
+                        </div>
+                    `;
+                }
                 return;
             }
 
-            listaCasos.innerHTML = casos.map(caso => `
-                <div class="case-card bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h4 class="text-white font-semibold text-lg">${caso.numero}</h4>
-                            <p class="text-blue-300">${caso.cliente}</p>
+            if (listaCasos) {
+                listaCasos.innerHTML = casos.map(caso => {
+                    // Verificar se caso é válido e tem as propriedades necessárias
+                    if (!caso) return '';
+                    
+                    const numero = caso.numero || 'Sem número';
+                    const cliente = caso.cliente || 'Sem cliente';
+                    const status = caso.status || 'pendente';
+                    const tipo = caso.tipo || 'geral';
+                    
+                    return `
+                        <div class="case-card bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h4 class="text-white font-semibold text-lg">${numero}</h4>
+                                    <p class="text-blue-300">${cliente}</p>
+                                </div>
+                            </div>
+                            <p class="text-blue-200 text-sm mb-3">${caso.descricao || 'Sem descrição'}</p>
+                            <div class="flex justify-between items-center">
+                                <small class="text-blue-400">Criado: ${caso.dataCriacao ? new Date(caso.dataCriacao).toLocaleDateString() : 'Data não informada'}</small>
+                                <div class="flex gap-2">
+                                    <button onclick="editarCaso('${caso.id || ''}')" class="text-blue-400 hover:text-blue-300" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="excluirCaso('${caso.id || ''}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <span class="px-2 py-1 rounded text-xs ${getStatusColor(caso.status)}">${caso.status.toUpperCase()}</span>
-                            <span class="px-2 py-1 rounded text-xs bg-blue-600/30 text-blue-200">${caso.tipo.toUpperCase()}</span>
-                        </div>
-                    </div>
-                    <p class="text-blue-200 text-sm mb-3">${caso.descricao || 'Sem descrição'}</p>
-                    <div class="flex justify-between items-center">
-                        <small class="text-blue-400">Criado: ${new Date(caso.dataCriacao).toLocaleDateString()}</small>
-                        <div class="flex gap-2">
-                            <button onclick="editarCaso('${caso.id}')" class="text-blue-400 hover:text-blue-300" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="excluirCaso('${caso.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+                    `;
+                }).filter(html => html !== '').join('');
+            }
         }
 
         // Função auxiliar para cores de status
@@ -11488,14 +11500,37 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
         // Filtrar casos
         function filtrarCasos() {
-            const busca = document.getElementById('busca-caso').value.toLowerCase();
-            const statusFiltro = document.getElementById('filtro-status').value;
-            const tipoFiltro = document.getElementById('filtro-tipo').value;
+            const buscaElement = document.getElementById('busca-caso');
+            const statusElement = document.getElementById('filtro-status');
+            const tipoElement = document.getElementById('filtro-tipo');
+            
+            const busca = buscaElement ? buscaElement.value.toLowerCase() : '';
+            const statusFiltro = statusElement ? statusElement.value : '';
+            const tipoFiltro = tipoElement ? tipoElement.value : '';
+
+            if (!casos || casos.length === 0) {
+                const listaCasos = document.getElementById('lista-casos');
+                if (listaCasos) {
+                    listaCasos.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-search text-4xl text-blue-400 mb-4"></i>
+                            <p class="text-blue-200">Nenhum caso encontrado.</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
 
             const casosFiltrados = casos.filter(caso => {
-                const matchBusca = caso.numero.toLowerCase().includes(busca) || 
-                                 caso.cliente.toLowerCase().includes(busca) ||
-                                 caso.descricao.toLowerCase().includes(busca);
+                if (!caso) return false;
+                
+                const numero = caso.numero || '';
+                const cliente = caso.cliente || '';
+                const descricao = caso.descricao || '';
+                
+                const matchBusca = numero.toLowerCase().includes(busca) || 
+                                 cliente.toLowerCase().includes(busca) ||
+                                 descricao.toLowerCase().includes(busca);
                 const matchStatus = !statusFiltro || caso.status === statusFiltro;
                 const matchTipo = !tipoFiltro || caso.tipo === tipoFiltro;
 
@@ -11504,6 +11539,8 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
             // Exibir casos filtrados (implementação similar a carregarCasos)
             const listaCasos = document.getElementById('lista-casos');
+            if (!listaCasos) return;
+            
             if (casosFiltrados.length === 0) {
                 listaCasos.innerHTML = `
                     <div class="text-center py-8">
@@ -11514,45 +11551,75 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 return;
             }
 
-            listaCasos.innerHTML = casosFiltrados.map(caso => `
-                <div class="case-card bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h4 class="text-white font-semibold text-lg">${caso.numero}</h4>
-                            <p class="text-blue-300">${caso.cliente}</p>
+            listaCasos.innerHTML = casosFiltrados.map(caso => {
+                if (!caso) return '';
+                
+                const numero = caso.numero || 'Sem número';
+                const cliente = caso.cliente || 'Sem cliente';
+                const status = caso.status || 'pendente';
+                const tipo = caso.tipo || 'geral';
+                
+                return `
+                    <div class="case-card bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="text-white font-semibold text-lg">${numero}</h4>
+                                <p class="text-blue-300">${cliente}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="px-2 py-1 rounded text-xs ${getStatusColor(status)}">${status.toUpperCase()}</span>
+                                <span class="px-2 py-1 rounded text-xs bg-blue-600/30 text-blue-200">${tipo.toUpperCase()}</span>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <span class="px-2 py-1 rounded text-xs ${getStatusColor(caso.status)}">${caso.status.toUpperCase()}</span>
-                            <span class="px-2 py-1 rounded text-xs bg-blue-600/30 text-blue-200">${caso.tipo.toUpperCase()}</span>
+                        <p class="text-blue-200 text-sm mb-3">${caso.descricao || 'Sem descrição'}</p>
+                        <div class="flex justify-between items-center">
+                            <small class="text-blue-400">Criado: ${caso.dataCriacao ? new Date(caso.dataCriacao).toLocaleDateString() : 'Data não informada'}</small>
+                            <div class="flex gap-2">
+                                <button onclick="editarCaso('${caso.id || ''}')" class="text-blue-400 hover:text-blue-300" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="excluirCaso('${caso.id || ''}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <p class="text-blue-200 text-sm mb-3">${caso.descricao || 'Sem descrição'}</p>
-                    <div class="flex justify-between items-center">
-                        <small class="text-blue-400">Criado: ${new Date(caso.dataCriacao).toLocaleDateString()}</small>
-                        <div class="flex gap-2">
-                            <button onclick="editarCaso('${caso.id}')" class="text-blue-400 hover:text-blue-300" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="excluirCaso('${caso.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).filter(html => html !== '').join('');
         }
 
         // Atualizar estatísticas de casos
         function atualizarEstatisticasCasos() {
-            const totalCasos = casos.length;
-            const casosAtivos = casos.filter(c => c.status === 'ativo').length;
-            const casosPendentes = casos.filter(c => c.status === 'pendente').length;
-            const casosUrgentes = casos.filter(c => c.status === 'ativo' && c.tipo === 'criminal').length;
+            try {
+                if (!casos || casos.length === 0) {
+                    // Zerar estatísticas se não há casos
+                    const elementos = ['total-casos', 'casos-ativos', 'casos-pendentes', 'casos-urgentes'];
+                    elementos.forEach(id => {
+                        const elemento = document.getElementById(id);
+                        if (elemento) elemento.textContent = '0';
+                    });
+                    return;
+                }
 
-            document.getElementById('total-casos').textContent = totalCasos;
-            document.getElementById('casos-ativos').textContent = casosAtivos;
-            document.getElementById('casos-pendentes').textContent = casosPendentes;
-            document.getElementById('casos-urgentes').textContent = casosUrgentes;
+                const totalCasos = casos.length;
+                const casosAtivos = casos.filter(c => c && c.status === 'ativo').length;
+                const casosPendentes = casos.filter(c => c && c.status === 'pendente').length;
+                const casosUrgentes = casos.filter(c => c && c.status === 'ativo' && c.tipo === 'criminal').length;
+
+                const totalElement = document.getElementById('total-casos');
+                const ativosElement = document.getElementById('casos-ativos');
+                const pendentesElement = document.getElementById('casos-pendentes');
+                const urgentesElement = document.getElementById('casos-urgentes');
+
+                if (totalElement) totalElement.textContent = totalCasos;
+                if (ativosElement) ativosElement.textContent = casosAtivos;
+                if (pendentesElement) pendentesElement.textContent = casosPendentes;
+                if (urgentesElement) urgentesElement.textContent = casosUrgentes;
+                
+                console.log('Estatísticas atualizadas:', { totalCasos, casosAtivos, casosPendentes, casosUrgentes });
+            } catch (error) {
+                console.error('Erro ao atualizar estatísticas de casos:', error);
+            }
         }
 
         // Editar caso
