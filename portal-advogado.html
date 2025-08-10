@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Biblioteca para gerar documentos Word -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.0.0/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/file-saver/2.0.5/FileSaver.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -824,11 +827,14 @@
                             <button onclick="closeDocumentGenerator()" class="btn btn-secondary mr-3">
                                 <i class="fas fa-times mr-2"></i>Cancelar
                             </button>
-                            <button onclick="downloadDocumentPDF()" class="btn btn-primary mr-3">
-                                <i class="fas fa-file-pdf mr-2"></i>Baixar PDF
+                            <button onclick="downloadDocumentPDF()" class="btn btn-danger mr-2">
+                                <i class="fas fa-file-pdf mr-2"></i>PDF
+                            </button>
+                            <button onclick="downloadDocumentWord()" class="btn btn-primary mr-2">
+                                <i class="fas fa-file-word mr-2"></i>Word
                             </button>
                             <button onclick="capturarFotoDocumento()" class="btn btn-success">
-                                <i class="fas fa-camera mr-2"></i>Gerar Foto HD
+                                <i class="fas fa-camera mr-2"></i>Foto HD
                             </button>
                         </div>
                     </div>
@@ -841,10 +847,13 @@
                             <h3 class="text-xl font-bold text-white" id="titulo-documento">Documento</h3>
                             <div class="space-x-2">
                                 <button onclick="downloadDocumentPDF()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-all">
-                                    📄 Baixar PDF
+                                    📄 PDF
+                                </button>
+                                <button onclick="downloadDocumentWord()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all">
+                                    📝 Word
                                 </button>
                                 <button onclick="capturarFotoDocumento()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg transition-all">
-                                    📸 Gerar Foto HD
+                                    📸 Foto HD
                                 </button>
                                 <button onclick="imprimirDocumento()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition-all">
                                     🖨️ Imprimir
@@ -2326,7 +2335,7 @@
 
         // Função universal de PDF que sempre funciona
         function downloadDocumentPDF() {
-            console.log('🔥 Iniciando geração de PDF...');
+            console.log('🔥 Iniciando geração de PDF REAL...');
             
             // Buscar conteúdo do preview ou documento
             let conteudo = document.getElementById('document-preview');
@@ -2339,76 +2348,262 @@
                 return;
             }
 
-            // Verificar bibliotecas necessárias
-            if (typeof html2canvas === 'undefined' || typeof window.jsPDF === 'undefined') {
-                showNotification('❌ Bibliotecas necessárias não encontradas. Usando método alternativo...', 'warning');
-                downloadDocumentFallback();
-                return;
-            }
-
-            showNotification('📄 Gerando PDF profissional...', 'info');
+            showNotification('📄 Gerando PDF real...', 'info');
 
             try {
-                // Criar container temporário com estilos profissionais
+                // Verificar se as bibliotecas estão carregadas
+                if (typeof html2canvas === 'undefined') {
+                    throw new Error('html2canvas não disponível');
+                }
+                
+                if (typeof window.jspdf === 'undefined' && typeof window.jsPDF === 'undefined') {
+                    throw new Error('jsPDF não disponível');
+                }
+
+                // Criar container temporário com estilos de impressão
                 const tempContainer = document.createElement('div');
                 tempContainer.style.cssText = `
                     position: fixed;
                     left: -9999px;
                     top: 0;
-                    width: 210mm;
-                    min-height: 297mm;
+                    width: 794px;
+                    min-height: 1123px;
                     background: white;
-                    padding: 20mm;
+                    padding: 40px;
                     font-family: 'Times New Roman', serif;
-                    font-size: 12pt;
-                    line-height: 1.6;
+                    font-size: 14px;
+                    line-height: 1.5;
                     color: black;
                     box-sizing: border-box;
-                    transform: scale(1);
                 `;
                 
-                // Limpar e formatar conteúdo
+                // Limpar conteúdo para formato profissional
                 const cleanContent = conteudo.innerHTML
-                    .replace(/<div[^>]*class="text-blue-200[^"]*"[^>]*>.*?<\/div>/gi, '')
-                    .replace(/class="[^"]*"/gi, '')
-                    .replace(/style="[^"]*"/gi, '')
                     .replace(/<button[^>]*>.*?<\/button>/gi, '')
-                    .replace(/<i[^>]*>.*?<\/i>/gi, '');
+                    .replace(/<i[^>]*class="fas[^"]*"[^>]*><\/i>/gi, '')
+                    .replace(/class="[^"]*"/gi, '')
+                    .replace(/style="[^"]*color[^"]*"/gi, 'style="color: black"')
+                    .replace(/style="[^"]*background[^"]*"/gi, '')
+                    .replace(/<div[^>]*class="text-blue[^"]*"[^>]*>/gi, '<div>')
+                    .replace(/<div[^>]*class="text-green[^"]*"[^>]*>/gi, '<div>')
+                    .replace(/<div[^>]*class="text-yellow[^"]*"[^>]*>/gi, '<div>');
                 
                 tempContainer.innerHTML = cleanContent;
                 document.body.appendChild(tempContainer);
 
-                // Gerar imagem do conteúdo
+                // Capturar com alta qualidade
                 html2canvas(tempContainer, {
                     scale: 2,
                     useCORS: true,
+                    allowTaint: true,
                     backgroundColor: 'white',
                     width: 794,
-                    height: 1123
+                    height: 1123,
+                    scrollX: 0,
+                    scrollY: 0
                 }).then(canvas => {
                     document.body.removeChild(tempContainer);
                     
-                    // Criar PDF
-                    const { jsPDF } = window.jsPDF;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    // Criar PDF usando jsPDF
+                    const PDF = window.jspdf?.jsPDF || window.jsPDF?.jsPDF || window.jsPDF;
+                    if (!PDF) {
+                        throw new Error('jsPDF não encontrado');
+                    }
                     
-                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new PDF('p', 'mm', 'a4');
+                    const imgData = canvas.toDataURL('image/png', 1.0);
+                    
+                    // Adicionar imagem ao PDF com tamanho A4 padrão
                     pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
                     
-                    const fileName = `Documento_${new Date().toISOString().split('T')[0]}.pdf`;
+                    // Gerar nome do arquivo
+                    const fileName = `Documento_Juridico_${new Date().toISOString().split('T')[0]}.pdf`;
+                    
+                    // Fazer download
                     pdf.save(fileName);
                     
-                    showNotification('✅ PDF gerado com sucesso!', 'success');
+                    showNotification('✅ PDF gerado e baixado com sucesso!', 'success');
+                    console.log('✅ PDF gerado:', fileName);
+                    
                 }).catch(error => {
-                    document.body.removeChild(tempContainer);
+                    if (tempContainer.parentNode) {
+                        document.body.removeChild(tempContainer);
+                    }
                     console.error('Erro html2canvas:', error);
+                    showNotification('❌ Erro ao gerar PDF. Tentando método alternativo...', 'warning');
                     downloadDocumentFallback();
                 });
 
             } catch (error) {
                 console.error('Erro na geração do PDF:', error);
+                showNotification('❌ Erro ao gerar PDF. Usando método alternativo...', 'warning');
                 downloadDocumentFallback();
             }
+        }
+
+        // Nova função para gerar documentos Word (.docx)
+        function downloadDocumentWord() {
+            console.log('📝 Iniciando geração de documento Word...');
+            
+            // Buscar conteúdo do preview ou documento
+            let conteudo = document.getElementById('document-preview');
+            if (!conteudo || !conteudo.innerHTML.trim()) {
+                conteudo = document.getElementById('conteudo-documento');
+            }
+            
+            if (!conteudo || !conteudo.innerHTML.trim()) {
+                showNotification('❌ Nenhum documento encontrado para gerar Word', 'error');
+                return;
+            }
+
+            showNotification('📝 Gerando documento Word...', 'info');
+
+            try {
+                // Verificar se as bibliotecas estão disponíveis
+                if (typeof docx === 'undefined' || typeof saveAs === 'undefined') {
+                    showNotification('❌ Bibliotecas Word não disponíveis. Gerando HTML alternativo...', 'warning');
+                    downloadDocumentWordFallback();
+                    return;
+                }
+
+                // Extrair texto limpo do HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = conteudo.innerHTML
+                    .replace(/<button[^>]*>.*?<\/button>/gi, '')
+                    .replace(/<i[^>]*class="fas[^"]*"[^>]*><\/i>/gi, '')
+                    .replace(/<br>/gi, '\n')
+                    .replace(/<\/p>/gi, '\n')
+                    .replace(/<\/div>/gi, '\n')
+                    .replace(/<[^>]*>/gi, '');
+
+                const textoLimpo = tempDiv.textContent || tempDiv.innerText || '';
+                
+                // Dividir em parágrafos
+                const paragrafos = textoLimpo.split('\n').filter(p => p.trim().length > 0);
+
+                // Criar documento Word usando docx
+                const { Document, Packer, Paragraph, TextRun } = docx;
+                
+                const children = paragrafos.map(texto => 
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: texto.trim(),
+                                font: "Times New Roman",
+                                size: 24 // 12pt = 24 half-points
+                            })
+                        ],
+                        spacing: {
+                            after: 200 // Espaço após parágrafo
+                        }
+                    })
+                );
+
+                const doc = new Document({
+                    sections: [{
+                        properties: {},
+                        children: children
+                    }]
+                });
+
+                // Gerar e baixar arquivo
+                Packer.toBlob(doc).then(blob => {
+                    const fileName = `Documento_Juridico_${new Date().toISOString().split('T')[0]}.docx`;
+                    saveAs(blob, fileName);
+                    showNotification('✅ Documento Word gerado e baixado com sucesso!', 'success');
+                    console.log('✅ Word gerado:', fileName);
+                }).catch(error => {
+                    console.error('Erro ao gerar Word:', error);
+                    showNotification('❌ Erro ao gerar Word. Usando método alternativo...', 'warning');
+                    downloadDocumentWordFallback();
+                });
+
+            } catch (error) {
+                console.error('Erro na geração do Word:', error);
+                downloadDocumentWordFallback();
+            }
+        }
+
+        // Método alternativo para gerar arquivo compatível com Word
+        function downloadDocumentWordFallback() {
+            console.log('📝 Usando método alternativo para Word...');
+            
+            let conteudo = document.getElementById('document-preview');
+            if (!conteudo || !conteudo.innerHTML.trim()) {
+                conteudo = document.getElementById('conteudo-documento');
+            }
+            
+            if (!conteudo) {
+                showNotification('❌ Nenhum conteúdo encontrado', 'error');
+                return;
+            }
+
+            // Criar HTML compatível com Word
+            const wordHTML = `
+                <!DOCTYPE html>
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                      xmlns:w="urn:schemas-microsoft-com:office:word" 
+                      xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="ProgId" content="Word.Document">
+                    <meta name="Generator" content="Microsoft Word 15">
+                    <meta name="Originator" content="Microsoft Word 15">
+                    <title>Documento Jurídico</title>
+                    <style>
+                        @page {
+                            size: 8.5in 11in;
+                            margin: 1in;
+                        }
+                        body { 
+                            font-family: 'Times New Roman', serif; 
+                            font-size: 12pt; 
+                            line-height: 1.5; 
+                            color: black; 
+                            background: white;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        h1, h2, h3 { 
+                            color: black; 
+                            margin: 12pt 0 6pt 0; 
+                            font-weight: bold;
+                        }
+                        p { 
+                            margin: 6pt 0; 
+                            text-align: justify;
+                        }
+                        .center { text-align: center; }
+                        .bold { font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    ${conteudo.innerHTML
+                        .replace(/<button[^>]*>.*?<\/button>/gi, '')
+                        .replace(/<i[^>]*class="fas[^"]*"[^>]*><\/i>/gi, '')
+                        .replace(/class="[^"]*text-blue[^"]*"/gi, 'class="bold"')
+                        .replace(/class="[^"]*text-green[^"]*"/gi, 'class="bold"')
+                        .replace(/class="[^"]*text-yellow[^"]*"/gi, 'class="bold"')
+                        .replace(/class="[^"]*text-center[^"]*"/gi, 'class="center"')
+                    }
+                </body>
+                </html>
+            `;
+
+            // Download como arquivo .doc (compatível com Word)
+            const blob = new Blob(['\ufeff', wordHTML], { 
+                type: 'application/msword' 
+            });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Documento_Juridico_${new Date().toISOString().split('T')[0]}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showNotification('📝 Documento Word baixado! (Abra no Microsoft Word ou LibreOffice)', 'success');
         }
 
         // Método alternativo para download
