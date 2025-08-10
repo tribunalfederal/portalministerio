@@ -1147,491 +1147,603 @@
         <!-- Casos Section -->
         <section id="casos" class="section">
             <div class="space-y-6">
-                <!-- Header da Seção -->
-                <div class="card p-6 bg-gradient-to-r from-slate-900/40 to-blue-900/40">
-                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                        <div>
-                            <h2 class="text-white text-3xl font-bold mb-2 flex items-center gap-3">
-                                <i class="fas fa-folder-open text-purple-400"></i>
-                                Gestão de Casos Jurídicos
-                            </h2>
-                            <p class="text-blue-200">Gerencie todos os seus processos e casos ativos</p>
+                <!-- Header Principal com Status Global -->
+                <div class="card p-6 bg-gradient-to-r from-slate-900/50 to-blue-900/50 border border-blue-500/20">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="p-3 bg-blue-600/20 rounded-lg border border-blue-500/30">
+                                    <i class="fas fa-briefcase text-blue-400 text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-white text-3xl font-bold">Gestão de Casos Jurídicos</h2>
+                                    <p class="text-blue-200 text-lg">Centro de controle dos processos e andamentos</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Status Rápido do Advogado -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                                <div class="bg-green-600/10 border border-green-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-green-400 text-2xl font-bold" id="total-casos-advogado">0</div>
+                                    <div class="text-green-300 text-xs">Total de Casos</div>
+                                </div>
+                                <div class="bg-yellow-600/10 border border-yellow-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-yellow-400 text-2xl font-bold" id="casos-ativos-advogado">0</div>
+                                    <div class="text-yellow-300 text-xs">Em Andamento</div>
+                                </div>
+                                <div class="bg-blue-600/10 border border-blue-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-blue-400 text-2xl font-bold" id="casos-assumidos">0</div>
+                                    <div class="text-blue-300 text-xs">Assumidos por Juízes</div>
+                                </div>
+                                <div class="bg-red-600/10 border border-red-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-red-400 text-2xl font-bold" id="casos-pendentes">0</div>
+                                    <div class="text-red-300 text-xs">Aguardando Juiz</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex gap-3">
-                            <button onclick="abrirModalNovoCaso()" class="btn bg-green-600 hover:bg-green-700 text-white">
-                                <i class="fas fa-plus mr-2"></i>Novo Caso
+                        
+                        <!-- Ações Principais -->
+                        <div class="flex flex-col gap-3">
+                            <button onclick="abrirModalNovoCaso()" class="btn bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg font-semibold rounded-lg shadow-lg">
+                                <i class="fas fa-plus-circle mr-2"></i>Novo Caso
                             </button>
-                            <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                            <button onclick="atualizarStatusCasos()" class="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
+                                <i class="fas fa-sync-alt mr-2"></i>Atualizar Status
+                            </button>
+                            <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white px-6 py-3">
                                 <i class="fas fa-arrow-left mr-2"></i>Dashboard
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Estatísticas Rápidas -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-green-400 mb-1" id="total-casos">0</div>
-                        <div class="text-blue-200 text-sm">Total de Casos</div>
+                <!-- Dashboard de Status dos Casos -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Painel Casos Assumidos -->
+                    <div class="card p-6 bg-gradient-to-br from-green-900/20 to-green-800/10 border border-green-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-green-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-check-circle text-green-400"></i>
+                                Casos Assumidos
+                            </h3>
+                            <span class="bg-green-600/20 text-green-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-assumidos">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-64 overflow-y-auto" id="lista-casos-assumidos">
+                            <div class="text-center py-8 text-green-400/60">
+                                <i class="fas fa-clipboard-check text-3xl mb-2"></i>
+                                <p class="text-sm">Nenhum caso assumido ainda</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodosCasos('assumidos')" class="mt-4 w-full btn bg-green-600/20 hover:bg-green-600/30 text-green-300 border border-green-500/30">
+                            Ver Todos os Assumidos
+                        </button>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-yellow-400 mb-1" id="casos-ativos">0</div>
-                        <div class="text-blue-200 text-sm">Casos Ativos</div>
+
+                    <!-- Painel Casos Pendentes -->
+                    <div class="card p-6 bg-gradient-to-br from-yellow-900/20 to-yellow-800/10 border border-yellow-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-yellow-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-clock text-yellow-400"></i>
+                                Aguardando Juiz
+                            </h3>
+                            <span class="bg-yellow-600/20 text-yellow-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-pendentes">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-64 overflow-y-auto" id="lista-casos-pendentes">
+                            <div class="text-center py-8 text-yellow-400/60">
+                                <i class="fas fa-hourglass-half text-3xl mb-2"></i>
+                                <p class="text-sm">Nenhum caso pendente</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodosCasos('pendentes')" class="mt-4 w-full btn bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-300 border border-yellow-500/30">
+                            Ver Todos os Pendentes
+                        </button>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-blue-400 mb-1" id="casos-pendentes">0</div>
-                        <div class="text-blue-200 text-sm">Pendentes</div>
-                    </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-red-400 mb-1" id="casos-urgentes">0</div>
-                        <div class="text-blue-200 text-sm">Urgentes</div>
+
+                    <!-- Painel Casos Urgentes -->
+                    <div class="card p-6 bg-gradient-to-br from-red-900/20 to-red-800/10 border border-red-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-red-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-exclamation-triangle text-red-400"></i>
+                                Casos Urgentes
+                            </h3>
+                            <span class="bg-red-600/20 text-red-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-urgentes">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-64 overflow-y-auto" id="lista-casos-urgentes">
+                            <div class="text-center py-8 text-red-400/60">
+                                <i class="fas fa-bell-slash text-3xl mb-2"></i>
+                                <p class="text-sm">Nenhum caso urgente</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodosCasos('urgentes')" class="mt-4 w-full btn bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/30">
+                            Ver Todos os Urgentes
+                        </button>
                     </div>
                 </div>
 
-                <!-- Filtros e Busca -->
+                <!-- Painel de Filtros e Busca Avançada -->
                 <div class="card p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label class="block text-blue-200 text-sm font-medium mb-2">Buscar Caso:</label>
-                            <input type="text" id="busca-caso" placeholder="Nome, número ou cliente..." 
-                                   onkeyup="filtrarCasos()" 
-                                   class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white placeholder-blue-300/50">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                            <i class="fas fa-search text-blue-400"></i>
+                            Busca e Filtros Avançados
+                        </h3>
+                        <button onclick="limparFiltros()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                            <i class="fas fa-eraser mr-2"></i>Limpar Filtros
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Busca por Texto -->
+                        <div class="md:col-span-2">
+                            <label class="block text-blue-300 font-semibold mb-2">
+                                <i class="fas fa-search mr-2"></i>Buscar por:
+                            </label>
+                            <input type="text" id="busca-geral" placeholder="Número do processo, cliente, juiz..." 
+                                   onkeyup="aplicarFiltros()" 
+                                   class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white placeholder-blue-300/50 focus:border-blue-400 focus:outline-none">
                         </div>
+
+                        <!-- Filtro por Status -->
                         <div>
-                            <label class="block text-blue-200 text-sm font-medium mb-2">Status:</label>
-                            <select id="filtro-status" onchange="filtrarCasos()" 
-                                    class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                            <label class="block text-blue-300 font-semibold mb-2">
+                                <i class="fas fa-list-alt mr-2"></i>Status:
+                            </label>
+                            <select id="filtro-status" onchange="aplicarFiltros()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
                                 <option value="">Todos os Status</option>
-                                <option value="ativo">Ativo</option>
-                                <option value="pendente">Pendente</option>
+                                <option value="assumido">Assumido por Juiz</option>
+                                <option value="pendente">Aguardando Juiz</option>
+                                <option value="urgente">Urgente</option>
                                 <option value="concluido">Concluído</option>
                                 <option value="arquivado">Arquivado</option>
                             </select>
                         </div>
+
+                        <!-- Filtro por Tipo -->
                         <div>
-                            <label class="block text-blue-200 text-sm font-medium mb-2">Tipo:</label>
-                            <select id="filtro-tipo" onchange="filtrarCasos()" 
-                                    class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                            <label class="block text-blue-300 font-semibold mb-2">
+                                <i class="fas fa-gavel mr-2"></i>Tipo:
+                            </label>
+                            <select id="filtro-tipo" onchange="aplicarFiltros()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
                                 <option value="">Todos os Tipos</option>
                                 <option value="civil">Civil</option>
                                 <option value="criminal">Criminal</option>
                                 <option value="trabalhista">Trabalhista</option>
                                 <option value="familia">Família</option>
+                                <option value="tributario">Tributário</option>
+                                <option value="previdenciario">Previdenciário</option>
                             </select>
                         </div>
+                    </div>
+
+                    <!-- Filtros Adicionais -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div>
-                            <label class="block text-blue-200 text-sm font-medium mb-2">Ações:</label>
-                            <button onclick="exportarCasos()" class="w-full btn bg-blue-600 hover:bg-blue-700 text-white">
-                                <i class="fas fa-download mr-2"></i>Exportar
+                            <label class="block text-blue-300 font-semibold mb-2">
+                                <i class="fas fa-user-tie mr-2"></i>Juiz Responsável:
+                            </label>
+                            <select id="filtro-juiz" onchange="aplicarFiltros()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
+                                <option value="">Todos os Juízes</option>
+                                <option value="nao-assumido">Não Assumido</option>
+                                <option value="juiz-silva">Dr. Silva</option>
+                                <option value="juiz-santos">Dra. Santos</option>
+                                <option value="juiz-oliveira">Dr. Oliveira</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-blue-300 font-semibold mb-2">
+                                <i class="fas fa-calendar mr-2"></i>Período:
+                            </label>
+                            <select id="filtro-periodo" onchange="aplicarFiltros()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
+                                <option value="">Todos os Períodos</option>
+                                <option value="hoje">Hoje</option>
+                                <option value="semana">Esta Semana</option>
+                                <option value="mes">Este Mês</option>
+                                <option value="trimestre">Último Trimestre</option>
+                                <option value="ano">Este Ano</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-blue-300 font-semibold mb-2">
+                                <i class="fas fa-sort mr-2"></i>Ordenar por:
+                            </label>
+                            <select id="filtro-ordenacao" onchange="aplicarFiltros()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
+                                <option value="data-desc">Data (Mais Recente)</option>
+                                <option value="data-asc">Data (Mais Antigo)</option>
+                                <option value="cliente">Cliente (A-Z)</option>
+                                <option value="numero">Número do Processo</option>
+                                <option value="status">Status</option>
+                                <option value="urgencia">Urgência</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista Completa de Casos -->
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                            <i class="fas fa-folder-open text-blue-400"></i>
+                            Todos os Casos
+                            <span class="bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm font-semibold ml-2" id="total-casos-exibidos">0</span>
+                        </h3>
+                        
+                        <div class="flex gap-3">
+                            <button onclick="exportarCasos()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                <i class="fas fa-file-excel mr-2"></i>Exportar Excel
+                            </button>
+                            <button onclick="imprimirRelatorio()" class="btn bg-blue-600 hover:bg-blue-700 text-white">
+                                <i class="fas fa-print mr-2"></i>Imprimir Relatório
                             </button>
                         </div>
                     </div>
-                </div>
 
-                <!-- Lista de Casos -->
-                <div class="card p-6">
-                    <h3 class="text-white font-bold text-lg mb-4">Meus Casos</h3>
-                    <div id="lista-casos" class="space-y-4">
-                        <!-- Casos serão inseridos aqui dinamicamente -->
-                        <div class="text-center py-8">
-                            <i class="fas fa-folder-open text-4xl text-blue-400 mb-4"></i>
-                            <p class="text-blue-200">Nenhum caso encontrado. Clique em "Novo Caso" para começar.</p>
+                    <!-- Tabela de Casos -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-white">
+                            <thead>
+                                <tr class="border-b border-blue-300/20">
+                                    <th class="text-left py-3 px-4 text-blue-300 font-semibold">
+                                        <i class="fas fa-hashtag mr-2"></i>Processo
+                                    </th>
+                                    <th class="text-left py-3 px-4 text-blue-300 font-semibold">
+                                        <i class="fas fa-user mr-2"></i>Cliente
+                                    </th>
+                                    <th class="text-left py-3 px-4 text-blue-300 font-semibold">
+                                        <i class="fas fa-gavel mr-2"></i>Tipo
+                                    </th>
+                                    <th class="text-left py-3 px-4 text-blue-300 font-semibold">
+                                        <i class="fas fa-info-circle mr-2"></i>Status
+                                    </th>
+                                    <th class="text-left py-3 px-4 text-blue-300 font-semibold">
+                                        <i class="fas fa-user-tie mr-2"></i>Juiz
+                                    </th>
+                                    <th class="text-left py-3 px-4 text-blue-300 font-semibold">
+                                        <i class="fas fa-calendar mr-2"></i>Data
+                                    </th>
+                                    <th class="text-center py-3 px-4 text-blue-300 font-semibold">
+                                        <i class="fas fa-cogs mr-2"></i>Ações
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-casos-corpo">
+                                <!-- Casos serão inseridos aqui dinamicamente -->
+                                <tr>
+                                    <td colspan="7" class="text-center py-12">
+                                        <div class="flex flex-col items-center gap-4">
+                                            <i class="fas fa-folder-open text-6xl text-blue-400/30"></i>
+                                            <div>
+                                                <h4 class="text-gray-400 text-xl mb-2">Nenhum caso encontrado</h4>
+                                                <p class="text-gray-500 mb-6">Clique em "Novo Caso" para criar seu primeiro processo</p>
+                                                <button onclick="abrirModalNovoCaso()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                                    <i class="fas fa-plus mr-2"></i>Criar Primeiro Caso
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginação -->
+                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-blue-300/20">
+                        <div class="text-blue-300 text-sm">
+                            Mostrando <span id="casos-inicio">0</span> a <span id="casos-fim">0</span> de <span id="casos-total">0</span> casos
+                        </div>
+                        <div class="flex gap-2" id="paginacao-casos">
+                            <!-- Botões de paginação serão inseridos aqui -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modal Novo Caso -->
+            <!-- Modal Novo Caso - Design Profissional -->
             <div id="modal-novo-caso" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="text-white text-xl font-bold">Novo Caso</h3>
-                        <button onclick="fecharModalNovoCaso()" class="text-gray-400 hover:text-white">
+                <div class="modal-content max-w-6xl">
+                    <div class="modal-header bg-gradient-to-r from-green-600 to-green-700">
+                        <h3 class="text-white text-2xl font-bold flex items-center gap-3">
+                            <div class="p-2 bg-white/20 rounded-lg">
+                                <i class="fas fa-plus-circle text-2xl"></i>
+                            </div>
+                            Novo Caso Jurídico
+                        </h3>
+                        <button onclick="fecharModalNovoCaso()" class="text-white/80 hover:text-white text-2xl">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
+                    
                     <div class="modal-body">
                         <form id="form-novo-caso" onsubmit="salvarNovoCaso(event)">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Número do Processo:</label>
-                                    <input type="text" id="numero-processo" required 
-                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Nome do Cliente:</label>
-                                    <input type="text" id="nome-cliente" required 
-                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Tipo do Caso:</label>
-                                    <select id="tipo-caso" required 
-                                            class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                        <option value="">Selecione...</option>
-                                        <option value="civil">Civil</option>
-                                        <option value="criminal">Criminal</option>
-                                        <option value="trabalhista">Trabalhista</option>
-                                        <option value="familia">Família</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Status:</label>
-                                    <select id="status-caso" required 
-                                            class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                        <option value="ativo">Ativo</option>
-                                        <option value="pendente">Pendente</option>
-                                        <option value="concluido">Concluído</option>
-                                    </select>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Descrição:</label>
-                                    <textarea id="descricao-caso" rows="3" 
-                                              class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white"></textarea>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button onclick="fecharModalNovoCaso()" class="btn btn-secondary mr-3">Cancelar</button>
-                        <button onclick="salvarNovoCaso()" class="btn btn-primary">Salvar Caso</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-                    <div class="card p-4 text-center">
-                        <div class="text-2xl font-bold text-blue-400 mb-1" id="processos-pendentes">0</div>
-                        <div class="text-blue-200 text-sm">Aguardando Análise</div>
-                    </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-2xl font-bold text-green-400 mb-1" id="processos-finalizados">0</div>
-                        <div class="text-blue-200 text-sm">Finalizados</div>
-                    </div>
-                </div>
-
-                <!-- Formulário de Novo Processo (Inicialmente Oculto) -->
-                <div id="novo-processo-form" class="hidden">
-                    <div class="card p-8">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-white text-2xl font-bold flex items-center gap-2">
-                                <i class="fas fa-file-plus text-green-400"></i>
-                                Abertura de Novo Processo
-                            </h3>
-                            <div class="flex gap-3">
-                                <button type="button" onclick="hideNewProcessForm()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
-                                    <i class="fas fa-arrow-left mr-2"></i>Voltar para Lista
-                                </button>
-                            </div>
-                        </div>
-
-                        <form id="processForm" class="space-y-6">
-                            <!-- Dados do Advogado Responsável -->
-                            <div class="bg-blue-900/20 rounded-lg p-6 border border-blue-400/30">
-                                <h4 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
-                                    <i class="fas fa-user-tie text-blue-400"></i>
-                                    Dados do Advogado Responsável
+                            <!-- Seção 1: Informações Básicas do Processo -->
+                            <div class="bg-slate-800/30 rounded-lg p-6 border border-slate-600/30 mb-6">
+                                <h4 class="text-blue-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-file-alt text-blue-400"></i>
+                                    Informações Básicas do Processo
                                 </h4>
                                 
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                                    <div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div class="md:col-span-2">
                                         <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-user mr-2"></i>Nome do Advogado *
+                                            <i class="fas fa-hashtag mr-2"></i>Número do Processo *
                                         </label>
-                                        <input type="text" id="advogado-nome" required readonly
-                                               class="w-full px-4 py-3 bg-slate-700/50 border border-blue-300/30 rounded-lg text-gray-300 cursor-not-allowed">
+                                        <input type="text" id="numero-processo-novo" required 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                               placeholder="Ex: 0001234-56.2024.4.01.3800">
+                                        <p class="text-blue-300/70 text-xs mt-1">Número oficial do processo no sistema judiciário</p>
                                     </div>
-
+                                    
                                     <div>
                                         <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-id-badge mr-2"></i>OAB do Advogado *
+                                            <i class="fas fa-calendar mr-2"></i>Data de Distribuição *
                                         </label>
-                                        <input type="text" id="advogado-oab" required readonly
-                                               class="w-full px-4 py-3 bg-slate-700/50 border border-blue-300/30 rounded-lg text-gray-300 cursor-not-allowed">
+                                        <input type="date" id="data-distribuicao-novo" required 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
                                     </div>
                                 </div>
-                                
-                                <!-- Natureza do Processo (agora dentro da mesma seção) -->
-                                <div class="border-t border-blue-400/20 pt-6">
-                                    <h5 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
-                                        <i class="fas fa-scales-balanced text-blue-400"></i>
-                                        Natureza do Processo
-                                    </h5>
-                                    
-                                    <div class="mb-4">
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                    <div>
                                         <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-gavel mr-2"></i>Área Jurídica *
+                                            <i class="fas fa-gavel mr-2"></i>Tipo de Processo *
                                         </label>
-                                        <select id="tipo-peticao" required onchange="toggleProcessFields()"
+                                        <select id="tipo-processo-novo" required onchange="atualizarCamposTipo()"
                                                 class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
-                                            <option value="">Selecione a área jurídica</option>
-                                            <option value="civil">Processo Cível (Civil)</option>
-                                            <option value="criminal">Processo Criminal (Penal)</option>
+                                            <option value="">Selecione o tipo...</option>
+                                            <option value="civil">Civil</option>
+                                            <option value="criminal">Criminal</option>
+                                            <option value="trabalhista">Trabalhista</option>
+                                            <option value="familia">Família</option>
+                                            <option value="tributario">Tributário</option>
+                                            <option value="previdenciario">Previdenciário</option>
                                         </select>
-                                        <p class="text-blue-300/70 text-xs mt-2">
-                                            <i class="fas fa-info-circle mr-1"></i>
-                                            <strong>Cível:</strong> Disputas entre particulares (cobrança, indenização, divórcio, etc.)<br>
-                                            <strong>Criminal:</strong> Crimes processados pelo Estado (defesa de acusados)
-                                        </p>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-blue-300 font-semibold mb-2">
+                                            <i class="fas fa-landmark mr-2"></i>Comarca/Tribunal *
+                                        </label>
+                                        <input type="text" id="comarca-novo" required 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                               placeholder="Ex: 1ª Vara Cível - Comarca de Brasilândia">
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Dados Básicos do Processo (oculto inicialmente) -->
-                            <div id="dados-cliente-section" class="bg-blue-900/20 rounded-lg p-6 border border-blue-400/30" style="display: none;">
-                                <h4 class="text-blue-300 font-semibold mb-4 flex items-center gap-2">
+                            <!-- Seção 2: Dados do Cliente -->
+                            <div class="bg-blue-900/20 rounded-lg p-6 border border-blue-400/30 mb-6">
+                                <h4 class="text-blue-300 font-semibold mb-6 flex items-center gap-2">
                                     <i class="fas fa-user text-blue-400"></i>
-                                    <span id="cliente-titulo">Dados do Cliente</span>
+                                    Dados do Cliente
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-blue-300 font-semibold mb-2">
+                                            <i class="fas fa-user mr-2"></i>Nome Completo do Cliente *
+                                        </label>
+                                        <input type="text" id="nome-cliente-novo" required 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                               placeholder="Nome completo conforme documento">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-blue-300 font-semibold mb-2">
+                                            <i class="fas fa-id-card mr-2"></i>CPF/CNPJ *
+                                        </label>
+                                        <input type="text" id="documento-cliente-novo" required 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                               placeholder="000.000.000-00 ou 00.000.000/0001-00">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                    <div>
+                                        <label class="block text-blue-300 font-semibold mb-2">
+                                            <i class="fas fa-phone mr-2"></i>Telefone de Contato
+                                        </label>
+                                        <input type="tel" id="telefone-cliente-novo" 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                               placeholder="(00) 00000-0000">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-blue-300 font-semibold mb-2">
+                                            <i class="fas fa-envelope mr-2"></i>E-mail
+                                        </label>
+                                        <input type="email" id="email-cliente-novo" 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                               placeholder="cliente@email.com">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seção 3: Parte Contrária (Condicional) -->
+                            <div id="secao-parte-contraria" class="bg-red-900/20 rounded-lg p-6 border border-red-400/30 mb-6" style="display: none;">
+                                <h4 class="text-red-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-user-times text-red-400"></i>
+                                    Parte Contrária
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-red-300 font-semibold mb-2">
+                                            <i class="fas fa-user mr-2"></i>Nome da Parte Contrária
+                                        </label>
+                                        <input type="text" id="nome-contrario-novo" 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-red-300/30 rounded-lg text-white focus:border-red-400 focus:outline-none"
+                                               placeholder="Nome da pessoa ou empresa">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-red-300 font-semibold mb-2">
+                                            <i class="fas fa-id-card mr-2"></i>CPF/CNPJ da Parte Contrária
+                                        </label>
+                                        <input type="text" id="documento-contrario-novo" 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-red-300/30 rounded-lg text-white focus:border-red-400 focus:outline-none"
+                                               placeholder="000.000.000-00 ou 00.000.000/0001-00">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seção 4: Resumo e Configurações -->
+                            <div class="bg-slate-700/30 rounded-lg p-6 border border-slate-500/30 mb-6">
+                                <h4 class="text-blue-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-clipboard-list text-blue-400"></i>
+                                    Resumo e Configurações
                                 </h4>
                                 
                                 <div class="grid grid-cols-1 gap-6">
                                     <div>
                                         <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-user mr-2"></i><span id="cliente-label">Nome do Cliente ou RG/CPF *</span>
+                                            <i class="fas fa-file-alt mr-2"></i>Resumo do Caso *
                                         </label>
-                                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                            <input type="text" id="requerente-nome" required 
-                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                                   placeholder="Nome completo do cliente">
-                                            <input type="text" id="requerente-documento" required maxlength="15"
-                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                                   placeholder="RG, CPF ou Passaporte"
-                                                   oninput="formatDocumentInput(this)">
-                                        </div>
-                                        <p class="text-blue-300/70 text-xs mt-2">
-                                            <i class="fas fa-info-circle mr-1"></i>
-                                            <span id="documento-hint">Preencha o nome completo e o documento (RG, CPF ou Passaporte)</span>
-                                        </p>
+                                        <textarea id="resumo-caso-novo" rows="4" required
+                                                  class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                                  placeholder="Descreva brevemente o caso, pedidos principais e situação atual..."></textarea>
+                                        <p class="text-blue-300/70 text-xs mt-1">Este resumo ajudará na identificação rápida do processo</p>
                                     </div>
-                                </div>
 
-                                <!-- Informações Específicas por Tipo -->
-                                <div id="info-civil" class="mt-4 p-4 bg-blue-900/20 rounded-lg border border-blue-400/20" style="display: none;">
-                                    <h5 class="text-blue-300 font-semibold mb-3 flex items-center gap-2">
-                                        <i class="fas fa-scales text-blue-400"></i>
-                                        Informações do Processo Civil
-                                    </h5>
-                                    <div class="grid grid-cols-1 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div>
                                             <label class="block text-blue-300 font-semibold mb-2">
-                                                <i class="fas fa-user-times mr-2"></i>Nome do Réu ou RG/CPF (opcional)
+                                                <i class="fas fa-flag mr-2"></i>Prioridade *
                                             </label>
-                                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                                <input type="text" id="reu-nome" 
-                                                       class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                                       placeholder="Nome da pessoa/empresa processada">
-                                                <input type="text" id="reu-documento" 
-                                                       class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                                       placeholder="RG, CPF ou CNPJ do réu">
-                                            </div>
+                                            <select id="prioridade-caso-novo" required 
+                                                    class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
+                                                <option value="normal">Normal</option>
+                                                <option value="alta">Alta</option>
+                                                <option value="urgente">Urgente</option>
+                                            </select>
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div id="info-criminal" class="mt-4 p-4 bg-red-900/20 rounded-lg border border-red-400/20" style="display: none;">
-                                    <h5 class="text-red-300 font-semibold mb-3 flex items-center gap-2">
-                                        <i class="fas fa-shield-alt text-red-400"></i>
-                                        Informações do Processo Criminal
-                                    </h5>
-                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        
                                         <div>
-                                            <label class="block text-red-300 font-semibold mb-2">
-                                                <i class="fas fa-building-columns mr-2"></i>Promotor/Ministério Público
+                                            <label class="block text-blue-300 font-semibold mb-2">
+                                                <i class="fas fa-dollar-sign mr-2"></i>Valor da Causa (R$)
                                             </label>
-                                            <input type="text" id="promotor-nome" 
-                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-red-300/30 rounded-lg text-white focus:border-red-400 focus:outline-none"
-                                                   placeholder="Nome do promotor ou 'Ministério Público'">
+                                            <input type="number" id="valor-causa-novo" step="0.01" 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                                   placeholder="0,00">
                                         </div>
+                                        
                                         <div>
-                                            <label class="block text-red-300 font-semibold mb-2">
-                                                <i class="fas fa-hashtag mr-2"></i>Número do Inquérito/Processo (opcional)
+                                            <label class="block text-blue-300 font-semibold mb-2">
+                                                <i class="fas fa-user-tie mr-2"></i>Juiz Atual
                                             </label>
-                                            <input type="text" id="inquerito-numero" 
-                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-red-300/30 rounded-lg text-white focus:border-red-400 focus:outline-none"
-                                                   placeholder="Ex: 001.2024.123456-7">
+                                            <select id="juiz-caso-novo" 
+                                                    class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
+                                                <option value="">Ainda não assumido</option>
+                                                <option value="juiz-silva">Dr. João Silva</option>
+                                                <option value="juiz-santos">Dra. Maria Santos</option>
+                                                <option value="juiz-oliveira">Dr. Carlos Oliveira</option>
+                                                <option value="juiz-costa">Dra. Ana Costa</option>
+                                            </select>
                                         </div>
-                                    </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-                            <!-- Dados do Processo -->
-                            <div class="bg-slate-800/50 rounded-lg p-6 border border-slate-600/30">
-                                <h4 class="text-blue-300 font-semibold mb-6 flex items-center gap-2">
-                                    <i class="fas fa-gavel text-blue-400"></i>
-                                    Dados do Processo
-                                </h4>
-
-                                <!-- Tipo de Processo -->
-                                <div class="mb-6">
-                                    <label class="block text-blue-300 font-semibold mb-2">
-                                        <i class="fas fa-balance-scale mr-2"></i>Tipo de Processo *
-                                    </label>
-                                    <select id="tipo-processo" required 
-                                            class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
-                                        <option value="">Selecione o tipo de processo</option>
-                                        <optgroup label="🏆 Mais Utilizados em BRASILÂNDIA">
-                                            <option value="limpeza-ficha">Limpeza de Ficha Criminal</option>
-                                            <option value="porte-armas">Porte de Armas</option>
-                                        </optgroup>
-                                        <optgroup label="📋 Cível">
-                                            <option value="acao-cobranca">Ação de Cobrança</option>
-                                            <option value="acao-indenizacao">Ação de Indenização</option>
-                                            <option value="acao-despejo">Ação de Despejo</option>
-                                            <option value="divorcio">Divórcio</option>
-                                            <option value="inventario">Inventário</option>
-                                            <option value="usucapiao">Usucapião</option>
-                                        </optgroup>
-                                        <optgroup label="⚖️ Criminal">
-                                            <option value="queixa-crime">Queixa-Crime</option>
-                                            <option value="habeas-corpus">Habeas Corpus</option>
-                                            <option value="revisao-criminal">Revisão Criminal</option>
-                                        </optgroup>
-                                        <optgroup label="👨‍💼 Trabalhista">
-                                            <option value="reclamacao-trabalhista">Reclamação Trabalhista</option>
-                                            <option value="acao-acidente-trabalho">Ação de Acidente de Trabalho</option>
-                                        </optgroup>
-                                        <optgroup label="🏛️ Administrativo">
-                                            <option value="acao-popular">Ação Popular</option>
-                                        </optgroup>
-                                    </select>
-                                </div>
-
-                                <!-- Assunto do Processo -->
-                                <div class="mb-6">
-                                    <label class="block text-blue-300 font-semibold mb-2">
-                                        <i class="fas fa-heading mr-2"></i>Assunto/Resumo do Processo *
-                                    </label>
-                                    <input type="text" id="assunto-processo" required 
-                                           class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                           placeholder="Ex: Cobrança de honorários advocatícios">
-                                </div>
-                            </div>
-
-                            <!-- Informações Adicionais -->
-                            <div class="bg-slate-700/30 rounded-lg p-6 border border-slate-500/30">
-                                <h4 class="text-blue-300 font-semibold mb-6 flex items-center gap-2">
-                                    <i class="fas fa-info-circle text-blue-400"></i>
-                                    Informações Adicionais
-                                </h4>
-
-                                <!-- Valor da Causa -->
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    <div>
-                                        <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-dollar-sign mr-2"></i>Valor da Causa (R$)
-                                        </label>
-                                        <input type="number" id="valor-causa" step="0.01" 
-                                               class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                               placeholder="0,00">
                                     </div>
 
                                     <div>
                                         <label class="block text-blue-300 font-semibold mb-2">
-                                            <i class="fas fa-gavel mr-2"></i>Vara/Instância
+                                            <i class="fas fa-sticky-note mr-2"></i>Observações Especiais
                                         </label>
-                                        <select id="vara-instancia" 
-                                                class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none">
-                                            <option value="">Selecione a vara</option>
-                                            <option value="1-vara-civel">1ª Vara Cível</option>
-                                            <option value="2-vara-civel">2ª Vara Cível</option>
-                                            <option value="vara-criminal">Vara Criminal</option>
-                                            <option value="vara-trabalhista">Vara Trabalhista</option>
-                                            <option value="vara-federal">Vara Federal</option>
-                                            <option value="tribunal-justica">Tribunal de Justiça</option>
-                                        </select>
+                                        <textarea id="observacoes-caso-novo" rows="2" 
+                                                  class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+                                                  placeholder="Observações especiais, prazos importantes, peculiaridades..."></textarea>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Upload de Múltiplos Anexos -->
-                            <div class="border-2 border-dashed border-blue-300/30 rounded-lg p-6 bg-slate-800/30">
-                                <div class="text-center">
-                                    <i class="fas fa-paperclip text-4xl text-blue-400 mb-4"></i>
-                                    <h4 class="text-white font-semibold mb-2">Anexar Documentos</h4>
-                                    <p class="text-blue-200 text-sm mb-4">Anexe múltiplos documentos (PDF, DOC, DOCX, PNG, JPG, JPEG) - Máximo 10MB por arquivo</p>
+                            <!-- Seção 5: Upload de Documentos -->
+                            <div class="bg-blue-900/20 rounded-lg p-6 border border-blue-400/30">
+                                <h4 class="text-blue-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-paperclip text-blue-400"></i>
+                                    Documentos Iniciais
+                                </h4>
+                                
+                                <div class="border-2 border-dashed border-blue-300/30 rounded-lg p-6 bg-slate-800/30 text-center">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-blue-400 mb-4"></i>
+                                    <h5 class="text-white font-semibold mb-2">Anexar Documentos</h5>
+                                    <p class="text-blue-200 text-sm mb-4">PDF, DOC, DOCX, PNG, JPG - Máximo 10MB por arquivo</p>
                                     
-                                    <input type="file" id="documentos-upload" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" 
-                                           class="hidden" multiple onchange="handleMultipleFilesUpload(event)">
+                                    <input type="file" id="documentos-caso-novo" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" 
+                                           class="hidden" multiple onchange="handleDocumentosUpload(event)">
                                     
-                                    <button type="button" onclick="document.getElementById('documentos-upload').click()" 
+                                    <button type="button" onclick="document.getElementById('documentos-caso-novo').click()" 
                                             class="btn bg-blue-600 hover:bg-blue-700 text-white mb-4">
-                                        <i class="fas fa-upload mr-2"></i>Selecionar Documentos
+                                        <i class="fas fa-upload mr-2"></i>Selecionar Arquivos
                                     </button>
                                     
-                                    <!-- Lista de Arquivos Anexados -->
-                                    <div id="lista-arquivos-anexados" class="space-y-2">
-                                        <!-- Arquivos serão listados aqui dinamicamente -->
-                                    </div>
-                                    
-                                    <!-- Estatísticas dos Anexos -->
-                                    <div id="stats-anexos" class="hidden mt-4 flex justify-between text-sm text-blue-300 bg-slate-700/50 rounded-lg p-3">
-                                        <span>Total de arquivos: <span id="total-arquivos" class="text-white font-semibold">0</span></span>
-                                        <span>Tamanho total: <span id="tamanho-total" class="text-white font-semibold">0 KB</span></span>
+                                    <div id="lista-documentos-novo" class="space-y-2 text-left">
+                                        <!-- Arquivos serão listados aqui -->
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Observações Especiais -->
-                            <div>
-                                <label class="block text-blue-300 font-semibold mb-2">
-                                    <i class="fas fa-sticky-note mr-2"></i>Observações Especiais
-                                </label>
-                                <textarea id="observacoes-processo" rows="3" 
-                                          class="w-full px-4 py-3 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white focus:border-blue-400 focus:outline-none"
-                                          placeholder="Alguma observação especial, urgência, peculiaridade do caso..."></textarea>
-                            </div>
-
-                            <!-- Botões de Ação -->
-                            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-blue-300/20">
-                                <button type="button" onclick="saveDraft()" class="btn bg-yellow-600 hover:bg-yellow-700 text-white flex-1">
-                                    <i class="fas fa-save mr-2"></i>Salvar Rascunho
-                                </button>
-                                <button type="submit" class="btn bg-green-600 hover:bg-green-700 text-white flex-1">
-                                    <i class="fas fa-paper-plane mr-2"></i>Protocolar Processo
-                                </button>
-                                <button type="button" onclick="hideNewProcessForm()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
-                                    <i class="fas fa-times mr-2"></i>Cancelar
-                                </button>
                             </div>
                         </form>
                     </div>
-                </div>
-
-                <!-- Lista de Processos -->
-                <div id="lista-processos" class="mt-12">
-                    <div class="card p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-white text-xl font-bold flex items-center gap-2">
-                                <i class="fas fa-list text-blue-400"></i>
-                                Meus Processos
-                            </h3>
-                            <div class="flex gap-2">
-                                <select id="filtro-status" onchange="filterProcesses()" 
-                                        class="px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white text-sm">
-                                    <option value="">Todos os Status</option>
-                                    <option value="rascunho">Rascunho</option>
-                                    <option value="protocolado">Protocolado</option>
-                                    <option value="em-andamento">Em Andamento</option>
-                                    <option value="finalizado">Finalizado</option>
-                                </select>
-                            </div>
+                    
+                    <div class="modal-footer bg-slate-800/50 border-t border-slate-600/30">
+                        <div class="flex flex-col sm:flex-row gap-3 justify-end">
+                            <button onclick="fecharModalNovoCaso()" class="btn bg-gray-600 hover:bg-gray-700 text-white px-6 py-3">
+                                <i class="fas fa-times mr-2"></i>Cancelar
+                            </button>
+                            <button onclick="salvarRascunhoCaso()" class="btn bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3">
+                                <i class="fas fa-save mr-2"></i>Salvar Rascunho
+                            </button>
+                            <button onclick="salvarNovoCaso()" class="btn bg-green-600 hover:bg-green-700 text-white px-6 py-3">
+                                <i class="fas fa-check-circle mr-2"></i>Criar Caso
+                            </button>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div id="processos-container">
-                            <!-- Mensagem quando não há processos -->
-                            <div id="sem-processos" class="text-center py-12">
-                                <i class="fas fa-folder-open text-6xl text-gray-500 mb-4"></i>
-                                <h4 class="text-gray-400 text-xl mb-2">Nenhum processo encontrado</h4>
-                                <p class="text-gray-500 mb-6">Clique em "Novo Processo" para começar</p>
-                                <button onclick="showNewProcessForm()" class="btn bg-green-600 hover:bg-green-700 text-white">
-                                    <i class="fas fa-plus mr-2"></i>Criar Primeiro Processo
+            <!-- Modal Visualização/Edição de Caso -->
+            <div id="modal-visualizar-caso" class="modal">
+                <div class="modal-content max-w-6xl">
+                    <div class="modal-header bg-gradient-to-r from-blue-600 to-blue-700">
+                        <h3 class="text-white text-2xl font-bold flex items-center gap-3">
+                            <div class="p-2 bg-white/20 rounded-lg">
+                                <i class="fas fa-eye text-2xl"></i>
+                            </div>
+                            <span id="titulo-caso-visualizar">Detalhes do Caso</span>
+                        </h3>
+                        <button onclick="fecharModalVisualizarCaso()" class="text-white/80 hover:text-white text-2xl">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div id="conteudo-caso-visualizar">
+                            <!-- Conteúdo dinâmico do caso será inserido aqui -->
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer bg-slate-800/50 border-t border-slate-600/30">
+                        <div class="flex flex-col sm:flex-row gap-3 justify-between">
+                            <div class="flex gap-3">
+                                <button onclick="imprimirCaso()" class="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
+                                    <i class="fas fa-print mr-2"></i>Imprimir
+                                </button>
+                                <button onclick="exportarCasoPDF()" class="btn bg-red-600 hover:bg-red-700 text-white px-6 py-3">
+                                    <i class="fas fa-file-pdf mr-2"></i>Exportar PDF
                                 </button>
                             </div>
-
-                            <!-- Lista dinâmica de processos será inserida aqui -->
-                            <div id="processos-list" class="space-y-4">
-                                <!-- Os processos serão carregados dinamicamente via JavaScript -->
+                            
+                            <div class="flex gap-3">
+                                <button onclick="editarCaso()" class="btn bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3">
+                                    <i class="fas fa-edit mr-2"></i>Editar
+                                </button>
+                                <button onclick="arquivarCaso()" class="btn bg-orange-600 hover:bg-orange-700 text-white px-6 py-3">
+                                    <i class="fas fa-archive mr-2"></i>Arquivar
+                                </button>
+                                <button onclick="fecharModalVisualizarCaso()" class="btn bg-gray-600 hover:bg-gray-700 text-white px-6 py-3">
+                                    <i class="fas fa-times mr-2"></i>Fechar
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1639,216 +1751,613 @@
             </div>
         </section>
 
-        <!-- Modal de Visualização/Edição de Processo -->
-        <div id="modal-processo" class="modal">
-            <div class="modal-content max-w-4xl">
-                <div class="modal-header">
-                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
-                        <i class="fas fa-eye text-blue-400"></i>
-                        <span id="modal-titulo">Detalhes do Processo</span>
-                    </h3>
-                </div>
-                <div class="modal-body">
-                    <div id="processo-detalhes">
-                        <!-- Conteúdo dinâmico do processo -->
-                    </div>
-                    
-                    <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-blue-300/20">
-                        <button onclick="editProcess()" id="btn-editar" class="btn bg-yellow-600 hover:bg-yellow-700 text-white">
-                            <i class="fas fa-edit mr-2"></i>Editar
-                        </button>
-                        <button onclick="deleteProcess()" id="btn-excluir" class="btn bg-red-600 hover:bg-red-700 text-white">
-                            <i class="fas fa-trash mr-2"></i>Excluir
-                        </button>
-                        <button onclick="closeProcessModal()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
-                            <i class="fas fa-times mr-2"></i>Fechar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         
         <!-- Agenda Section -->
         <section id="agenda" class="section">
             <div class="space-y-6">
-                <!-- Header da Seção -->
-                <div class="card p-6 bg-gradient-to-r from-indigo-900/40 to-purple-900/40">
-                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                        <div>
-                            <h2 class="text-white text-3xl font-bold mb-2 flex items-center gap-3">
-                                <i class="fas fa-calendar-alt text-blue-400"></i>
-                                Agenda e Compromissos
-                            </h2>
-                            <p class="text-blue-200">Gerencie audiências, prazos e compromissos</p>
+                <!-- Header Principal com Sincronização -->
+                <div class="card p-6 bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-indigo-500/20">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="p-3 bg-indigo-600/20 rounded-lg border border-indigo-500/30">
+                                    <i class="fas fa-calendar-alt text-indigo-400 text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-white text-3xl font-bold">Agenda Jurídica Integrada</h2>
+                                    <p class="text-indigo-200 text-lg">Sincronizada com casos e sistema judiciário</p>
+                                </div>
+                                <div class="hidden lg:flex items-center gap-2 px-3 py-1 bg-green-600/20 border border-green-500/30 rounded-full">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    <span class="text-green-300 text-sm font-semibold">Sincronizado</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Status Rápido -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                                <div class="bg-blue-600/10 border border-blue-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-blue-400 text-xl font-bold" id="eventos-hoje">0</div>
+                                    <div class="text-blue-300 text-xs">Hoje</div>
+                                </div>
+                                <div class="bg-yellow-600/10 border border-yellow-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-yellow-400 text-xl font-bold" id="audiencias-semana">0</div>
+                                    <div class="text-yellow-300 text-xs">Audiências Semana</div>
+                                </div>
+                                <div class="bg-red-600/10 border border-red-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-red-400 text-xl font-bold" id="prazos-urgentes">0</div>
+                                    <div class="text-red-300 text-xs">Prazos Urgentes</div>
+                                </div>
+                                <div class="bg-green-600/10 border border-green-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-green-400 text-xl font-bold" id="casos-movimento">0</div>
+                                    <div class="text-green-300 text-xs">Casos em Movimento</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex gap-3">
-                            <button onclick="abrirModalNovoCompromisso()" class="btn bg-green-600 hover:bg-green-700 text-white">
-                                <i class="fas fa-plus mr-2"></i>Novo Compromisso
+                        
+                        <!-- Ações Principais -->
+                        <div class="flex flex-col gap-3">
+                            <button onclick="abrirModalNovoEvento()" class="btn bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg font-semibold rounded-lg shadow-lg">
+                                <i class="fas fa-plus-circle mr-2"></i>Novo Evento
                             </button>
-                            <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                            <button onclick="sincronizarAgenda()" class="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
+                                <i class="fas fa-sync-alt mr-2"></i>Sincronizar
+                            </button>
+                            <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white px-6 py-3">
                                 <i class="fas fa-arrow-left mr-2"></i>Dashboard
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Estatísticas da Agenda -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-green-400 mb-1" id="compromissos-hoje">0</div>
-                        <div class="text-blue-200 text-sm">Hoje</div>
+                <!-- Dashboard de Eventos por Tipo -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Audiências Agendadas -->
+                    <div class="card p-6 bg-gradient-to-br from-blue-900/20 to-blue-800/10 border border-blue-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-blue-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-gavel text-blue-400"></i>
+                                Audiências
+                            </h3>
+                            <span class="bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-audiencias">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-48 overflow-y-auto" id="lista-audiencias">
+                            <div class="text-center py-4 text-blue-400/60">
+                                <i class="fas fa-calendar-check text-2xl mb-2"></i>
+                                <p class="text-xs">Nenhuma audiência agendada</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodasAudiencias()" class="mt-4 w-full btn bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30">
+                            Ver Todas
+                        </button>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-yellow-400 mb-1" id="compromissos-semana">0</div>
-                        <div class="text-blue-200 text-sm">Esta Semana</div>
+
+                    <!-- Prazos de Casos -->
+                    <div class="card p-6 bg-gradient-to-br from-red-900/20 to-red-800/10 border border-red-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-red-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-clock text-red-400"></i>
+                                Prazos
+                            </h3>
+                            <span class="bg-red-600/20 text-red-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-prazos">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-48 overflow-y-auto" id="lista-prazos">
+                            <div class="text-center py-4 text-red-400/60">
+                                <i class="fas fa-hourglass-half text-2xl mb-2"></i>
+                                <p class="text-xs">Nenhum prazo urgente</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodosPrazos()" class="mt-4 w-full btn bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/30">
+                            Ver Todos
+                        </button>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-blue-400 mb-1" id="audiencias-pendentes">0</div>
-                        <div class="text-blue-200 text-sm">Audiências</div>
+
+                    <!-- Notificações do Sistema -->
+                    <div class="card p-6 bg-gradient-to-br from-purple-900/20 to-purple-800/10 border border-purple-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-purple-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-bell text-purple-400"></i>
+                                Notificações
+                            </h3>
+                            <span class="bg-purple-600/20 text-purple-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-notificacoes">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-48 overflow-y-auto" id="lista-notificacoes">
+                            <div class="text-center py-4 text-purple-400/60">
+                                <i class="fas fa-bell-slash text-2xl mb-2"></i>
+                                <p class="text-xs">Nenhuma notificação</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodasNotificacoes()" class="mt-4 w-full btn bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30">
+                            Ver Todas
+                        </button>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-red-400 mb-1" id="prazos-vencendo">0</div>
-                        <div class="text-blue-200 text-sm">Prazos Urgentes</div>
+
+                    <!-- Compromissos Pessoais -->
+                    <div class="card p-6 bg-gradient-to-br from-green-900/20 to-green-800/10 border border-green-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-green-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-user-clock text-green-400"></i>
+                                Compromissos
+                            </h3>
+                            <span class="bg-green-600/20 text-green-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-compromissos">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-48 overflow-y-auto" id="lista-compromissos-pessoais">
+                            <div class="text-center py-4 text-green-400/60">
+                                <i class="fas fa-calendar-plus text-2xl mb-2"></i>
+                                <p class="text-xs">Nenhum compromisso</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodosCompromissos()" class="mt-4 w-full btn bg-green-600/20 hover:bg-green-600/30 text-green-300 border border-green-500/30">
+                            Ver Todos
+                        </button>
                     </div>
                 </div>
 
-                <!-- Calendário e Filtros -->
+                <!-- Calendário Visual e Timeline -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Calendário -->
+                    <!-- Calendário Mensal -->
                     <div class="lg:col-span-2 card p-6">
-                        <h3 class="text-white font-bold text-lg mb-4">Calendário</h3>
-                        <div id="calendario" class="bg-slate-800/30 rounded-lg p-4">
-                            <!-- Calendário será inserido aqui -->
-                            <div class="grid grid-cols-7 gap-2 text-center">
-                                <div class="text-blue-300 font-semibold p-2">Dom</div>
-                                <div class="text-blue-300 font-semibold p-2">Seg</div>
-                                <div class="text-blue-300 font-semibold p-2">Ter</div>
-                                <div class="text-blue-300 font-semibold p-2">Qua</div>
-                                <div class="text-blue-300 font-semibold p-2">Qui</div>
-                                <div class="text-blue-300 font-semibold p-2">Sex</div>
-                                <div class="text-blue-300 font-semibold p-2">Sáb</div>
-                                <!-- Dias do mês serão inseridos dinamicamente -->
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                                <i class="fas fa-calendar text-indigo-400"></i>
+                                Calendário Mensal
+                            </h3>
+                            <div class="flex items-center gap-3">
+                                <button onclick="mesAnterior()" class="btn bg-slate-700 hover:bg-slate-600 text-white p-2">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span class="text-white font-semibold text-lg" id="mes-ano-atual">Agosto 2025</span>
+                                <button onclick="proximoMes()" class="btn bg-slate-700 hover:bg-slate-600 text-white p-2">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
+                            <div class="grid grid-cols-7 gap-2 mb-4">
+                                <div class="text-indigo-300 font-semibold text-center py-2">Dom</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Seg</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Ter</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Qua</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Qui</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Sex</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Sáb</div>
+                            </div>
+                            <div id="dias-calendario" class="grid grid-cols-7 gap-2">
+                                <!-- Dias serão inseridos dinamicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Legenda -->
+                        <div class="mt-4 flex flex-wrap gap-4 text-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-blue-500 rounded"></div>
+                                <span class="text-blue-300">Audiências</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-red-500 rounded"></div>
+                                <span class="text-red-300">Prazos</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-purple-500 rounded"></div>
+                                <span class="text-purple-300">Sistema</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-green-500 rounded"></div>
+                                <span class="text-green-300">Compromissos</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Próximos Compromissos -->
+                    <!-- Timeline do Dia/Próximos Eventos -->
                     <div class="card p-6">
-                        <h3 class="text-white font-bold text-lg mb-4">Próximos Compromissos</h3>
-                        <div id="proximos-compromissos" class="space-y-3">
-                            <!-- Compromissos serão inseridos aqui -->
-                            <div class="text-center py-4">
-                                <i class="fas fa-calendar text-blue-400 text-2xl mb-2"></i>
-                                <p class="text-blue-200 text-sm">Nenhum compromisso próximo</p>
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-white font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-clock text-yellow-400"></i>
+                                Timeline Hoje
+                            </h3>
+                            <span class="text-yellow-300 text-sm" id="data-hoje">10/08/2025</span>
+                        </div>
+                        
+                        <div class="space-y-4 max-h-96 overflow-y-auto" id="timeline-hoje">
+                            <div class="text-center py-8">
+                                <i class="fas fa-calendar-day text-4xl text-yellow-400/30 mb-3"></i>
+                                <h4 class="text-gray-400 mb-2">Nenhum evento hoje</h4>
+                                <p class="text-gray-500 text-sm">Sua agenda está livre!</p>
+                            </div>
+                        </div>
+
+                        <!-- Próximos Eventos -->
+                        <div class="mt-6 pt-4 border-t border-slate-600/30">
+                            <h4 class="text-gray-300 font-semibold mb-3 flex items-center gap-2">
+                                <i class="fas fa-forward text-gray-400"></i>
+                                Próximos 7 Dias
+                            </h4>
+                            <div class="space-y-3" id="proximos-eventos">
+                                <!-- Próximos eventos serão listados aqui -->
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Lista Completa de Compromissos -->
+                <!-- Painel de Filtros e Busca -->
                 <div class="card p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-white font-bold text-lg">Todos os Compromissos</h3>
-                        <div class="flex gap-2">
-                            <select id="filtro-mes" onchange="filtrarCompromissos()" 
-                                    class="px-3 py-1 bg-slate-800/50 border border-blue-300/30 rounded text-white text-sm">
-                                <option value="">Todos os Meses</option>
-                                <option value="01">Janeiro</option>
-                                <option value="02">Fevereiro</option>
-                                <option value="03">Março</option>
-                                <option value="04">Abril</option>
-                                <option value="05">Maio</option>
-                                <option value="06">Junho</option>
-                                <option value="07">Julho</option>
-                                <option value="08">Agosto</option>
-                                <option value="09">Setembro</option>
-                                <option value="10">Outubro</option>
-                                <option value="11">Novembro</option>
-                                <option value="12">Dezembro</option>
-                            </select>
-                            <select id="filtro-tipo-compromisso" onchange="filtrarCompromissos()" 
-                                    class="px-3 py-1 bg-slate-800/50 border border-blue-300/30 rounded text-white text-sm">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                            <i class="fas fa-filter text-indigo-400"></i>
+                            Filtros e Busca de Eventos
+                        </h3>
+                        <button onclick="limparFiltrosAgenda()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                            <i class="fas fa-eraser mr-2"></i>Limpar Filtros
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">
+                                <i class="fas fa-search mr-2"></i>Buscar:
+                            </label>
+                            <input type="text" id="busca-eventos" placeholder="Evento, local, caso..." 
+                                   onkeyup="aplicarFiltrosAgenda()" 
+                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white placeholder-indigo-300/50 focus:border-indigo-400 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">
+                                <i class="fas fa-list-alt mr-2"></i>Tipo:
+                            </label>
+                            <select id="filtro-tipo-evento" onchange="aplicarFiltrosAgenda()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
                                 <option value="">Todos os Tipos</option>
-                                <option value="audiencia">Audiência</option>
-                                <option value="prazo">Prazo</option>
-                                <option value="reuniao">Reunião</option>
-                                <option value="compromisso">Compromisso</option>
+                                <option value="audiencia">Audiências</option>
+                                <option value="prazo">Prazos</option>
+                                <option value="notificacao">Notificações</option>
+                                <option value="compromisso">Compromissos</option>
+                                <option value="reuniao">Reuniões</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">
+                                <i class="fas fa-calendar-alt mr-2"></i>Período:
+                            </label>
+                            <select id="filtro-periodo-agenda" onchange="aplicarFiltrosAgenda()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                <option value="todos">Todos os Períodos</option>
+                                <option value="hoje">Hoje</option>
+                                <option value="amanha">Amanhã</option>
+                                <option value="semana">Esta Semana</option>
+                                <option value="mes">Este Mês</option>
+                                <option value="personalizado">Período Personalizado</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">
+                                <i class="fas fa-folder mr-2"></i>Caso:
+                            </label>
+                            <select id="filtro-caso-agenda" onchange="aplicarFiltrosAgenda()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                <option value="">Todos os Casos</option>
+                                <!-- Casos serão carregados dinamicamente dos casos ativos -->
                             </select>
                         </div>
                     </div>
-                    <div id="lista-compromissos" class="space-y-3">
-                        <!-- Compromissos serão inseridos aqui -->
-                        <div class="text-center py-8">
-                            <i class="fas fa-calendar-plus text-4xl text-blue-400 mb-4"></i>
-                            <p class="text-blue-200">Nenhum compromisso agendado. Clique em "Novo Compromisso" para começar.</p>
+
+                    <!-- Período Personalizado (oculto inicialmente) -->
+                    <div id="periodo-personalizado" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" style="display: none;">
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">Data Início:</label>
+                            <input type="date" id="data-inicio-filtro" onchange="aplicarFiltrosAgenda()" 
+                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">Data Fim:</label>
+                            <input type="date" id="data-fim-filtro" onchange="aplicarFiltrosAgenda()" 
+                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista Completa de Eventos -->
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                            <i class="fas fa-list text-indigo-400"></i>
+                            Todos os Eventos da Agenda
+                            <span class="bg-indigo-600/20 text-indigo-300 px-3 py-1 rounded-full text-sm font-semibold ml-2" id="total-eventos-exibidos">0</span>
+                        </h3>
+                        
+                        <div class="flex gap-3">
+                            <button onclick="exportarAgenda()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                <i class="fas fa-file-excel mr-2"></i>Exportar
+                            </button>
+                            <button onclick="imprimirAgenda()" class="btn bg-blue-600 hover:bg-blue-700 text-white">
+                                <i class="fas fa-print mr-2"></i>Imprimir
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Timeline de Eventos -->
+                    <div class="space-y-4" id="lista-eventos-completa">
+                        <!-- Eventos serão inseridos aqui dinamicamente -->
+                        <div class="text-center py-12">
+                            <div class="flex flex-col items-center gap-4">
+                                <i class="fas fa-calendar-alt text-6xl text-indigo-400/30"></i>
+                                <div>
+                                    <h4 class="text-gray-400 text-xl mb-2">Nenhum evento encontrado</h4>
+                                    <p class="text-gray-500 mb-6">Clique em "Novo Evento" para começar a organizar sua agenda</p>
+                                    <button onclick="abrirModalNovoEvento()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                        <i class="fas fa-plus mr-2"></i>Criar Primeiro Evento
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paginação -->
+                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-indigo-300/20">
+                        <div class="text-indigo-300 text-sm">
+                            Mostrando <span id="eventos-inicio">0</span> a <span id="eventos-fim">0</span> de <span id="eventos-total">0</span> eventos
+                        </div>
+                        <div class="flex gap-2" id="paginacao-eventos">
+                            <!-- Botões de paginação serão inseridos aqui -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modal Novo Compromisso -->
-            <div id="modal-novo-compromisso" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="text-white text-xl font-bold">Novo Compromisso</h3>
-                        <button onclick="fecharModalNovoCompromisso()" class="text-gray-400 hover:text-white">
+            <!-- Modal Novo Evento - Design Profissional Sincronizado -->
+            <div id="modal-novo-evento" class="modal">
+                <div class="modal-content max-w-5xl">
+                    <div class="modal-header bg-gradient-to-r from-indigo-600 to-purple-700">
+                        <h3 class="text-white text-2xl font-bold flex items-center gap-3">
+                            <div class="p-2 bg-white/20 rounded-lg">
+                                <i class="fas fa-calendar-plus text-2xl"></i>
+                            </div>
+                            Novo Evento na Agenda
+                        </h3>
+                        <button onclick="fecharModalNovoEvento()" class="text-white/80 hover:text-white text-2xl">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
+                    
                     <div class="modal-body">
-                        <form id="form-novo-compromisso">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Título:</label>
-                                    <input type="text" id="titulo-compromisso" required 
-                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                        <form id="form-novo-evento" onsubmit="salvarNovoEvento(event)">
+                            <!-- Seção 1: Tipo de Evento e Sincronização -->
+                            <div class="bg-slate-800/30 rounded-lg p-6 border border-slate-600/30 mb-6">
+                                <h4 class="text-indigo-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-tags text-indigo-400"></i>
+                                    Tipo de Evento e Sincronização
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-indigo-300 font-semibold mb-2">
+                                            <i class="fas fa-list-alt mr-2"></i>Tipo de Evento *
+                                        </label>
+                                        <select id="tipo-evento-novo" required onchange="atualizarCamposEvento()"
+                                                class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                            <option value="">Selecione o tipo...</option>
+                                            <option value="audiencia">🏛️ Audiência (Agendada pelo Juiz)</option>
+                                            <option value="prazo">⏰ Prazo Processual (Automático)</option>
+                                            <option value="notificacao">🔔 Notificação do Sistema</option>
+                                            <option value="compromisso">👤 Compromisso Pessoal</option>
+                                            <option value="reuniao">🤝 Reunião com Cliente</option>
+                                            <option value="estudo">📚 Estudo de Caso</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-indigo-300 font-semibold mb-2">
+                                            <i class="fas fa-folder mr-2"></i>Caso Relacionado
+                                        </label>
+                                        <select id="caso-relacionado-evento" onchange="carregarDadosCaso()"
+                                                class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                            <option value="">Selecionar caso...</option>
+                                            <!-- Casos serão carregados dinamicamente da seção casos -->
+                                        </select>
+                                        <p class="text-indigo-300/70 text-xs mt-1">Vincule este evento a um caso específico</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Tipo:</label>
-                                    <select id="tipo-compromisso" required 
-                                            class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                        <option value="">Selecione...</option>
-                                        <option value="audiencia">Audiência</option>
-                                        <option value="prazo">Prazo</option>
-                                        <option value="reuniao">Reunião</option>
-                                        <option value="compromisso">Compromisso</option>
-                                    </select>
+
+                                <!-- Informações do Caso Selecionado -->
+                                <div id="info-caso-selecionado" class="mt-4 p-4 bg-blue-900/20 rounded-lg border border-blue-400/20" style="display: none;">
+                                    <h5 class="text-blue-300 font-semibold mb-2 flex items-center gap-2">
+                                        <i class="fas fa-info-circle text-blue-400"></i>
+                                        Informações do Caso Vinculado
+                                    </h5>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                        <div>
+                                            <span class="text-blue-300">Cliente:</span>
+                                            <div class="text-white font-medium" id="caso-cliente">-</div>
+                                        </div>
+                                        <div>
+                                            <span class="text-blue-300">Processo:</span>
+                                            <div class="text-white font-medium" id="caso-processo">-</div>
+                                        </div>
+                                        <div>
+                                            <span class="text-blue-300">Juiz:</span>
+                                            <div class="text-white font-medium" id="caso-juiz">-</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Data:</label>
-                                    <input type="date" id="data-compromisso" required 
-                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                            </div>
+
+                            <!-- Seção 2: Detalhes do Evento -->
+                            <div class="bg-indigo-900/20 rounded-lg p-6 border border-indigo-400/30 mb-6">
+                                <h4 class="text-indigo-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-calendar-day text-indigo-400"></i>
+                                    Detalhes do Evento
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 gap-6">
+                                    <div>
+                                        <label class="block text-indigo-300 font-semibold mb-2">
+                                            <i class="fas fa-heading mr-2"></i>Título do Evento *
+                                        </label>
+                                        <input type="text" id="titulo-evento-novo" required 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none"
+                                               placeholder="Ex: Audiência de Instrução - Caso Silva">
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div>
+                                            <label class="block text-indigo-300 font-semibold mb-2">
+                                                <i class="fas fa-calendar mr-2"></i>Data *
+                                            </label>
+                                            <input type="date" id="data-evento-novo" required 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-indigo-300 font-semibold mb-2">
+                                                <i class="fas fa-clock mr-2"></i>Horário *
+                                            </label>
+                                            <input type="time" id="horario-evento-novo" required 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-indigo-300 font-semibold mb-2">
+                                                <i class="fas fa-hourglass-half mr-2"></i>Duração (minutos)
+                                            </label>
+                                            <input type="number" id="duracao-evento-novo" min="15" step="15" value="60" 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-indigo-300 font-semibold mb-2">
+                                                <i class="fas fa-map-marker-alt mr-2"></i>Local/Sala
+                                            </label>
+                                            <input type="text" id="local-evento-novo" 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none"
+                                                   placeholder="Ex: Sala 3 - 1ª Vara Cível">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-indigo-300 font-semibold mb-2">
+                                                <i class="fas fa-flag mr-2"></i>Prioridade *
+                                            </label>
+                                            <select id="prioridade-evento-novo" required 
+                                                    class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                                <option value="normal">Normal</option>
+                                                <option value="alta">Alta</option>
+                                                <option value="urgente">Urgente</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Horário:</label>
-                                    <input type="time" id="horario-compromisso" required 
-                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Local:</label>
-                                    <input type="text" id="local-compromisso" 
-                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Caso Relacionado:</label>
-                                    <select id="caso-relacionado" 
-                                            class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                        <option value="">Selecione um caso...</option>
-                                        <!-- Casos serão carregados dinamicamente -->
-                                    </select>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Observações:</label>
-                                    <textarea id="observacoes-compromisso" rows="3" 
-                                              class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white"></textarea>
+                            </div>
+
+                            <!-- Seção 3: Observações e Configurações -->
+                            <div class="bg-slate-700/30 rounded-lg p-6 border border-slate-500/30 mb-6">
+                                <h4 class="text-indigo-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-cog text-indigo-400"></i>
+                                    Observações e Configurações
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 gap-6">
+                                    <div>
+                                        <label class="block text-indigo-300 font-semibold mb-2">
+                                            <i class="fas fa-comment-alt mr-2"></i>Descrição/Observações
+                                        </label>
+                                        <textarea id="descricao-evento-novo" rows="3" 
+                                                  class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none"
+                                                  placeholder="Detalhes adicionais sobre o evento..."></textarea>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" id="lembrete-evento" checked
+                                                   class="w-4 h-4 text-indigo-600 bg-slate-800 border-indigo-300 rounded focus:ring-indigo-500">
+                                            <label for="lembrete-evento" class="text-indigo-300 font-semibold">
+                                                <i class="fas fa-bell mr-2"></i>Criar Lembrete
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" id="sincronizar-evento" checked
+                                                   class="w-4 h-4 text-indigo-600 bg-slate-800 border-indigo-300 rounded focus:ring-indigo-500">
+                                            <label for="sincronizar-evento" class="text-indigo-300 font-semibold">
+                                                <i class="fas fa-sync mr-2"></i>Sincronizar Sistema
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" id="notificar-cliente"
+                                                   class="w-4 h-4 text-indigo-600 bg-slate-800 border-indigo-300 rounded focus:ring-indigo-500">
+                                            <label for="notificar-cliente" class="text-indigo-300 font-semibold">
+                                                <i class="fas fa-envelope mr-2"></i>Notificar Cliente
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button onclick="fecharModalNovoCompromisso()" class="btn btn-secondary mr-3">Cancelar</button>
-                        <button onclick="salvarNovoCompromisso()" class="btn btn-primary">Salvar Compromisso</button>
+                    
+                    <div class="modal-footer bg-slate-800/50 border-t border-slate-600/30">
+                        <div class="flex flex-col sm:flex-row gap-3 justify-end">
+                            <button onclick="fecharModalNovoEvento()" class="btn bg-gray-600 hover:bg-gray-700 text-white px-6 py-3">
+                                <i class="fas fa-times mr-2"></i>Cancelar
+                            </button>
+                            <button onclick="salvarRascunhoEvento()" class="btn bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3">
+                                <i class="fas fa-save mr-2"></i>Salvar Rascunho
+                            </button>
+                            <button onclick="salvarNovoEvento()" class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3">
+                                <i class="fas fa-calendar-check mr-2"></i>Criar Evento
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Visualização de Evento -->
+            <div id="modal-visualizar-evento" class="modal">
+                <div class="modal-content max-w-4xl">
+                    <div class="modal-header bg-gradient-to-r from-indigo-600 to-indigo-700">
+                        <h3 class="text-white text-2xl font-bold flex items-center gap-3">
+                            <div class="p-2 bg-white/20 rounded-lg">
+                                <i class="fas fa-calendar-day text-2xl"></i>
+                            </div>
+                            <span id="titulo-evento-visualizar">Detalhes do Evento</span>
+                        </h3>
+                        <button onclick="fecharModalVisualizarEvento()" class="text-white/80 hover:text-white text-2xl">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div id="conteudo-evento-visualizar">
+                            <!-- Conteúdo dinâmico do evento será inserido aqui -->
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer bg-slate-800/50 border-t border-slate-600/30">
+                        <div class="flex flex-col sm:flex-row gap-3 justify-between">
+                            <div class="flex gap-3">
+                                <button onclick="imprimirEvento()" class="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
+                                    <i class="fas fa-print mr-2"></i>Imprimir
+                                </button>
+                                <button onclick="exportarEventoICS()" class="btn bg-purple-600 hover:bg-purple-700 text-white px-6 py-3">
+                                    <i class="fas fa-calendar-plus mr-2"></i>Exportar (.ics)
+                                </button>
+                            </div>
+                            
+                            <div class="flex gap-3">
+                                <button onclick="editarEvento()" class="btn bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3">
+                                    <i class="fas fa-edit mr-2"></i>Editar
+                                </button>
+                                <button onclick="removerEvento()" class="btn bg-red-600 hover:bg-red-700 text-white px-6 py-3">
+                                    <i class="fas fa-trash mr-2"></i>Remover
+                                </button>
+                                <button onclick="fecharModalVisualizarEvento()" class="btn bg-gray-600 hover:bg-gray-700 text-white px-6 py-3">
+                                    <i class="fas fa-times mr-2"></i>Fechar
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2482,28 +2991,12 @@
             localStorage.setItem('advogado_cidade', cidade);
         }
 
-        // PETIÇÃO INICIAL - Documento específico único
+        // PETIÇÃO INICIAL - Documento específico COM CAMPOS EDITÁVEIS
         function criarPeticaoInicialEspecifica(formData = {}) {
             const dadosAdvogado = obterDadosAdvogado();
             
-            // Dados padrão se não foram fornecidos
-            const dados = {
-                juizExcelentissimo: formData.juizExcelentissimo || 'EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO',
-                requerenteNome: formData.requerenteNome || 'NOME DO REQUERENTE',
-                requerenteQualificacao: formData.requerenteQualificacao || 'brasileiro, solteiro, profissão, portador do RG nº 000.000.000-0, inscrito no CPF sob nº 000.000.000-00',
-                requeridoNome: formData.requeridoNome || 'NOME DO REQUERIDO',
-                requeridoQualificacao: formData.requeridoQualificacao || 'empresa/pessoa, qualificação completa',
-                fundamentacao: formData.fundamentacao || 'DOS FATOS: Expor aqui os fatos que motivaram a ação...',
-                pedidos: formData.pedidos || 'a) Pedido principal;\nb) Pedido subsidiário;',
-                valorCausa: formData.valorCausa || 'R$ 10.000,00',
-                numeroProcesso: formData.numeroProcesso || '0000000-00.0000.0.00.0000',
-                comarca: formData.comarca || 'Brasilândia',
-                vara: formData.vara || '1ª Vara Cível',
-                ...formData
-            };
-
             return `
-                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                <div class="max-w-4xl mx-auto bg-white text-black p-8 shadow-lg" style="font-family: 'Times New Roman', serif; line-height: 1.6;">
                     <!-- Cabeçalho do Documento -->
                     <div class="text-center mb-8 border-b-2 border-blue-500 pb-4">
                         <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg mb-4">
@@ -2511,64 +3004,92 @@
                             <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
                         </div>
                         <h2 class="text-xl font-bold text-gray-800">PETIÇÃO INICIAL</h2>
-                        <p class="text-sm text-gray-600 mt-2">Processo nº ${dados.numeroProcesso}</p>
                     </div>
 
-                    <!-- Conteúdo da Petição -->
+                    <!-- Conteúdo da Petição TOTALMENTE EDITÁVEL -->
                     <div class="space-y-6 text-justify">
-                        <p class="font-bold">${dados.juizExcelentissimo}</p>
-                        <p class="font-bold">${dados.vara} da Comarca de ${dados.comarca}</p>
+                        <p class="font-bold">
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO</span>
+                        </p>
+                        
+                        <p class="font-bold">
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">1ª Vara Cível</span> da Comarca de 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Brasilândia</span>
+                        </p>
                         
                         <div class="my-6">
-                            <p><strong>${dados.requerenteNome}</strong>, ${dados.requerenteQualificacao}, 
-                            vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, propor a presente</p>
+                            <p>
+                                <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">NOME DO REQUERENTE</span></strong>, 
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">brasileiro, solteiro, profissão, portador do RG nº 000.000.000-0, inscrito no CPF sob nº 000.000.000-00, residente e domiciliado na [endereço completo]</span>, 
+                                vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, propor a presente
+                            </p>
                             
-                            <h3 class="text-center text-lg font-bold my-4">AÇÃO JUDICIAL</h3>
+                            <h3 class="text-center text-lg font-bold my-4">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">AÇÃO DE COBRANÇA</span>
+                            </h3>
                             
-                            <p>em face de <strong>${dados.requeridoNome}</strong>, ${dados.requeridoQualificacao}, 
-                            pelos fatos e fundamentos jurídicos a seguir expostos:</p>
+                            <p>em face de 
+                                <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">NOME DO REQUERIDO</span></strong>, 
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">qualificação completa do requerido</span>, 
+                                pelos fatos e fundamentos jurídicos a seguir expostos:
+                            </p>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">I - DOS FATOS</h3>
-                            <div class="border border-gray-300 p-4 min-h-32">
-                                <p>${dados.fundamentacao}</p>
-                            </div>
+                            <p><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Expor aqui de forma clara e objetiva os fatos que motivaram a ação judicial. Detalhar cronologicamente os acontecimentos, mencionando datas, valores, documentos e todas as circunstâncias relevantes para o caso. Esta narrativa deve ser precisa e fundamentar juridicamente a pretensão do requerente.</span></p>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">II - DO DIREITO</h3>
-                            <div class="border border-gray-300 p-4 min-h-32">
-                                <p>${dados.fundamentacaoJuridica || 'Apresentar aqui a fundamentação jurídica da pretensão, citando dispositivos legais, jurisprudência e doutrina aplicáveis ao caso concreto.'}</p>
-                            </div>
+                            <p><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Apresentar aqui a fundamentação jurídica da pretensão, citando os dispositivos legais aplicáveis (Código Civil, Código de Processo Civil, Constituição Federal, etc.), jurisprudência dos tribunais superiores e doutrina especializada que sustentam o pedido formulado.</span></p>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">III - DOS PEDIDOS</h3>
                             <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
-                            <div class="border border-gray-300 p-4 min-h-24">
-                                <p>${dados.pedidos}</p>
-                            </div>
+                            <p><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">a) Receber e processar a presente ação;<br>
+                            b) Citar o requerido para, querendo, contestar a presente ação no prazo legal;<br>
+                            c) Ao final, julgar procedente o pedido, condenando o requerido ao pagamento de R$ [valor], devidamente corrigido e acrescido de juros legais;<br>
+                            d) Condenar o requerido ao pagamento das custas processuais e honorários advocatícios.</span></p>
                         </div>
 
-                        <div class="my-6">
-                            <p><strong>Dá-se à causa o valor de ${dados.valorCausa}.</strong></p>
+                        <p>Dá-se à causa o valor de <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">R$ 10.000,00</span>.</p>
+
+                        <div class="mt-8 text-center">
+                            <p>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Brasilândia</span>, 
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">${new Date().toLocaleDateString('pt-BR')}</span>.
+                            </p>
+                            
+                            <div class="mt-8">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>Advogado</p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                            </div>
                         </div>
+                    </div>
+        }
+
+        // RECURSO DE APELAÇÃO - Documento específico COM CAMPOS EDITÁVEIS
 
                         <div class="my-6">
                             <p>Protesta-se por todos os meios de prova em direito admitidas, especialmente prova documental, testemunhal e pericial.</p>
                             <p class="mt-4">Termos em que pede deferimento.</p>
                         </div>
 
-                        <!-- Rodapé -->
-                        <div class="mt-12 text-center">
-                            <p class="mb-8">
-                                ${dados.comarca}, ${new Date().toLocaleDateString('pt-BR')}.
+                        <div class="mt-8 text-center">
+                            <p>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Brasilândia</span>, 
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">${new Date().toLocaleDateString('pt-BR')}</span>.
                             </p>
-                            <div class="border-t border-gray-400 w-64 mx-auto pt-2">
-                                <p class="font-bold">${dadosAdvogado.nome}</p>
-                                <p>OAB/${dadosAdvogado.oab}</p>
+                            
+                            <div class="mt-8">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>Advogado</p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -9306,25 +9827,23 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             container.innerHTML = processosHtml;
         }
 
-        // Atualizar estatísticas
+        // Atualizar estatísticas (TEMPORARIAMENTE DESABILITADA)
         function updateProcessStats() {
-            const total = processosData.length;
-            const andamento = processosData.filter(p => p.status === 'em-andamento').length;
-            const pendentes = processosData.filter(p => p.status === 'protocolado').length;
-            const finalizados = processosData.filter(p => p.status === 'finalizado').length;
-            
-            // Atualizar estatísticas da seção de processos
-            document.getElementById('total-processos').textContent = total;
-            document.getElementById('processos-andamento').textContent = andamento;
-            document.getElementById('processos-pendentes').textContent = pendentes;
-            document.getElementById('processos-finalizados').textContent = finalizados;
-            
-            // Atualizar estatísticas do dashboard principal
-            const processosDiv = document.getElementById('processos-dashboard');
-            if (processosDiv) processosDiv.textContent = total;
-            
-            const profileDiv = document.getElementById('total-processos-profile');
-            if (profileDiv) profileDiv.textContent = total;
+            // Função desabilitada até reimplementação das seções Casos/Agenda
+            try {
+                const total = processosData.length || 0;
+                
+                // Atualizar apenas elementos que existem
+                const processosDiv = document.getElementById('processos-dashboard');
+                if (processosDiv) processosDiv.textContent = total;
+                
+                const profileDiv = document.getElementById('total-processos-profile');
+                if (profileDiv) profileDiv.textContent = total;
+                
+                console.log('📊 Estatísticas atualizadas: ' + total + ' processos');
+            } catch (error) {
+                console.log('⚠️ Erro nas estatísticas (ignorado):', error.message);
+            }
         }
 
         // Funções auxiliares
@@ -11428,42 +11947,53 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         function carregarCasos() {
             const listaCasos = document.getElementById('lista-casos');
             
-            if (casos.length === 0) {
-                listaCasos.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fas fa-folder-open text-4xl text-blue-400 mb-4"></i>
-                        <p class="text-blue-200">Nenhum caso encontrado. Clique em "Novo Caso" para começar.</p>
-                    </div>
-                `;
+            // Verificar se casos está definido
+            if (!casos || casos.length === 0) {
+                if (listaCasos) {
+                    listaCasos.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-folder-open text-4xl text-blue-400 mb-4"></i>
+                            <p class="text-blue-200">Nenhum caso encontrado. Clique em "Novo Caso" para começar.</p>
+                        </div>
+                    `;
+                }
                 return;
             }
 
-            listaCasos.innerHTML = casos.map(caso => `
-                <div class="case-card bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h4 class="text-white font-semibold text-lg">${caso.numero}</h4>
-                            <p class="text-blue-300">${caso.cliente}</p>
+            if (listaCasos) {
+                listaCasos.innerHTML = casos.map(caso => {
+                    // Verificar se caso é válido e tem as propriedades necessárias
+                    if (!caso) return '';
+                    
+                    const numero = caso.numero || 'Sem número';
+                    const cliente = caso.cliente || 'Sem cliente';
+                    const status = caso.status || 'pendente';
+                    const tipo = caso.tipo || 'geral';
+                    
+                    return `
+                        <div class="case-card bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h4 class="text-white font-semibold text-lg">${numero}</h4>
+                                    <p class="text-blue-300">${cliente}</p>
+                                </div>
+                            </div>
+                            <p class="text-blue-200 text-sm mb-3">${caso.descricao || 'Sem descrição'}</p>
+                            <div class="flex justify-between items-center">
+                                <small class="text-blue-400">Criado: ${caso.dataCriacao ? new Date(caso.dataCriacao).toLocaleDateString() : 'Data não informada'}</small>
+                                <div class="flex gap-2">
+                                    <button onclick="editarCaso('${caso.id || ''}')" class="text-blue-400 hover:text-blue-300" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="excluirCaso('${caso.id || ''}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <span class="px-2 py-1 rounded text-xs ${getStatusColor(caso.status)}">${caso.status.toUpperCase()}</span>
-                            <span class="px-2 py-1 rounded text-xs bg-blue-600/30 text-blue-200">${caso.tipo.toUpperCase()}</span>
-                        </div>
-                    </div>
-                    <p class="text-blue-200 text-sm mb-3">${caso.descricao || 'Sem descrição'}</p>
-                    <div class="flex justify-between items-center">
-                        <small class="text-blue-400">Criado: ${new Date(caso.dataCriacao).toLocaleDateString()}</small>
-                        <div class="flex gap-2">
-                            <button onclick="editarCaso('${caso.id}')" class="text-blue-400 hover:text-blue-300" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="excluirCaso('${caso.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+                    `;
+                }).filter(html => html !== '').join('');
+            }
         }
 
         // Função auxiliar para cores de status
@@ -11479,14 +12009,37 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
         // Filtrar casos
         function filtrarCasos() {
-            const busca = document.getElementById('busca-caso').value.toLowerCase();
-            const statusFiltro = document.getElementById('filtro-status').value;
-            const tipoFiltro = document.getElementById('filtro-tipo').value;
+            const buscaElement = document.getElementById('busca-caso');
+            const statusElement = document.getElementById('filtro-status');
+            const tipoElement = document.getElementById('filtro-tipo');
+            
+            const busca = buscaElement ? buscaElement.value.toLowerCase() : '';
+            const statusFiltro = statusElement ? statusElement.value : '';
+            const tipoFiltro = tipoElement ? tipoElement.value : '';
+
+            if (!casos || casos.length === 0) {
+                const listaCasos = document.getElementById('lista-casos');
+                if (listaCasos) {
+                    listaCasos.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-search text-4xl text-blue-400 mb-4"></i>
+                            <p class="text-blue-200">Nenhum caso encontrado.</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
 
             const casosFiltrados = casos.filter(caso => {
-                const matchBusca = caso.numero.toLowerCase().includes(busca) || 
-                                 caso.cliente.toLowerCase().includes(busca) ||
-                                 caso.descricao.toLowerCase().includes(busca);
+                if (!caso) return false;
+                
+                const numero = caso.numero || '';
+                const cliente = caso.cliente || '';
+                const descricao = caso.descricao || '';
+                
+                const matchBusca = numero.toLowerCase().includes(busca) || 
+                                 cliente.toLowerCase().includes(busca) ||
+                                 descricao.toLowerCase().includes(busca);
                 const matchStatus = !statusFiltro || caso.status === statusFiltro;
                 const matchTipo = !tipoFiltro || caso.tipo === tipoFiltro;
 
@@ -11495,6 +12048,8 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
             // Exibir casos filtrados (implementação similar a carregarCasos)
             const listaCasos = document.getElementById('lista-casos');
+            if (!listaCasos) return;
+            
             if (casosFiltrados.length === 0) {
                 listaCasos.innerHTML = `
                     <div class="text-center py-8">
@@ -11505,45 +12060,75 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 return;
             }
 
-            listaCasos.innerHTML = casosFiltrados.map(caso => `
-                <div class="case-card bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h4 class="text-white font-semibold text-lg">${caso.numero}</h4>
-                            <p class="text-blue-300">${caso.cliente}</p>
+            listaCasos.innerHTML = casosFiltrados.map(caso => {
+                if (!caso) return '';
+                
+                const numero = caso.numero || 'Sem número';
+                const cliente = caso.cliente || 'Sem cliente';
+                const status = caso.status || 'pendente';
+                const tipo = caso.tipo || 'geral';
+                
+                return `
+                    <div class="case-card bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="text-white font-semibold text-lg">${numero}</h4>
+                                <p class="text-blue-300">${cliente}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="px-2 py-1 rounded text-xs ${getStatusColor(status)}">${status.toUpperCase()}</span>
+                                <span class="px-2 py-1 rounded text-xs bg-blue-600/30 text-blue-200">${tipo.toUpperCase()}</span>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <span class="px-2 py-1 rounded text-xs ${getStatusColor(caso.status)}">${caso.status.toUpperCase()}</span>
-                            <span class="px-2 py-1 rounded text-xs bg-blue-600/30 text-blue-200">${caso.tipo.toUpperCase()}</span>
+                        <p class="text-blue-200 text-sm mb-3">${caso.descricao || 'Sem descrição'}</p>
+                        <div class="flex justify-between items-center">
+                            <small class="text-blue-400">Criado: ${caso.dataCriacao ? new Date(caso.dataCriacao).toLocaleDateString() : 'Data não informada'}</small>
+                            <div class="flex gap-2">
+                                <button onclick="editarCaso('${caso.id || ''}')" class="text-blue-400 hover:text-blue-300" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="excluirCaso('${caso.id || ''}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <p class="text-blue-200 text-sm mb-3">${caso.descricao || 'Sem descrição'}</p>
-                    <div class="flex justify-between items-center">
-                        <small class="text-blue-400">Criado: ${new Date(caso.dataCriacao).toLocaleDateString()}</small>
-                        <div class="flex gap-2">
-                            <button onclick="editarCaso('${caso.id}')" class="text-blue-400 hover:text-blue-300" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="excluirCaso('${caso.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).filter(html => html !== '').join('');
         }
 
         // Atualizar estatísticas de casos
         function atualizarEstatisticasCasos() {
-            const totalCasos = casos.length;
-            const casosAtivos = casos.filter(c => c.status === 'ativo').length;
-            const casosPendentes = casos.filter(c => c.status === 'pendente').length;
-            const casosUrgentes = casos.filter(c => c.status === 'ativo' && c.tipo === 'criminal').length;
+            try {
+                if (!casos || casos.length === 0) {
+                    // Zerar estatísticas se não há casos
+                    const elementos = ['total-casos', 'casos-ativos', 'casos-pendentes', 'casos-urgentes'];
+                    elementos.forEach(id => {
+                        const elemento = document.getElementById(id);
+                        if (elemento) elemento.textContent = '0';
+                    });
+                    return;
+                }
 
-            document.getElementById('total-casos').textContent = totalCasos;
-            document.getElementById('casos-ativos').textContent = casosAtivos;
-            document.getElementById('casos-pendentes').textContent = casosPendentes;
-            document.getElementById('casos-urgentes').textContent = casosUrgentes;
+                const totalCasos = casos.length;
+                const casosAtivos = casos.filter(c => c && c.status === 'ativo').length;
+                const casosPendentes = casos.filter(c => c && c.status === 'pendente').length;
+                const casosUrgentes = casos.filter(c => c && c.status === 'ativo' && c.tipo === 'criminal').length;
+
+                const totalElement = document.getElementById('total-casos');
+                const ativosElement = document.getElementById('casos-ativos');
+                const pendentesElement = document.getElementById('casos-pendentes');
+                const urgentesElement = document.getElementById('casos-urgentes');
+
+                if (totalElement) totalElement.textContent = totalCasos;
+                if (ativosElement) ativosElement.textContent = casosAtivos;
+                if (pendentesElement) pendentesElement.textContent = casosPendentes;
+                if (urgentesElement) urgentesElement.textContent = casosUrgentes;
+                
+                console.log('Estatísticas atualizadas:', { totalCasos, casosAtivos, casosPendentes, casosUrgentes });
+            } catch (error) {
+                console.error('Erro ao atualizar estatísticas de casos:', error);
+            }
         }
 
         // Editar caso
