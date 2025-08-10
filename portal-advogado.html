@@ -2099,7 +2099,8 @@
                 'lista-casos',
                 'casos-container', 
                 'sem-casos',
-                'novo-caso-form'
+                'novo-caso-form',
+                'meus-casos-card'  // ADICIONADO controle específico do card
             ];
             
             casosElements.forEach(id => {
@@ -9226,46 +9227,46 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
         // Função de compatibilidade (removida duplicação)
         // updateProcessList já definida acima
-                <div class="border border-blue-300/20 rounded-lg p-4 mb-4 bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
-                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-2">
-                                <h4 class="text-white font-semibold">${processo.assunto}</h4>
-                                <span class="px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(processo.status)}">
-                                    ${getStatusText(processo.status)}
-                                </span>
-                                ${processo.protocolo ? `<span class="text-blue-300 text-sm font-mono">${processo.protocolo}</span>` : ''}
-                            </div>
-                            
-                            <div class="text-blue-200 text-sm space-y-1">
-                                <div><strong>Cliente:</strong> ${processo.requerente}</div>
-                                <div><strong>RG/Passaporte:</strong> ${processo.documentoRequerente}</div>
-                                <div><strong>Advogado:</strong> ${processo.advogadoResponsavel} (OAB: ${processo.oabAdvogado})</div>
-                                <div><strong>Tipo:</strong> ${getTipoProcessoText(processo.tipoProcesso)}</div>
-                                ${processo.valorCausa > 0 ? `<div><strong>Valor:</strong> R$ ${processo.valorCausa.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>` : ''}
-                                <div><strong>Data:</strong> ${formatDate(processo.dataAberto)}</div>
-                                ${renderAnexosInfo(processo)}
-                            </div>
-                        </div>
-                        
-                        <div class="flex gap-2">
-                            <button onclick="viewProcess('${processo.id}')" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm">
-                                <i class="fas fa-eye mr-1"></i>Ver
-                            </button>
-                            ${processo.status === 'rascunho' ? `
-                                <button onclick="editProcess('${processo.id}')" class="btn bg-yellow-600 hover:bg-yellow-700 text-white text-sm">
-                                    <i class="fas fa-edit mr-1"></i>Editar
-                                </button>
-                            ` : ''}
-                            <button onclick="deleteProcess('${processo.id}')" class="btn bg-red-600 hover:bg-red-700 text-white text-sm">
-                                <i class="fas fa-trash mr-1"></i>Excluir
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            container.innerHTML = processosHtml;
+
+        // === FUNÇÕES AUXILIARES ===
+        
+        function getStatusBadgeClass(status) {
+            const classes = {
+                'rascunho': 'bg-yellow-600/20 text-yellow-300',
+                'protocolado': 'bg-blue-600/20 text-blue-300',
+                'em-andamento': 'bg-green-600/20 text-green-300',
+                'finalizado': 'bg-gray-600/20 text-gray-300'
+            };
+            return classes[status] || 'bg-gray-600/20 text-gray-300';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'rascunho': 'Rascunho',
+                'protocolado': 'Protocolado', 
+                'em-andamento': 'Em Andamento',
+                'finalizado': 'Finalizado'
+            };
+            return texts[status] || 'Desconhecido';
+        }
+
+        function getTipoProcessoText(tipo) {
+            const tipos = {
+                'civil': 'Cível',
+                'criminal': 'Criminal',
+                'trabalhista': 'Trabalhista',
+                'tributario': 'Tributário',
+                'familia': 'Família'
+            };
+            return tipos[tipo] || 'Outro';
+        }
+
+        // Função para renderizar informações de anexos
+        function renderAnexosInfo(processo) {
+            if (processo.anexos && processo.anexos.length > 0) {
+                return `<div><strong>Anexos:</strong> ${processo.anexos.length} arquivo${processo.anexos.length > 1 ? 's' : ''}</div>`;
+            }
+            return '';
         }
 
         // Atualizar estatísticas
@@ -9350,7 +9351,6 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
             const filteredProcesses = filterProcessesByStatus();
             console.log('📋 Atualizando lista com', filteredProcesses.length, 'casos');
-        }
             
             const processosHtml = filteredProcesses.map(processo => `
                 <div class="bg-slate-800/50 border border-blue-300/20 rounded-lg p-6 hover:border-blue-400/40 transition-colors cursor-pointer"
@@ -11555,19 +11555,19 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         // === FUNÇÕES DE NAVEGAÇÃO E INTERFACE ===
         
         // showSection já definida no início do script - removendo duplicação
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                
-                const navItem = document.querySelector(`[data-section="${sectionName}"]`);
-                if (navItem) {
-                    navItem.classList.add('active');
-                }
-                
-                showNotification(`📋 Seção ${sectionName} carregada`, 'info');
-            } else {
-                console.error(`❌ Seção ${sectionName} não encontrada`);
-                showNotification(`❌ Seção ${sectionName} não encontrada`, 'error');
+
+        function showUserProfile() {
+            if (typeof userProfile !== 'undefined') {
+                document.getElementById('userInfo').innerHTML = `
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-user-circle text-6xl text-blue-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">${userProfile.nome}</h3>
+                        <p class="text-blue-300">${userProfile.oab}</p>
+                        <p class="text-gray-300 text-sm">${userProfile.email}</p>
+                    </div>
+                `;
             }
         }
 
