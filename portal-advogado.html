@@ -2079,6 +2079,85 @@
             mobileMenuOpen: false
         };
 
+        // === FUNÇÃO CRÍTICA DE NAVEGAÇÃO (carregada primeiro) ===
+        // Função para mostrar seções
+        function showSection(sectionName) {
+            console.log('🔄 Navegando para seção:', sectionName);
+            
+            // FORÇAR ocultação de todas as seções
+            const sections = document.querySelectorAll('.section');
+            console.log('📋 Total de seções encontradas:', sections.length);
+            
+            sections.forEach((section, index) => {
+                section.classList.remove('active');
+                section.style.display = 'none'; // FORÇAR hide via CSS inline
+                console.log(`Seção ${index}: ${section.id} - removendo active e forçando hide`);
+            });
+            
+            // CONTROLAR elementos específicos de casos
+            const casosElements = [
+                'lista-casos',
+                'casos-container', 
+                'sem-casos',
+                'novo-caso-form'
+            ];
+            
+            casosElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (sectionName === 'casos') {
+                        // SE estou na seção casos, MOSTRAR os elementos
+                        element.style.display = '';
+                        element.style.visibility = 'visible';
+                        console.log(`✅ Mostrando elemento de casos: ${id}`);
+                    } else {
+                        // SE NÃO estou na seção casos, ESCONDER os elementos
+                        element.style.display = 'none';
+                        element.style.visibility = 'hidden';
+                        console.log(`🚫 Escondendo elemento de casos: ${id}`);
+                    }
+                }
+            });
+            
+            // Mostrar seção específica
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                targetSection.style.display = 'block'; // FORÇAR show via CSS inline
+                console.log(`✅ Seção ${sectionName} ativada e forçada a aparecer`);
+                
+                // Se for a seção casos, garantir que todos os elementos internos estejam visíveis
+                if (sectionName === 'casos') {
+                    // Forçar visibilidade de todos os elementos dentro da seção casos
+                    const casosSection = document.getElementById('casos');
+                    if (casosSection) {
+                        const allCasosElements = casosSection.querySelectorAll('*');
+                        allCasosElements.forEach(el => {
+                            if (el.style.display === 'none') {
+                                el.style.display = '';
+                            }
+                        });
+                        console.log('🎯 Todos elementos da seção casos foram forçados a aparecer');
+                    }
+                }
+                
+                // Atualizar navegação ativa
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                const navItem = document.querySelector(`[data-section="${sectionName}"]`);
+                if (navItem) {
+                    navItem.classList.add('active');
+                }
+                
+                // Log de sucesso
+                console.log(`📋 Seção ${sectionName} carregada com sucesso`);
+            } else {
+                console.error(`❌ Seção ${sectionName} não encontrada`);
+            }
+        }
+
         // ===== GERADOR COM DESIGN ANTIGO + FUNCIONALIDADES DO INDEX =====
         
         // Função principal (DESIGN ANTIGO + FUNCIONALIDADES INDEX)
@@ -9145,19 +9224,8 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             return '';
         }
 
-        // Atualizar lista de processos
-        function updateProcessList() {
-            const container = document.getElementById('processos-container');
-            const semProcessos = document.getElementById('sem-processos');
-            
-            if (processosData.length === 0) {
-                semProcessos.classList.remove('hidden');
-                return;
-            }
-            
-            semProcessos.classList.add('hidden');
-            
-            const processosHtml = processosData.map(processo => `
+        // Função de compatibilidade (removida duplicação)
+        // updateProcessList já definida acima
                 <div class="border border-blue-300/20 rounded-lg p-4 mb-4 bg-slate-800/30 hover:bg-slate-800/50 transition-colors">
                     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                         <div class="flex-1">
@@ -9258,21 +9326,31 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             updateProcessStats();
         }
 
-        // Atualizar lista de processos
+        // Atualizar lista de casos (função unificada)
         function updateProcessList() {
-            const container = document.getElementById('processos-list');
-            const semProcessos = document.getElementById('sem-processos');
+            // Tentar ambos os IDs para compatibilidade
+            const container = document.getElementById('casos-list') || document.getElementById('processos-list');
+            const semCasos = document.getElementById('sem-casos') || document.getElementById('sem-processos');
             
-            if (processosData.length === 0) {
-                container.style.display = 'none';
-                semProcessos.style.display = 'block';
+            if (!container) {
+                console.warn('⚠️ Container de casos não encontrado');
                 return;
             }
             
-            container.style.display = 'block';
-            semProcessos.style.display = 'none';
+            const processosData = AppState.cases || [];
+            
+            if (processosData.length === 0) {
+                if (container) container.style.display = 'none';
+                if (semCasos) semCasos.style.display = 'block';
+                return;
+            }
+            
+            if (container) container.style.display = 'block';
+            if (semCasos) semCasos.style.display = 'none';
 
             const filteredProcesses = filterProcessesByStatus();
+            console.log('📋 Atualizando lista com', filteredProcesses.length, 'casos');
+        }
             
             const processosHtml = filteredProcesses.map(processo => `
                 <div class="bg-slate-800/50 border border-blue-300/20 rounded-lg p-6 hover:border-blue-400/40 transition-colors cursor-pointer"
@@ -11476,71 +11554,9 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
 
         // === FUNÇÕES DE NAVEGAÇÃO E INTERFACE ===
         
-        // Função para mostrar seções
-        function showSection(sectionName) {
-            console.log('🔄 Navegando para seção:', sectionName);
-            
-            // FORÇAR ocultação de todas as seções
-            const sections = document.querySelectorAll('.section');
-            console.log('📋 Total de seções encontradas:', sections.length);
-            
-            sections.forEach((section, index) => {
-                section.classList.remove('active');
-                section.style.display = 'none'; // FORÇAR hide via CSS inline
-                console.log(`Seção ${index}: ${section.id} - removendo active e forçando hide`);
-            });
-            
-            // CONTROLAR elementos específicos de casos
-            const casosElements = [
-                'lista-casos',
-                'casos-container', 
-                'sem-casos',
-                'novo-caso-form'
-            ];
-            
-            casosElements.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    if (sectionName === 'casos') {
-                        // SE estou na seção casos, MOSTRAR os elementos
-                        element.style.display = '';
-                        element.style.visibility = 'visible';
-                        console.log(`✅ Mostrando elemento de casos: ${id}`);
-                    } else {
-                        // SE NÃO estou na seção casos, ESCONDER os elementos
-                        element.style.display = 'none';
-                        element.style.visibility = 'hidden';
-                        console.log(`🚫 Escondendo elemento de casos: ${id}`);
-                    }
-                }
-            });
-            
-            // Mostrar seção específica
-            const targetSection = document.getElementById(sectionName);
-            if (targetSection) {
-                targetSection.classList.add('active');
-                targetSection.style.display = 'block'; // FORÇAR show via CSS inline
-                console.log(`✅ Seção ${sectionName} ativada e forçada a aparecer`);
-                
-                // Se for a seção casos, garantir que todos os elementos internos estejam visíveis
-                if (sectionName === 'casos') {
-                    // Forçar visibilidade de todos os elementos dentro da seção casos
-                    const casosSection = document.getElementById('casos');
-                    if (casosSection) {
-                        const allCasosElements = casosSection.querySelectorAll('*');
-                        allCasosElements.forEach(el => {
-                            if (el.style.display === 'none') {
-                                el.style.display = '';
-                            }
-                        });
-                        console.log('🎯 Todos elementos da seção casos foram forçados a aparecer');
-                    }
-                }
-                
-                // Atualizar navegação ativa
+        // showSection já definida no início do script - removendo duplicação
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.classList.remove('active');
-                });
                 });
                 
                 const navItem = document.querySelector(`[data-section="${sectionName}"]`);
