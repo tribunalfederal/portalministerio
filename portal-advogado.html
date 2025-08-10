@@ -2099,8 +2099,7 @@
                 'lista-casos',
                 'casos-container', 
                 'sem-casos',
-                'novo-caso-form',
-                'meus-casos-card'  // ADICIONADO controle específico do card
+                'novo-caso-form'
             ];
             
             casosElements.forEach(id => {
@@ -2150,6 +2149,18 @@
                 const navItem = document.querySelector(`[data-section="${sectionName}"]`);
                 if (navItem) {
                     navItem.classList.add('active');
+                }
+                
+                // EXTRA: Se for dashboard, forçar esconder card "Meus Casos"
+                if (sectionName === 'dashboard') {
+                    setTimeout(() => {
+                        const listaCasos = document.getElementById('lista-casos');
+                        if (listaCasos) {
+                            listaCasos.style.display = 'none';
+                            listaCasos.style.visibility = 'hidden';
+                            console.log('🔒 DASHBOARD: Lista de casos forçadamente escondida');
+                        }
+                    }, 50);
                 }
                 
                 // Log de sucesso
@@ -12483,8 +12494,18 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 }
             });
             
-            // Mostrar dashboard por padrão
+            // Mostrar dashboard por padrão E garantir que casos estejam escondidos
             showSection('dashboard');
+            
+            // FORÇA EXTRA: Esconder lista de casos especificamente no dashboard
+            setTimeout(() => {
+                const listaCasos = document.getElementById('lista-casos');
+                if (listaCasos) {
+                    listaCasos.style.display = 'none';
+                    listaCasos.style.visibility = 'hidden';
+                    console.log('🔒 FORÇADO: Lista de casos escondida no dashboard inicial');
+                }
+            }, 100);
             
             console.log('✅ Sistema inicializado com sucesso!');
             showNotification('🎉 Portal do Advogado carregado com sucesso!', 'success');
