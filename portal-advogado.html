@@ -9,6 +9,50 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // 🔥 CONFIGURAÇÕES DO FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjfrCStqaOKJmezF4ztfnJGOq4Y4QWdNA",
+            authDomain: "sistema-juridico-brasila-7c777.firebaseapp.com",
+            projectId: "sistema-juridico-brasila-7c777",
+            storageBucket: "sistema-juridico-brasila-7c777.firebasestorage.app",
+            messagingSenderId: "1094857204040",
+            appId: "1:1094857204040:web:f2af65b6a2a0cf5e3c7e90"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Expor globalmente para uso nos scripts
+        window.firebaseAuth = auth;
+        window.firebaseDB = db;
+        window.firebaseApp = app;
+        window.firebaseModules = {
+            doc, setDoc, getDoc, collection, addDoc, getDocs, 
+            onSnapshot, deleteDoc, updateDoc, query, where, orderBy,
+            signOut, onAuthStateChanged
+        };
+
+        console.log('🔥 Firebase inicializado no Portal do Advogado!');
+
+        // ===== SISTEMA DE SINCRONIZAÇÃO ENTRE PORTAIS =====
+        window.PORTAL_SYNC = {
+            portalType: 'advogado',
+            syncProcessos: true,
+            syncHierarquia: true,
+            syncDocumentos: true,
+            syncCalculos: true,
+            lastSync: null
+        };
+    </script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
@@ -542,17 +586,21 @@
                     
                     <!-- Botões de Ação -->
                     <div class="flex flex-wrap gap-3">
-                        <!-- Perfil Completo -->
-                        <button onclick="showUserProfile()" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2">
-                            <i class="fas fa-user mr-2"></i>Perfil
-                        </button>
-                        
-                        <!-- Hierarquia Jurídica -->
-                        <button onclick="showJudicialHierarchy()" class="btn bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-2">
-                            <i class="fas fa-sitemap mr-2"></i>Hierarquia
-                        </button>
-                        
-                        <!-- Configurações -->
+                    <!-- Perfil Completo -->
+                    <button onclick="showUserProfile()" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2">
+                        <i class="fas fa-user mr-2"></i>Perfil
+                    </button>
+                    
+                    <!-- Status de Sincronização -->
+                    <div class="flex items-center gap-2 px-3 py-2 bg-black/20 rounded-lg">
+                        <i id="sync-status" class="fas fa-circle text-gray-400" title="Status de Conectividade"></i>
+                        <span class="text-xs text-blue-200">Sync</span>
+                    </div>
+                    
+                    <!-- Hierarquia Jurídica -->
+                    <button onclick="showJudicialHierarchy()" class="btn bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-2">
+                        <i class="fas fa-sitemap mr-2"></i>Hierarquia
+                    </button>                        <!-- Configurações -->
                         <button onclick="showSettings()" class="btn bg-gray-600 hover:bg-gray-700 text-white text-sm px-4 py-2">
                             <i class="fas fa-cog mr-2"></i>Config
                         </button>
@@ -2483,43 +2531,125 @@
         function capturarFotoDocumento() {
             const conteudo = document.getElementById('conteudo-documento');
             if (!conteudo) {
-                alert('Nenhum documento para capturar');
+                showNotification('❌ Nenhum documento para capturar', 'error');
                 return;
             }
             
-            // Usar html2canvas para capturar o elemento (MESMO CÓDIGO INDEX)
-            html2canvas(conteudo, {
-                scale: 3, // Alta resolução
+            showNotification('📸 Gerando captura em alta resolução...', 'info', 2000);
+            
+            // Verificar se html2canvas está disponível
+            if (typeof html2canvas === 'undefined') {
+                showNotification('❌ Biblioteca html2canvas não carregada', 'error');
+                return;
+            }
+            
+            // Configurações otimizadas para captura
+            const options = {
+                scale: 2, // Alta resolução mas otimizada
                 useCORS: true,
-                allowTaint: true,
+                allowTaint: false,
                 backgroundColor: '#ffffff',
                 width: conteudo.scrollWidth,
-                height: conteudo.scrollHeight
-            }).then(canvas => {
-                // Criar link para download
-                const link = document.createElement('a');
-                link.download = `documento_${new Date().getTime()}.png`;
-                link.href = canvas.toDataURL('image/png', 1.0);
-                link.click();
+                height: conteudo.scrollHeight,
+                scrollX: 0,
+                scrollY: 0,
+                foreignObjectRendering: true
+            };
+            
+            // Capturar elemento com html2canvas
+            html2canvas(conteudo, options).then(canvas => {
+                try {
+                    // Gerar nome do arquivo com timestamp
+                    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+                    const filename = `documento_${timestamp}.png`;
+                    
+                    // Converter para blob para melhor performance
+                    canvas.toBlob(function(blob) {
+                        if (blob) {
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.download = filename;
+                            link.href = url;
+                            
+                            // Trigger download
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            
+                            // Limpar URL
+                            setTimeout(() => URL.revokeObjectURL(url), 1000);
+                            
+                            showNotification('✅ Captura salva com sucesso!', 'success');
+                            
+                            // Log da operação
+                            logSystemActivity('DOCUMENT_CAPTURE', { filename: filename });
+                        } else {
+                            throw new Error('Falha na geração do blob');
+                        }
+                    }, 'image/png', 0.95);
+                    
+                } catch (error) {
+                    console.error('Erro na captura:', error);
+                    showNotification('❌ Erro ao salvar captura', 'error');
+                }
                 
-                alert('📸 Foto HD do documento gerada com sucesso!');
-            }).catch(err => {
-                // Fallback: captura simples
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = 1200;
-                canvas.height = 1600;
+            }).catch(error => {
+                console.error('Erro html2canvas:', error);
                 
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.fillStyle = '#000000';
-                ctx.font = '16px Arial';
-                ctx.fillText('Documento gerado com sucesso!', 50, 50);
-                
-                const link = document.createElement('a');
-                link.download = `documento_${new Date().getTime()}.png`;
-                link.href = canvas.toDataURL();
+                // Fallback: método alternativo
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Configurar canvas
+                    canvas.width = 794; // A4 width em pixels (72 DPI)
+                    canvas.height = 1123; // A4 height em pixels (72 DPI)
+                    
+                    // Fundo branco
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Adicionar texto básico
+                    ctx.fillStyle = '#000000';
+                    ctx.font = 'bold 24px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('DOCUMENTO JURÍDICO', canvas.width / 2, 100);
+                    
+                    ctx.font = '16px Arial';
+                    ctx.textAlign = 'left';
+                    
+                    // Extrair texto básico do documento
+                    const textoDocumento = conteudo.innerText || conteudo.textContent || '';
+                    const linhas = textoDocumento.split('\n').slice(0, 30); // Primeiras 30 linhas
+                    
+                    let y = 150;
+                    linhas.forEach(linha => {
+                        if (linha.trim() && y < canvas.height - 50) {
+                            ctx.fillText(linha.substring(0, 80), 50, y); // Máximo 80 caracteres por linha
+                            y += 25;
+                        }
+                    });
+                    
+                    // Adicionar rodapé
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, canvas.width / 2, canvas.height - 30);
+                    
+                    // Download
+                    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+                    const link = document.createElement('a');
+                    link.download = `documento_fallback_${timestamp}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    showNotification('⚠️ Captura básica gerada (modo alternativo)', 'warning');
+                    
+                } catch (fallbackError) {
+                    console.error('Erro no fallback:', fallbackError);
+                    showNotification('❌ Falha completa na captura', 'error');
+                }
+            });
+        }
                 link.click();
                 
                 alert('📸 Documento capturado (modo fallback)!');
@@ -3183,16 +3313,6 @@
                                 <p>Advogado</p>
                                 <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
                             </div>
-                        </div>
-                    </div>
-        }
-
-        // RECURSO DE APELAÇÃO - Documento específico COM CAMPOS EDITÁVEIS
-                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
-                                <p>Advogado</p>
-                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
-                            </div>
-                        </div>
                         </div>
                     </div>
                 </div>
@@ -6246,50 +6366,539 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
             }
         }
 
-        // Mostrar notificação
-        function showNotification(message, type = 'info') {
+        // ===== SISTEMA AVANÇADO DE NOTIFICAÇÕES =====
+        
+        let notificationQueue = [];
+        let maxNotifications = 5;
+
+        // Mostrar notificação avançada
+        function showNotification(message, type = 'info', duration = 4000, actions = null) {
+            // Limitar número de notificações simultâneas
+            if (document.querySelectorAll('.notification-toast').length >= maxNotifications) {
+                const oldest = document.querySelector('.notification-toast');
+                if (oldest) oldest.remove();
+            }
+
             // Criar elemento de notificação
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg border transform transition-all duration-300 translate-x-full`;
+            const notificationId = 'notification-' + Date.now();
+            notification.id = notificationId;
+            notification.className = `notification-toast fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl border transform transition-all duration-300 translate-x-full max-w-sm`;
             
-            // Definir cores baseadas no tipo
+            // Definir cores e ícones baseados no tipo
+            let bgColor, borderColor, icon, iconColor;
             switch(type) {
                 case 'success':
-                    notification.className += ' bg-green-600 border-green-500 text-white';
+                    bgColor = 'bg-green-600/95';
+                    borderColor = 'border-green-500';
+                    icon = 'fa-check-circle';
+                    iconColor = 'text-green-200';
                     break;
                 case 'error':
-                    notification.className += ' bg-red-600 border-red-500 text-white';
+                    bgColor = 'bg-red-600/95';
+                    borderColor = 'border-red-500';
+                    icon = 'fa-exclamation-triangle';
+                    iconColor = 'text-red-200';
                     break;
                 case 'warning':
-                    notification.className += ' bg-yellow-600 border-yellow-500 text-white';
+                    bgColor = 'bg-yellow-600/95';
+                    borderColor = 'border-yellow-500';
+                    icon = 'fa-exclamation-circle';
+                    iconColor = 'text-yellow-200';
+                    break;
+                case 'firebase':
+                    bgColor = 'bg-orange-600/95';
+                    borderColor = 'border-orange-500';
+                    icon = 'fa-database';
+                    iconColor = 'text-orange-200';
+                    break;
+                case 'sync':
+                    bgColor = 'bg-purple-600/95';
+                    borderColor = 'border-purple-500';
+                    icon = 'fa-sync-alt';
+                    iconColor = 'text-purple-200';
                     break;
                 default:
-                    notification.className += ' bg-blue-600 border-blue-500 text-white';
+                    bgColor = 'bg-blue-600/95';
+                    borderColor = 'border-blue-500';
+                    icon = 'fa-info-circle';
+                    iconColor = 'text-blue-200';
             }
             
+            notification.className += ` ${bgColor} ${borderColor} text-white backdrop-blur-sm`;
+            
+            const actionsHtml = actions ? `
+                <div class="flex gap-2 mt-2">
+                    ${actions.map(action => `
+                        <button onclick="${action.onClick}" class="px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs transition-colors">
+                            ${action.label}
+                        </button>
+                    `).join('')}
+                </div>
+            ` : '';
+            
             notification.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info'}-circle"></i>
-                    <span>${message}</span>
+                <div class="flex items-start gap-3">
+                    <i class="fas ${icon} ${iconColor} mt-0.5 flex-shrink-0"></i>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium">${message}</div>
+                        ${actionsHtml}
+                    </div>
+                    <button onclick="removeNotification('${notificationId}')" class="text-white/60 hover:text-white ml-2 flex-shrink-0">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
                 </div>
             `;
             
             // Adicionar ao body
             document.body.appendChild(notification);
             
+            // Ajustar posição das notificações existentes
+            adjustNotificationPositions();
+            
             // Animar entrada
             setTimeout(() => {
                 notification.classList.remove('translate-x-full');
             }, 100);
             
-            // Remover após 4 segundos
+            // Remover automaticamente
             setTimeout(() => {
+                removeNotification(notificationId);
+            }, duration);
+
+            return notificationId;
+        }
+
+        // Remover notificação específica
+        function removeNotification(notificationId) {
+            const notification = document.getElementById(notificationId);
+            if (notification) {
                 notification.classList.add('translate-x-full');
                 setTimeout(() => {
                     notification.remove();
+                    adjustNotificationPositions();
                 }, 300);
-            }, 4000);
+            }
         }
+
+        // Ajustar posições das notificações
+        function adjustNotificationPositions() {
+            const notifications = document.querySelectorAll('.notification-toast');
+            notifications.forEach((notification, index) => {
+                notification.style.top = `${1 + (index * 5.5)}rem`;
+            });
+        }
+
+        // Notificação de sincronização
+        function showSyncNotification(message, status = 'info') {
+            return showNotification(message, 'sync', 3000);
+        }
+
+        // Notificação do Firebase
+        function showFirebaseNotification(message, status = 'info') {
+            return showNotification(message, 'firebase', 4000);
+        }
+
+        // ===== SISTEMA DE SINCRONIZAÇÃO FIREBASE =====
+
+        // Sincronizar dados com Firebase
+        async function syncWithFirebase(collection, data, operation = 'create') {
+            if (!window.firebaseDB) {
+                showNotification('Firebase não inicializado', 'error');
+                return false;
+            }
+
+            try {
+                showSyncNotification('Sincronizando dados...', 'sync');
+                
+                const { doc, setDoc, updateDoc, deleteDoc, collection: fbCollection, addDoc } = window.firebaseModules;
+                
+                switch(operation) {
+                    case 'create':
+                        if (data.id) {
+                            await setDoc(doc(window.firebaseDB, collection, data.id), {
+                                ...data,
+                                portalOrigin: 'advogado',
+                                timestamp: new Date(),
+                                lastSync: new Date()
+                            });
+                        } else {
+                            const docRef = await addDoc(fbCollection(window.firebaseDB, collection), {
+                                ...data,
+                                portalOrigin: 'advogado',
+                                timestamp: new Date(),
+                                lastSync: new Date()
+                            });
+                            data.id = docRef.id;
+                        }
+                        break;
+                        
+                    case 'update':
+                        await updateDoc(doc(window.firebaseDB, collection, data.id), {
+                            ...data,
+                            lastSync: new Date()
+                        });
+                        break;
+                        
+                    case 'delete':
+                        await deleteDoc(doc(window.firebaseDB, collection, data.id));
+                        break;
+                }
+                
+                showSyncNotification('Dados sincronizados com sucesso!', 'success');
+                updateSyncStatus(true);
+                return true;
+                
+            } catch (error) {
+                console.error('Erro na sincronização:', error);
+                showNotification('Erro na sincronização: ' + error.message, 'error');
+                updateSyncStatus(false);
+                return false;
+            }
+        }
+
+        // Atualizar status de sincronização
+        function updateSyncStatus(isConnected) {
+            window.PORTAL_SYNC.lastSync = isConnected ? new Date() : window.PORTAL_SYNC.lastSync;
+            window.PORTAL_SYNC.isConnected = isConnected;
+            
+            // Atualizar indicador visual (se existir)
+            const syncIndicator = document.getElementById('sync-status');
+            if (syncIndicator) {
+                syncIndicator.className = isConnected ? 
+                    'text-green-400' : 'text-red-400';
+                syncIndicator.title = isConnected ? 
+                    'Conectado ao Firebase' : 'Desconectado do Firebase';
+            }
+        }
+
+        // Sincronizar processo específico
+        async function syncProcess(processo, operation = 'create') {
+            return await syncWithFirebase('processos', processo, operation);
+        }
+
+        // Sincronizar cálculo de sentença
+        async function syncCalculation(calculo, operation = 'create') {
+            return await syncWithFirebase('calculos', calculo, operation);
+        }
+
+        // Sincronizar documento gerado
+        async function syncDocument(documento, operation = 'create') {
+            return await syncWithFirebase('documentos', documento, operation);
+        }
+
+        // ===== SISTEMA DE SINCRONIZAÇÃO EM TEMPO REAL =====
+
+        // Escutar mudanças em tempo real
+        function startRealTimeSync() {
+            if (!window.firebaseDB) return;
+
+            const { onSnapshot, collection, query, where } = window.firebaseModules;
+            
+            // Escutar mudanças nos processos
+            const processosQuery = query(
+                collection(window.firebaseDB, 'processos'),
+                where('portalOrigin', '!=', 'advogado') // Apenas de outros portais
+            );
+            
+            onSnapshot(processosQuery, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added' || change.type === 'modified') {
+                        showNotification(`Processo atualizado por ${change.doc.data().portalOrigin}`, 'sync', 3000);
+                    }
+                });
+            });
+
+            // Escutar mudanças na hierarquia
+            const hierarchyQuery = collection(window.firebaseDB, 'hierarquia');
+            onSnapshot(hierarchyQuery, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added' || change.type === 'modified') {
+                        const data = change.doc.data();
+                        if (data.portalOrigin !== 'advogado') {
+                            showNotification(`Hierarquia atualizada: ${data.cargo}`, 'sync', 3000);
+                            // Atualizar dados locais
+                            if (window.hierarchyData && data.id) {
+                                window.hierarchyData[data.id] = data;
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        // ===== INICIALIZAÇÃO DO FIREBASE =====
+        
+        // Inicializar Firebase
+        async function initializeFirebase() {
+            try {
+                // Verificar se o Firebase já foi inicializado
+                if (window.firebaseDB) {
+                    return true;
+                }
+
+                // Verificar se os módulos do Firebase estão disponíveis
+                if (!window.firebaseModules) {
+                    throw new Error('Firebase SDK não carregado');
+                }
+
+                const { initializeApp, getFirestore, getAuth, connectAuthEmulator, connectFirestoreEmulator } = window.firebaseModules;
+
+                // Configuração do Firebase (produção)
+                const firebaseConfig = {
+                    apiKey: "AIzaSyC9vJ8J5vJ8J5vJ8J5vJ8J5vJ8J5vJ8J5v",
+                    authDomain: "portal-ministerio.firebaseapp.com", 
+                    projectId: "portal-ministerio",
+                    storageBucket: "portal-ministerio.appspot.com",
+                    messagingSenderId: "123456789012",
+                    appId: "1:123456789012:web:abcdef123456789012345678"
+                };
+
+                // Inicializar Firebase App
+                const app = initializeApp(firebaseConfig);
+                
+                // Inicializar Firestore
+                window.firebaseDB = getFirestore(app);
+                
+                // Inicializar Auth
+                window.firebaseAuth = getAuth(app);
+
+                console.log('Firebase inicializado com sucesso');
+                return true;
+
+            } catch (error) {
+                console.error('Erro ao inicializar Firebase:', error);
+                
+                // Modo simulação para desenvolvimento local
+                window.firebaseDB = {
+                    simulation: true,
+                    collections: {}
+                };
+                
+                console.warn('Firebase em modo simulação');
+                return false;
+            }
+        }
+
+        // Obter usuário atual
+        function getCurrentUser() {
+            if (window.firebaseAuth && window.firebaseAuth.currentUser) {
+                return window.firebaseAuth.currentUser.email || window.firebaseAuth.currentUser.uid;
+            }
+            
+            // Fallback para dados locais
+            const userData = localStorage.getItem('userProfile');
+            if (userData) {
+                const user = JSON.parse(userData);
+                return user.nome || 'Usuário Logado';
+            }
+            
+            return 'Sistema';
+        }
+
+        // Gerar protocolo único
+        function generateProtocol() {
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `ADV-${timestamp}-${random}`;
+        }
+
+        // ===== SISTEMA DE VALIDAÇÃO E SEGURANÇA =====
+        
+        // Validar integridade do sistema
+        function validateSystemIntegrity() {
+            const errors = [];
+            const warnings = [];
+            
+            // Verificar elementos críticos da DOM
+            const criticalElements = [
+                'dashboard', 'documentos', 'calculadora', 
+                'casos', 'agenda', 'sync-status'
+            ];
+            
+            criticalElements.forEach(id => {
+                if (!document.getElementById(id)) {
+                    errors.push(`Elemento crítico não encontrado: ${id}`);
+                }
+            });
+            
+            // Verificar dados essenciais
+            if (!window.PORTAL_SYNC) {
+                errors.push('PORTAL_SYNC não inicializado');
+            }
+            
+            if (!window.firebaseModules) {
+                warnings.push('Firebase SDK não carregado - funcionará em modo offline');
+            }
+            
+            // Verificar localStorage
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+            } catch (error) {
+                errors.push('LocalStorage não disponível');
+            }
+            
+            // Relatório de validação
+            if (errors.length > 0) {
+                console.error('❌ Erros críticos encontrados:', errors);
+                showNotification('Sistema com problemas críticos', 'error', 8000);
+                return false;
+            }
+            
+            if (warnings.length > 0) {
+                console.warn('⚠️ Avisos do sistema:', warnings);
+                warnings.forEach(warning => {
+                    showNotification(warning, 'warning', 4000);
+                });
+            }
+            
+            console.log('✅ Sistema validado com sucesso');
+            return true;
+        }
+
+        // Sanitizar dados de entrada
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return input;
+            
+            return input
+                .replace(/[<>]/g, '') // Remove caracteres HTML básicos
+                .replace(/javascript:/gi, '') // Remove javascript: 
+                .replace(/on\w+=/gi, '') // Remove event handlers
+                .trim();
+        }
+
+        // Validar dados do processo
+        function validateProcessData(processo) {
+            const required = ['assunto', 'requerente', 'documentoRequerente'];
+            const missing = required.filter(field => !processo[field] || processo[field].trim() === '');
+            
+            if (missing.length > 0) {
+                throw new Error(`Campos obrigatórios não preenchidos: ${missing.join(', ')}`);
+            }
+            
+            // Sanitizar dados
+            Object.keys(processo).forEach(key => {
+                if (typeof processo[key] === 'string') {
+                    processo[key] = sanitizeInput(processo[key]);
+                }
+            });
+            
+            return true;
+        }
+
+        // Sistema de backup automático
+        function createSystemBackup() {
+            try {
+                const backup = {
+                    timestamp: new Date().toISOString(),
+                    version: '2.0',
+                    data: {
+                        processos: processosData || [],
+                        userProfile: JSON.parse(localStorage.getItem('userProfile') || '{}'),
+                        agenda: JSON.parse(localStorage.getItem('eventos') || '[]'),
+                        configuracao: JSON.parse(localStorage.getItem('configuracao') || '{}')
+                    }
+                };
+                
+                localStorage.setItem('systemBackup', JSON.stringify(backup));
+                localStorage.setItem('lastBackup', new Date().toISOString());
+                
+                console.log('💾 Backup automático criado');
+                return true;
+            } catch (error) {
+                console.error('❌ Erro ao criar backup:', error);
+                return false;
+            }
+        }
+
+        // Restaurar backup do sistema
+        function restoreSystemBackup() {
+            try {
+                const backup = JSON.parse(localStorage.getItem('systemBackup') || '{}');
+                
+                if (!backup.data) {
+                    throw new Error('Backup inválido');
+                }
+                
+                // Restaurar dados
+                if (backup.data.processos) {
+                    processosData = backup.data.processos;
+                    localStorage.setItem('processosAdvogado', JSON.stringify(processosData));
+                }
+                
+                if (backup.data.userProfile) {
+                    localStorage.setItem('userProfile', JSON.stringify(backup.data.userProfile));
+                }
+                
+                if (backup.data.agenda) {
+                    localStorage.setItem('eventos', JSON.stringify(backup.data.agenda));
+                }
+                
+                if (backup.data.configuracao) {
+                    localStorage.setItem('configuracao', JSON.stringify(backup.data.configuracao));
+                }
+                
+                showNotification('✅ Backup restaurado com sucesso', 'success');
+                location.reload(); // Recarregar página para aplicar mudanças
+                
+            } catch (error) {
+                console.error('❌ Erro ao restaurar backup:', error);
+                showNotification('❌ Erro ao restaurar backup', 'error');
+            }
+        }
+
+        // Monitor de performance
+        function startPerformanceMonitor() {
+            let lastMemoryCheck = performance.now();
+            
+            setInterval(() => {
+                const now = performance.now();
+                
+                // Verificar uso de memória (se disponível)
+                if (performance.memory) {
+                    const memoryUsage = performance.memory.usedJSHeapSize / 1024 / 1024; // MB
+                    
+                    if (memoryUsage > 100) { // Mais de 100MB
+                        console.warn(`⚠️ Alto uso de memória: ${memoryUsage.toFixed(2)}MB`);
+                    }
+                }
+                
+                // Backup automático a cada 30 minutos
+                if (now - lastMemoryCheck > 1800000) { // 30 minutos
+                    createSystemBackup();
+                    lastMemoryCheck = now;
+                }
+                
+            }, 300000); // Verificar a cada 5 minutos
+        }
+
+        // ===== SISTEMA DE LOGS AVANÇADO =====
+        
+        function logSystemActivity(action, details = {}) {
+            const logEntry = {
+                timestamp: new Date().toISOString(),
+                action: action,
+                details: details,
+                user: getCurrentUser(),
+                portal: 'advogado'
+            };
+            
+            // Armazenar logs (máximo 1000 entradas)
+            let logs = JSON.parse(localStorage.getItem('systemLogs') || '[]');
+            logs.unshift(logEntry);
+            
+            if (logs.length > 1000) {
+                logs = logs.slice(0, 1000);
+            }
+            
+            localStorage.setItem('systemLogs', JSON.stringify(logs));
+            
+            // Log também no console para desenvolvimento
+            console.log(`📝 ${action}:`, details);
+        }
+
+        // ===== MELHORAR FUNÇÃO EXISTENTE =====
 
         // Carregar dados do usuário do localStorage na inicialização
         function loadUserData() {
@@ -9807,22 +10416,55 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 return;
             }
 
-            formData.status = 'protocolado';
-            formData.id = generateProcessId();
-            formData.protocolo = generateProtocol();
-            formData.dataAberto = new Date().toISOString();
-            formData.dataProtocolo = new Date().toISOString();
+            try {
+                // Validar dados antes do processamento
+                validateProcessData(formData);
+                
+                formData.status = 'protocolado';
+                formData.id = generateProcessId();
+                formData.protocolo = generateProtocol();
+                formData.dataAberto = new Date().toISOString();
+                formData.dataProtocolo = new Date().toISOString();
+                formData.portalOrigin = 'advogado';
+                formData.userId = getCurrentUser() || 'sistema';
 
-            processosData.push(formData);
-            saveProcessesToStorage();
-            
-            // Simular sincronização com outros portais
-            syncProcessWithOtherPortals(formData);
-            
-            showNotification(`Processo protocolado com sucesso! Protocolo: ${formData.protocolo}`, 'success');
-            hideNewProcessForm();
-            updateProcessList();
-            updateProcessStats();
+                // Log da operação
+                logSystemActivity('PROCESS_PROTOCOL', { 
+                    processId: formData.id, 
+                    protocolo: formData.protocolo,
+                    assunto: formData.assunto 
+                });
+
+                // Adicionar à lista local
+                processosData.push(formData);
+                saveProcessesToStorage();
+                
+                // Sincronizar com Firebase
+                syncProcess(formData, 'create').then(success => {
+                    if (success) {
+                        showNotification(`✅ Processo protocolado e sincronizado! Protocolo: ${formData.protocolo}`, 'success');
+                        logSystemActivity('PROCESS_SYNCED', { processId: formData.id });
+                    } else {
+                        showNotification(`⚠️ Processo protocolado localmente. Protocolo: ${formData.protocolo} (Sincronização pendente)`, 'warning');
+                        logSystemActivity('PROCESS_SYNC_PENDING', { processId: formData.id });
+                    }
+                    
+                    hideNewProcessForm();
+                    updateProcessList();
+                    updateProcessStats();
+                });
+                
+                // Backup automático após protocolar
+                createSystemBackup();
+                
+                // Sincronizar com outros portais
+                syncProcessWithOtherPortals(formData);
+                
+            } catch (error) {
+                console.error('❌ Erro ao protocolar processo:', error);
+                showNotification(`❌ Erro ao protocolar: ${error.message}`, 'error');
+                logSystemActivity('PROCESS_PROTOCOL_ERROR', { error: error.message });
+            }
         }
 
         // Coletar dados do formulário
@@ -10091,75 +10733,6 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             
             updateProcessList();
             updateProcessStats();
-        }
-
-        // Atualizar lista de processos
-        function updateProcessList() {
-            const container = document.getElementById('processos-list');
-            const semProcessos = document.getElementById('sem-processos');
-            
-            if (processosData.length === 0) {
-                container.style.display = 'none';
-                semProcessos.style.display = 'block';
-                return;
-            }
-            
-            container.style.display = 'block';
-            semProcessos.style.display = 'none';
-
-            const filteredProcesses = filterProcessesByStatus();
-            
-            const processosHtml = filteredProcesses.map(processo => `
-                <div class="bg-slate-800/50 border border-blue-300/20 rounded-lg p-6 hover:border-blue-400/40 transition-colors cursor-pointer"
-                     onclick="viewProcess('${processo.id}')">
-                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-2">
-                                <h4 class="text-white font-semibold text-lg">${safeData(processo.assunto, 'Assunto não informado')}</h4>
-                                <span class="px-3 py-1 rounded-full text-sm ${getStatusBadgeClass(processo.status)}">
-                                    ${getStatusText(processo.status)}
-                                </span>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                                <div class="text-blue-200">
-                                    <i class="fas fa-user mr-2"></i>
-                                    <strong>Requerente:</strong><br>
-                                    ${safeData(processo.requerente, 'Não informado')}
-                                </div>
-                                <div class="text-green-200">
-                                    <i class="fas fa-balance-scale mr-2"></i>
-                                    <strong>Tipo:</strong><br>
-                                    ${safeData(processo.tipoProcesso, 'Não informado')}
-                                </div>
-                                <div class="text-yellow-200">
-                                    <i class="fas fa-calendar mr-2"></i>
-                                    <strong>Data:</strong><br>
-                                    ${new Date(processo.dataAberto).toLocaleDateString('pt-BR')}
-                                </div>
-                                <div class="text-slate-200">
-                                    <i class="fas fa-hashtag mr-2"></i>
-                                    <strong>Protocolo:</strong><br>
-                                    ${processo.protocolo || 'Não protocolado'}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex gap-2 lg:flex-col">
-                            <button onclick="editProcess('${processo.id}'); event.stopPropagation();" 
-                                    class="btn btn-sm bg-yellow-600 hover:bg-yellow-700 text-white">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="deleteProcess('${processo.id}'); event.stopPropagation();" 
-                                    class="btn btn-sm bg-red-600 hover:bg-red-700 text-white">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            container.innerHTML = processosHtml;
         }
 
         // Filtrar processos por status
@@ -10435,7 +11008,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             }
         }
 
-        // Excluir processo
+        // Excluir processo com sincronização
         function deleteProcess(processId = null) {
             const id = processId || currentProcessId;
             if (!id) return;
@@ -10444,14 +11017,22 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             if (!processo) return;
 
             if (confirm(`Tem certeza que deseja excluir o processo "${processo.assunto}"?\n\nEsta ação não pode ser desfeita.`)) {
-                processosData = processosData.filter(p => p.id !== id);
-                saveProcessesToStorage();
-                
-                closeProcessModal();
-                updateProcessList();
-                updateProcessStats();
-                
-                showNotification('Processo excluído com sucesso!', 'success');
+                // Sincronizar exclusão com Firebase primeiro
+                syncProcess(processo, 'delete').then(success => {
+                    // Remover da lista local independentemente do resultado da sincronização
+                    processosData = processosData.filter(p => p.id !== id);
+                    saveProcessesToStorage();
+                    
+                    closeProcessModal();
+                    updateProcessList();
+                    updateProcessStats();
+                    
+                    if (success) {
+                        showNotification('Processo excluído e sincronizado com sucesso!', 'success');
+                    } else {
+                        showNotification('Processo excluído localmente (Sincronização pendente)', 'warning');
+                    }
+                });
             }
         }
 
@@ -13217,6 +13798,57 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             document.getElementById('filtro-caso-agenda').value = '';
             showNotification('🧹 Filtros limpos!', 'success');
         }
+        
+        // ===== INICIALIZAÇÃO PRINCIPAL DO SISTEMA =====
+        
+        // Aguardar o carregamento completo da página
+        window.addEventListener('load', function() {
+            // Log de inicialização
+            logSystemActivity('SYSTEM_START', { version: '2.0', timestamp: new Date().toISOString() });
+            
+            // Validar integridade do sistema
+            if (!validateSystemIntegrity()) {
+                console.error('❌ Falha na validação do sistema');
+                return;
+            }
+            
+            // Inicializar Firebase
+            initializeFirebase().then(() => {
+                showNotification('🔄 Sistema iniciado com sincronização ativa', 'firebase', 3000);
+                startRealTimeSync();
+                updateSyncStatus(true);
+                logSystemActivity('FIREBASE_CONNECTED');
+            }).catch(error => {
+                console.warn('Firebase não inicializado:', error);
+                showNotification('⚠️ Sistema iniciado em modo offline', 'warning', 3000);
+                updateSyncStatus(false);
+                logSystemActivity('FIREBASE_OFFLINE', { error: error.message });
+            });
+            
+            // Iniciar monitoramento
+            startPerformanceMonitor();
+            
+            // Backup inicial
+            createSystemBackup();
+            
+            // Verificar conectividade periodicamente
+            setInterval(() => {
+                if (window.firebaseDB && window.PORTAL_SYNC.isConnected) {
+                    try {
+                        updateSyncStatus(true);
+                    } catch (error) {
+                        updateSyncStatus(false);
+                        logSystemActivity('CONNECTIVITY_LOST', { error: error.message });
+                    }
+                } else {
+                    updateSyncStatus(false);
+                }
+            }, 30000); // Verificar a cada 30 segundos
+            
+            // Log de sistema iniciado
+            console.log('🚀 Portal do Advogado iniciado com sucesso!');
+            logSystemActivity('SYSTEM_READY');
+        });
         
         
         

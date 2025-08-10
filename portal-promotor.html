@@ -3,9 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏛️ Ministério Público - Níveis 5-6 - Sistema Jurídico</title>
+    <title>🏛️ Portal do Ministério Público - Sistema Jurídico Integrado</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Firebase SDK v10.7.1 -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, addDoc, onSnapshot, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        
+        window.firebaseModules = {
+            initializeApp, getFirestore, getAuth, doc, setDoc, getDoc, updateDoc, deleteDoc, 
+            collection, addDoc, onSnapshot, query, where, orderBy, signInAnonymously
+        };
+    </script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -16,38 +30,473 @@
             min-height: 100vh;
         }
         
-        .portal-card {
-            background: rgba(255, 255, 255, 0.1);
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 1rem; }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
         
-        .portal-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
+        .btn {
+            padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600;
+            transition: all 0.3s ease; cursor: pointer; border: none;
+            display: inline-flex; align-items: center; justify-content: center;
         }
         
-        .btn-primary {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            border: none;
-            transition: all 0.3s ease;
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.3s ease-in; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
-            transform: translateY(-1px);
+        .mobile-nav { display: none; }
+        
+        @media (max-width: 768px) {
+            .desktop-nav { display: none; }
+            .mobile-nav { display: block; }
+        }
+        
+        .mp-gradient { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%); }
+        .mp-text { color: #dc2626; }
+        .mp-card:hover { background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.3); }
+    </style>
+</head>
+<body class="mp-gradient">
+    
+    <script>
+        // ===== CONFIGURAÇÃO PORTAL MP =====
+        window.PORTAL_SYNC = {
+            portalType: 'ministerio-publico', version: '1.0', isConnected: false, lastSync: null,
+            syncConfig: { denuncias: true, pareceres: true, investigacoes: true, recursos: true, audiencias: true }
+        };
+        
+        let denunciasData = JSON.parse(localStorage.getItem('denunciasMP') || '[]');
+        let pareceresData = JSON.parse(localStorage.getItem('pareceresMP') || '[]');
+        let investigacoesData = JSON.parse(localStorage.getItem('investigacoesMP') || '[]');
+        let recursosData = JSON.parse(localStorage.getItem('recursosMP') || '[]');
+        let audienciasData = JSON.parse(localStorage.getItem('audienciasMP') || '[]');
+    </script>
+
+    <!-- Header -->
+    <header class="bg-black/20 backdrop-blur-lg border-b border-white/10 sticky top-0 z-40">
+        <div class="container">
+            <div class="flex items-center justify-between py-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-balance-scale text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-white font-bold text-xl">Portal do Ministério Público</h1>
+                        <p class="text-red-200 text-sm">Sistema Jurídico Integrado - Níveis 5-6</p>
+                    </div>
+                </div>
+                
+                <nav class="desktop-nav flex items-center gap-6">
+                    <button onclick="showSection('dashboard')" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </button>
+                    <button onclick="showSection('denuncias')" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-gavel mr-2"></i>Denúncias
+                    </button>
+                    <button onclick="showSection('pareceres')" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-file-alt mr-2"></i>Pareceres
+                    </button>
+                    <button onclick="showSection('investigacoes')" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-search mr-2"></i>Investigações
+                    </button>
+                    <button onclick="showSection('recursos')" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-arrow-up mr-2"></i>Recursos
+                    </button>
+                    <button onclick="showSection('agenda')" class="text-red-200 hover:text-white transition-colors">
+                        <i class="fas fa-calendar mr-2"></i>Agenda
+                    </button>
+                </nav>
+                
+                <button onclick="toggleMobileMenu()" class="mobile-nav text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="mobile-menu" class="mobile-nav hidden bg-black/30 backdrop-blur-lg border-t border-white/10">
+            <div class="container py-4">
+                <nav class="space-y-2">
+                    <button onclick="showSection('dashboard'); toggleMobileMenu()" class="w-full text-left text-red-200 hover:text-white transition-colors py-2">
+                        <i class="fas fa-home mr-3"></i>Dashboard
+                    </button>
+                    <button onclick="showSection('denuncias'); toggleMobileMenu()" class="w-full text-left text-red-200 hover:text-white transition-colors py-2">
+                        <i class="fas fa-gavel mr-3"></i>Denúncias
+                    </button>
+                    <button onclick="showSection('pareceres'); toggleMobileMenu()" class="w-full text-left text-red-200 hover:text-white transition-colors py-2">
+                        <i class="fas fa-file-alt mr-3"></i>Pareceres
+                    </button>
+                    <button onclick="showSection('investigacoes'); toggleMobileMenu()" class="w-full text-left text-red-200 hover:text-white transition-colors py-2">
+                        <i class="fas fa-search mr-3"></i>Investigações
+                    </button>
+                    <button onclick="showSection('recursos'); toggleMobileMenu()" class="w-full text-left text-red-200 hover:text-white transition-colors py-2">
+                        <i class="fas fa-arrow-up mr-3"></i>Recursos
+                    </button>
+                    <button onclick="showSection('agenda'); toggleMobileMenu()" class="w-full text-left text-red-200 hover:text-white transition-colors py-2">
+                        <i class="fas fa-calendar mr-3"></i>Agenda
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container py-8">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <!-- Perfil do Promotor -->
+            <div class="card p-6 mb-8 mp-gradient">
+                <div class="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                            <span>CM</span>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-xl mb-1">Dr. Carlos Montenegro</h3>
+                            <p class="text-red-200 text-sm mb-1">Promotor de Justiça Titular</p>
+                            <p class="text-red-300 text-xs flex items-center gap-2">
+                                <i class="fas fa-id-badge"></i>
+                                <span>Matrícula MP-2024-0789</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flex items-center gap-2 text-green-400">
+                            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                            <span class="text-sm">Online</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-red-200">
+                            <i class="fas fa-gavel text-yellow-400"></i>
+                            <span class="text-sm"><span id="active-denuncias">8</span> denúncias ativas</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-red-200">
+                            <i class="fas fa-clock text-yellow-400"></i>
+                            <span class="text-sm">Último acesso: Hoje</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="showUserProfile()" class="btn bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2">
+                            <i class="fas fa-user mr-2"></i>Perfil
+                        </button>
+                        <div class="flex items-center gap-2 px-3 py-2 bg-black/20 rounded-lg">
+                            <i id="sync-status" class="fas fa-circle text-gray-400" title="Status de Conectividade"></i>
+                            <span class="text-xs text-red-200">Sync</span>
+                        </div>
+                        <button onclick="showJudicialHierarchy()" class="btn bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-2">
+                            <i class="fas fa-sitemap mr-2"></i>Hierarquia
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estatísticas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="card p-6 mp-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium">Denúncias</p>
+                            <p class="text-3xl font-bold mp-text" id="total-denuncias">12</p>
+                        </div>
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-gavel text-red-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <span class="text-green-600 flex items-center text-sm">
+                            <i class="fas fa-arrow-up text-xs mr-1"></i>+3 esta semana
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card p-6 mp-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium">Pareceres</p>
+                            <p class="text-3xl font-bold mp-text" id="total-pareceres">28</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-file-alt text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <span class="text-green-600 flex items-center text-sm">
+                            <i class="fas fa-arrow-up text-xs mr-1"></i>+7 este mês
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card p-6 mp-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium">Investigações</p>
+                            <p class="text-3xl font-bold mp-text" id="total-investigacoes">5</p>
+                        </div>
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-search text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <span class="text-yellow-600 flex items-center text-sm">
+                            <i class="fas fa-minus text-xs mr-1"></i>Em andamento
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card p-6 mp-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium">Recursos</p>
+                            <p class="text-3xl font-bold mp-text" id="total-recursos">9</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-arrow-up text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <span class="text-red-600 flex items-center text-sm">
+                            <i class="fas fa-clock text-xs mr-1"></i>2 urgentes
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold mb-4 mp-text">Denúncias Recentes</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-medium">Furto Qualificado</p>
+                                <p class="text-sm text-gray-600">Contra João Silva</p>
+                                <p class="text-xs text-gray-500">Protocolado hoje às 14:30</p>
+                            </div>
+                            <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">Novo</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-medium">Lesão Corporal</p>
+                                <p class="text-sm text-gray-600">Contra Maria Santos</p>
+                                <p class="text-xs text-gray-500">Ontem às 16:45</p>
+                            </div>
+                            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Em análise</span>
+                        </div>
+                    </div>
+                    <button onclick="showSection('denuncias')" class="mt-4 w-full btn bg-red-600 hover:bg-red-700 text-white">
+                        Ver Todas as Denúncias
+                    </button>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold mb-4 mp-text">Prazos Urgentes</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
+                            <div>
+                                <p class="font-medium text-red-800">Recurso em Sentido Estrito</p>
+                                <p class="text-sm text-red-600">Processo nº 0001234-56.2024.8.XX.XXXX</p>
+                            </div>
+                            <span class="text-red-600 font-bold text-sm">2 dias</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
+                            <div>
+                                <p class="font-medium text-yellow-800">Parecer Técnico</p>
+                                <p class="text-sm text-yellow-600">Inquérito Civil nº IC-002/2024</p>
+                            </div>
+                            <span class="text-yellow-600 font-bold text-sm">5 dias</span>
+                        </div>
+                    </div>
+                    <button onclick="showSection('agenda')" class="mt-4 w-full btn bg-yellow-600 hover:bg-yellow-700 text-white">
+                        Ver Agenda Completa
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seções em Desenvolvimento -->
+        <section id="denuncias" class="section">
+            <div class="card p-6">
+                <h2 class="text-2xl font-bold mp-text mb-6">🏛️ Gestão de Denúncias - Portal MP</h2>
+                <div class="text-center py-8">
+                    <i class="fas fa-gavel text-red-400 text-6xl mb-4"></i>
+                    <p class="text-lg font-semibold mb-2">Portal do Ministério Público</p>
+                    <p class="text-gray-600 mb-4">Sistema específico para gestão de denúncias e ações penais</p>
+                    <button onclick="showNotification('🏛️ Seção de denúncias em desenvolvimento', 'mp', 3000)" class="btn bg-red-600 hover:bg-red-700 text-white">
+                        <i class="fas fa-plus mr-2"></i>Funcionalidades em Desenvolvimento
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="pareceres" class="section">
+            <div class="card p-6">
+                <h2 class="text-2xl font-bold mp-text mb-6">📝 Pareceres Ministeriais</h2>
+                <div class="text-center py-8">
+                    <i class="fas fa-file-alt text-blue-400 text-6xl mb-4"></i>
+                    <p class="text-lg font-semibold mb-2">Pareceres do MP</p>
+                    <p class="text-gray-600">Sistema integrado para elaboração de pareceres ministeriais</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="investigacoes" class="section">
+            <div class="card p-6">
+                <h2 class="text-2xl font-bold mp-text mb-6">🔍 Investigações</h2>
+                <div class="text-center py-8">
+                    <i class="fas fa-search text-yellow-400 text-6xl mb-4"></i>
+                    <p class="text-lg font-semibold mb-2">Gestão de Investigações</p>
+                    <p class="text-gray-600">Controle e acompanhamento de investigações ministeriais</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="recursos" class="section">
+            <div class="card p-6">
+                <h2 class="text-2xl font-bold mp-text mb-6">⬆️ Recursos</h2>
+                <div class="text-center py-8">
+                    <i class="fas fa-arrow-up text-purple-400 text-6xl mb-4"></i>
+                    <p class="text-lg font-semibold mb-2">Gestão de Recursos</p>
+                    <p class="text-gray-600">Sistema para interposição e acompanhamento de recursos</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="agenda" class="section">
+            <div class="card p-6">
+                <h2 class="text-2xl font-bold mp-text mb-6">📅 Agenda MP</h2>
+                <div class="text-center py-8">
+                    <i class="fas fa-calendar text-green-400 text-6xl mb-4"></i>
+                    <p class="text-lg font-semibold mb-2">Agenda do Ministério Público</p>
+                    <p class="text-gray-600">Calendário integrado com prazos e compromissos ministeriais</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ===== SISTEMA DE NOTIFICAÇÕES =====
+        function showNotification(message, type = 'info', duration = 4000) {
+            const notification = document.createElement('div');
+            const notificationId = 'notification-' + Date.now();
+            notification.id = notificationId;
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl border transform transition-all duration-300 translate-x-full max-w-sm`;
+            
+            let bgColor, icon;
+            switch(type) {
+                case 'success': bgColor = 'bg-green-600/95'; icon = 'fa-check-circle'; break;
+                case 'error': bgColor = 'bg-red-600/95'; icon = 'fa-exclamation-triangle'; break;
+                case 'warning': bgColor = 'bg-yellow-600/95'; icon = 'fa-exclamation-circle'; break;
+                case 'mp': bgColor = 'bg-red-600/95'; icon = 'fa-balance-scale'; break;
+                default: bgColor = 'bg-blue-600/95'; icon = 'fa-info-circle';
+            }
+            
+            notification.className += ` ${bgColor} text-white backdrop-blur-sm`;
+            notification.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <i class="fas ${icon} mt-0.5 flex-shrink-0"></i>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium">${message}</div>
+                    </div>
+                    <button onclick="removeNotification('${notificationId}')" class="text-white/60 hover:text-white ml-2">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => notification.classList.remove('translate-x-full'), 100);
+            setTimeout(() => removeNotification(notificationId), duration);
         }
 
-        .hierarchy-indicator {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
+        function removeNotification(notificationId) {
+            const notification = document.getElementById(notificationId);
+            if (notification) {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => notification.remove(), 300);
+            }
+        }
+
+        // ===== NAVEGAÇÃO =====
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) targetSection.classList.add('active');
+            
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) toggleMobileMenu();
+        }
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) mobileMenu.classList.toggle('hidden');
+        }
+
+        function showUserProfile() { showNotification('👤 Perfil do usuário em desenvolvimento', 'info', 3000); }
+        function showJudicialHierarchy() { showNotification('🏛️ Hierarquia jurídica em desenvolvimento', 'info', 3000); }
+        function updateSyncStatus(isConnected) {
+            const syncIndicator = document.getElementById('sync-status');
+            if (syncIndicator) {
+                syncIndicator.className = isConnected ? 'fas fa-circle text-green-400' : 'fas fa-circle text-red-400';
+                syncIndicator.title = isConnected ? 'Conectado ao Firebase' : 'Desconectado do Firebase';
+            }
+        }
+
+        // ===== INICIALIZAÇÃO =====
+        window.addEventListener('load', function() {
+            showNotification('🏛️ Portal do Ministério Público inicializado', 'mp', 3000);
+            updateSyncStatus(false);
+        });
+    </script>
+</body>
+</html>
+        }
+        
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+            
+            .mobile-nav {
+                display: block;
+            }
+        }
+        
+        .notification-toast {
+            transition: all 0.3s ease;
+        }
+        
+        /* Estilos específicos do MP */
+        .mp-gradient {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+        }
+        
+        .mp-card:hover {
+            background: rgba(220, 38, 38, 0.1);
+            border-color: rgba(220, 38, 38, 0.3);
+        }
+        
+        .mp-text {
+            color: #dc2626;
+        }
+        
+        .mp-bg {
+            background: rgba(220, 38, 38, 0.1);
+        }
+    </style>
+</head>
+<body class="mp-gradient">
             gap: 0.5rem;
         }
 
