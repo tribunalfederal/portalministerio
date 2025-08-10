@@ -428,6 +428,18 @@
                 grid-template-columns: 1fr !important;
             }
         }
+
+        /* PROIBIÇÃO ABSOLUTA: Card "Meus Casos" APENAS na aba de casos */
+        #lista-casos {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        /* Só mostra quando estamos especificamente na seção casos */
+        .section#casos.active #lista-casos {
+            display: block !important;
+            visibility: visible !important;
+        }
     </style>
 </head>
 
@@ -2094,9 +2106,8 @@
                 console.log(`Seção ${index}: ${section.id} - removendo active e forçando hide`);
             });
             
-            // CONTROLAR elementos específicos de casos
+            // CONTROLAR elementos específicos de casos (simplificado - CSS já cuida do resto)
             const casosElements = [
-                'lista-casos',
                 'casos-container', 
                 'sem-casos',
                 'novo-caso-form'
@@ -2151,17 +2162,8 @@
                     navItem.classList.add('active');
                 }
                 
-                // EXTRA: Se for dashboard, forçar esconder card "Meus Casos"
-                if (sectionName === 'dashboard') {
-                    setTimeout(() => {
-                        const listaCasos = document.getElementById('lista-casos');
-                        if (listaCasos) {
-                            listaCasos.style.display = 'none';
-                            listaCasos.style.visibility = 'hidden';
-                            console.log('🔒 DASHBOARD: Lista de casos forçadamente escondida');
-                        }
-                    }, 50);
-                }
+                // CSS já cuida de esconder/mostrar #lista-casos automaticamente
+                // Não precisamos mais de verificações manuais
                 
                 // Log de sucesso
                 console.log(`📋 Seção ${sectionName} carregada com sucesso`);
@@ -12483,8 +12485,8 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             // Atualizar dashboard unificado
             updateUnifiedDashboard();
             
-            // LIMPAR elementos de casos na inicialização
-            const casosElements = ['lista-casos', 'casos-container', 'sem-casos', 'novo-caso-form'];
+            // LIMPAR elementos de casos na inicialização (CSS já cuida do #lista-casos)
+            const casosElements = ['casos-container', 'sem-casos', 'novo-caso-form'];
             casosElements.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
@@ -12494,18 +12496,8 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 }
             });
             
-            // Mostrar dashboard por padrão E garantir que casos estejam escondidos
+            // Mostrar dashboard por padrão (CSS já esconde #lista-casos automaticamente)
             showSection('dashboard');
-            
-            // FORÇA EXTRA: Esconder lista de casos especificamente no dashboard
-            setTimeout(() => {
-                const listaCasos = document.getElementById('lista-casos');
-                if (listaCasos) {
-                    listaCasos.style.display = 'none';
-                    listaCasos.style.visibility = 'hidden';
-                    console.log('🔒 FORÇADO: Lista de casos escondida no dashboard inicial');
-                }
-            }, 100);
             
             console.log('✅ Sistema inicializado com sucesso!');
             showNotification('🎉 Portal do Advogado carregado com sucesso!', 'success');
