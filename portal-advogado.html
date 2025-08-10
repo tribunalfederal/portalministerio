@@ -6,8 +6,10 @@
     <title>👨‍💼 Portal do Advogado - Sistema Jurídico BRASILÂNDIA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Bibliotecas para geração de documentos profissionais -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -2528,7 +2530,7 @@
 
         // Função universal de PDF que sempre funciona
         function downloadDocumentPDF() {
-            console.log('🔥 Iniciando geração de PDF...');
+            console.log('🔥 Iniciando geração de PDF profissional...');
             
             // PASSO 1: Verificar se há um documento gerado
             if (!currentDocumentType) {
@@ -2551,185 +2553,184 @@
                 }
             });
 
-            // PASSO 3: Gerar o conteúdo HTML completo do documento
-            let documentoCompleto = '';
-            
+            // PASSO 3: Verificar bibliotecas necessárias
+            if (typeof window.jsPDF === 'undefined') {
+                showNotification('❌ Biblioteca PDF não encontrada. Usando método alternativo...', 'warning');
+                downloadAsHTML(generateDocumentContent(currentDocumentType, formData), template.title);
+                return;
+            }
+
+            showNotification('📄 Gerando PDF profissional com texto selecionável...', 'info');
+
             try {
+                // PASSO 4: Criar instância do jsPDF
+                const { jsPDF } = window.jsPDF;
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4',
+                    putOnlyUsedFonts: true
+                });
+
+                // PASSO 5: Configurações de layout
+                const pageWidth = 210; // A4 width in mm
+                const pageHeight = 297; // A4 height in mm
+                const margin = 20;
+                const maxLineWidth = pageWidth - (margin * 2);
+                let currentY = margin;
+
+                // PASSO 6: Função para adicionar texto com quebra automática
+                function addTextToPDF(text, fontSize = 12, isBold = false, isCenter = false, isTitle = false) {
+                    doc.setFontSize(fontSize);
+                    doc.setFont("times", isBold ? "bold" : "normal");
+
+                    if (isTitle) {
+                        // Títulos centralizados
+                        const textWidth = doc.getTextWidth(text);
+                        const x = (pageWidth - textWidth) / 2;
+                        doc.text(text, x, currentY);
+                        currentY += fontSize * 0.8 + 3;
+                    } else if (isCenter) {
+                        // Texto centralizado
+                        const textWidth = doc.getTextWidth(text);
+                        const x = (pageWidth - textWidth) / 2;
+                        doc.text(text, x, currentY);
+                        currentY += fontSize * 0.6 + 3;
+                    } else {
+                        // Texto justificado com quebra de linha
+                        const lines = doc.splitTextToSize(text, maxLineWidth);
+                        
+                        lines.forEach(line => {
+                            // Verificar se precisa de nova página
+                            if (currentY > pageHeight - margin) {
+                                doc.addPage();
+                                currentY = margin;
+                            }
+                            
+                            doc.text(line, margin, currentY);
+                            currentY += fontSize * 0.6 + 2;
+                        });
+                    }
+                    
+                    currentY += 2; // Espaço extra após cada bloco
+                }
+
+                // PASSO 7: Função para processar conteúdo HTML em texto estruturado
+                // PASSO 8: Gerar conteúdo estruturado
+                const docData = extractDocumentData(formData, template);
+
+                // PASSO 9: Construir PDF estruturado
+                // Cabeçalho do documento
+                addTextToPDF(docData.court.toUpperCase(), 14, true, true, true);
+                addTextToPDF(docData.title.toUpperCase(), 16, true, true, true);
+                
+                currentY += 10;
+
+                // Dados das partes
+                addTextToPDF('REQUERENTE:', 12, true);
+                addTextToPDF(docData.author, 12);
+                addTextToPDF('ADVOGADO:', 12, true);
+                addTextToPDF(`${docData.lawyer} - OAB/${docData.oab}`, 12);
+                
+                if (docData.defendant && docData.defendant !== '[REQUERIDO]') {
+                    addTextToPDF('REQUERIDO:', 12, true);
+                    addTextToPDF(docData.defendant, 12);
+                }
+
+                currentY += 5;
+
+                // Assunto
+                addTextToPDF('ASSUNTO:', 12, true);
+                addTextToPDF(docData.subject, 12);
+
+                currentY += 10;
+
+                // Conteúdo principal baseado no tipo de documento
                 switch(currentDocumentType) {
                     case 'peticao-inicial':
-                        documentoCompleto = criarPeticaoInicialEspecifica(formData);
+                        addTextToPDF('EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO:', 12, false, true);
+                        currentY += 5;
+                        
+                        addTextToPDF('DOS FATOS:', 12, true);
+                        addTextToPDF(docData.facts, 12);
+                        
+                        addTextToPDF('DO DIREITO:', 12, true);
+                        addTextToPDF('A presente ação encontra amparo legal nos dispositivos constitucionais e infraconstitucionais aplicáveis à espécie, conforme fundamentação jurídica que segue...', 12);
+                        
+                        addTextToPDF('DOS PEDIDOS:', 12, true);
+                        addTextToPDF(`Diante do exposto, requer-se: ${docData.requests}`, 12);
                         break;
+
                     case 'recurso-apelacao':
-                        documentoCompleto = criarRecursoApelacaoEspecifico(formData);
+                        addTextToPDF('EGRÉGIO TRIBUNAL DE JUSTIÇA:', 12, false, true);
+                        currentY += 5;
+                        
+                        addTextToPDF('DOS FUNDAMENTOS DO RECURSO:', 12, true);
+                        addTextToPDF(docData.facts, 12);
+                        
+                        addTextToPDF('DOS PEDIDOS:', 12, true);
+                        addTextToPDF(docData.requests, 12);
                         break;
+
                     case 'habeas-corpus':
-                        documentoCompleto = criarHabeasCorpusEspecifico(formData);
+                        addTextToPDF('EXCELENTÍSSIMO SENHOR DOUTOR JUIZ:', 12, false, true);
+                        currentY += 5;
+                        
+                        addTextToPDF('DA COAÇÃO ILEGAL:', 12, true);
+                        addTextToPDF(docData.facts, 12);
+                        
+                        addTextToPDF('DO PEDIDO DE LIMINAR:', 12, true);
+                        addTextToPDF(docData.requests, 12);
                         break;
-                    case 'contestacao':
-                        documentoCompleto = criarContestacaoEspecifica(formData);
-                        break;
-                    case 'liberdade-provisoria':
-                        documentoCompleto = criarLiberdadeProvisoriaEspecifica(formData);
-                        break;
-                    case 'peticao-fianca':
-                        documentoCompleto = criarPeticaoFiancaEspecifica(formData);
-                        break;
-                    case 'alegacoes-finais':
-                        documentoCompleto = criarAlegacoesFinaisEspecificas(formData);
-                        break;
-                    case 'requerimento-provas':
-                        documentoCompleto = criarRequerimentoProvasEspecifico(formData);
-                        break;
-                    case 'porte-armas':
-                        documentoCompleto = criarPorteArmasEspecifico(formData);
-                        break;
-                    case 'limpeza-ficha':
-                        documentoCompleto = criarLimpezaFichaEspecifica(formData);
-                        break;
-                    case 'embargos-declaracao':
-                        documentoCompleto = criarEmbargosDeclaracaoEspecificos(formData);
-                        break;
+
                     default:
-                        showNotification('❌ Tipo de documento não reconhecido', 'error');
-                        return;
+                        addTextToPDF('HISTÓRICO:', 12, true);
+                        addTextToPDF(docData.facts, 12);
+                        
+                        addTextToPDF('REQUERIMENTOS:', 12, true);
+                        addTextToPDF(docData.requests, 12);
                 }
 
-                // PASSO 4: Verificar se o conteúdo foi gerado
-                if (!documentoCompleto || documentoCompleto.trim() === '') {
-                    showNotification('❌ Erro ao gerar conteúdo do documento', 'error');
-                    return;
+                // Provas (se houver)
+                if (docData.evidence && docData.evidence !== '[PROVAS]') {
+                    currentY += 5;
+                    addTextToPDF('DAS PROVAS:', 12, true);
+                    addTextToPDF(docData.evidence, 12);
                 }
 
-                // PASSO 5: Criar container temporário com documento formatado
-                generatePDFFromContent(documentoCompleto, template.title);
+                // Observações (se houver)
+                if (docData.observations && docData.observations.trim() !== '') {
+                    currentY += 5;
+                    addTextToPDF('OBSERVAÇÕES:', 12, true);
+                    addTextToPDF(docData.observations, 12);
+                }
+
+                // Encerramento
+                currentY += 15;
+                addTextToPDF('Termos em que pede deferimento.', 12, false, true);
+                
+                currentY += 10;
+                addTextToPDF(`${docData.city}, ${docData.date}`, 12, false, true);
+                
+                currentY += 20;
+                addTextToPDF('_________________________________', 12, false, true);
+                addTextToPDF(docData.lawyer, 12, true, true);
+                addTextToPDF(`OAB/${docData.oab}`, 12, false, true);
+
+                // PASSO 10: Salvar arquivo
+                const fileName = `${template.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                doc.save(fileName);
+                
+                showNotification('✅ PDF profissional gerado com sucesso! (Texto selecionável)', 'success');
 
             } catch (error) {
-                console.error('Erro ao gerar documento:', error);
-                showNotification('❌ Erro ao processar documento', 'error');
+                console.error('Erro ao gerar PDF:', error);
+                showNotification('⚠️ Erro ao gerar PDF. Usando método alternativo...', 'warning');
+                downloadAsHTML(generateDocumentContent(currentDocumentType, formData), template.title);
             }
         }
 
         // Função para gerar PDF a partir do conteúdo HTML
-        function generatePDFFromContent(htmlContent, documentTitle) {
-            // Verificar bibliotecas necessárias
-            if (typeof html2canvas === 'undefined' || typeof window.jsPDF === 'undefined') {
-                showNotification('❌ Bibliotecas necessárias não encontradas. Usando método alternativo...', 'warning');
-                downloadAsHTML(htmlContent, documentTitle);
-                return;
-            }
-
-            showNotification('📄 Gerando PDF profissional...', 'info');
-
-            try {
-                // Criar container temporário com estilos profissionais
-                const tempContainer = document.createElement('div');
-                tempContainer.style.cssText = `
-                    position: fixed;
-                    left: -9999px;
-                    top: 0;
-                    width: 794px;
-                    min-height: 1123px;
-                    background: white;
-                    padding: 60px;
-                    font-family: 'Times New Roman', serif !important;
-                    font-size: 14px;
-                    line-height: 1.6;
-                    color: black;
-                    box-sizing: border-box;
-                `;
-                
-                // Limpar conteúdo de elementos de UI e inserir HTML - MELHORADO
-                const cleanHTML = htmlContent
-                    .replace(/<div[^>]*class="[^"]*bg-gradient[^"]*"[^>]*>.*?<\/div>/gi, '') // Remove header gradients
-                    .replace(/<div[^>]*class="[^"]*text-blue[^"]*"[^>]*>.*?<\/div>/gi, '')
-                    .replace(/<button[^>]*>.*?<\/button>/gi, '')
-                    .replace(/<i class="fas[^"]*"[^>]*><\/i>/gi, '')
-                    .replace(/style="[^"]*cursor[^"]*[^"]*"/gi, '')
-                    .replace(/onclick="[^"]*"/gi, '')
-                    .replace(/title="[^"]*"/gi, '')
-                    .replace(/border-bottom: 1px dashed[^"]*;/gi, '')  // Remove linhas pontilhadas
-                    .replace(/class="[^"]*bg-gradient[^"]*"/gi, '')     // Remove classes de gradiente
-                    .replace(/from-\w+-\d+/gi, '')                     // Remove classes Tailwind
-                    .replace(/to-\w+-\d+/gi, '');                      // Remove classes Tailwind
-
-                tempContainer.innerHTML = cleanHTML;
-                
-                // Aplicar estilos específicos para PDF
-                const allElements = tempContainer.querySelectorAll('*');
-                allElements.forEach(el => {
-                    el.style.fontFamily = "'Times New Roman', serif";
-                    if (el.classList.contains('font-bold') || el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3') {
-                        el.style.fontWeight = 'bold';
-                    }
-                    if (el.classList.contains('text-center')) {
-                        el.style.textAlign = 'center';
-                    }
-                    if (el.classList.contains('text-justify')) {
-                        el.style.textAlign = 'justify';
-                    }
-                });
-
-                document.body.appendChild(tempContainer);
-
-                // Gerar imagem do conteúdo - CONFIGURAÇÕES MELHORADAS
-                html2canvas(tempContainer, {
-                    scale: 3,  // Aumentado para melhor qualidade
-                    useCORS: true,
-                    backgroundColor: '#ffffff',
-                    width: 794,
-                    height: tempContainer.scrollHeight,
-                    logging: false,
-                    allowTaint: false,
-                    foreignObjectRendering: true
-                }).then(canvas => {
-                    document.body.removeChild(tempContainer);
-                    
-                    // Criar PDF com configurações melhoradas
-                    const { jsPDF } = window.jsPDF;
-                    const pdf = new jsPDF({
-                        orientation: 'p',
-                        unit: 'mm',
-                        format: 'a4',
-                        compress: true
-                    });
-                    
-                    const imgData = canvas.toDataURL('image/jpeg', 0.98); // JPEG com alta qualidade
-                    const imgWidth = 210;  // A4 width in mm
-                    const pageHeight = 297; // A4 height in mm
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = 0;
-
-                    // Adicionar primeira página
-                    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, '', 'FAST');
-                    heightLeft -= pageHeight;
-
-                    // Adicionar páginas extras se necessário
-                    while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, '', 'FAST');
-                        heightLeft -= pageHeight;
-                    }
-                    
-                    const fileName = `${documentTitle.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-                    pdf.save(fileName);
-                    
-                    showNotification('✅ PDF gerado com sucesso!', 'success');
-                }).catch(error => {
-                    document.body.removeChild(tempContainer);
-                    console.error('Erro html2canvas:', error);
-                    showNotification('⚠️ Erro ao gerar PDF. Tentando método alternativo...', 'warning');
-                    downloadAsHTML(htmlContent, documentTitle);
-                });
-
-            } catch (error) {
-                console.error('Erro na geração do PDF:', error);
-                showNotification('⚠️ Erro ao gerar PDF. Usando método alternativo...', 'warning');
-                downloadAsHTML(htmlContent, documentTitle);
-            }
-        }
-
         // Método alternativo para download como HTML
         function downloadAsHTML(htmlContent, documentTitle) {
             console.log('📄 Usando método alternativo - HTML...');
@@ -2798,9 +2799,34 @@
             showNotification('📄 Documento baixado como HTML. Abra no navegador e use Ctrl+P para imprimir como PDF', 'info');
         }
 
+        // Função auxiliar para extrair dados estruturados do formulário
+        function extractDocumentData(formData, template) {
+            return {
+                title: template.title || 'DOCUMENTO JURÍDICO',
+                court: formData.tribunal || formData.vara || '[TRIBUNAL/VARA]',
+                subject: formData.assunto || '[ASSUNTO]',
+                author: formData.requerente || formData.cliente || '[REQUERENTE]',
+                lawyer: formData.advogado || 'Dr(a). [NOME DO ADVOGADO]',
+                oab: formData.oab || '[UF] nº [NÚMERO]',
+                defendant: formData.requerido || formData.reu || '[REQUERIDO]',
+                facts: formData.fatos || formData.historico || '[DESCRIÇÃO DOS FATOS]',
+                requests: formData.pedidos || formData.requerimentos || '[PEDIDOS]',
+                evidence: formData.provas || formData.documentos || '[PROVAS]',
+                observations: formData.observacoes || formData.outros || '',
+                city: formData.cidade || '[CIDADE]',
+                date: new Date().toLocaleDateString('pt-BR'),
+                processNumber: formData.processo || formData.numeroProcesso || '[Nº DO PROCESSO]',
+                cpf: formData.cpf || '[CPF]',
+                rg: formData.rg || '[RG]',
+                address: formData.endereco || '[ENDEREÇO]',
+                phone: formData.telefone || '[TELEFONE]',
+                email: formData.email || '[EMAIL]'
+            };
+        }
+
         // Função para baixar como Word (.docx)
         function downloadDocumentWord() {
-            console.log('📝 Iniciando geração de Word...');
+            console.log('📝 Iniciando geração de DOCX profissional...');
             
             // PASSO 1: Verificar se há um documento gerado
             if (!currentDocumentType) {
@@ -2823,219 +2849,250 @@
                 }
             });
 
-            // PASSO 3: Gerar conteúdo específico do documento
-            let documentoCompleto = '';
-            const documentTitle = template.title || 'Documento';
-
-            switch(currentDocumentType) {
-                case 'peticao-inicial':
-                    documentoCompleto = criarPeticaoInicialEspecifica(formData);
-                    break;
-                case 'recurso-apelacao':
-                    documentoCompleto = criarRecursoApelacaoEspecifico(formData);
-                    break;
-                case 'habeas-corpus':
-                    documentoCompleto = criarHabeasCorpusEspecifico(formData);
-                    break;
-                case 'contestacao':
-                    documentoCompleto = criarContestacaoEspecifica(formData);
-                    break;
-                case 'liberdade-provisoria':
-                    documentoCompleto = criarLiberdadeProvisoriaEspecifica(formData);
-                    break;
-                case 'peticao-fianca':
-                    documentoCompleto = criarPeticaoFiancaEspecifica(formData);
-                    break;
-                case 'alegacoes-finais':
-                    documentoCompleto = criarAlegacoesFinaisEspecificas(formData);
-                    break;
-                case 'requerimento-provas':
-                    documentoCompleto = criarRequerimentoProvasEspecifico(formData);
-                    break;
-                case 'porte-armas':
-                    documentoCompleto = criarPorteArmasEspecifico(formData);
-                    break;
-                case 'limpeza-ficha':
-                    documentoCompleto = criarLimpezaFichaEspecifica(formData);
-                    break;
-                case 'embargos-declaracao':
-                    documentoCompleto = criarEmbargosDeclaracaoEspecificos(formData);
-                    break;
-                default:
-                    showNotification('❌ Tipo de documento não reconhecido', 'error');
-                    return;
+            // PASSO 3: Verificar bibliotecas necessárias
+            if (typeof docx === 'undefined' || typeof saveAs === 'undefined') {
+                showNotification('❌ Bibliotecas necessárias não encontradas. Usando método alternativo...', 'warning');
+                downloadAsHTMLWord(generateDocumentContent(currentDocumentType, formData), template.title);
+                return;
             }
 
-            // PASSO 4: Preparar conteúdo limpo para Word - MELHORADO
-            const cleanContent = documentoCompleto
-                .replace(/<div[^>]*class="[^"]*bg-gradient[^"]*"[^>]*>.*?<\/div>/gi, '') // Remove gradientes
+            showNotification('📝 Gerando documento DOCX profissional...', 'info');
+
+            try {
+                // PASSO 4: Preparar dados estruturados
+                const docData = extractDocumentData(formData, template);
+
+                // PASSO 5: Construir documento DOCX usando docx.js
+                const { Document, Paragraph, TextRun, AlignmentType, HeadingLevel } = docx;
+
+                // Função para criar parágrafos com estilos
+                function createParagraph(text, options = {}) {
+                    return new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: text,
+                                bold: options.bold || false,
+                                font: "Times New Roman",
+                                size: options.size || 24 // 12pt em half-points
+                            })
+                        ],
+                        alignment: options.alignment || AlignmentType.JUSTIFIED,
+                        heading: options.heading
+                    });
+                }
+
+                function createCenterParagraph(text, options = {}) {
+                    return new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: text,
+                                bold: options.bold || false,
+                                font: "Times New Roman",
+                                size: options.size || 24
+                            })
+                        ],
+                        alignment: AlignmentType.CENTER,
+                        heading: options.heading
+                    });
+                }
+
+                // PASSO 6: Criar estrutura do documento
+                const paragraphs = [];
+
+                // Cabeçalho
+                paragraphs.push(createCenterParagraph(docData.court.toUpperCase(), { bold: true, size: 28 }));
+                paragraphs.push(createCenterParagraph(''));
+                paragraphs.push(createCenterParagraph(docData.title.toUpperCase(), { bold: true, size: 32 }));
+                paragraphs.push(createCenterParagraph(''));
+                paragraphs.push(createCenterParagraph(''));
+
+                // Dados das partes
+                paragraphs.push(createParagraph('REQUERENTE:', { bold: true }));
+                paragraphs.push(createParagraph(docData.author));
+                paragraphs.push(createParagraph(''));
+                
+                paragraphs.push(createParagraph('ADVOGADO:', { bold: true }));
+                paragraphs.push(createParagraph(`${docData.lawyer} - OAB/${docData.oab}`));
+                paragraphs.push(createParagraph(''));
+
+                if (docData.defendant && docData.defendant !== '[REQUERIDO]') {
+                    paragraphs.push(createParagraph('REQUERIDO:', { bold: true }));
+                    paragraphs.push(createParagraph(docData.defendant));
+                    paragraphs.push(createParagraph(''));
+                }
+
+                paragraphs.push(createParagraph('ASSUNTO:', { bold: true }));
+                paragraphs.push(createParagraph(docData.subject));
+                paragraphs.push(createParagraph(''));
+                paragraphs.push(createParagraph(''));
+
+                // Conteúdo específico por tipo de documento
+                switch(currentDocumentType) {
+                    case 'peticao-inicial':
+                        paragraphs.push(createCenterParagraph('EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO:'));
+                        paragraphs.push(createParagraph(''));
+                        
+                        paragraphs.push(createParagraph('DOS FATOS:', { bold: true }));
+                        paragraphs.push(createParagraph(''));
+                        paragraphs.push(createParagraph(docData.facts));
+                        paragraphs.push(createParagraph(''));
+                        
+                        paragraphs.push(createParagraph('DO DIREITO:', { bold: true }));
+                        paragraphs.push(createParagraph(''));
+                        paragraphs.push(createParagraph('A presente ação encontra amparo legal nos dispositivos constitucionais e infraconstitucionais aplicáveis à espécie. O direito pleiteado está devidamente fundamentado na legislação vigente e na jurisprudência consolidada dos tribunais superiores.'));
+                        paragraphs.push(createParagraph(''));
+                        
+                        paragraphs.push(createParagraph('DOS PEDIDOS:', { bold: true }));
+                        paragraphs.push(createParagraph(''));
+                        paragraphs.push(createParagraph(`Diante do exposto, requer-se a Vossa Excelência que se digne a: ${docData.requests}`));
+                        break;
+
+                    case 'recurso-apelacao':
+                        paragraphs.push(createCenterParagraph('EGRÉGIO TRIBUNAL DE JUSTIÇA:'));
+                        paragraphs.push(createParagraph(''));
+                        
+                        paragraphs.push(createParagraph('DOS FUNDAMENTOS DO RECURSO:', { bold: true }));
+                        paragraphs.push(createParagraph(''));
+                        paragraphs.push(createParagraph(docData.facts));
+                        paragraphs.push(createParagraph(''));
+                        
+                        paragraphs.push(createParagraph('DOS PEDIDOS:', { bold: true }));
+                        paragraphs.push(createParagraph(''));
+                        paragraphs.push(createParagraph(docData.requests));
+                        break;
+
+                    case 'habeas-corpus':
+                        paragraphs.push(createCenterParagraph('EXCELENTÍSSIMO SENHOR DOUTOR JUIZ:'));
+                        paragraphs.push(createParagraph(''));
+                        
+                        paragraphs.push(createParagraph('DA COAÇÃO ILEGAL:', { bold: true }));
+                        paragraphs.push(createParagraph(''));
+                        paragraphs.push(createParagraph(docData.facts));
+                        paragraphs.push(createParagraph(''));
+                        
+                        paragraphs.push(createParagraph('DO PEDIDO DE LIMINAR:', { bold: true }));
+                        paragraphs.push(createParagraph(''));
+                        paragraphs.push(createParagraph(docData.requests));
+                        break;
+
+                    default:
+                        paragraphs.push(createParagraph('HISTÓRICO:', { bold: true }));
+                        paragraphs.push(createParagraph(''));
+                        paragraphs.push(createParagraph(docData.facts));
+                        paragraphs.push(createParagraph(''));
+                        
+                        paragraphs.push(createParagraph('REQUERIMENTOS:', { bold: true }));
+                        paragraphs.push(createParagraph(''));
+                        paragraphs.push(createParagraph(docData.requests));
+                }
+
+                // Provas (se houver)
+                if (docData.evidence && docData.evidence !== '[PROVAS]') {
+                    paragraphs.push(createParagraph(''));
+                    paragraphs.push(createParagraph('DAS PROVAS:', { bold: true }));
+                    paragraphs.push(createParagraph(''));
+                    paragraphs.push(createParagraph(docData.evidence));
+                }
+
+                // Observações (se houver)
+                if (docData.observations && docData.observations.trim() !== '') {
+                    paragraphs.push(createParagraph(''));
+                    paragraphs.push(createParagraph('OBSERVAÇÕES:', { bold: true }));
+                    paragraphs.push(createParagraph(''));
+                    paragraphs.push(createParagraph(docData.observations));
+                }
+
+                // Encerramento
+                paragraphs.push(createParagraph(''));
+                paragraphs.push(createParagraph(''));
+                paragraphs.push(createCenterParagraph('Termos em que pede deferimento.'));
+                paragraphs.push(createParagraph(''));
+                paragraphs.push(createParagraph(''));
+                paragraphs.push(createCenterParagraph(`${docData.city}, ${docData.date}`));
+                paragraphs.push(createParagraph(''));
+                paragraphs.push(createParagraph(''));
+                paragraphs.push(createParagraph(''));
+                paragraphs.push(createCenterParagraph('_________________________________'));
+                paragraphs.push(createCenterParagraph(docData.lawyer, { bold: true }));
+                paragraphs.push(createCenterParagraph(`OAB/${docData.oab}`));
+
+                // PASSO 7: Criar documento final
+                const doc = new Document({
+                    sections: [{
+                        properties: {},
+                        children: paragraphs
+                    }]
+                });
+
+                // PASSO 8: Gerar e baixar arquivo
+                docx.Packer.toBlob(doc).then(blob => {
+                    const fileName = `${template.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.docx`;
+                    saveAs(blob, fileName);
+                    showNotification('✅ Documento DOCX profissional gerado com sucesso!', 'success');
+                }).catch(error => {
+                    console.error('Erro ao gerar DOCX:', error);
+                    showNotification('⚠️ Erro ao gerar DOCX. Usando método alternativo...', 'warning');
+                    downloadAsHTMLWord(generateDocumentContent(currentDocumentType, formData), template.title);
+                });
+
+            } catch (error) {
+                console.error('Erro ao gerar Word:', error);
+                showNotification('⚠️ Erro ao gerar documento Word. Usando método alternativo...', 'warning');
+                downloadAsHTMLWord(generateDocumentContent(currentDocumentType, formData), template.title);
+            }
+        }
+
+        // Método alternativo para Word (versão melhorada do método anterior)
+        function downloadAsHTMLWord(htmlContent, documentTitle) {
+            console.log('📝 Usando método alternativo - Word HTML...');
+
+            // Limpar conteúdo HTML
+            const cleanContent = htmlContent
+                .replace(/<div[^>]*class="[^"]*bg-gradient[^"]*"[^>]*>.*?<\/div>/gi, '')
                 .replace(/<div[^>]*class="[^"]*text-blue[^"]*"[^>]*>.*?<\/div>/gi, '')
                 .replace(/<button[^>]*>.*?<\/button>/gi, '')
                 .replace(/<i class="fas[^"]*"[^>]*><\/i>/gi, '')
                 .replace(/style="[^"]*cursor[^"]*[^"]*"/gi, '')
                 .replace(/onclick="[^"]*"/gi, '')
-                .replace(/title="[^"]*"/gi, '')
-                .replace(/border-bottom: 1px dashed[^"]*;/gi, '')  // Remove linhas pontilhadas
-                .replace(/class="[^"]*bg-gradient[^"]*"/gi, '')     // Remove classes de gradiente
-                .replace(/from-\w+-\d+/gi, '')                     // Remove classes Tailwind
-                .replace(/to-\w+-\d+/gi, '')                       // Remove classes Tailwind
-                .replace(/<span[^>]*class="editable"[^>]*>/gi, '<span>')
-                .replace(/class="[^"]*editable[^"]*"/gi, '');
+                .replace(/title="[^"]*"/gi, '');
 
-            // Criar documento Word compatível - FORMATO CORRETO
+            // Criar documento Word compatível
             const wordContent = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" 
                       xmlns:w="urn:schemas-microsoft-com:office:word" 
                       xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
                     <meta charset="utf-8">
-                    <meta name="progid" content="Word.Document">
-                    <meta name="generator" content="Microsoft Word 15">
-                    <meta name="originator" content="Microsoft Word 15">
                     <title>${documentTitle}</title>
-                    <!--[if gte mso 9]>
-                    <xml>
-                        <o:DocumentProperties>
-                            <o:Title>${documentTitle}</o:Title>
-                            <o:Author>Portal Jurídico Digital</o:Author>
-                            <o:Company>Tribunal de Justiça</o:Company>
-                            <o:Version>16.00</o:Version>
-                        </o:DocumentProperties>
-                        <w:WordDocument>
-                            <w:View>Print</w:View>
-                            <w:Zoom>100</w:Zoom>
-                            <w:DoNotPromptForConvert/>
-                            <w:DoNotShowRevisions/>
-                            <w:DoNotPrintRevisions/>
-                            <w:DoNotShowMarkup/>
-                            <w:DoNotShowComments/>
-                            <w:DoNotShowInsertionsAndDeletions/>
-                            <w:DoNotShowPropertyChanges/>
-                            <w:ValidateAgainstSchemas/>
-                            <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
-                            <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
-                            <w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText>
-                            <w:Compatibility>
-                                <w:BreakWrappedTables/>
-                                <w:SnapToGridInCell/>
-                                <w:WrapTextWithPunct/>
-                                <w:UseAsianBreakRules/>
-                                <w:DontGrowAutofit/>
-                                <w:SplitPgBreakAndParaMark/>
-                                <w:DontVertAlignCellWithSp/>
-                                <w:DontBreakConstrainedForcedTables/>
-                                <w:DontVertAlignInTxbx/>
-                                <w:Word11KerningPairs/>
-                                <w:CachedColBalance/>
-                            </w:Compatibility>
-                        </w:WordDocument>
-                    </xml>
-                    <![endif]-->
                     <style>
-                        @page Section1 {
-                            size: 8.5in 11in;
-                            margin: 1.0in 1.0in 1.0in 1.0in;
-                            mso-header-margin: .5in;
-                            mso-footer-margin: .5in;
-                            mso-paper-source: 0;
-                        }
-                        div.Section1 { page: Section1; }
                         body {
                             font-family: "Times New Roman", serif;
-                            font-size: 12.0pt;
+                            font-size: 12pt;
                             line-height: 1.5;
-                            margin: 0;
-                            padding: 0;
-                            mso-line-height-rule: exactly;
+                            margin: 2.5cm;
                         }
-                        p {
-                            margin: 0cm 0cm 6pt 0cm;
-                            text-align: justify;
-                            text-justify: inter-word;
-                            mso-pagination: widow-orphan;
-                            font-family: "Times New Roman", serif;
-                            font-size: 12.0pt;
-                        }
-                        .MsoNormal {
-                            margin: 0cm 0cm 6pt 0cm;
-                            text-align: justify;
-                            font-family: "Times New Roman", serif;
-                            font-size: 12.0pt;
-                        }
-                        .center { 
-                            text-align: center; 
-                            mso-element: para-border-div;
-                        }
-                        .right { 
-                            text-align: right; 
-                        }
-                        .font-bold, .bold, strong, b { 
-                            font-weight: bold; 
-                            mso-bidi-font-weight: bold;
-                        }
-                        .underline, u { 
-                            text-decoration: underline; 
-                        }
-                        h1, h2, h3, h4 {
-                            margin: 12pt 0;
-                            font-weight: bold;
-                            font-family: "Times New Roman", serif;
-                            mso-font-kerning: 1.0pt;
-                        }
-                        h1 { 
-                            font-size: 16pt; 
-                            text-align: center;
-                        }
-                        h2 { 
-                            font-size: 14pt; 
-                            text-align: center;
-                        }
-                        h3 { 
-                            font-size: 12pt; 
-                            font-weight: bold;
-                        }
-                        .text-center { text-align: center; }
-                        .text-justify { text-align: justify; }
-                        .space-y-6 > * + * { margin-top: 6pt; }
-                        .my-6 { margin: 6pt 0; }
-                        .mt-8 { margin-top: 8pt; }
-                        .mb-8 { margin-bottom: 8pt; }
-                        .border { border: 1pt solid windowtext; }
-                        .p-4 { padding: 4pt; }
-                        .min-h-32 { min-height: 32pt; }
-                        .min-h-24 { min-height: 24pt; }
-                        .grid { display: table; width: 100%; }
-                        .grid-cols-2 { }
-                        .grid-cols-2 > * { display: table-cell; width: 50%; padding: 2pt; }
+                        p { text-align: justify; margin: 6pt 0; }
+                        .center { text-align: center; }
+                        .bold { font-weight: bold; }
                     </style>
                 </head>
                 <body>
-                    <div class="Section1">
-                        ${cleanContent}
-                    </div>
+                    ${cleanContent}
                 </body>
                 </html>
             `;
 
-            // PASSO 5: Download como arquivo Word compatível - MELHORADO
-            try {
-                const blob = new Blob(['\ufeff', wordContent], { 
-                    type: 'application/msword'
-                });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${documentTitle.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.doc`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+            const blob = new Blob(['\ufeff', wordContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${documentTitle.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
 
-                showNotification('📝 Documento Word gerado com sucesso!', 'success');
-            } catch (error) {
-                console.error('Erro ao gerar Word:', error);
-                showNotification('❌ Erro ao gerar documento Word', 'error');
-            }
+            showNotification('📝 Documento Word gerado (formato compatível)!', 'success');
         }
 
         // === TEMPLATES DE DOCUMENTOS ===
