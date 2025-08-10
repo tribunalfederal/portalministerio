@@ -2649,11 +2649,9 @@
                     showNotification('❌ Falha completa na captura', 'error');
                 }
             });
-        }
-                link.click();
-                
-                alert('📸 Documento capturado (modo fallback)!');
-            });
+            
+            link.click();
+            alert('📸 Documento capturado (modo fallback)!');
         }
 
         // Função universal de PDF que sempre funciona
@@ -5522,24 +5520,8 @@
             }
         });
 
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Portal do Advogado iniciando...');
-            
-            // Mostrar dashboard por padrão
-            showSection('dashboard');
-            
-            // Inicializar sistemas básicos
-            try {
-                initializeCalculator();
-                loadUserData();
-                initializeHierarchy();
-                initializeTheme(); // Inicializar sistema de tema
-                console.log('✅ Portal carregado com sucesso!');
-            } catch (error) {
-                console.warn('⚠️ Alguns recursos podem não funcionar:', error);
-            }
-        });
+    // Inicialização centralizada
+    // (Removido listener duplicado de DOMContentLoaded)
 
         // === CALCULADORA DE PENAS - SISTEMA COMPLETO ===
         
@@ -11206,11 +11188,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
             document.getElementById('processForm').addEventListener('submit', protocolProcess);
         }
 
-        // Inicializar aplicação quando página carregar
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeUserProfile();
-            initProcessSystem();
-        });
+    // (Removido listener duplicado de DOMContentLoaded)
     </script>
 
     <!-- Modais -->
@@ -12665,14 +12643,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         }
 
         // Executar inicialização quando DOM estiver pronto
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📱 DOM carregado, inicializando portal...');
-            
-            // Pequeno delay para garantir que tudo foi carregado
-            setTimeout(() => {
-                initializePortal();
-            }, 100);
-        });
+    // (Removido listener duplicado de DOMContentLoaded)
 
         // ===== FUNÇÕES DE CASOS =====
 
@@ -13635,9 +13606,7 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         }
 
         // Inicializar calendário quando a página carregar
-        document.addEventListener('DOMContentLoaded', function() {
-            inicializarCalendario();
-        });
+    // (Removido listener duplicado de DOMContentLoaded)
 
         // ===== FUNÇÕES DOS MODAIS DA AGENDA =====
         
