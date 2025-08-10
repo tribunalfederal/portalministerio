@@ -1229,7 +1229,7 @@
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-white text-xl font-bold flex items-center gap-2">
                             <i class="fas fa-list text-purple-400"></i>
-                            Casos Ativos
+                            Casos Ativos (Resumo)
                         </h3>
                         <div class="flex gap-2">
                             <button onclick="toggleView('grid')" id="view-grid" class="p-2 rounded bg-slate-700 text-gray-300 hover:bg-slate-600 hover:text-white">
@@ -1241,8 +1241,9 @@
                         </div>
                     </div>
                     
-                    <div id="cases-container" class="space-y-4">
-                        <!-- Os casos serão carregados dinamicamente aqui -->
+                    <div class="text-center py-8">
+                        <i class="fas fa-info-circle text-4xl text-blue-400 mb-3"></i>
+                        <p class="text-blue-200">Casos detalhados disponíveis abaixo</p>
                     </div>
                 </div>
 
@@ -1473,6 +1474,18 @@
                 </div>
             </div>
         </section>
+
+                <!-- Formulário de Novo Caso (Inicialmente Oculto) -->
+                <div id="novo-caso-form" class="hidden">
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                                <i class="fas fa-plus text-green-400"></i>
+                                Novo Caso
+                            </h3>
+                            <button onclick="hideNewCaseForm()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                                <i class="fas fa-times mr-2"></i>Cancelar
+                            </button>
                         </div>
 
                         <form id="processForm" class="space-y-6">
@@ -1750,40 +1763,40 @@
                     </div>
                 </div>
 
-                <!-- Lista de Processos -->
-                <div id="lista-processos" class="mt-12">
+                <!-- Lista de Casos -->
+                <div id="lista-casos" class="mt-12">
                     <div class="card p-6">
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="text-white text-xl font-bold flex items-center gap-2">
                                 <i class="fas fa-list text-blue-400"></i>
-                                Meus Processos
+                                Meus Casos
                             </h3>
                             <div class="flex gap-2">
-                                <select id="filtro-status" onchange="filterProcesses()" 
+                                <select id="filtro-status" onchange="filterCases()" 
                                         class="px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded-lg text-white text-sm">
                                     <option value="">Todos os Status</option>
                                     <option value="rascunho">Rascunho</option>
-                                    <option value="protocolado">Protocolado</option>
+                                    <option value="ativo">Ativo</option>
                                     <option value="em-andamento">Em Andamento</option>
                                     <option value="finalizado">Finalizado</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div id="processos-container">
-                            <!-- Mensagem quando não há processos -->
-                            <div id="sem-processos" class="text-center py-12">
+                        <div id="casos-container">
+                            <!-- Mensagem quando não há casos -->
+                            <div id="sem-casos" class="text-center py-12">
                                 <i class="fas fa-folder-open text-6xl text-gray-500 mb-4"></i>
-                                <h4 class="text-gray-400 text-xl mb-2">Nenhum processo encontrado</h4>
-                                <p class="text-gray-500 mb-6">Clique em "Novo Processo" para começar</p>
-                                <button onclick="showNewProcessForm()" class="btn bg-green-600 hover:bg-green-700 text-white">
-                                    <i class="fas fa-plus mr-2"></i>Criar Primeiro Processo
+                                <h4 class="text-gray-400 text-xl mb-2">Nenhum caso encontrado</h4>
+                                <p class="text-gray-500 mb-6">Clique em "Novo Caso" para começar</p>
+                                <button onclick="showNewCaseForm()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                    <i class="fas fa-plus mr-2"></i>Criar Primeiro Caso
                                 </button>
                             </div>
 
-                            <!-- Lista dinâmica de processos será inserida aqui -->
-                            <div id="processos-list" class="space-y-4">
-                                <!-- Os processos serão carregados dinamicamente via JavaScript -->
+                            <!-- Lista dinâmica de casos será inserida aqui -->
+                            <div id="casos-list" class="space-y-4">
+                                <!-- Os casos serão carregados dinamicamente via JavaScript -->
                             </div>
                         </div>
                     </div>
@@ -1791,13 +1804,13 @@
             </div>
         </section>
 
-        <!-- Modal de Visualização/Edição de Processo -->
-        <div id="modal-processo" class="modal">
+        <!-- Modal de Visualização/Edição de Caso -->
+        <div id="modal-caso" class="modal">
             <div class="modal-content max-w-4xl">
                 <div class="modal-header">
                     <h3 class="text-2xl font-bold text-white flex items-center gap-3">
                         <i class="fas fa-eye text-blue-400"></i>
-                        <span id="modal-titulo">Detalhes do Processo</span>
+                        <span id="modal-titulo">Detalhes do Caso</span>
                     </h3>
                 </div>
                 <div class="modal-body">
@@ -5867,34 +5880,39 @@ Reduções limitadas a 50% máximo conforme regulamento GTARP.
         const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
         const ALLOWED_TYPES = ['.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg'];
 
-        // Mostrar formulário de novo processo
-        function showNewProcessForm() {
-            document.getElementById('novo-processo-form').classList.remove('hidden');
-            document.getElementById('lista-processos').classList.add('hidden');
-            clearProcessForm();
+        // Mostrar formulário de novo caso
+        function showNewCaseForm() {
+            document.getElementById('novo-caso-form').classList.remove('hidden');
+            document.getElementById('lista-casos').scrollIntoView({ behavior: 'smooth' });
+            clearCaseForm();
             
             // Preencher automaticamente dados do advogado logado
-            document.getElementById('advogado-nome').value = userData.name;
-            document.getElementById('advogado-oab').value = userData.oab;
+            const dados = obterDadosAdvogado();
+            document.getElementById('advogado-nome').value = dados.nome;
+            document.getElementById('advogado-oab').value = dados.oab;
         }
 
-        // Esconder formulário de novo processo
-        function hideNewProcessForm() {
-            document.getElementById('novo-processo-form').classList.add('hidden');
-            document.getElementById('lista-processos').classList.remove('hidden');
-            clearProcessForm();
+        // Esconder formulário de novo caso
+        function hideNewCaseForm() {
+            document.getElementById('novo-caso-form').classList.add('hidden');
+            clearCaseForm();
             
             // Reset modo de edição
-            isEditingProcess = false;
-            currentProcessId = null;
+            isEditingCase = false;
+            currentCaseId = null;
             updateFormButtons(false);
         }
 
         // Limpar formulário
-        function clearProcessForm() {
+        function clearCaseForm() {
             document.getElementById('processForm').reset();
             clearAllFiles();
         }
+
+        // ===== FUNÇÕES DE COMPATIBILIDADE (para não quebrar chamadas existentes) =====
+        function showNewProcessForm() { showNewCaseForm(); }
+        function hideNewProcessForm() { hideNewCaseForm(); }
+        function clearProcessForm() { clearCaseForm(); }
 
         // Lidar com upload de múltiplos arquivos
         function handleMultipleFilesUpload(event) {
@@ -11462,20 +11480,40 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         function showSection(sectionName) {
             console.log('🔄 Navegando para seção:', sectionName);
             
-            // Esconder todas as seções
+            // FORÇAR ocultação de todas as seções
             const sections = document.querySelectorAll('.section');
             console.log('📋 Total de seções encontradas:', sections.length);
             
             sections.forEach((section, index) => {
                 section.classList.remove('active');
-                console.log(`Seção ${index}: ${section.id} - removendo active`);
+                section.style.display = 'none'; // FORÇAR hide via CSS inline
+                console.log(`Seção ${index}: ${section.id} - removendo active e forçando hide`);
+            });
+            
+            // FORÇAR esconder elementos específicos problemáticos
+            const problematicElements = [
+                'lista-casos',
+                'casos-container', 
+                'sem-casos',
+                'novo-caso-form'
+            ];
+            
+            problematicElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (sectionName !== 'casos') {
+                        element.style.display = 'none';
+                        console.log(`🚫 Escondendo elemento problemático: ${id}`);
+                    }
+                }
             });
             
             // Mostrar seção específica
             const targetSection = document.getElementById(sectionName);
             if (targetSection) {
                 targetSection.classList.add('active');
-                console.log(`✅ Seção ${sectionName} ativada`);
+                targetSection.style.display = 'block'; // FORÇAR show via CSS inline
+                console.log(`✅ Seção ${sectionName} ativada e forçada a aparecer`);
                 
                 // Atualizar navegação ativa
                 document.querySelectorAll('.nav-item').forEach(item => {
