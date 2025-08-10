@@ -3171,10 +3171,6 @@
                             <p>Protesta-se por todos os meios de prova em direito admitidas, especialmente prova documental, testemunhal e pericial.</p>
                             <p class="mt-4">Termos em que pede deferimento.</p>
                         </div>
-                    </div>
-        }
-
-        // RECURSO DE APELAÇÃO - Documento específico COM CAMPOS EDITÁVEIS
 
                         <div class="mt-8 text-center">
                             <p>
@@ -3183,6 +3179,15 @@
                             </p>
                             
                             <div class="mt-8">
+                                <p><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>Advogado</p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                            </div>
+                        </div>
+                    </div>
+        }
+
+        // RECURSO DE APELAÇÃO - Documento específico COM CAMPOS EDITÁVEIS
                                 <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
                                 <p>Advogado</p>
                                 <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
@@ -9975,6 +9980,12 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
         function updateProcessList() {
             const container = document.getElementById('processos-container');
             const semProcessos = document.getElementById('sem-processos');
+            
+            // Verificar se os elementos existem antes de usá-los
+            if (!container || !semProcessos) {
+                console.warn('Elementos de processos não encontrados na página atual');
+                return;
+            }
             
             if (processosData.length === 0) {
                 semProcessos.classList.remove('hidden');
