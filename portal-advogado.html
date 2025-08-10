@@ -831,6 +831,9 @@
                                 <button onclick="downloadDocumentPDF()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-all">
                                     📄 Baixar PDF
                                 </button>
+                                <button onclick="downloadDocumentWord()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all">
+                                    📝 Baixar Word
+                                </button>
                                 <button onclick="capturarFotoDocumento()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg transition-all">
                                     📸 Gerar Foto HD
                                 </button>
@@ -1149,14 +1152,14 @@
                     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                         <div>
                             <h2 class="text-white text-3xl font-bold mb-2 flex items-center gap-3">
-                                <i class="fas fa-folder-open text-slate-400"></i>
-                                Sistema de Abertura de Processos
+                                <i class="fas fa-folder-open text-purple-400"></i>
+                                Gestão de Casos Jurídicos
                             </h2>
-                            <p class="text-blue-200">Gerencie e abra novos processos jurídicos</p>
+                            <p class="text-blue-200">Gerencie todos os seus processos e casos ativos</p>
                         </div>
                         <div class="flex gap-3">
-                            <button onclick="showNewProcessForm()" class="btn bg-green-600 hover:bg-green-700 text-white">
-                                <i class="fas fa-plus mr-2"></i>Novo Processo
+                            <button onclick="abrirModalNovoCaso()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                <i class="fas fa-plus mr-2"></i>Novo Caso
                             </button>
                             <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white">
                                 <i class="fas fa-arrow-left mr-2"></i>Dashboard
@@ -1166,15 +1169,135 @@
                 </div>
 
                 <!-- Estatísticas Rápidas -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="card p-4 text-center">
-                        <div class="text-2xl font-bold text-green-400 mb-1" id="total-processos">0</div>
-                        <div class="text-blue-200 text-sm">Total de Processos</div>
+                        <div class="text-3xl font-bold text-green-400 mb-1" id="total-casos">0</div>
+                        <div class="text-blue-200 text-sm">Total de Casos</div>
                     </div>
                     <div class="card p-4 text-center">
-                        <div class="text-2xl font-bold text-yellow-400 mb-1" id="processos-andamento">0</div>
-                        <div class="text-blue-200 text-sm">Em Andamento</div>
+                        <div class="text-3xl font-bold text-yellow-400 mb-1" id="casos-ativos">0</div>
+                        <div class="text-blue-200 text-sm">Casos Ativos</div>
                     </div>
+                    <div class="card p-4 text-center">
+                        <div class="text-3xl font-bold text-blue-400 mb-1" id="casos-pendentes">0</div>
+                        <div class="text-blue-200 text-sm">Pendentes</div>
+                    </div>
+                    <div class="card p-4 text-center">
+                        <div class="text-3xl font-bold text-red-400 mb-1" id="casos-urgentes">0</div>
+                        <div class="text-blue-200 text-sm">Urgentes</div>
+                    </div>
+                </div>
+
+                <!-- Filtros e Busca -->
+                <div class="card p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-blue-200 text-sm font-medium mb-2">Buscar Caso:</label>
+                            <input type="text" id="busca-caso" placeholder="Nome, número ou cliente..." 
+                                   onkeyup="filtrarCasos()" 
+                                   class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white placeholder-blue-300/50">
+                        </div>
+                        <div>
+                            <label class="block text-blue-200 text-sm font-medium mb-2">Status:</label>
+                            <select id="filtro-status" onchange="filtrarCasos()" 
+                                    class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                <option value="">Todos os Status</option>
+                                <option value="ativo">Ativo</option>
+                                <option value="pendente">Pendente</option>
+                                <option value="concluido">Concluído</option>
+                                <option value="arquivado">Arquivado</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-blue-200 text-sm font-medium mb-2">Tipo:</label>
+                            <select id="filtro-tipo" onchange="filtrarCasos()" 
+                                    class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                <option value="">Todos os Tipos</option>
+                                <option value="civil">Civil</option>
+                                <option value="criminal">Criminal</option>
+                                <option value="trabalhista">Trabalhista</option>
+                                <option value="familia">Família</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-blue-200 text-sm font-medium mb-2">Ações:</label>
+                            <button onclick="exportarCasos()" class="w-full btn bg-blue-600 hover:bg-blue-700 text-white">
+                                <i class="fas fa-download mr-2"></i>Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Casos -->
+                <div class="card p-6">
+                    <h3 class="text-white font-bold text-lg mb-4">Meus Casos</h3>
+                    <div id="lista-casos" class="space-y-4">
+                        <!-- Casos serão inseridos aqui dinamicamente -->
+                        <div class="text-center py-8">
+                            <i class="fas fa-folder-open text-4xl text-blue-400 mb-4"></i>
+                            <p class="text-blue-200">Nenhum caso encontrado. Clique em "Novo Caso" para começar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Novo Caso -->
+            <div id="modal-novo-caso" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="text-white text-xl font-bold">Novo Caso</h3>
+                        <button onclick="fecharModalNovoCaso()" class="text-gray-400 hover:text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-novo-caso" onsubmit="salvarNovoCaso(event)">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Número do Processo:</label>
+                                    <input type="text" id="numero-processo" required 
+                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Nome do Cliente:</label>
+                                    <input type="text" id="nome-cliente" required 
+                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Tipo do Caso:</label>
+                                    <select id="tipo-caso" required 
+                                            class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                        <option value="">Selecione...</option>
+                                        <option value="civil">Civil</option>
+                                        <option value="criminal">Criminal</option>
+                                        <option value="trabalhista">Trabalhista</option>
+                                        <option value="familia">Família</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Status:</label>
+                                    <select id="status-caso" required 
+                                            class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                        <option value="ativo">Ativo</option>
+                                        <option value="pendente">Pendente</option>
+                                        <option value="concluido">Concluído</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Descrição:</label>
+                                    <textarea id="descricao-caso" rows="3" 
+                                              class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="fecharModalNovoCaso()" class="btn btn-secondary mr-3">Cancelar</button>
+                        <button onclick="salvarNovoCaso()" class="btn btn-primary">Salvar Caso</button>
+                    </div>
+                </div>
+            </div>
+        </section>
                     <div class="card p-4 text-center">
                         <div class="text-2xl font-bold text-blue-400 mb-1" id="processos-pendentes">0</div>
                         <div class="text-blue-200 text-sm">Aguardando Análise</div>
@@ -1548,15 +1671,186 @@
         
         <!-- Agenda Section -->
         <section id="agenda" class="section">
-            <div class="card p-8">
-                <h2 class="text-white text-2xl font-bold mb-6">
-                    <i class="fas fa-calendar mr-3 text-indigo-400"></i>
-                    Agenda e Compromissos
-                </h2>
-                <p class="text-blue-200 mb-6">Em desenvolvimento...</p>
-                <button onclick="showSection('dashboard')" class="btn btn-primary">
-                    <i class="fas fa-arrow-left mr-2"></i>Voltar ao Dashboard
-                </button>
+            <div class="space-y-6">
+                <!-- Header da Seção -->
+                <div class="card p-6 bg-gradient-to-r from-indigo-900/40 to-purple-900/40">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-white text-3xl font-bold mb-2 flex items-center gap-3">
+                                <i class="fas fa-calendar-alt text-blue-400"></i>
+                                Agenda e Compromissos
+                            </h2>
+                            <p class="text-blue-200">Gerencie audiências, prazos e compromissos</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="abrirModalNovoCompromisso()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                <i class="fas fa-plus mr-2"></i>Novo Compromisso
+                            </button>
+                            <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                                <i class="fas fa-arrow-left mr-2"></i>Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estatísticas da Agenda -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="card p-4 text-center">
+                        <div class="text-3xl font-bold text-green-400 mb-1" id="compromissos-hoje">0</div>
+                        <div class="text-blue-200 text-sm">Hoje</div>
+                    </div>
+                    <div class="card p-4 text-center">
+                        <div class="text-3xl font-bold text-yellow-400 mb-1" id="compromissos-semana">0</div>
+                        <div class="text-blue-200 text-sm">Esta Semana</div>
+                    </div>
+                    <div class="card p-4 text-center">
+                        <div class="text-3xl font-bold text-blue-400 mb-1" id="audiencias-pendentes">0</div>
+                        <div class="text-blue-200 text-sm">Audiências</div>
+                    </div>
+                    <div class="card p-4 text-center">
+                        <div class="text-3xl font-bold text-red-400 mb-1" id="prazos-vencendo">0</div>
+                        <div class="text-blue-200 text-sm">Prazos Urgentes</div>
+                    </div>
+                </div>
+
+                <!-- Calendário e Filtros -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Calendário -->
+                    <div class="lg:col-span-2 card p-6">
+                        <h3 class="text-white font-bold text-lg mb-4">Calendário</h3>
+                        <div id="calendario" class="bg-slate-800/30 rounded-lg p-4">
+                            <!-- Calendário será inserido aqui -->
+                            <div class="grid grid-cols-7 gap-2 text-center">
+                                <div class="text-blue-300 font-semibold p-2">Dom</div>
+                                <div class="text-blue-300 font-semibold p-2">Seg</div>
+                                <div class="text-blue-300 font-semibold p-2">Ter</div>
+                                <div class="text-blue-300 font-semibold p-2">Qua</div>
+                                <div class="text-blue-300 font-semibold p-2">Qui</div>
+                                <div class="text-blue-300 font-semibold p-2">Sex</div>
+                                <div class="text-blue-300 font-semibold p-2">Sáb</div>
+                                <!-- Dias do mês serão inseridos dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Próximos Compromissos -->
+                    <div class="card p-6">
+                        <h3 class="text-white font-bold text-lg mb-4">Próximos Compromissos</h3>
+                        <div id="proximos-compromissos" class="space-y-3">
+                            <!-- Compromissos serão inseridos aqui -->
+                            <div class="text-center py-4">
+                                <i class="fas fa-calendar text-blue-400 text-2xl mb-2"></i>
+                                <p class="text-blue-200 text-sm">Nenhum compromisso próximo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista Completa de Compromissos -->
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-white font-bold text-lg">Todos os Compromissos</h3>
+                        <div class="flex gap-2">
+                            <select id="filtro-mes" onchange="filtrarCompromissos()" 
+                                    class="px-3 py-1 bg-slate-800/50 border border-blue-300/30 rounded text-white text-sm">
+                                <option value="">Todos os Meses</option>
+                                <option value="01">Janeiro</option>
+                                <option value="02">Fevereiro</option>
+                                <option value="03">Março</option>
+                                <option value="04">Abril</option>
+                                <option value="05">Maio</option>
+                                <option value="06">Junho</option>
+                                <option value="07">Julho</option>
+                                <option value="08">Agosto</option>
+                                <option value="09">Setembro</option>
+                                <option value="10">Outubro</option>
+                                <option value="11">Novembro</option>
+                                <option value="12">Dezembro</option>
+                            </select>
+                            <select id="filtro-tipo-compromisso" onchange="filtrarCompromissos()" 
+                                    class="px-3 py-1 bg-slate-800/50 border border-blue-300/30 rounded text-white text-sm">
+                                <option value="">Todos os Tipos</option>
+                                <option value="audiencia">Audiência</option>
+                                <option value="prazo">Prazo</option>
+                                <option value="reuniao">Reunião</option>
+                                <option value="compromisso">Compromisso</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="lista-compromissos" class="space-y-3">
+                        <!-- Compromissos serão inseridos aqui -->
+                        <div class="text-center py-8">
+                            <i class="fas fa-calendar-plus text-4xl text-blue-400 mb-4"></i>
+                            <p class="text-blue-200">Nenhum compromisso agendado. Clique em "Novo Compromisso" para começar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Novo Compromisso -->
+            <div id="modal-novo-compromisso" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="text-white text-xl font-bold">Novo Compromisso</h3>
+                        <button onclick="fecharModalNovoCompromisso()" class="text-gray-400 hover:text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-novo-compromisso">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Título:</label>
+                                    <input type="text" id="titulo-compromisso" required 
+                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Tipo:</label>
+                                    <select id="tipo-compromisso" required 
+                                            class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                        <option value="">Selecione...</option>
+                                        <option value="audiencia">Audiência</option>
+                                        <option value="prazo">Prazo</option>
+                                        <option value="reuniao">Reunião</option>
+                                        <option value="compromisso">Compromisso</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Data:</label>
+                                    <input type="date" id="data-compromisso" required 
+                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Horário:</label>
+                                    <input type="time" id="horario-compromisso" required 
+                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Local:</label>
+                                    <input type="text" id="local-compromisso" 
+                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Caso Relacionado:</label>
+                                    <select id="caso-relacionado" 
+                                            class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                                        <option value="">Selecione um caso...</option>
+                                        <!-- Casos serão carregados dinamicamente -->
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-blue-200 text-sm font-medium mb-2">Observações:</label>
+                                    <textarea id="observacoes-compromisso" rows="3" 
+                                              class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="fecharModalNovoCompromisso()" class="btn btn-secondary mr-3">Cancelar</button>
+                        <button onclick="salvarNovoCompromisso()" class="btn btn-primary">Salvar Compromisso</button>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -1575,6 +1869,9 @@
         function gerarDocumento(tipo) {
             try {
                 console.log('🚀 Gerando documento:', tipo);
+                
+                // DEFINIR O TIPO ATUAL PARA O DOWNLOAD
+                currentDocumentType = tipo;
                 
                 // Usar mesma estrutura do INDEX - mostrar área documento
                 document.getElementById('area-documento').classList.remove('hidden');
@@ -1961,6 +2258,177 @@
             URL.revokeObjectURL(url);
 
             showNotification('📄 Documento baixado como HTML. Abra no navegador e use Ctrl+P para imprimir como PDF', 'info');
+        }
+
+        // Função para baixar como Word (.docx)
+        function downloadDocumentWord() {
+            console.log('📝 Iniciando geração de Word...');
+            
+            // PASSO 1: Verificar se há um documento gerado
+            if (!currentDocumentType) {
+                showNotification('❌ Nenhum documento selecionado. Gere um documento primeiro.', 'error');
+                return;
+            }
+
+            // PASSO 2: Obter dados do formulário atual
+            const template = documentTemplates[currentDocumentType];
+            if (!template) {
+                showNotification('❌ Template de documento não encontrado', 'error');
+                return;
+            }
+
+            const formData = {};
+            template.fields.forEach(field => {
+                const element = document.getElementById(`field-${field.name}`);
+                if (element) {
+                    formData[field.name] = element.value.trim();
+                }
+            });
+
+            // PASSO 3: Gerar conteúdo específico do documento
+            let documentoCompleto = '';
+            const documentTitle = template.title || 'Documento';
+
+            switch(currentDocumentType) {
+                case 'peticao-inicial':
+                    documentoCompleto = criarPeticaoInicialEspecifica(formData);
+                    break;
+                case 'recurso-apelacao':
+                    documentoCompleto = criarRecursoApelacaoEspecifico(formData);
+                    break;
+                case 'habeas-corpus':
+                    documentoCompleto = criarHabeasCorpusEspecifico(formData);
+                    break;
+                case 'contestacao':
+                    documentoCompleto = criarContestacaoEspecifica(formData);
+                    break;
+                case 'liberdade-provisoria':
+                    documentoCompleto = criarLiberdadeProvisoriaEspecifica(formData);
+                    break;
+                case 'peticao-fianca':
+                    documentoCompleto = criarPeticaoFiancaEspecifica(formData);
+                    break;
+                case 'alegacoes-finais':
+                    documentoCompleto = criarAlegacoesFinaisEspecificas(formData);
+                    break;
+                case 'requerimento-provas':
+                    documentoCompleto = criarRequerimentoProvasEspecifico(formData);
+                    break;
+                case 'porte-armas':
+                    documentoCompleto = criarPorteArmasEspecifico(formData);
+                    break;
+                case 'limpeza-ficha':
+                    documentoCompleto = criarLimpezaFichaEspecifica(formData);
+                    break;
+                case 'embargos-declaracao':
+                    documentoCompleto = criarEmbargosDeclaracaoEspecificos(formData);
+                    break;
+                default:
+                    showNotification('❌ Tipo de documento não reconhecido', 'error');
+                    return;
+            }
+
+            // PASSO 4: Preparar conteúdo para Word
+            const cleanContent = documentoCompleto
+                .replace(/<div[^>]*class="[^"]*text-blue[^"]*"[^>]*>.*?<\/div>/gi, '')
+                .replace(/<button[^>]*>.*?<\/button>/gi, '')
+                .replace(/<i class="fas[^"]*"[^>]*><\/i>/gi, '')
+                .replace(/style="[^"]*cursor[^"]*"/gi, '')
+                .replace(/onclick="[^"]*"/gi, '')
+                .replace(/title="[^"]*"/gi, '')
+                .replace(/<span[^>]*class="editable"[^>]*>/gi, '')
+                .replace(/<\/span>/gi, '')
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<p[^>]*>/gi, '\n')
+                .replace(/<\/p>/gi, '\n')
+                .replace(/<[^>]*>/gi, '')
+                .replace(/\n\s*\n/gi, '\n\n')
+                .trim();
+
+            // Criar conteúdo HTML compatível com Word
+            const wordContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="utf-8">
+                    <title>${documentTitle}</title>
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <w:WordDocument>
+                            <w:View>Print</w:View>
+                            <w:Zoom>90</w:Zoom>
+                            <w:DoNotPromptForConvert/>
+                            <w:DoNotShowRevisions/>
+                            <w:DoNotPrintRevisions/>
+                            <w:DoNotShowMarkup/>
+                            <w:DoNotShowComments/>
+                            <w:DoNotShowInsertionsAndDeletions/>
+                            <w:DoNotShowPropertyChanges/>
+                            <w:DisplayHorizontalDrawingGridEvery>0</w:DisplayHorizontalDrawingGridEvery>
+                            <w:DisplayVerticalDrawingGridEvery>2</w:DisplayVerticalDrawingGridEvery>
+                            <w:UseMarginsForDrawingGridOrigin/>
+                            <w:ValidateAgainstSchemas/>
+                            <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
+                            <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
+                            <w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText>
+                            <w:Compatibility>
+                                <w:BreakWrappedTables/>
+                                <w:SnapToGridInCell/>
+                                <w:WrapTextWithPunct/>
+                                <w:UseAsianBreakRules/>
+                                <w:DontGrowAutofit/>
+                            </w:Compatibility>
+                        </w:WordDocument>
+                    </xml>
+                    <![endif]-->
+                    <style>
+                        @page { 
+                            size: 8.5in 11in; 
+                            margin: 1in; 
+                        }
+                        body { 
+                            font-family: 'Times New Roman', serif; 
+                            font-size: 12pt; 
+                            line-height: 1.5; 
+                            margin: 0; 
+                            padding: 0;
+                        }
+                        p { 
+                            margin: 0 0 12pt 0; 
+                            text-align: justify;
+                        }
+                        .center { text-align: center; }
+                        .right { text-align: right; }
+                        .bold { font-weight: bold; }
+                        .underline { text-decoration: underline; }
+                        h1, h2, h3 { 
+                            margin: 12pt 0; 
+                            font-weight: bold; 
+                        }
+                        h1 { font-size: 16pt; }
+                        h2 { font-size: 14pt; }
+                        h3 { font-size: 12pt; }
+                    </style>
+                </head>
+                <body>
+                    ${documentoCompleto}
+                </body>
+                </html>
+            `;
+
+            // Download como arquivo Word
+            const blob = new Blob([wordContent], { 
+                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+            });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${documentTitle.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.docx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showNotification('📝 Documento Word gerado com sucesso!', 'success');
         }
 
         // === TEMPLATES DE DOCUMENTOS ===
@@ -10903,6 +11371,580 @@ OAB/${formData.advogadoEstado || 'UF'} nº ${formData.advogadoOAB || '000.000'}`
                 initializePortal();
             }, 100);
         });
+
+        // ===== FUNÇÕES DE CASOS =====
+
+        // Variável global para armazenar casos
+        let casos = JSON.parse(localStorage.getItem('casos') || '[]');
+
+        // Abrir modal de novo caso
+        function abrirModalNovoCaso() {
+            document.getElementById('modal-novo-caso').style.display = 'flex';
+        }
+
+        // Fechar modal de novo caso
+        function fecharModalNovoCaso() {
+            document.getElementById('modal-novo-caso').style.display = 'none';
+            document.getElementById('form-novo-caso').reset();
+        }
+
+        // Salvar novo caso
+        function salvarNovoCaso(event) {
+            if (event) event.preventDefault();
+
+            const numeroCaso = document.getElementById('numero-processo').value;
+            const nomeCliente = document.getElementById('nome-cliente').value;
+            const tipoCaso = document.getElementById('tipo-caso').value;
+            const statusCaso = document.getElementById('status-caso').value;
+            const descricaoCaso = document.getElementById('descricao-caso').value;
+
+            if (!numeroCaso || !nomeCliente || !tipoCaso || !statusCaso) {
+                showNotification('❌ Preencha todos os campos obrigatórios', 'error');
+                return;
+            }
+
+            const novoCaso = {
+                id: Date.now().toString(),
+                numero: numeroCaso,
+                cliente: nomeCliente,
+                tipo: tipoCaso,
+                status: statusCaso,
+                descricao: descricaoCaso,
+                dataCriacao: new Date().toISOString(),
+                dataUltimaAtualizacao: new Date().toISOString()
+            };
+
+            casos.push(novoCaso);
+            localStorage.setItem('casos', JSON.stringify(casos));
+            
+            carregarCasos();
+            atualizarEstatisticasCasos();
+            fecharModalNovoCaso();
+            
+            showNotification('✅ Caso salvo com sucesso!', 'success');
+        }
+
+        // Carregar e exibir casos
+        function carregarCasos() {
+            const listaCasos = document.getElementById('lista-casos');
+            
+            if (casos.length === 0) {
+                listaCasos.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-folder-open text-4xl text-blue-400 mb-4"></i>
+                        <p class="text-blue-200">Nenhum caso encontrado. Clique em "Novo Caso" para começar.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listaCasos.innerHTML = casos.map(caso => `
+                <div class="case-card bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="text-white font-semibold text-lg">${caso.numero}</h4>
+                            <p class="text-blue-300">${caso.cliente}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 rounded text-xs ${getStatusColor(caso.status)}">${caso.status.toUpperCase()}</span>
+                            <span class="px-2 py-1 rounded text-xs bg-blue-600/30 text-blue-200">${caso.tipo.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <p class="text-blue-200 text-sm mb-3">${caso.descricao || 'Sem descrição'}</p>
+                    <div class="flex justify-between items-center">
+                        <small class="text-blue-400">Criado: ${new Date(caso.dataCriacao).toLocaleDateString()}</small>
+                        <div class="flex gap-2">
+                            <button onclick="editarCaso('${caso.id}')" class="text-blue-400 hover:text-blue-300" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="excluirCaso('${caso.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Função auxiliar para cores de status
+        function getStatusColor(status) {
+            switch(status) {
+                case 'ativo': return 'bg-green-600/30 text-green-200';
+                case 'pendente': return 'bg-yellow-600/30 text-yellow-200';
+                case 'concluido': return 'bg-blue-600/30 text-blue-200';
+                case 'arquivado': return 'bg-gray-600/30 text-gray-200';
+                default: return 'bg-gray-600/30 text-gray-200';
+            }
+        }
+
+        // Filtrar casos
+        function filtrarCasos() {
+            const busca = document.getElementById('busca-caso').value.toLowerCase();
+            const statusFiltro = document.getElementById('filtro-status').value;
+            const tipoFiltro = document.getElementById('filtro-tipo').value;
+
+            const casosFiltrados = casos.filter(caso => {
+                const matchBusca = caso.numero.toLowerCase().includes(busca) || 
+                                 caso.cliente.toLowerCase().includes(busca) ||
+                                 caso.descricao.toLowerCase().includes(busca);
+                const matchStatus = !statusFiltro || caso.status === statusFiltro;
+                const matchTipo = !tipoFiltro || caso.tipo === tipoFiltro;
+
+                return matchBusca && matchStatus && matchTipo;
+            });
+
+            // Exibir casos filtrados (implementação similar a carregarCasos)
+            const listaCasos = document.getElementById('lista-casos');
+            if (casosFiltrados.length === 0) {
+                listaCasos.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-search text-4xl text-blue-400 mb-4"></i>
+                        <p class="text-blue-200">Nenhum caso encontrado com os filtros aplicados.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listaCasos.innerHTML = casosFiltrados.map(caso => `
+                <div class="case-card bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="text-white font-semibold text-lg">${caso.numero}</h4>
+                            <p class="text-blue-300">${caso.cliente}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 rounded text-xs ${getStatusColor(caso.status)}">${caso.status.toUpperCase()}</span>
+                            <span class="px-2 py-1 rounded text-xs bg-blue-600/30 text-blue-200">${caso.tipo.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <p class="text-blue-200 text-sm mb-3">${caso.descricao || 'Sem descrição'}</p>
+                    <div class="flex justify-between items-center">
+                        <small class="text-blue-400">Criado: ${new Date(caso.dataCriacao).toLocaleDateString()}</small>
+                        <div class="flex gap-2">
+                            <button onclick="editarCaso('${caso.id}')" class="text-blue-400 hover:text-blue-300" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="excluirCaso('${caso.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Atualizar estatísticas de casos
+        function atualizarEstatisticasCasos() {
+            const totalCasos = casos.length;
+            const casosAtivos = casos.filter(c => c.status === 'ativo').length;
+            const casosPendentes = casos.filter(c => c.status === 'pendente').length;
+            const casosUrgentes = casos.filter(c => c.status === 'ativo' && c.tipo === 'criminal').length;
+
+            document.getElementById('total-casos').textContent = totalCasos;
+            document.getElementById('casos-ativos').textContent = casosAtivos;
+            document.getElementById('casos-pendentes').textContent = casosPendentes;
+            document.getElementById('casos-urgentes').textContent = casosUrgentes;
+        }
+
+        // Editar caso
+        function editarCaso(id) {
+            const caso = casos.find(c => c.id === id);
+            if (!caso) return;
+
+            // Preencher formulário com dados do caso
+            document.getElementById('numero-processo').value = caso.numero;
+            document.getElementById('nome-cliente').value = caso.cliente;
+            document.getElementById('tipo-caso').value = caso.tipo;
+            document.getElementById('status-caso').value = caso.status;
+            document.getElementById('descricao-caso').value = caso.descricao || '';
+
+            // Abrir modal
+            abrirModalNovoCaso();
+
+            // Alterar função de salvar para edição
+            const form = document.getElementById('form-novo-caso');
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                
+                caso.numero = document.getElementById('numero-processo').value;
+                caso.cliente = document.getElementById('nome-cliente').value;
+                caso.tipo = document.getElementById('tipo-caso').value;
+                caso.status = document.getElementById('status-caso').value;
+                caso.descricao = document.getElementById('descricao-caso').value;
+                caso.dataUltimaAtualizacao = new Date().toISOString();
+
+                localStorage.setItem('casos', JSON.stringify(casos));
+                carregarCasos();
+                atualizarEstatisticasCasos();
+                fecharModalNovoCaso();
+                
+                showNotification('✅ Caso atualizado com sucesso!', 'success');
+
+                // Restaurar função original
+                form.onsubmit = salvarNovoCaso;
+            };
+        }
+
+        // Excluir caso
+        function excluirCaso(id) {
+            if (confirm('Deseja realmente excluir este caso?')) {
+                casos = casos.filter(c => c.id !== id);
+                localStorage.setItem('casos', JSON.stringify(casos));
+                carregarCasos();
+                atualizarEstatisticasCasos();
+                showNotification('✅ Caso excluído com sucesso!', 'success');
+            }
+        }
+
+        // Exportar casos
+        function exportarCasos() {
+            const dadosExport = {
+                timestamp: new Date().toISOString(),
+                totalCasos: casos.length,
+                casos: casos
+            };
+
+            const blob = new Blob([JSON.stringify(dadosExport, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `casos_export_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showNotification('📥 Casos exportados com sucesso!', 'success');
+        }
+
+        // ===== FUNÇÕES DE AGENDA =====
+
+        // Variável global para armazenar compromissos
+        let compromissos = JSON.parse(localStorage.getItem('compromissos') || '[]');
+
+        // Abrir modal de novo compromisso
+        function abrirModalNovoCompromisso() {
+            // Carregar casos no select
+            const casoSelect = document.getElementById('caso-relacionado');
+            casoSelect.innerHTML = '<option value="">Selecione um caso...</option>';
+            casos.forEach(caso => {
+                casoSelect.innerHTML += `<option value="${caso.id}">${caso.numero} - ${caso.cliente}</option>`;
+            });
+
+            document.getElementById('modal-novo-compromisso').style.display = 'flex';
+        }
+
+        // Fechar modal de novo compromisso
+        function fecharModalNovoCompromisso() {
+            document.getElementById('modal-novo-compromisso').style.display = 'none';
+            document.getElementById('form-novo-compromisso').reset();
+        }
+
+        // Salvar novo compromisso
+        function salvarNovoCompromisso() {
+            const titulo = document.getElementById('titulo-compromisso').value;
+            const tipo = document.getElementById('tipo-compromisso').value;
+            const data = document.getElementById('data-compromisso').value;
+            const horario = document.getElementById('horario-compromisso').value;
+            const local = document.getElementById('local-compromisso').value;
+            const casoRelacionado = document.getElementById('caso-relacionado').value;
+            const observacoes = document.getElementById('observacoes-compromisso').value;
+
+            if (!titulo || !tipo || !data || !horario) {
+                showNotification('❌ Preencha todos os campos obrigatórios', 'error');
+                return;
+            }
+
+            const novoCompromisso = {
+                id: Date.now().toString(),
+                titulo,
+                tipo,
+                data,
+                horario,
+                local,
+                casoRelacionado,
+                observacoes,
+                dataCriacao: new Date().toISOString()
+            };
+
+            compromissos.push(novoCompromisso);
+            localStorage.setItem('compromissos', JSON.stringify(compromissos));
+            
+            carregarCompromissos();
+            atualizarEstatisticasAgenda();
+            fecharModalNovoCompromisso();
+            
+            showNotification('✅ Compromisso salvo com sucesso!', 'success');
+        }
+
+        // Carregar e exibir compromissos
+        function carregarCompromissos() {
+            const listaCompromissos = document.getElementById('lista-compromissos');
+            
+            if (compromissos.length === 0) {
+                listaCompromissos.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-calendar-plus text-4xl text-blue-400 mb-4"></i>
+                        <p class="text-blue-200">Nenhum compromisso agendado. Clique em "Novo Compromisso" para começar.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Ordenar por data
+            const compromissosOrdenados = [...compromissos].sort((a, b) => 
+                new Date(a.data + ' ' + a.horario) - new Date(b.data + ' ' + b.horario)
+            );
+
+            listaCompromissos.innerHTML = compromissosOrdenados.map(compromisso => {
+                const casoRelacionado = casos.find(c => c.id === compromisso.casoRelacionado);
+                return `
+                    <div class="bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="text-white font-semibold text-lg">${compromisso.titulo}</h4>
+                                <p class="text-blue-300">${new Date(compromisso.data).toLocaleDateString()} às ${compromisso.horario}</p>
+                            </div>
+                            <span class="px-2 py-1 rounded text-xs ${getTipoColor(compromisso.tipo)}">${compromisso.tipo.toUpperCase()}</span>
+                        </div>
+                        ${compromisso.local ? `<p class="text-blue-200 text-sm"><i class="fas fa-map-marker-alt mr-1"></i>${compromisso.local}</p>` : ''}
+                        ${casoRelacionado ? `<p class="text-blue-200 text-sm"><i class="fas fa-folder mr-1"></i>${casoRelacionado.numero} - ${casoRelacionado.cliente}</p>` : ''}
+                        ${compromisso.observacoes ? `<p class="text-blue-200 text-sm mt-2">${compromisso.observacoes}</p>` : ''}
+                        <div class="flex justify-end gap-2 mt-3">
+                            <button onclick="editarCompromisso('${compromisso.id}')" class="text-blue-400 hover:text-blue-300" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="excluirCompromisso('${compromisso.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Atualizar próximos compromissos
+            atualizarProximosCompromissos();
+        }
+
+        // Função auxiliar para cores de tipo
+        function getTipoColor(tipo) {
+            switch(tipo) {
+                case 'audiencia': return 'bg-red-600/30 text-red-200';
+                case 'prazo': return 'bg-yellow-600/30 text-yellow-200';
+                case 'reuniao': return 'bg-blue-600/30 text-blue-200';
+                case 'compromisso': return 'bg-green-600/30 text-green-200';
+                default: return 'bg-gray-600/30 text-gray-200';
+            }
+        }
+
+        // Atualizar próximos compromissos
+        function atualizarProximosCompromissos() {
+            const hoje = new Date();
+            const proximosDias = new Date();
+            proximosDias.setDate(hoje.getDate() + 7);
+
+            const proximosCompromissos = compromissos
+                .filter(c => {
+                    const dataCompromisso = new Date(c.data);
+                    return dataCompromisso >= hoje && dataCompromisso <= proximosDias;
+                })
+                .sort((a, b) => new Date(a.data + ' ' + a.horario) - new Date(b.data + ' ' + b.horario))
+                .slice(0, 5);
+
+            const container = document.getElementById('proximos-compromissos');
+            
+            if (proximosCompromissos.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar text-blue-400 text-2xl mb-2"></i>
+                        <p class="text-blue-200 text-sm">Nenhum compromisso próximo</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = proximosCompromissos.map(comp => `
+                <div class="bg-slate-700/30 rounded p-3 border-l-4 ${getBorderColor(comp.tipo)}">
+                    <div class="text-white font-medium text-sm">${comp.titulo}</div>
+                    <div class="text-blue-300 text-xs">${new Date(comp.data).toLocaleDateString()} - ${comp.horario}</div>
+                    <div class="text-blue-400 text-xs">${comp.tipo}</div>
+                </div>
+            `).join('');
+        }
+
+        // Função auxiliar para cores de borda
+        function getBorderColor(tipo) {
+            switch(tipo) {
+                case 'audiencia': return 'border-red-400';
+                case 'prazo': return 'border-yellow-400';
+                case 'reuniao': return 'border-blue-400';
+                case 'compromisso': return 'border-green-400';
+                default: return 'border-gray-400';
+            }
+        }
+
+        // Atualizar estatísticas da agenda
+        function atualizarEstatisticasAgenda() {
+            const hoje = new Date();
+            const inicioSemana = new Date(hoje);
+            inicioSemana.setDate(hoje.getDate() - hoje.getDay());
+            const fimSemana = new Date(inicioSemana);
+            fimSemana.setDate(inicioSemana.getDate() + 6);
+
+            const compromissosHoje = compromissos.filter(c => 
+                new Date(c.data).toDateString() === hoje.toDateString()
+            ).length;
+
+            const compromissosSemana = compromissos.filter(c => {
+                const dataComp = new Date(c.data);
+                return dataComp >= inicioSemana && dataComp <= fimSemana;
+            }).length;
+
+            const audienciasPendentes = compromissos.filter(c => 
+                c.tipo === 'audiencia' && new Date(c.data) >= hoje
+            ).length;
+
+            const prazosVencendo = compromissos.filter(c => {
+                const dataComp = new Date(c.data);
+                const diffDays = (dataComp - hoje) / (1000 * 60 * 60 * 24);
+                return c.tipo === 'prazo' && diffDays <= 3 && diffDays >= 0;
+            }).length;
+
+            document.getElementById('compromissos-hoje').textContent = compromissosHoje;
+            document.getElementById('compromissos-semana').textContent = compromissosSemana;
+            document.getElementById('audiencias-pendentes').textContent = audienciasPendentes;
+            document.getElementById('prazos-vencendo').textContent = prazosVencendo;
+        }
+
+        // Filtrar compromissos
+        function filtrarCompromissos() {
+            const mesFiltro = document.getElementById('filtro-mes').value;
+            const tipoFiltro = document.getElementById('filtro-tipo-compromisso').value;
+
+            const compromissosFiltrados = compromissos.filter(comp => {
+                const mesCompromisso = new Date(comp.data).getMonth() + 1;
+                const mesStr = mesCompromisso.toString().padStart(2, '0');
+                
+                const matchMes = !mesFiltro || mesStr === mesFiltro;
+                const matchTipo = !tipoFiltro || comp.tipo === tipoFiltro;
+
+                return matchMes && matchTipo;
+            });
+
+            // Atualizar exibição com compromissos filtrados
+            const listaCompromissos = document.getElementById('lista-compromissos');
+            
+            if (compromissosFiltrados.length === 0) {
+                listaCompromissos.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-search text-4xl text-blue-400 mb-4"></i>
+                        <p class="text-blue-200">Nenhum compromisso encontrado com os filtros aplicados.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const compromissosOrdenados = [...compromissosFiltrados].sort((a, b) => 
+                new Date(a.data + ' ' + a.horario) - new Date(b.data + ' ' + b.horario)
+            );
+
+            listaCompromissos.innerHTML = compromissosOrdenados.map(compromisso => {
+                const casoRelacionado = casos.find(c => c.id === compromisso.casoRelacionado);
+                return `
+                    <div class="bg-slate-800/30 rounded-lg p-4 border border-blue-300/20 hover:border-blue-400/40 transition-all">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="text-white font-semibold text-lg">${compromisso.titulo}</h4>
+                                <p class="text-blue-300">${new Date(compromisso.data).toLocaleDateString()} às ${compromisso.horario}</p>
+                            </div>
+                            <span class="px-2 py-1 rounded text-xs ${getTipoColor(compromisso.tipo)}">${compromisso.tipo.toUpperCase()}</span>
+                        </div>
+                        ${compromisso.local ? `<p class="text-blue-200 text-sm"><i class="fas fa-map-marker-alt mr-1"></i>${compromisso.local}</p>` : ''}
+                        ${casoRelacionado ? `<p class="text-blue-200 text-sm"><i class="fas fa-folder mr-1"></i>${casoRelacionado.numero} - ${casoRelacionado.cliente}</p>` : ''}
+                        ${compromisso.observacoes ? `<p class="text-blue-200 text-sm mt-2">${compromisso.observacoes}</p>` : ''}
+                        <div class="flex justify-end gap-2 mt-3">
+                            <button onclick="editarCompromisso('${compromisso.id}')" class="text-blue-400 hover:text-blue-300" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="excluirCompromisso('${compromisso.id}')" class="text-red-400 hover:text-red-300" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Editar compromisso
+        function editarCompromisso(id) {
+            const compromisso = compromissos.find(c => c.id === id);
+            if (!compromisso) return;
+
+            // Preencher formulário
+            document.getElementById('titulo-compromisso').value = compromisso.titulo;
+            document.getElementById('tipo-compromisso').value = compromisso.tipo;
+            document.getElementById('data-compromisso').value = compromisso.data;
+            document.getElementById('horario-compromisso').value = compromisso.horario;
+            document.getElementById('local-compromisso').value = compromisso.local || '';
+            document.getElementById('caso-relacionado').value = compromisso.casoRelacionado || '';
+            document.getElementById('observacoes-compromisso').value = compromisso.observacoes || '';
+
+            abrirModalNovoCompromisso();
+
+            // Alterar botão para edição
+            const botaoSalvar = document.querySelector('#modal-novo-compromisso .btn-primary');
+            const textoOriginal = botaoSalvar.innerHTML;
+            botaoSalvar.innerHTML = '<i class="fas fa-save mr-2"></i>Atualizar';
+            
+            botaoSalvar.onclick = function() {
+                compromisso.titulo = document.getElementById('titulo-compromisso').value;
+                compromisso.tipo = document.getElementById('tipo-compromisso').value;
+                compromisso.data = document.getElementById('data-compromisso').value;
+                compromisso.horario = document.getElementById('horario-compromisso').value;
+                compromisso.local = document.getElementById('local-compromisso').value;
+                compromisso.casoRelacionado = document.getElementById('caso-relacionado').value;
+                compromisso.observacoes = document.getElementById('observacoes-compromisso').value;
+
+                localStorage.setItem('compromissos', JSON.stringify(compromissos));
+                carregarCompromissos();
+                atualizarEstatisticasAgenda();
+                fecharModalNovoCompromisso();
+                
+                showNotification('✅ Compromisso atualizado com sucesso!', 'success');
+
+                // Restaurar botão original
+                botaoSalvar.innerHTML = textoOriginal;
+                botaoSalvar.onclick = salvarNovoCompromisso;
+            };
+        }
+
+        // Excluir compromisso
+        function excluirCompromisso(id) {
+            if (confirm('Deseja realmente excluir este compromisso?')) {
+                compromissos = compromissos.filter(c => c.id !== id);
+                localStorage.setItem('compromissos', JSON.stringify(compromissos));
+                carregarCompromissos();
+                atualizarEstatisticasAgenda();
+                showNotification('✅ Compromisso excluído com sucesso!', 'success');
+            }
+        }
+
+        // Carregar dados das seções
+        function loadCasosData() {
+            casos = JSON.parse(localStorage.getItem('casos') || '[]');
+            if (document.getElementById('lista-casos')) {
+                carregarCasos();
+                atualizarEstatisticasCasos();
+            }
+        }
+
+        function loadAgendaData() {
+            compromissos = JSON.parse(localStorage.getItem('compromissos') || '[]');
+            if (document.getElementById('lista-compromissos')) {
+                carregarCompromissos();
+                atualizarEstatisticasAgenda();
+            }
+        }
 
         // Backup automático dos dados
         function createBackup() {
