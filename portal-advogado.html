@@ -2482,78 +2482,87 @@
             localStorage.setItem('advogado_cidade', cidade);
         }
 
-        // PETIÇÃO INICIAL - Documento específico único
+        // PETIÇÃO INICIAL - Documento específico COM CAMPOS EDITÁVEIS
         function criarPeticaoInicialEspecifica(formData = {}) {
             const dadosAdvogado = obterDadosAdvogado();
             
-            // Dados padrão se não foram fornecidos
-            const dados = {
-                juizExcelentissimo: formData.juizExcelentissimo || 'EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO',
-                requerenteNome: formData.requerenteNome || 'NOME DO REQUERENTE',
-                requerenteQualificacao: formData.requerenteQualificacao || 'brasileiro, solteiro, profissão, portador do RG nº 000.000.000-0, inscrito no CPF sob nº 000.000.000-00',
-                requeridoNome: formData.requeridoNome || 'NOME DO REQUERIDO',
-                requeridoQualificacao: formData.requeridoQualificacao || 'empresa/pessoa, qualificação completa',
-                fundamentacao: formData.fundamentacao || 'DOS FATOS: Expor aqui os fatos que motivaram a ação...',
-                pedidos: formData.pedidos || 'a) Pedido principal;\nb) Pedido subsidiário;',
-                valorCausa: formData.valorCausa || 'R$ 10.000,00',
-                numeroProcesso: formData.numeroProcesso || '0000000-00.0000.0.00.0000',
-                comarca: formData.comarca || 'Brasilândia',
-                vara: formData.vara || '1ª Vara Cível',
-                ...formData
-            };
-
             return `
-                <div class="max-w-4xl mx-auto bg-white p-8 shadow-lg">
+                <div class="max-w-4xl mx-auto bg-white text-black p-8 shadow-lg" style="font-family: 'Times New Roman', serif; line-height: 1.6;">
                     <!-- Cabeçalho do Documento -->
                     <div class="text-center mb-8 border-b-2 border-blue-500 pb-4">
                         <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg mb-4">
-                            <h1 class="text-2xl font-bold">PORTAL JURÍDICO DIGITAL</h1>
-                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica</p>
+                            <h1 class="text-2xl font-bold">⚖️ PORTAL JURÍDICO DIGITAL</h1>
+                            <p class="text-sm opacity-90">Sistema Integrado de Gestão Jurídica - Brasilândia/DF</p>
                         </div>
                         <h2 class="text-xl font-bold text-gray-800">PETIÇÃO INICIAL</h2>
-                        <p class="text-sm text-gray-600 mt-2">Processo nº ${dados.numeroProcesso}</p>
                     </div>
 
-                    <!-- Conteúdo da Petição -->
+                    <!-- Conteúdo da Petição TOTALMENTE EDITÁVEL -->
                     <div class="space-y-6 text-justify">
-                        <p class="font-bold">${dados.juizExcelentissimo}</p>
-                        <p class="font-bold">${dados.vara} da Comarca de ${dados.comarca}</p>
+                        <p class="font-bold">
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO</span>
+                        </p>
+                        
+                        <p class="font-bold">
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">1ª Vara Cível</span> da Comarca de 
+                            <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">Brasilândia</span>
+                        </p>
                         
                         <div class="my-6">
-                            <p><strong>${dados.requerenteNome}</strong>, ${dados.requerenteQualificacao}, 
-                            vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, propor a presente</p>
+                            <p>
+                                <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">NOME DO REQUERENTE</span></strong>, 
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">brasileiro, solteiro, profissão, portador do RG nº 000.000.000-0, inscrito no CPF sob nº 000.000.000-00, residente e domiciliado na [endereço completo]</span>, 
+                                vem, respeitosamente, à presença de Vossa Excelência, por intermédio de seu advogado signatário, propor a presente
+                            </p>
                             
-                            <h3 class="text-center text-lg font-bold my-4">AÇÃO JUDICIAL</h3>
+                            <h3 class="text-center text-lg font-bold my-4">
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">AÇÃO DE COBRANÇA</span>
+                            </h3>
                             
-                            <p>em face de <strong>${dados.requeridoNome}</strong>, ${dados.requeridoQualificacao}, 
-                            pelos fatos e fundamentos jurídicos a seguir expostos:</p>
+                            <p>em face de 
+                                <strong><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">NOME DO REQUERIDO</span></strong>, 
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">qualificação completa do requerido</span>, 
+                                pelos fatos e fundamentos jurídicos a seguir expostos:
+                            </p>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">I - DOS FATOS</h3>
-                            <div class="border border-gray-300 p-4 min-h-32">
-                                <p>${dados.fundamentacao}</p>
-                            </div>
+                            <p><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Expor aqui de forma clara e objetiva os fatos que motivaram a ação judicial. Detalhar cronologicamente os acontecimentos, mencionando datas, valores, documentos e todas as circunstâncias relevantes para o caso. Esta narrativa deve ser precisa e fundamentar juridicamente a pretensão do requerente.</span></p>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">II - DO DIREITO</h3>
-                            <div class="border border-gray-300 p-4 min-h-32">
-                                <p>${dados.fundamentacaoJuridica || 'Apresentar aqui a fundamentação jurídica da pretensão, citando dispositivos legais, jurisprudência e doutrina aplicáveis ao caso concreto.'}</p>
-                            </div>
+                            <p><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Apresentar aqui a fundamentação jurídica da pretensão, citando os dispositivos legais aplicáveis (Código Civil, Código de Processo Civil, Constituição Federal, etc.), jurisprudência dos tribunais superiores e doutrina especializada que sustentam o pedido formulado.</span></p>
                         </div>
 
                         <div class="my-6">
                             <h3 class="text-lg font-bold mb-3">III - DOS PEDIDOS</h3>
                             <p>Diante do exposto, requer-se a Vossa Excelência que se digne:</p>
-                            <div class="border border-gray-300 p-4 min-h-24">
-                                <p>${dados.pedidos}</p>
-                            </div>
+                            <p><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">a) Receber e processar a presente ação;<br>
+                            b) Citar o requerido para, querendo, contestar a presente ação no prazo legal;<br>
+                            c) Ao final, julgar procedente o pedido, condenando o requerido ao pagamento de R$ [valor], devidamente corrigido e acrescido de juros legais;<br>
+                            d) Condenar o requerido ao pagamento das custas processuais e honorários advocatícios.</span></p>
                         </div>
 
-                        <div class="my-6">
-                            <p><strong>Dá-se à causa o valor de ${dados.valorCausa}.</strong></p>
+                        <p>Dá-se à causa o valor de <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">R$ 10.000,00</span>.</p>
+
+                        <div class="mt-8 text-center">
+                            <p>
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">Brasilândia</span>, 
+                                <span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #000;" title="Clique para editar">${new Date().toLocaleDateString('pt-BR')}</span>.
+                            </p>
+                            
+                            <div class="mt-8">
+                                <p class="font-bold"><span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.nome}</span></p>
+                                <p>Advogado</p>
+                                <p>OAB/<span onclick="tornarEditavel(this)" style="cursor: pointer; color: #000; border-bottom: 1px dashed #666;" title="Clique para editar">${dadosAdvogado.oab}</span></p>
+                            </div>
                         </div>
+                    </div>
+        }
+
+        // RECURSO DE APELAÇÃO - Documento específico COM CAMPOS EDITÁVEIS
 
                         <div class="my-6">
                             <p>Protesta-se por todos os meios de prova em direito admitidas, especialmente prova documental, testemunhal e pericial.</p>
