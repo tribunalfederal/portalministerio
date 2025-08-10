@@ -1755,183 +1755,609 @@
         <!-- Agenda Section -->
         <section id="agenda" class="section">
             <div class="space-y-6">
-                <!-- Header da Seção -->
-                <div class="card p-6 bg-gradient-to-r from-indigo-900/40 to-purple-900/40">
-                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                        <div>
-                            <h2 class="text-white text-3xl font-bold mb-2 flex items-center gap-3">
-                                <i class="fas fa-calendar-alt text-blue-400"></i>
-                                Agenda e Compromissos
-                            </h2>
-                            <p class="text-blue-200">Gerencie audiências, prazos e compromissos</p>
+                <!-- Header Principal com Sincronização -->
+                <div class="card p-6 bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-indigo-500/20">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="p-3 bg-indigo-600/20 rounded-lg border border-indigo-500/30">
+                                    <i class="fas fa-calendar-alt text-indigo-400 text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-white text-3xl font-bold">Agenda Jurídica Integrada</h2>
+                                    <p class="text-indigo-200 text-lg">Sincronizada com casos e sistema judiciário</p>
+                                </div>
+                                <div class="hidden lg:flex items-center gap-2 px-3 py-1 bg-green-600/20 border border-green-500/30 rounded-full">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    <span class="text-green-300 text-sm font-semibold">Sincronizado</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Status Rápido -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                                <div class="bg-blue-600/10 border border-blue-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-blue-400 text-xl font-bold" id="eventos-hoje">0</div>
+                                    <div class="text-blue-300 text-xs">Hoje</div>
+                                </div>
+                                <div class="bg-yellow-600/10 border border-yellow-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-yellow-400 text-xl font-bold" id="audiencias-semana">0</div>
+                                    <div class="text-yellow-300 text-xs">Audiências Semana</div>
+                                </div>
+                                <div class="bg-red-600/10 border border-red-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-red-400 text-xl font-bold" id="prazos-urgentes">0</div>
+                                    <div class="text-red-300 text-xs">Prazos Urgentes</div>
+                                </div>
+                                <div class="bg-green-600/10 border border-green-500/20 rounded-lg p-3 text-center">
+                                    <div class="text-green-400 text-xl font-bold" id="casos-movimento">0</div>
+                                    <div class="text-green-300 text-xs">Casos em Movimento</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex gap-3">
-                            <button onclick="abrirModalNovoCompromisso()" class="btn bg-green-600 hover:bg-green-700 text-white">
-                                <i class="fas fa-plus mr-2"></i>Novo Compromisso
+                        
+                        <!-- Ações Principais -->
+                        <div class="flex flex-col gap-3">
+                            <button onclick="abrirModalNovoEvento()" class="btn bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg font-semibold rounded-lg shadow-lg">
+                                <i class="fas fa-plus-circle mr-2"></i>Novo Evento
                             </button>
-                            <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                            <button onclick="sincronizarAgenda()" class="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
+                                <i class="fas fa-sync-alt mr-2"></i>Sincronizar
+                            </button>
+                            <button onclick="showSection('dashboard')" class="btn bg-gray-600 hover:bg-gray-700 text-white px-6 py-3">
                                 <i class="fas fa-arrow-left mr-2"></i>Dashboard
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Estatísticas da Agenda -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-green-400 mb-1" id="compromissos-hoje">0</div>
-                        <div class="text-blue-200 text-sm">Hoje</div>
+                <!-- Dashboard de Eventos por Tipo -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Audiências Agendadas -->
+                    <div class="card p-6 bg-gradient-to-br from-blue-900/20 to-blue-800/10 border border-blue-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-blue-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-gavel text-blue-400"></i>
+                                Audiências
+                            </h3>
+                            <span class="bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-audiencias">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-48 overflow-y-auto" id="lista-audiencias">
+                            <div class="text-center py-4 text-blue-400/60">
+                                <i class="fas fa-calendar-check text-2xl mb-2"></i>
+                                <p class="text-xs">Nenhuma audiência agendada</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodasAudiencias()" class="mt-4 w-full btn bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30">
+                            Ver Todas
+                        </button>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-yellow-400 mb-1" id="compromissos-semana">0</div>
-                        <div class="text-blue-200 text-sm">Esta Semana</div>
+
+                    <!-- Prazos de Casos -->
+                    <div class="card p-6 bg-gradient-to-br from-red-900/20 to-red-800/10 border border-red-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-red-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-clock text-red-400"></i>
+                                Prazos
+                            </h3>
+                            <span class="bg-red-600/20 text-red-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-prazos">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-48 overflow-y-auto" id="lista-prazos">
+                            <div class="text-center py-4 text-red-400/60">
+                                <i class="fas fa-hourglass-half text-2xl mb-2"></i>
+                                <p class="text-xs">Nenhum prazo urgente</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodosPrazos()" class="mt-4 w-full btn bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/30">
+                            Ver Todos
+                        </button>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-blue-400 mb-1" id="audiencias-pendentes">0</div>
-                        <div class="text-blue-200 text-sm">Audiências</div>
+
+                    <!-- Notificações do Sistema -->
+                    <div class="card p-6 bg-gradient-to-br from-purple-900/20 to-purple-800/10 border border-purple-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-purple-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-bell text-purple-400"></i>
+                                Notificações
+                            </h3>
+                            <span class="bg-purple-600/20 text-purple-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-notificacoes">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-48 overflow-y-auto" id="lista-notificacoes">
+                            <div class="text-center py-4 text-purple-400/60">
+                                <i class="fas fa-bell-slash text-2xl mb-2"></i>
+                                <p class="text-xs">Nenhuma notificação</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodasNotificacoes()" class="mt-4 w-full btn bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30">
+                            Ver Todas
+                        </button>
                     </div>
-                    <div class="card p-4 text-center">
-                        <div class="text-3xl font-bold text-red-400 mb-1" id="prazos-vencendo">0</div>
-                        <div class="text-blue-200 text-sm">Prazos Urgentes</div>
+
+                    <!-- Compromissos Pessoais -->
+                    <div class="card p-6 bg-gradient-to-br from-green-900/20 to-green-800/10 border border-green-500/20">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-green-300 font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-user-clock text-green-400"></i>
+                                Compromissos
+                            </h3>
+                            <span class="bg-green-600/20 text-green-300 px-3 py-1 rounded-full text-sm font-semibold" id="count-compromissos">0</span>
+                        </div>
+                        <div class="space-y-3 max-h-48 overflow-y-auto" id="lista-compromissos-pessoais">
+                            <div class="text-center py-4 text-green-400/60">
+                                <i class="fas fa-calendar-plus text-2xl mb-2"></i>
+                                <p class="text-xs">Nenhum compromisso</p>
+                            </div>
+                        </div>
+                        <button onclick="verTodosCompromissos()" class="mt-4 w-full btn bg-green-600/20 hover:bg-green-600/30 text-green-300 border border-green-500/30">
+                            Ver Todos
+                        </button>
                     </div>
                 </div>
 
-                <!-- Calendário e Filtros -->
+                <!-- Calendário Visual e Timeline -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Calendário -->
+                    <!-- Calendário Mensal -->
                     <div class="lg:col-span-2 card p-6">
-                        <h3 class="text-white font-bold text-lg mb-4">Calendário</h3>
-                        <div id="calendario" class="bg-slate-800/30 rounded-lg p-4">
-                            <!-- Calendário será inserido aqui -->
-                            <div class="grid grid-cols-7 gap-2 text-center">
-                                <div class="text-blue-300 font-semibold p-2">Dom</div>
-                                <div class="text-blue-300 font-semibold p-2">Seg</div>
-                                <div class="text-blue-300 font-semibold p-2">Ter</div>
-                                <div class="text-blue-300 font-semibold p-2">Qua</div>
-                                <div class="text-blue-300 font-semibold p-2">Qui</div>
-                                <div class="text-blue-300 font-semibold p-2">Sex</div>
-                                <div class="text-blue-300 font-semibold p-2">Sáb</div>
-                                <!-- Dias do mês serão inseridos dinamicamente -->
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                                <i class="fas fa-calendar text-indigo-400"></i>
+                                Calendário Mensal
+                            </h3>
+                            <div class="flex items-center gap-3">
+                                <button onclick="mesAnterior()" class="btn bg-slate-700 hover:bg-slate-600 text-white p-2">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span class="text-white font-semibold text-lg" id="mes-ano-atual">Agosto 2025</span>
+                                <button onclick="proximoMes()" class="btn bg-slate-700 hover:bg-slate-600 text-white p-2">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
+                            <div class="grid grid-cols-7 gap-2 mb-4">
+                                <div class="text-indigo-300 font-semibold text-center py-2">Dom</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Seg</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Ter</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Qua</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Qui</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Sex</div>
+                                <div class="text-indigo-300 font-semibold text-center py-2">Sáb</div>
+                            </div>
+                            <div id="dias-calendario" class="grid grid-cols-7 gap-2">
+                                <!-- Dias serão inseridos dinamicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Legenda -->
+                        <div class="mt-4 flex flex-wrap gap-4 text-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-blue-500 rounded"></div>
+                                <span class="text-blue-300">Audiências</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-red-500 rounded"></div>
+                                <span class="text-red-300">Prazos</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-purple-500 rounded"></div>
+                                <span class="text-purple-300">Sistema</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-green-500 rounded"></div>
+                                <span class="text-green-300">Compromissos</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Próximos Compromissos -->
+                    <!-- Timeline do Dia/Próximos Eventos -->
                     <div class="card p-6">
-                        <h3 class="text-white font-bold text-lg mb-4">Próximos Compromissos</h3>
-                        <div id="proximos-compromissos" class="space-y-3">
-                            <!-- Compromissos serão inseridos aqui -->
-                            <div class="text-center py-4">
-                                <i class="fas fa-calendar text-blue-400 text-2xl mb-2"></i>
-                                <p class="text-blue-200 text-sm">Nenhum compromisso próximo</p>
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-white font-bold text-lg flex items-center gap-2">
+                                <i class="fas fa-clock text-yellow-400"></i>
+                                Timeline Hoje
+                            </h3>
+                            <span class="text-yellow-300 text-sm" id="data-hoje">10/08/2025</span>
+                        </div>
+                        
+                        <div class="space-y-4 max-h-96 overflow-y-auto" id="timeline-hoje">
+                            <div class="text-center py-8">
+                                <i class="fas fa-calendar-day text-4xl text-yellow-400/30 mb-3"></i>
+                                <h4 class="text-gray-400 mb-2">Nenhum evento hoje</h4>
+                                <p class="text-gray-500 text-sm">Sua agenda está livre!</p>
+                            </div>
+                        </div>
+
+                        <!-- Próximos Eventos -->
+                        <div class="mt-6 pt-4 border-t border-slate-600/30">
+                            <h4 class="text-gray-300 font-semibold mb-3 flex items-center gap-2">
+                                <i class="fas fa-forward text-gray-400"></i>
+                                Próximos 7 Dias
+                            </h4>
+                            <div class="space-y-3" id="proximos-eventos">
+                                <!-- Próximos eventos serão listados aqui -->
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Lista Completa de Compromissos -->
+                <!-- Painel de Filtros e Busca -->
                 <div class="card p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-white font-bold text-lg">Todos os Compromissos</h3>
-                        <div class="flex gap-2">
-                            <select id="filtro-mes" onchange="filtrarCompromissos()" 
-                                    class="px-3 py-1 bg-slate-800/50 border border-blue-300/30 rounded text-white text-sm">
-                                <option value="">Todos os Meses</option>
-                                <option value="01">Janeiro</option>
-                                <option value="02">Fevereiro</option>
-                                <option value="03">Março</option>
-                                <option value="04">Abril</option>
-                                <option value="05">Maio</option>
-                                <option value="06">Junho</option>
-                                <option value="07">Julho</option>
-                                <option value="08">Agosto</option>
-                                <option value="09">Setembro</option>
-                                <option value="10">Outubro</option>
-                                <option value="11">Novembro</option>
-                                <option value="12">Dezembro</option>
-                            </select>
-                            <select id="filtro-tipo-compromisso" onchange="filtrarCompromissos()" 
-                                    class="px-3 py-1 bg-slate-800/50 border border-blue-300/30 rounded text-white text-sm">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                            <i class="fas fa-filter text-indigo-400"></i>
+                            Filtros e Busca de Eventos
+                        </h3>
+                        <button onclick="limparFiltrosAgenda()" class="btn bg-gray-600 hover:bg-gray-700 text-white">
+                            <i class="fas fa-eraser mr-2"></i>Limpar Filtros
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">
+                                <i class="fas fa-search mr-2"></i>Buscar:
+                            </label>
+                            <input type="text" id="busca-eventos" placeholder="Evento, local, caso..." 
+                                   onkeyup="aplicarFiltrosAgenda()" 
+                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white placeholder-indigo-300/50 focus:border-indigo-400 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">
+                                <i class="fas fa-list-alt mr-2"></i>Tipo:
+                            </label>
+                            <select id="filtro-tipo-evento" onchange="aplicarFiltrosAgenda()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
                                 <option value="">Todos os Tipos</option>
-                                <option value="audiencia">Audiência</option>
-                                <option value="prazo">Prazo</option>
-                                <option value="reuniao">Reunião</option>
-                                <option value="compromisso">Compromisso</option>
+                                <option value="audiencia">Audiências</option>
+                                <option value="prazo">Prazos</option>
+                                <option value="notificacao">Notificações</option>
+                                <option value="compromisso">Compromissos</option>
+                                <option value="reuniao">Reuniões</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">
+                                <i class="fas fa-calendar-alt mr-2"></i>Período:
+                            </label>
+                            <select id="filtro-periodo-agenda" onchange="aplicarFiltrosAgenda()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                <option value="todos">Todos os Períodos</option>
+                                <option value="hoje">Hoje</option>
+                                <option value="amanha">Amanhã</option>
+                                <option value="semana">Esta Semana</option>
+                                <option value="mes">Este Mês</option>
+                                <option value="personalizado">Período Personalizado</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">
+                                <i class="fas fa-folder mr-2"></i>Caso:
+                            </label>
+                            <select id="filtro-caso-agenda" onchange="aplicarFiltrosAgenda()" 
+                                    class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                <option value="">Todos os Casos</option>
+                                <!-- Casos serão carregados dinamicamente dos casos ativos -->
                             </select>
                         </div>
                     </div>
-                    <div id="lista-compromissos" class="space-y-3">
-                        <!-- Compromissos serão inseridos aqui -->
-                        <div class="text-center py-8">
-                            <i class="fas fa-calendar-plus text-4xl text-blue-400 mb-4"></i>
-                            <p class="text-blue-200">Nenhum compromisso agendado. Clique em "Novo Compromisso" para começar.</p>
+
+                    <!-- Período Personalizado (oculto inicialmente) -->
+                    <div id="periodo-personalizado" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" style="display: none;">
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">Data Início:</label>
+                            <input type="date" id="data-inicio-filtro" onchange="aplicarFiltrosAgenda()" 
+                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-indigo-300 font-semibold mb-2">Data Fim:</label>
+                            <input type="date" id="data-fim-filtro" onchange="aplicarFiltrosAgenda()" 
+                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista Completa de Eventos -->
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-white font-bold text-xl flex items-center gap-2">
+                            <i class="fas fa-list text-indigo-400"></i>
+                            Todos os Eventos da Agenda
+                            <span class="bg-indigo-600/20 text-indigo-300 px-3 py-1 rounded-full text-sm font-semibold ml-2" id="total-eventos-exibidos">0</span>
+                        </h3>
+                        
+                        <div class="flex gap-3">
+                            <button onclick="exportarAgenda()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                <i class="fas fa-file-excel mr-2"></i>Exportar
+                            </button>
+                            <button onclick="imprimirAgenda()" class="btn bg-blue-600 hover:bg-blue-700 text-white">
+                                <i class="fas fa-print mr-2"></i>Imprimir
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Timeline de Eventos -->
+                    <div class="space-y-4" id="lista-eventos-completa">
+                        <!-- Eventos serão inseridos aqui dinamicamente -->
+                        <div class="text-center py-12">
+                            <div class="flex flex-col items-center gap-4">
+                                <i class="fas fa-calendar-alt text-6xl text-indigo-400/30"></i>
+                                <div>
+                                    <h4 class="text-gray-400 text-xl mb-2">Nenhum evento encontrado</h4>
+                                    <p class="text-gray-500 mb-6">Clique em "Novo Evento" para começar a organizar sua agenda</p>
+                                    <button onclick="abrirModalNovoEvento()" class="btn bg-green-600 hover:bg-green-700 text-white">
+                                        <i class="fas fa-plus mr-2"></i>Criar Primeiro Evento
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paginação -->
+                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-indigo-300/20">
+                        <div class="text-indigo-300 text-sm">
+                            Mostrando <span id="eventos-inicio">0</span> a <span id="eventos-fim">0</span> de <span id="eventos-total">0</span> eventos
+                        </div>
+                        <div class="flex gap-2" id="paginacao-eventos">
+                            <!-- Botões de paginação serão inseridos aqui -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modal Novo Compromisso -->
-            <div id="modal-novo-compromisso" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="text-white text-xl font-bold">Novo Compromisso</h3>
-                        <button onclick="fecharModalNovoCompromisso()" class="text-gray-400 hover:text-white">
+            <!-- Modal Novo Evento - Design Profissional Sincronizado -->
+            <div id="modal-novo-evento" class="modal">
+                <div class="modal-content max-w-5xl">
+                    <div class="modal-header bg-gradient-to-r from-indigo-600 to-purple-700">
+                        <h3 class="text-white text-2xl font-bold flex items-center gap-3">
+                            <div class="p-2 bg-white/20 rounded-lg">
+                                <i class="fas fa-calendar-plus text-2xl"></i>
+                            </div>
+                            Novo Evento na Agenda
+                        </h3>
+                        <button onclick="fecharModalNovoEvento()" class="text-white/80 hover:text-white text-2xl">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
+                    
                     <div class="modal-body">
-                        <form id="form-novo-compromisso">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Título:</label>
-                                    <input type="text" id="titulo-compromisso" required 
-                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                        <form id="form-novo-evento" onsubmit="salvarNovoEvento(event)">
+                            <!-- Seção 1: Tipo de Evento e Sincronização -->
+                            <div class="bg-slate-800/30 rounded-lg p-6 border border-slate-600/30 mb-6">
+                                <h4 class="text-indigo-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-tags text-indigo-400"></i>
+                                    Tipo de Evento e Sincronização
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-indigo-300 font-semibold mb-2">
+                                            <i class="fas fa-list-alt mr-2"></i>Tipo de Evento *
+                                        </label>
+                                        <select id="tipo-evento-novo" required onchange="atualizarCamposEvento()"
+                                                class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                            <option value="">Selecione o tipo...</option>
+                                            <option value="audiencia">🏛️ Audiência (Agendada pelo Juiz)</option>
+                                            <option value="prazo">⏰ Prazo Processual (Automático)</option>
+                                            <option value="notificacao">🔔 Notificação do Sistema</option>
+                                            <option value="compromisso">👤 Compromisso Pessoal</option>
+                                            <option value="reuniao">🤝 Reunião com Cliente</option>
+                                            <option value="estudo">📚 Estudo de Caso</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-indigo-300 font-semibold mb-2">
+                                            <i class="fas fa-folder mr-2"></i>Caso Relacionado
+                                        </label>
+                                        <select id="caso-relacionado-evento" onchange="carregarDadosCaso()"
+                                                class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                            <option value="">Selecionar caso...</option>
+                                            <!-- Casos serão carregados dinamicamente da seção casos -->
+                                        </select>
+                                        <p class="text-indigo-300/70 text-xs mt-1">Vincule este evento a um caso específico</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Tipo:</label>
-                                    <select id="tipo-compromisso" required 
-                                            class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                        <option value="">Selecione...</option>
-                                        <option value="audiencia">Audiência</option>
-                                        <option value="prazo">Prazo</option>
-                                        <option value="reuniao">Reunião</option>
-                                        <option value="compromisso">Compromisso</option>
-                                    </select>
+
+                                <!-- Informações do Caso Selecionado -->
+                                <div id="info-caso-selecionado" class="mt-4 p-4 bg-blue-900/20 rounded-lg border border-blue-400/20" style="display: none;">
+                                    <h5 class="text-blue-300 font-semibold mb-2 flex items-center gap-2">
+                                        <i class="fas fa-info-circle text-blue-400"></i>
+                                        Informações do Caso Vinculado
+                                    </h5>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                        <div>
+                                            <span class="text-blue-300">Cliente:</span>
+                                            <div class="text-white font-medium" id="caso-cliente">-</div>
+                                        </div>
+                                        <div>
+                                            <span class="text-blue-300">Processo:</span>
+                                            <div class="text-white font-medium" id="caso-processo">-</div>
+                                        </div>
+                                        <div>
+                                            <span class="text-blue-300">Juiz:</span>
+                                            <div class="text-white font-medium" id="caso-juiz">-</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Data:</label>
-                                    <input type="date" id="data-compromisso" required 
-                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
+                            </div>
+
+                            <!-- Seção 2: Detalhes do Evento -->
+                            <div class="bg-indigo-900/20 rounded-lg p-6 border border-indigo-400/30 mb-6">
+                                <h4 class="text-indigo-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-calendar-day text-indigo-400"></i>
+                                    Detalhes do Evento
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 gap-6">
+                                    <div>
+                                        <label class="block text-indigo-300 font-semibold mb-2">
+                                            <i class="fas fa-heading mr-2"></i>Título do Evento *
+                                        </label>
+                                        <input type="text" id="titulo-evento-novo" required 
+                                               class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none"
+                                               placeholder="Ex: Audiência de Instrução - Caso Silva">
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div>
+                                            <label class="block text-indigo-300 font-semibold mb-2">
+                                                <i class="fas fa-calendar mr-2"></i>Data *
+                                            </label>
+                                            <input type="date" id="data-evento-novo" required 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-indigo-300 font-semibold mb-2">
+                                                <i class="fas fa-clock mr-2"></i>Horário *
+                                            </label>
+                                            <input type="time" id="horario-evento-novo" required 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-indigo-300 font-semibold mb-2">
+                                                <i class="fas fa-hourglass-half mr-2"></i>Duração (minutos)
+                                            </label>
+                                            <input type="number" id="duracao-evento-novo" min="15" step="15" value="60" 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-indigo-300 font-semibold mb-2">
+                                                <i class="fas fa-map-marker-alt mr-2"></i>Local/Sala
+                                            </label>
+                                            <input type="text" id="local-evento-novo" 
+                                                   class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none"
+                                                   placeholder="Ex: Sala 3 - 1ª Vara Cível">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-indigo-300 font-semibold mb-2">
+                                                <i class="fas fa-flag mr-2"></i>Prioridade *
+                                            </label>
+                                            <select id="prioridade-evento-novo" required 
+                                                    class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none">
+                                                <option value="normal">Normal</option>
+                                                <option value="alta">Alta</option>
+                                                <option value="urgente">Urgente</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Horário:</label>
-                                    <input type="time" id="horario-compromisso" required 
-                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Local:</label>
-                                    <input type="text" id="local-compromisso" 
-                                           class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Caso Relacionado:</label>
-                                    <select id="caso-relacionado" 
-                                            class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white">
-                                        <option value="">Selecione um caso...</option>
-                                        <!-- Casos serão carregados dinamicamente -->
-                                    </select>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-blue-200 text-sm font-medium mb-2">Observações:</label>
-                                    <textarea id="observacoes-compromisso" rows="3" 
-                                              class="w-full px-3 py-2 bg-slate-800/50 border border-blue-300/30 rounded text-white"></textarea>
+                            </div>
+
+                            <!-- Seção 3: Observações e Configurações -->
+                            <div class="bg-slate-700/30 rounded-lg p-6 border border-slate-500/30 mb-6">
+                                <h4 class="text-indigo-300 font-semibold mb-6 flex items-center gap-2">
+                                    <i class="fas fa-cog text-indigo-400"></i>
+                                    Observações e Configurações
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 gap-6">
+                                    <div>
+                                        <label class="block text-indigo-300 font-semibold mb-2">
+                                            <i class="fas fa-comment-alt mr-2"></i>Descrição/Observações
+                                        </label>
+                                        <textarea id="descricao-evento-novo" rows="3" 
+                                                  class="w-full px-4 py-3 bg-slate-800/50 border border-indigo-300/30 rounded-lg text-white focus:border-indigo-400 focus:outline-none"
+                                                  placeholder="Detalhes adicionais sobre o evento..."></textarea>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" id="lembrete-evento" checked
+                                                   class="w-4 h-4 text-indigo-600 bg-slate-800 border-indigo-300 rounded focus:ring-indigo-500">
+                                            <label for="lembrete-evento" class="text-indigo-300 font-semibold">
+                                                <i class="fas fa-bell mr-2"></i>Criar Lembrete
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" id="sincronizar-evento" checked
+                                                   class="w-4 h-4 text-indigo-600 bg-slate-800 border-indigo-300 rounded focus:ring-indigo-500">
+                                            <label for="sincronizar-evento" class="text-indigo-300 font-semibold">
+                                                <i class="fas fa-sync mr-2"></i>Sincronizar Sistema
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" id="notificar-cliente"
+                                                   class="w-4 h-4 text-indigo-600 bg-slate-800 border-indigo-300 rounded focus:ring-indigo-500">
+                                            <label for="notificar-cliente" class="text-indigo-300 font-semibold">
+                                                <i class="fas fa-envelope mr-2"></i>Notificar Cliente
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button onclick="fecharModalNovoCompromisso()" class="btn btn-secondary mr-3">Cancelar</button>
-                        <button onclick="salvarNovoCompromisso()" class="btn btn-primary">Salvar Compromisso</button>
+                    
+                    <div class="modal-footer bg-slate-800/50 border-t border-slate-600/30">
+                        <div class="flex flex-col sm:flex-row gap-3 justify-end">
+                            <button onclick="fecharModalNovoEvento()" class="btn bg-gray-600 hover:bg-gray-700 text-white px-6 py-3">
+                                <i class="fas fa-times mr-2"></i>Cancelar
+                            </button>
+                            <button onclick="salvarRascunhoEvento()" class="btn bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3">
+                                <i class="fas fa-save mr-2"></i>Salvar Rascunho
+                            </button>
+                            <button onclick="salvarNovoEvento()" class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3">
+                                <i class="fas fa-calendar-check mr-2"></i>Criar Evento
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Visualização de Evento -->
+            <div id="modal-visualizar-evento" class="modal">
+                <div class="modal-content max-w-4xl">
+                    <div class="modal-header bg-gradient-to-r from-indigo-600 to-indigo-700">
+                        <h3 class="text-white text-2xl font-bold flex items-center gap-3">
+                            <div class="p-2 bg-white/20 rounded-lg">
+                                <i class="fas fa-calendar-day text-2xl"></i>
+                            </div>
+                            <span id="titulo-evento-visualizar">Detalhes do Evento</span>
+                        </h3>
+                        <button onclick="fecharModalVisualizarEvento()" class="text-white/80 hover:text-white text-2xl">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div id="conteudo-evento-visualizar">
+                            <!-- Conteúdo dinâmico do evento será inserido aqui -->
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer bg-slate-800/50 border-t border-slate-600/30">
+                        <div class="flex flex-col sm:flex-row gap-3 justify-between">
+                            <div class="flex gap-3">
+                                <button onclick="imprimirEvento()" class="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3">
+                                    <i class="fas fa-print mr-2"></i>Imprimir
+                                </button>
+                                <button onclick="exportarEventoICS()" class="btn bg-purple-600 hover:bg-purple-700 text-white px-6 py-3">
+                                    <i class="fas fa-calendar-plus mr-2"></i>Exportar (.ics)
+                                </button>
+                            </div>
+                            
+                            <div class="flex gap-3">
+                                <button onclick="editarEvento()" class="btn bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3">
+                                    <i class="fas fa-edit mr-2"></i>Editar
+                                </button>
+                                <button onclick="removerEvento()" class="btn bg-red-600 hover:bg-red-700 text-white px-6 py-3">
+                                    <i class="fas fa-trash mr-2"></i>Remover
+                                </button>
+                                <button onclick="fecharModalVisualizarEvento()" class="btn bg-gray-600 hover:bg-gray-700 text-white px-6 py-3">
+                                    <i class="fas fa-times mr-2"></i>Fechar
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
